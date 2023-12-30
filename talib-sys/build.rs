@@ -1,17 +1,19 @@
 extern crate bindgen;
 
-// use std::env;
+use std::env;
 use std::path::PathBuf;
 
 fn main() {
     println!("cargo:rustc-link-lib=static=ta_lib");
+    let ta_library_path = env::var("TA_LIBRARY_PATH").unwrap_or("dependencies/lib".to_string());
+    let ta_include_path = env::var("TA_INCLUDE_PATH").unwrap_or("dependencies/include".to_string());
+    println!("cargo:rustc-link-search=native={ta_library_path}");
     println!("cargo:rustc-link-search=native=../dependencies/lib");
-    println!("cargo:rustc-link-search=native=dependencies/lib");
     let bindings = bindgen::Builder::default()
         // The input header we would like to generate
         // bindings for.
         .header("wrapper.h")
-        .clang_arg("-Idependencies/include")
+        .clang_arg(format!("-I{}", ta_include_path))
         .clang_arg("-I../dependencies/include")
         .clang_arg("-v")
         // Generate rustified enums

@@ -36,6 +36,11 @@ jobs:
           args: --release --out dist --find-interpreter
           sccache: 'true'
           manylinux: auto
+          before-script-linux: ./utils/build_talib.bash $DEPS_PATH
+        env:
+          DEPS_PATH: ${{ github.workspace }}/dependencies
+          TA_INCLUDE_PATH: ${{ github.workspace }}/dependencies/include
+          TA_LIBRARY_PATH: ${{ github.workspace }}/dependencies/lib
       - name: Upload wheels
         uses: actions/upload-artifact@v3
         with:
@@ -59,6 +64,11 @@ jobs:
           target: ${{ matrix.target }}
           args: --release --out dist --find-interpreter
           sccache: 'true'
+          before-script-linux: ./utils/build_talib.bash $DEPS_PATH
+        env:
+          DEPS_PATH: ${{ github.workspace }}/dependencies
+          TA_INCLUDE_PATH: ${{ github.workspace }}/dependencies/include
+          TA_LIBRARY_PATH: ${{ github.workspace }}/dependencies/lib
       - name: Upload wheels
         uses: actions/upload-artifact@v3
         with:
@@ -81,22 +91,12 @@ jobs:
           target: ${{ matrix.target }}
           args: --release --out dist --find-interpreter
           sccache: 'true'
+          before-script-linux: ./utils/build_talib.bash $DEPS_PATH
+        env:
+          DEPS_PATH: ${{ github.workspace }}/dependencies
+          TA_INCLUDE_PATH: ${{ github.workspace }}/dependencies/include
+          TA_LIBRARY_PATH: ${{ github.workspace }}/dependencies/lib
       - name: Upload wheels
-        uses: actions/upload-artifact@v3
-        with:
-          name: wheels
-          path: dist
-
-  sdist:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Build sdist
-        uses: PyO3/maturin-action@v1
-        with:
-          command: sdist
-          args: --out dist
-      - name: Upload sdist
         uses: actions/upload-artifact@v3
         with:
           name: wheels
