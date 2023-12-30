@@ -36,9 +36,8 @@ jobs:
           args: --release --out dist --find-interpreter
           sccache: 'true'
           manylinux: auto
-          before-script-linux: ./utils/build_talib.bash $DEPS_PATH
+          before-script-linux: ./utils/build_talib.bash ${{ github.workspace }}/dependencies
         env:
-          DEPS_PATH: ${{ github.workspace }}/dependencies
           TA_INCLUDE_PATH: ${{ github.workspace }}/dependencies/include
           TA_LIBRARY_PATH: ${{ github.workspace }}/dependencies/lib
       - name: Upload wheels
@@ -58,13 +57,17 @@ jobs:
         with:
           python-version: '3.10'
           architecture: ${{ matrix.target }}
+      - name: Build Ta-Lib
+        run: |
+          ./utils/build_talib.bash $DEPS_PATH
+        env:
+          DEPS_PATH: ${{ github.workspace }}/dependencies   
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.target }}
           args: --release --out dist --find-interpreter
           sccache: 'true'
-          before-script-linux: ./utils/build_talib.bash $DEPS_PATH
         env:
           DEPS_PATH: ${{ github.workspace }}/dependencies
           TA_INCLUDE_PATH: ${{ github.workspace }}/dependencies/include
@@ -85,13 +88,18 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: '3.10'
+      - name: Build Ta-Lib
+        run: |
+          ./utils/build_talib.bash $DEPS_PATH
+        env:
+            DEPS_PATH: ${{ github.workspace }}/dependencies         
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.target }}
           args: --release --out dist --find-interpreter
           sccache: 'true'
-          before-script-linux: ./utils/build_talib.bash $DEPS_PATH
+          before-script-linux: 
         env:
           DEPS_PATH: ${{ github.workspace }}/dependencies
           TA_INCLUDE_PATH: ${{ github.workspace }}/dependencies/include
