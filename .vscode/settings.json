@@ -1,0 +1,6 @@
+{
+    "rust-analyzer.linkedProjects": [
+        "./talib-sys/Cargo.toml",
+        "./Cargo.toml"
+    ]
+}
