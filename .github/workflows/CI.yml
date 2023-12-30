@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        target: [x86_64, x86, aarch64, armv7, s390x, ppc64le]
+        target: [x86_64, x86, aarch64, armv7]
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
@@ -36,8 +36,8 @@ jobs:
           args: --release --out dist --find-interpreter
           sccache: 'true'
           manylinux: auto
-          before-script-linux: ./utils/build_talib.bash ${{ github.workspace }}/dependencies
         env:
+          DEPS_PATH: ${{ github.workspace }}/dependencies
           TA_INCLUDE_PATH: ${{ github.workspace }}/dependencies/include
           TA_LIBRARY_PATH: ${{ github.workspace }}/dependencies/lib
       - name: Upload wheels
@@ -57,11 +57,6 @@ jobs:
         with:
           python-version: '3.10'
           architecture: ${{ matrix.target }}
-      - name: Build Ta-Lib
-        run: |
-          ./utils/build_talib.bash $DEPS_PATH
-        env:
-          DEPS_PATH: ${{ github.workspace }}/dependencies   
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
@@ -87,19 +82,13 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
-      - name: Build Ta-Lib
-        run: |
-          ./utils/build_talib.bash $DEPS_PATH
-        env:
-            DEPS_PATH: ${{ github.workspace }}/dependencies         
+          python-version: '3.10'  
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.target }}
           args: --release --out dist --find-interpreter
           sccache: 'true'
-          before-script-linux: 
         env:
           DEPS_PATH: ${{ github.workspace }}/dependencies
           TA_INCLUDE_PATH: ${{ github.workspace }}/dependencies/include
