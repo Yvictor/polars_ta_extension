@@ -14,7 +14,7 @@ fn main() {
     );
     let cwd = env::current_dir().unwrap();
     let deps_dir = PathBuf::from(
-        &env::var("DEPS_DIR").unwrap_or(cwd.join("dependencies").display().to_string()),
+        &env::var("DEPS_PATH").unwrap_or(cwd.join("dependencies").display().to_string()),
     );
     let tmp_dir = deps_dir.join("tmp");
     let file_gz_path = tmp_dir.join(ta_lib_gz);
@@ -51,6 +51,11 @@ fn main() {
         .current_dir(&tmp_dir.join("ta-lib"))
         .status()
         .expect("Failed to run configure command");
+
+    Command::new("make")
+        .current_dir(&tmp_dir.join("ta-lib"))
+        .status()
+        .expect("Failed to run make command");
 
     Command::new("make")
         .arg("install")
