@@ -48,7 +48,7 @@ jobs:
                 fi
             else
                 # If we're running on debian-based system.
-                apt update -y && apt-get install -y libssl-dev openssl pkg-config libclang-dev
+                apt update -y && apt-get install -y libssl-dev openssl pkg-config libclang-dev gcc-multilib
             fi
         env:
           DEPS_PATH: ${{ github.workspace }}/dependencies
