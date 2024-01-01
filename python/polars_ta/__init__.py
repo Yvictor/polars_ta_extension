@@ -71,7 +71,7 @@ class TAExpr:
     def ht_dcperiod(self) -> pl.Expr:
         """Hilbert Transform - Dominant Cycle Period (Cycle Indicators)
         pl.col("close").ta.ht_dcperiod()
-        
+
         Inputs:
             real: (any ndarray)
         Outputs:
@@ -106,10 +106,7 @@ class TAExpr:
             is_elementwise=False,
         )
 
-
-    def aroon(
-        self, low: IntoExpr = pl.col("low"), timeperiod: int = 14
-    ) -> pl.Expr:
+    def aroon(self, low: IntoExpr = pl.col("low"), timeperiod: int = 14) -> pl.Expr:
         """Aroon (Momentum Indicators)
         pl.col("high").ta.aroon("low", [, timeperiod=?])
         Inputs:
@@ -127,5 +124,33 @@ class TAExpr:
                 "timeperiod": timeperiod,
             },
             symbol="aroon",
+            is_elementwise=False,
+        )
+
+    def cdlabandonedbaby(
+        self,
+        high: IntoExpr = pl.col("high"),
+        low: IntoExpr = pl.col("low"),
+        close: IntoExpr = pl.col("close"),
+        penetration: float = 0.3,
+    ):
+        """CDLABANDONEDBABY(open, high, low, close[, penetration=?])
+
+        Abandoned Baby (Pattern Recognition)
+
+        Inputs:
+            prices: ['open', 'high', 'low', 'close']
+        Parameters:
+            penetration: 0.3
+        Outputs:
+            integer (values are -100, 0 or 100)
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[high, low, close],
+            kwargs={
+                "penetration": penetration,
+            },
+            symbol="cdlabandonedbaby",
             is_elementwise=False,
         )

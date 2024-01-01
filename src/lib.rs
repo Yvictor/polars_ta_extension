@@ -3,6 +3,7 @@ mod overlap;
 mod volatility;
 mod cycle;
 mod momentum;
+mod pattern;
 mod utils;
 use pyo3::{pymodule, types::PyModule, PyResult, Python};
 
