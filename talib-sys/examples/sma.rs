@@ -1,5 +1,5 @@
 extern crate talib_sys;
-use talib_sys::{TA_Integer, TA_Real, TA_MA, TA_MAType, TA_RetCode};
+use talib_sys::{TA_Integer, TA_Real, TA_MA, TA_MAType_TA_MAType_SMA, TA_RetCode};
 
 
 /// Compute SMA(period) on `close_prices`
@@ -16,7 +16,7 @@ fn sma(period: u32, close_prices: &Vec<TA_Real>) -> (Vec<TA_Real>, TA_Integer) {
             close_prices.len() as i32 - 1,  // index of the last close to use
             close_prices.as_ptr(),          // pointer to the first element of the vector
             period as i32,                  // period of the sma
-            TA_MAType::TA_MAType_SMA,       // type of the MA, here forced to sma
+            TA_MAType_TA_MAType_SMA,       // type of the MA, here forced to sma
             &mut out_begin,                 // set to index of the first close to have an sma value
             &mut out_size,                  // set to number of sma values computed
             out.as_mut_ptr()                // pointer to the first element of the output vector

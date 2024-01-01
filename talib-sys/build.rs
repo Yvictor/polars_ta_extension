@@ -1,11 +1,40 @@
 extern crate bindgen;
 
+use bindgen::callbacks::{DeriveInfo, ParseCallbacks, TypeKind};
 use std::env;
 use std::process::Command;
 use std::{io::Write, path::PathBuf};
 
 const TA_LIB_VER: &str = "0.4.0";
 // const TA_LIB_TGZ: &str = "ta-lib-0.4.0-src.tar.gz";
+
+#[derive(Debug)]
+struct DerivesCallback;
+
+impl ParseCallbacks for DerivesCallback {
+    // Test the "custom derives" capability by adding `PartialEq` to the `Test` struct.
+    fn add_derives(&self, info: &DeriveInfo<'_>) -> Vec<String> {
+        if info.name.starts_with("_") {
+            vec![]
+        } else if info.kind == TypeKind::Struct {
+            vec![]
+        } else if info.name == "TA_RangeType"
+            || info.name == "TA_CandleSettingType"
+            || info.name == "TA_InputParameterType"
+            || info.name == "TA_OptInputParameterType"
+            || info.name == "TA_OutputParameterType"
+            || info.name == "TA_Compatibility"
+            || info.name == "TA_MAType"
+            || info.name == "TA_FuncUnstId"
+            || info.name == "TA_RetCode"
+            || info.name == "TA_FuncUnstId"
+        {
+            vec!["Deserialize".into()]
+        } else {
+            vec!["Deserialize".into(), "Deserialize_repr".into()]
+        }
+    }
+}
 
 fn main() {
     let ta_lib_gz = format!("ta-lib-{TA_LIB_VER}-src.tar.gz");
@@ -66,6 +95,7 @@ fn main() {
     println!("cargo:rustc-link-lib=static=ta_lib");
     println!("cargo:rustc-link-search=native={ta_library_path}");
     println!("cargo:rustc-link-search=native=../dependencies/lib");
+    // let cb = ParseCallbacks::add_derives();
     let bindings = bindgen::Builder::default()
         // The input header we would like to generate
         // bindings for.
@@ -74,7 +104,17 @@ fn main() {
         .clang_arg("-I../dependencies/include")
         .clang_arg("-v")
         // Generate rustified enums
-        .rustified_enum(".*")
+        // .newtype_enum("*")
+        // .bitfield_enum("*")
+        // .constified_enum_module(".*")
+        // .rustified_enum(".*")
+        .constified_enum(".*")
+        .rustified_enum("TA_RetCode")
+        // .rustified_non_exhaustive_enum(".*")
+        // .raw_line("use serde::Deserialize;")
+        // .raw_line("use serde_repr::Deserialize_repr;")
+        // .parse_callbacks(bindgen::callbacks::ParseCallbacks::add_derives(vec!["Deserialize"]))
+        // .parse_callbacks(Box::new(DerivesCallback {}))
         // Finish the builder and generate the bindings.
         .generate()
         // Unwrap the Result and panic on failure.
