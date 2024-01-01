@@ -1,7 +1,7 @@
 
-mod expressions;
 mod overlap;
 mod volatility;
+mod utils;
 use pyo3::{pymodule, types::PyModule, PyResult, Python};
 
 #[cfg(target_os = "linux")]

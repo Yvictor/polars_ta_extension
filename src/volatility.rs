@@ -1,30 +1,16 @@
 use polars::prelude::*;
 use pyo3_polars::derive::polars_expr;
 use serde::Deserialize;
-// use std::fmt::Write;
 use talib_sys::{TA_NATR_Lookback, TA_NATR, TA_Integer, TA_Real, TA_RetCode};
-
+use crate::utils::get_series_f64_ptr;
 
 #[derive(Deserialize)]
-pub struct EMAKwargs {
+pub struct NATRKwargs {
     timeperiod: i32,
 }
 
-fn get_series_f64_ptr(series: &mut Series) -> PolarsResult<*const f64> {
-    if series.has_validity() {
-        let series: Vec<f64> = series
-            .f64()?
-            .into_iter()
-            .map(|x| x.unwrap_or(std::f64::NAN))
-            .collect();
-        Ok(series.as_ptr())
-    } else {
-        Ok(series.as_single_ptr()? as *const f64)
-    }
-}
-
 #[polars_expr(output_type=Float64)]
-fn natr(inputs: &[Series], kwargs: EMAKwargs) -> PolarsResult<Series> {
+fn natr(inputs: &[Series], kwargs: NATRKwargs) -> PolarsResult<Series> {
     let close = &mut inputs[0].to_float()?.rechunk();
     let high = &mut inputs[1].to_float()?.rechunk();
     let low = &mut inputs[2].to_float()?.rechunk();
@@ -32,9 +18,9 @@ fn natr(inputs: &[Series], kwargs: EMAKwargs) -> PolarsResult<Series> {
     let mut out_size: TA_Integer = 0;
     let len = close.len();
     let mut out: Vec<TA_Real> = Vec::with_capacity(len);
-    let high_ptr = get_series_f64_ptr(high)?;
-    let low_ptr = get_series_f64_ptr(low)?;
-    let close_ptr = get_series_f64_ptr(close)?;
+    let (high_ptr, _high) = get_series_f64_ptr(high)?;
+    let (low_ptr, _low) = get_series_f64_ptr(low)?;
+    let (close_ptr, _close) = get_series_f64_ptr(close)?;
 
     let lookback = unsafe { TA_NATR_Lookback(kwargs.timeperiod) as usize };
     for _ in 0..lookback {

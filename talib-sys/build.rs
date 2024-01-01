@@ -59,38 +59,41 @@ fn main() {
         file_gz.write_all(&content).unwrap();
         file_gz.sync_data().unwrap();
     }
-    let file_gz = std::fs::File::open(file_gz_path).unwrap();
-    let mut archive = tar::Archive::new(flate2::read::GzDecoder::new(file_gz));
-    archive
-        .entries()
-        .unwrap()
-        .filter_map(|r| r.ok())
-        .map(|mut entry| -> std::io::Result<PathBuf> {
-            let strip_path = entry.path()?.iter().skip(1).collect::<std::path::PathBuf>();
-            let path = tmp_dir.join("ta-lib").join(strip_path);
-            // println!("unpack: {:?}", path);
-            entry.unpack(&path)?;
-            Ok(path)
-        })
-        .filter_map(|e| e.ok())
-        .for_each(|x| println!("> {}", x.display()));
+    let lib_path = PathBuf::from(ta_library_path.clone());
+    if !lib_path.exists() {
+        let file_gz = std::fs::File::open(file_gz_path).unwrap();
+        let mut archive = tar::Archive::new(flate2::read::GzDecoder::new(file_gz));
+        archive
+            .entries()
+            .unwrap()
+            .filter_map(|r| r.ok())
+            .map(|mut entry| -> std::io::Result<PathBuf> {
+                let strip_path = entry.path()?.iter().skip(1).collect::<std::path::PathBuf>();
+                let path = tmp_dir.join("ta-lib").join(strip_path);
+                // println!("unpack: {:?}", path);
+                entry.unpack(&path)?;
+                Ok(path)
+            })
+            .filter_map(|e| e.ok())
+            .for_each(|x| println!("> {}", x.display()));
 
-    Command::new("./configure")
-        .arg(format!("--prefix={}", deps_dir.display()))
-        .current_dir(&tmp_dir.join("ta-lib"))
-        .status()
-        .expect("Failed to run configure command");
+        Command::new("./configure")
+            .arg(format!("--prefix={}", deps_dir.display()))
+            .current_dir(&tmp_dir.join("ta-lib"))
+            .status()
+            .expect("Failed to run configure command");
 
-    Command::new("make")
-        .current_dir(&tmp_dir.join("ta-lib"))
-        .status()
-        .expect("Failed to run make command");
+        Command::new("make")
+            .current_dir(&tmp_dir.join("ta-lib"))
+            .status()
+            .expect("Failed to run make command");
 
-    Command::new("make")
-        .arg("install")
-        .current_dir(&tmp_dir.join("ta-lib"))
-        .status()
-        .expect("Failed to run make install command");
+        Command::new("make")
+            .arg("install")
+            .current_dir(&tmp_dir.join("ta-lib"))
+            .status()
+            .expect("Failed to run make install command");
+    }
 
     println!("cargo:rustc-link-lib=static=ta_lib");
     println!("cargo:rustc-link-search=native={ta_library_path}");

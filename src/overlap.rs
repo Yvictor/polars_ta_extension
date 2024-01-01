@@ -1,7 +1,7 @@
 use polars::prelude::*;
 use pyo3_polars::derive::polars_expr;
 use serde::Deserialize;
-// use std::fmt::Write;
+use crate::utils::get_series_f64_ptr;
 use talib_sys::{TA_BBANDS_Lookback, TA_BBANDS, TA_EMA_Lookback, TA_EMA, TA_Integer, TA_MAType, TA_Real, TA_RetCode};
 
 #[derive(Deserialize)]
@@ -29,16 +29,7 @@ fn bbands(inputs: &[Series], kwargs: BBANDSKwargs) -> PolarsResult<Series> {
     let mut outrealupperband: Vec<TA_Real> = Vec::with_capacity(input.len());
     let mut outrealmiddleband: Vec<TA_Real> = Vec::with_capacity(input.len());
     let mut outreallowerband: Vec<TA_Real> = Vec::with_capacity(input.len());
-    let input_ptr: *const f64 = if input.has_validity() {
-        let input: Vec<f64> = input
-            .f64()?
-            .into_iter()
-            .map(|x| x.unwrap_or(std::f64::NAN))
-            .collect();
-        input.as_ptr()
-    } else {
-        input.as_single_ptr()? as *const f64
-    };
+    let (input_ptr, _input) = get_series_f64_ptr(input)?;
     let lookback = unsafe {
         TA_BBANDS_Lookback(
             kwargs.timeperiod,
@@ -97,47 +88,18 @@ pub struct EMAKwargs {
 
 #[polars_expr(output_type=Float64)]
 fn ema(inputs: &[Series], kwargs: EMAKwargs) -> PolarsResult<Series> {
-    let input = &mut inputs[0].to_float()?;//.rechunk();
+    let input = &mut inputs[0].to_float()?.rechunk();
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
     let mut out: Vec<TA_Real> = Vec::with_capacity(input.len());
-    let input_vec: Vec<f64>;
-    println!("has_validity: {}", input.has_validity());
-    println!("len: {}", input.len());
-    println!("null_count: {}", input.null_count());
-    let input_ptr: *const f64 = if input.has_validity() {
-        input_vec = input
-            .f64()?
-            .into_iter()
-            .map(|x| x.unwrap_or(std::f64::NAN))
-            .collect();
-
-        input_vec.as_ptr()
-    } else {
-        // input_vec = vec![];
-        input.as_single_ptr()? as *const f64
-    };
-    // let ca = input.f64()?;
-    // let r: Float64Chunked = ca.apply_generic(|x| {
-    //     print!("{},", x.unwrap_or(std::f64::NAN));
-    //     x
-    // });
-    // // input_ca.apply_generic(|x| {
-    // //     if let Some(x) = x {
-    // //         None
-    // //     } else {
-    // //         None
-    // //     }
-    // // });
+    // println!("has_validity: {}", input.has_validity());
+    // println!("len: {}", input.len());
+    // println!("null_count: {}", input.null_count());
+    let (input_ptr, _input) = get_series_f64_ptr(input)?;
     let lookback = unsafe { TA_EMA_Lookback(kwargs.timeperiod) as usize };
     for _ in 0..lookback {
         out.push(std::f64::NAN);
     }
-    // println!("vec: [");
-    // for i in input_vec {
-    //     print!("{}, ", i)
-    // }
-    // println!("]");
     let ret_code = unsafe {
         TA_EMA(
             0,
