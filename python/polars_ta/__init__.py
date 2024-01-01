@@ -11,7 +11,9 @@ class TAExpr:
     def __init__(self, expr: pl.Expr):
         self._expr = expr
 
-    def bbands(self, timeperiod: int = 5, nbdevup: float = 2.0, nbdevdn: float = 2.0, ma_type: int = 0) -> pl.Expr:
+    def bbands(
+        self, timeperiod: int = 5, nbdevup: float = 2.0, nbdevdn: float = 2.0, ma_type: int = 0
+    ) -> pl.Expr:
         """bbands"""
         return self._expr.register_plugin(
             lib=lib,
@@ -23,7 +25,7 @@ class TAExpr:
                 "matype": ma_type,
             },
             symbol="bbands",
-            is_elementwise=True,
+            is_elementwise=False,
         )
 
     def ema(
@@ -43,8 +45,18 @@ class TAExpr:
             is_elementwise=False,
         )
 
-    def natr(self, high: IntoExpr, low: IntoExpr, timeperiod: int) -> pl.Expr:
-        """ natr
+    def natr(
+        self, high: IntoExpr = pl.col("high"), low: IntoExpr = pl.col("low"), timeperiod: int = 14
+    ) -> pl.Expr:
+        """Normalized Average True Range (Volatility Indicators)
+        pl.col("close").ta.natr("high", "low", [, timeperiod=?])
+
+        Inputs:
+            prices: ['high', 'low', 'close']
+        Parameters:
+            timeperiod: 14
+        Outputs:
+            real
         """
         return self._expr.register_plugin(
             lib=lib,
@@ -53,5 +65,67 @@ class TAExpr:
                 "timeperiod": timeperiod,
             },
             symbol="natr",
+            is_elementwise=False,
+        )
+
+    def ht_dcperiod(self) -> pl.Expr:
+        """Hilbert Transform - Dominant Cycle Period (Cycle Indicators)
+        pl.col("close").ta.ht_dcperiod()
+        
+        Inputs:
+            real: (any ndarray)
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            symbol="ht_dcperiod",
+            is_elementwise=False,
+        )
+
+    def adx(
+        self, high: IntoExpr = pl.col("high"), low: IntoExpr = pl.col("low"), timeperiod: int = 14
+    ) -> pl.Expr:
+        """Average Directional Movement Index (Momentum Indicators)
+        pl.col("close").ta.adx("high", "low", [, timeperiod=?])
+
+        Inputs:
+            prices: ['high', 'low', 'close']
+        Parameters:
+            timeperiod: 14
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[high, low],
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="adx",
+            is_elementwise=False,
+        )
+
+
+    def aroon(
+        self, low: IntoExpr = pl.col("low"), timeperiod: int = 14
+    ) -> pl.Expr:
+        """Aroon (Momentum Indicators)
+        pl.col("high").ta.aroon("low", [, timeperiod=?])
+        Inputs:
+            prices: ['high', 'low']
+        Parameters:
+            timeperiod: 14
+        Outputs:
+            aroondown
+            aroonup
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[low],
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="aroon",
             is_elementwise=False,
         )
