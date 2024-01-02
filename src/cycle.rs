@@ -1,7 +1,7 @@
-use crate::utils::get_series_f64_ptr;
+use crate::utils::{get_series_f64_ptr, make_vec};
 use polars::prelude::*;
 use pyo3_polars::derive::polars_expr;
-use talib_sys::{TA_HT_DCPERIOD_Lookback, TA_Integer, TA_Real, TA_RetCode, TA_HT_DCPERIOD};
+use talib_sys::{TA_HT_DCPERIOD_Lookback, TA_Integer, TA_RetCode, TA_HT_DCPERIOD};
 
 #[polars_expr(output_type=Float64)]
 fn ht_dcperiod(inputs: &[Series]) -> PolarsResult<Series> {
@@ -9,13 +9,9 @@ fn ht_dcperiod(inputs: &[Series]) -> PolarsResult<Series> {
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
     let len = real.len();
-    let mut out: Vec<TA_Real> = Vec::with_capacity(len);
     let (real_ptr, _real) = get_series_f64_ptr(real)?;
-
-    let lookback = unsafe { TA_HT_DCPERIOD_Lookback() as usize };
-    for _ in 0..lookback {
-        out.push(std::f64::NAN);
-    }
+    let lookback = unsafe { TA_HT_DCPERIOD_Lookback()};
+    let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_HT_DCPERIOD(
             0,
@@ -23,7 +19,7 @@ fn ht_dcperiod(inputs: &[Series]) -> PolarsResult<Series> {
             real_ptr,
             &mut out_begin,
             &mut out_size,
-            out[lookback..].as_mut_ptr(),
+            ptr,
         )
     };
     match ret_code {

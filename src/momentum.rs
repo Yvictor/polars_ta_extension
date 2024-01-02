@@ -1,8 +1,8 @@
-use crate::utils::get_series_f64_ptr;
+use crate::utils::{get_series_f64_ptr, make_vec};
 use polars::prelude::*;
 use pyo3_polars::derive::polars_expr;
 use serde::Deserialize;
-use talib_sys::{TA_ADX_Lookback, TA_Integer, TA_Real, TA_RetCode, TA_ADX};
+use talib_sys::{TA_ADX_Lookback, TA_Integer, TA_RetCode, TA_ADX};
 use talib_sys::{TA_AROON_Lookback, TA_AROON};
 #[derive(Deserialize)]
 pub struct ADXKwargs {
@@ -11,21 +11,18 @@ pub struct ADXKwargs {
 
 #[polars_expr(output_type=Float64)]
 fn adx(inputs: &[Series], kwargs: ADXKwargs) -> PolarsResult<Series> {
+    let mut out_begin: TA_Integer = 0;
+    let mut out_size: TA_Integer = 0;
     let high = &mut inputs[1].to_float()?.rechunk();
     let low = &mut inputs[2].to_float()?.rechunk();
     let close = &mut inputs[0].to_float()?.rechunk();
-    let mut out_begin: TA_Integer = 0;
-    let mut out_size: TA_Integer = 0;
-    let len = close.len();
-    let mut out: Vec<TA_Real> = Vec::with_capacity(len);
     let (high_ptr, _high) = get_series_f64_ptr(high)?;
     let (low_ptr, _low) = get_series_f64_ptr(low)?;
     let (close_ptr, _close) = get_series_f64_ptr(close)?;
+    let len = close.len();
 
-    let lookback = unsafe { TA_ADX_Lookback(kwargs.timeperiod) as usize };
-    for _ in 0..lookback {
-        out.push(std::f64::NAN);
-    }
+    let lookback = unsafe { TA_ADX_Lookback(kwargs.timeperiod)};
+    let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_ADX(
             0,
@@ -36,7 +33,7 @@ fn adx(inputs: &[Series], kwargs: ADXKwargs) -> PolarsResult<Series> {
             kwargs.timeperiod,
             &mut out_begin,
             &mut out_size,
-            out[lookback..].as_mut_ptr(),
+           ptr,
         )
     };
     match ret_code {
@@ -76,24 +73,20 @@ pub fn arron_output(_: &[Field]) -> PolarsResult<Field> {
 #[polars_expr(output_type_func=arron_output)]
 fn aroon(inputs: &[Series], kwargs: ArronKwargs) -> PolarsResult<Series> {
     let high = &mut inputs[0].to_float()?.rechunk();
-    let low = &mut inputs[1].to_float()?.rechunk();
+    let low = &mut inputs[1].to_float()?.rechunk();    
+    let (high_ptr, _high) = get_series_f64_ptr(high)?;
+    let (low_ptr, _low) = get_series_f64_ptr(low)?;
     let len = high.len();
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
-    let mut outaroondown: Vec<TA_Real> = Vec::with_capacity(len);
-    let mut outaroonup: Vec<TA_Real> = Vec::with_capacity(len);
-    
-    let (high_ptr, _high) = get_series_f64_ptr(high)?;
-    let (low_ptr, _low) = get_series_f64_ptr(low)?;
     let lookback = unsafe {
         TA_AROON_Lookback(
             kwargs.timeperiod,
-        ) as usize
+        ) 
     };
-    for _ in 0..lookback {
-        outaroondown.push(std::f64::NAN);
-        outaroonup.push(std::f64::NAN);
-    }
+    let (mut outaroondown, outaroondown_ptr) = make_vec(len, lookback);
+    let (mut outaroonup, outaroonup_ptr) = make_vec(len, lookback);
+    
     let ret_code = unsafe {
         TA_AROON(
             0,
@@ -103,8 +96,8 @@ fn aroon(inputs: &[Series], kwargs: ArronKwargs) -> PolarsResult<Series> {
             kwargs.timeperiod,
             &mut out_begin,
             &mut out_size,
-            outaroondown[lookback..].as_mut_ptr(),
-            outaroonup[lookback..].as_mut_ptr(),
+            outaroondown_ptr,
+            outaroonup_ptr,
         )
     };
     match ret_code {
