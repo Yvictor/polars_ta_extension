@@ -11,8 +11,9 @@ crate-type = ["cdylib"]
 
 [dependencies]
 pyo3 = { version = "*", features = ["extension-module"] }
-pyo3-polars = { version = "*", features = ["derive"] }
-polars = {version = "0.35.4", features = ["performant", "lazy", "dtype-array", "dtype-struct"]}
+pyo3-polars = { version = "0.10.0", features = ["derive"] }
+polars = {version = "0.36.2", features = ["dtype-struct"]}
+# "performant", "lazy", "dtype-array"
 serde = { version = "*", features = ["derive"] }
 talib-sys = { path = "talib-sys"}
 talib = { path = "talib"}
