@@ -5,6 +5,7 @@ mod cycle;
 mod momentum;
 mod pattern;
 mod utils;
+mod volume;
 use pyo3::{pymodule, types::PyModule, PyResult, Python};
 
 #[cfg(target_os = "linux")]

@@ -15,6 +15,7 @@ pyo3-polars = { version = "*", features = ["derive"] }
 polars = {version = "0.35.4", features = ["performant", "lazy", "dtype-array", "dtype-struct"]}
 serde = { version = "*", features = ["derive"] }
 talib-sys = { path = "talib-sys"}
+talib = { path = "talib"}
 
 [target.'cfg(any(not(target_os = "linux"), use_mimalloc))'.dependencies]
 mimalloc = { version = "0.1", default-features = false }

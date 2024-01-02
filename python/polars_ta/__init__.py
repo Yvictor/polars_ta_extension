@@ -154,3 +154,20 @@ class TAExpr:
             symbol="cdlabandonedbaby",
             is_elementwise=False,
         )
+    
+    def obv(self, volume: IntoExpr = pl.col("volume")):
+        """OBV(close, volume)
+
+        On Balance Volume (Volume Indicators)
+
+        Inputs:
+            prices: ['close', 'volume']
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[volume],
+            symbol="obv",
+            is_elementwise=False,
+        )

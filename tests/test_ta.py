@@ -10,11 +10,13 @@ def df_ohlc():
     close = [8843.0, 8810.0, 8850.0, 8829.0, 9200.0, 8951.0, 9190.0, 9115.0, 9073.0, 9230.0] * 5
     high = [8939.0, 8870.0, 9005.0, 8870.0, 9200.0, 9340.0, 9190.0, 9195.0, 9190.0, 9230.0] * 5
     low = [8650.0, 8671.0, 8820.0, 8711.0, 8880.0, 8930.0, 8951.0, 9066.0, 8976.0, 9095.0] * 5
+    volume = [8650.0, 8671.0, 8820.0, 8711.0, 8880.0, 8930.0, 8951.0, 9066.0, 8976.0, 9095.0] * 5
     close_series = pl.Series("close", close)
     high_series = pl.Series("high", high)
     low_series = pl.Series("low", low)
     open_series = pl.Series("open", _open)
-    return pl.DataFrame([close_series, high_series, low_series, open_series])
+    volume_series = pl.Series("volume", volume)
+    return pl.DataFrame([close_series, high_series, low_series, open_series, volume_series])
 
 
 def test_ema_eq(df_ohlc: pl.DataFrame):
@@ -71,5 +73,12 @@ def test_cdlabandonedbaby_eq(df_ohlc: pl.DataFrame):
         talib.CDLABANDONEDBABY(
             df_ohlc["open"], df_ohlc["high"], df_ohlc["low"], df_ohlc["close"], penetration=0.3
         ).alias("talib"),
+    ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+    assert not_eq == 0
+
+def test_obv_eq(df_ohlc: pl.DataFrame):
+    not_eq = df_ohlc.with_columns(
+        pl.col("close").ta.obv(pl.col("volume")).alias("expr"),
+        talib.OBV(df_ohlc["close"], df_ohlc["volume"]).alias("talib"),
     ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
     assert not_eq == 0
