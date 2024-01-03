@@ -68,6 +68,78 @@ def test_cdlabandonedbaby_eq(df_ohlc: pl.DataFrame):
     ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
     assert not_eq == 0
 
+def test_beta_eq(df_ohlc: pl.DataFrame):
+    not_eq = df_ohlc.with_columns(
+        pl.col("close").ta.beta(pl.col("high"), 3).alias("expr"),
+        talib.BETA(df_ohlc["close"], df_ohlc["high"], timeperiod=3).alias("talib"),
+    ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+
+    assert not_eq == 0
+
+def test_correl_eq(df_ohlc: pl.DataFrame):
+    not_eq = df_ohlc.with_columns(
+        pl.col("close").ta.correl(pl.col("high"), 3).alias("expr"),
+        talib.CORREL(df_ohlc["close"], df_ohlc["high"], timeperiod=3).alias("talib"),
+    ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+
+    assert not_eq == 0
+
+def test_linearreg_eq(df_ohlc: pl.DataFrame):
+    not_eq = df_ohlc.with_columns(
+        pl.col("close").ta.linearreg(3).alias("expr"),
+        talib.LINEARREG(df_ohlc["close"], timeperiod=3).alias("talib"),
+    ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+
+    assert not_eq == 0
+
+def test_linearreg_angle_eq(df_ohlc: pl.DataFrame):
+    not_eq = df_ohlc.with_columns(
+        pl.col("close").ta.linearreg_angle(3).alias("expr"),
+        talib.LINEARREG_ANGLE(df_ohlc["close"], timeperiod=3).alias("talib"),
+    ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+
+    assert not_eq == 0
+
+def test_linearreg_intercept_eq(df_ohlc: pl.DataFrame):
+    not_eq = df_ohlc.with_columns(
+        pl.col("close").ta.linearreg_intercept( 3).alias("expr"),
+        talib.LINEARREG_INTERCEPT(df_ohlc["close"], timeperiod=3).alias("talib"),
+    ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+
+    assert not_eq == 0
+
+def test_linearreg_slope_eq(df_ohlc: pl.DataFrame):
+    not_eq = df_ohlc.with_columns(
+        pl.col("close").ta.linearreg_slope(3).alias("expr"),
+        talib.LINEARREG_SLOPE(df_ohlc["close"], timeperiod=3).alias("talib"),
+    ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+
+    assert not_eq == 0
+
+def test_stddev_eq(df_ohlc: pl.DataFrame):
+    not_eq = df_ohlc.with_columns(
+        pl.col("close").ta.stddev(3).alias("expr"),
+        talib.STDDEV(df_ohlc["close"], timeperiod=3, nbdev=1).alias("talib"),
+    ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+
+    assert not_eq == 0
+
+def test_var_eq(df_ohlc: pl.DataFrame):
+    not_eq = df_ohlc.with_columns(
+        pl.col("close").ta.var(3).alias("expr"),
+        talib.VAR(df_ohlc["close"], timeperiod=3, nbdev=1).alias("talib"),
+    ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+
+    assert not_eq == 0
+
+def test_tsf_eq(df_ohlc: pl.DataFrame):
+    not_eq = df_ohlc.with_columns(
+        pl.col("close").ta.tsf(3).alias("expr"),
+        talib.TSF(df_ohlc["close"], timeperiod=3).alias("talib"),
+    ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+
+    assert not_eq == 0
+
 
 def test_atr_eq(df_ohlc: pl.DataFrame):
     not_eq = df_ohlc.with_columns(

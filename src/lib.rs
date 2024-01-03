@@ -1,11 +1,12 @@
 
 mod overlap;
-mod volatility;
 mod cycle;
 mod momentum;
 mod pattern;
-mod utils;
+mod statistic;
+mod volatility;
 mod volume;
+mod utils;
 use pyo3::{pymodule, types::PyModule, PyResult, Python};
 
 #[cfg(target_os = "linux")]

@@ -155,6 +155,192 @@ class TAExpr:
             is_elementwise=False,
         )
 
+    def beta(self, real: IntoExpr, timeperiod: int = 5):
+        """Beta (Statistic Functions)
+        pl.col("close").ta.beta(pl.col("high"), timeperiod=5)
+        Inputs:
+            real0
+            real1
+        Parameters:
+            timeperiod: 5
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[real],
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="beta",
+            is_elementwise=False,
+        )
+
+    def correl(self, real: IntoExpr, timeperiod: int = 30):
+        """Pearson's Correlation Coefficient (r) (Statistic Functions)
+        pl.col("close").ta.correl(pl.col("high"), timeperiod=30)
+        Inputs:
+            real0
+            real1
+        Parameters:
+            timeperiod: 30
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[real],
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="correl",
+            is_elementwise=False,
+        )
+
+    def linearreg(self, timeperiod: int = 14):
+        """Linear Regression (Statistic Functions)
+        pl.col("close").ta.linearreg(timeperiod=14)
+        Inputs:
+            real
+        Parameters:
+            timeperiod: 14
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[],
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="linearreg",
+            is_elementwise=False,
+        )
+
+    def linearreg_angle(self, timeperiod: int = 14):
+        """Linear Regression Angle (Statistic Functions)
+        pl.col("close").ta.linearreg_angle(timeperiod=14)
+        Inputs:
+            real
+        Parameters:
+            timeperiod: 14
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[],
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="linearreg_angle",
+            is_elementwise=False,
+        )
+
+    def linearreg_intercept(self, timeperiod: int = 14):
+        """Linear Regression Intercept (Statistic Functions)
+        pl.col("close").ta.linearreg_intercept(timeperiod=14)
+        Inputs:
+            real
+        Parameters:
+            timeperiod: 14
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[],
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="linearreg_intercept",
+            is_elementwise=False,
+        )
+
+    def linearreg_slope(self, timeperiod: int = 14):
+        """Linear Regression Slope (Statistic Functions)
+        pl.col("close").ta.linearreg_slope(timeperiod=14)
+        Inputs:
+            real
+        Parameters:
+            timeperiod: 14
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[],
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="linearreg_slope",
+            is_elementwise=False,
+        )
+
+    def stddev(self, timeperiod: int = 5, nbdev: float = 1.0):
+        """Standard Deviation (Statistic Functions)
+        pl.col("close").ta.stddev(timeperiod=5, nbdev=1.0)
+        Inputs:
+            real
+        Parameters:
+            timeperiod: 5
+            nbdev: 1.0
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[],
+            kwargs={
+                "timeperiod": timeperiod,
+                "nbdev": nbdev,
+            },
+            symbol="stddev",
+            is_elementwise=False,
+        )
+
+    def tsf(self, timeperiod: int = 14):
+        """Time Series Forecast (Statistic Functions)
+        pl.col("close").ta.tsf(timeperiod=14)
+        Inputs:
+            real
+        Parameters:
+            timeperiod: 14
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[],
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="tsf",
+            is_elementwise=False,
+        )
+
+    def var(self, timeperiod: int = 5, nbdev: float = 1.0):
+        """Variance (Statistic Functions)
+        pl.col("close").ta.var(timeperiod=5, nbdev=1.0)
+        Inputs:
+            real
+        Parameters:
+            timeperiod: 5
+            nbdev: 1.0
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[],
+            kwargs={
+                "timeperiod": timeperiod,
+                "nbdev": nbdev,
+            },
+            symbol="var",
+            is_elementwise=False,
+        )
+
     def obv(self, volume: IntoExpr = pl.col("volume")):
         """OBV(close, volume)
 
