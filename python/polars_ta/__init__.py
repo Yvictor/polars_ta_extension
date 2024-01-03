@@ -216,3 +216,42 @@ class TAExpr:
             symbol="adosc",
             is_elementwise=False,
         )
+
+    def atr(
+        self, high: IntoExpr = pl.col("high"), low: IntoExpr = pl.col("low"), timeperiod: int = 14
+    ):
+        """Average True Range (Volatility Indicators)
+        pl.col("close").ta.atr("high", "low", [, timeperiod=?])
+
+        Inputs:
+            prices: ['high', 'low', 'close']
+        Parameters:
+            timeperiod: 14
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[high, low],
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="atr",
+            is_elementwise=False,
+        )
+
+    def trange(self, high: IntoExpr = pl.col("high"), low: IntoExpr = pl.col("low")) -> pl.Expr:
+        """True Range (Volatility Indicators)
+        pl.col("close").ta.trange("high", "low")
+
+        Inputs:
+            prices: ['high', 'low', 'close']
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[high, low],
+            symbol="trange",
+            is_elementwise=False,
+        )
