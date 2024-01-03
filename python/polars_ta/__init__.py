@@ -154,7 +154,7 @@ class TAExpr:
             symbol="cdlabandonedbaby",
             is_elementwise=False,
         )
-    
+
     def obv(self, volume: IntoExpr = pl.col("volume")):
         """OBV(close, volume)
 
@@ -169,5 +169,50 @@ class TAExpr:
             lib=lib,
             args=[volume],
             symbol="obv",
+            is_elementwise=False,
+        )
+
+    def ad(
+        self,
+        high: IntoExpr = pl.col("high"),
+        low: IntoExpr = pl.col("low"),
+        volume: IntoExpr = pl.col("volume"),
+    ):
+        """Chaikin A/D Line (Volume Indicators)
+        pl.col("close").ta.ad(pl.col("high"), pl.col("low"), pl.col("volume"))
+
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[high, low, volume],
+            symbol="ad",
+            is_elementwise=False,
+        )
+
+    def adosc(
+        self,
+        high: IntoExpr = pl.col("high"),
+        low: IntoExpr = pl.col("low"),
+        volume: IntoExpr = pl.col("volume"),
+        fastperiod: int = 3,
+        slowperiod: int = 10,
+    ):
+        """Chaikin A/D Oscillator (Volume Indicators)
+        pl.col("close").ta.adosc(pl.col("high"), pl.col("low"), pl.col("volume"), timeperiod=3)
+
+        Parameters:
+            fastperiod: 3
+            slowperiod: 10
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[high, low, volume],
+            kwargs={
+                "fastperiod": fastperiod,
+                "slowperiod": slowperiod,
+            },
+            symbol="adosc",
             is_elementwise=False,
         )

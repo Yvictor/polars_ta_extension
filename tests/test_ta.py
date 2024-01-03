@@ -76,9 +76,30 @@ def test_cdlabandonedbaby_eq(df_ohlc: pl.DataFrame):
     ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
     assert not_eq == 0
 
+
 def test_obv_eq(df_ohlc: pl.DataFrame):
     not_eq = df_ohlc.with_columns(
         pl.col("close").ta.obv(pl.col("volume")).alias("expr"),
         talib.OBV(df_ohlc["close"], df_ohlc["volume"]).alias("talib"),
     ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
     assert not_eq == 0
+
+
+def test_ad_eq(df_ohlc: pl.DataFrame):
+    not_eq = df_ohlc.with_columns(
+        pl.col("high").ta.ad(pl.col("low"), pl.col("close"), pl.col("volume")).alias("expr"),
+        talib.AD(df_ohlc["high"], df_ohlc["low"], df_ohlc["close"], df_ohlc["volume"]).alias(
+            "talib"
+        ),
+    ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+    assert not_eq == 0
+
+def test_ta_adosc_eq(df_ohlc: pl.DataFrame):
+    not_eq = df_ohlc.with_columns(
+        pl.col("close").ta.adosc(pl.col("high"), pl.col("low"), pl.col("volume"), fastperiod=3, slowperiod=10).alias("expr"),
+        talib.ADOSC(df_ohlc["high"], df_ohlc["low"], df_ohlc["close"], df_ohlc["volume"], fastperiod=3, slowperiod=10).alias(
+            "talib"
+        ),
+    ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+    assert not_eq == 0
+
