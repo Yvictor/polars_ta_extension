@@ -78,6 +78,9 @@ jobs:
         with:
           version: latest
           platform: ${{ matrix.target }}
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: ${{ matrix.arch }}
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
