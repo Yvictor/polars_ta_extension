@@ -2,6 +2,7 @@ extern crate bindgen;
 
 use bindgen::callbacks::{DeriveInfo, ParseCallbacks, TypeKind};
 use std::env;
+use std::io::{Cursor, Read};
 use std::process::Command;
 use std::{io::Write, path::PathBuf};
 
@@ -37,6 +38,9 @@ impl ParseCallbacks for DerivesCallback {
 }
 
 fn main() {
+    #[cfg(target_os = "windows")]
+    let ta_lib_gz = format!("ta-lib-{TA_LIB_VER}-msvc.zip");
+    #[cfg(target_family = "unix")]
     let ta_lib_gz = format!("ta-lib-{TA_LIB_VER}-src.tar.gz");
     let ta_lib_url = format!(
         "https://sourceforge.net/projects/ta-lib/files/ta-lib/{TA_LIB_VER}/{ta_lib_gz}/download"
@@ -60,39 +64,87 @@ fn main() {
         file_gz.sync_data().unwrap();
     }
     let lib_path = PathBuf::from(ta_library_path.clone());
+    let os = std::env::consts::OS;
     if !lib_path.exists() {
-        let file_gz = std::fs::File::open(file_gz_path).unwrap();
-        let mut archive = tar::Archive::new(flate2::read::GzDecoder::new(file_gz));
-        archive
-            .entries()
-            .unwrap()
-            .filter_map(|r| r.ok())
-            .map(|mut entry| -> std::io::Result<PathBuf> {
-                let strip_path = entry.path()?.iter().skip(1).collect::<std::path::PathBuf>();
-                let path = tmp_dir.join("ta-lib").join(strip_path);
-                // println!("unpack: {:?}", path);
-                entry.unpack(&path)?;
-                Ok(path)
-            })
-            .filter_map(|e| e.ok())
-            .for_each(|x| println!("> {}", x.display()));
-
-        Command::new("./configure")
-            .arg(format!("--prefix={}", deps_dir.display()))
-            .current_dir(&tmp_dir.join("ta-lib"))
-            .status()
-            .expect("Failed to run configure command");
-
-        Command::new("make")
-            .current_dir(&tmp_dir.join("ta-lib"))
-            .status()
-            .expect("Failed to run make command");
-
-        Command::new("make")
-            .arg("install")
-            .current_dir(&tmp_dir.join("ta-lib"))
-            .status()
-            .expect("Failed to run make install command");
+        let mut file_gz = std::fs::File::open(file_gz_path).unwrap();
+        if os == "windows" {
+            let metadata = std::fs::File::metadata(&file_gz).expect("unable to read metadata");
+            let mut buf = vec![0; metadata.len() as usize];
+            file_gz.read(&mut buf).expect("buffer overflow");
+            zip_extract::extract(Cursor::new(buf), &tmp_dir, false).unwrap();
+            Command::new("nmake")
+                .current_dir(
+                    &tmp_dir
+                        .join("ta-lib")
+                        .join("c")
+                        .join("make")
+                        .join("cdr")
+                        .join("win32")
+                        .join("msvc"),
+                )
+                .status()
+                .expect("Failed to run make command");
+            // nmake and clang
+            // set LIBCLANG_PATH=bin
+            fs_extra::dir::copy(
+                &tmp_dir.join("ta-lib").join("c").join("lib"),
+                deps_dir.clone(),
+                &fs_extra::dir::CopyOptions::new().skip_exist(true),
+            )
+            .unwrap();
+            fs_extra::dir::copy(
+                &tmp_dir.join("ta-lib").join("c").join("include"),
+                ta_include_path.clone(),
+                &fs_extra::dir::CopyOptions::new().skip_exist(true),
+            )
+            .unwrap();
+            let _ = std::fs::create_dir_all(PathBuf::from(&ta_include_path).join("ta-lib"));
+            fs_extra::dir::copy(
+                &PathBuf::from(&ta_include_path),
+                PathBuf::from(&ta_include_path).join("ta-lib"),
+                &fs_extra::dir::CopyOptions::new()
+                    .skip_exist(true)
+                    .content_only(true),
+            )
+            .unwrap();
+            let ta_lib_path = PathBuf::from(&ta_library_path);
+            let _ = std::fs::copy(
+                ta_lib_path.join("ta_libc_crd.lib"),
+                ta_lib_path.join("ta_lib.lib"),
+            );
+        } else {
+            let mut archive = tar::Archive::new(flate2::read::GzDecoder::new(file_gz));
+            archive
+                .entries()
+                .unwrap()
+                .filter_map(|r| r.ok())
+                .map(|mut entry| -> std::io::Result<PathBuf> {
+                    let strip_path = entry.path()?.iter().skip(1).collect::<std::path::PathBuf>();
+                    let path = tmp_dir.join("ta-lib").join(strip_path);
+                    // println!("unpack: {:?}", path);
+                    entry.unpack(&path)?;
+                    Ok(path)
+                })
+                .filter_map(|e| e.ok())
+                .for_each(|x| println!("> {}", x.display()));
+    
+            Command::new("./configure")
+                .arg(format!("--prefix={}", deps_dir.display()))
+                .current_dir(&tmp_dir.join("ta-lib"))
+                .status()
+                .expect("Failed to run configure command");
+    
+            Command::new("make")
+                .current_dir(&tmp_dir.join("ta-lib"))
+                .status()
+                .expect("Failed to run make command");
+    
+            Command::new("make")
+                .arg("install")
+                .current_dir(&tmp_dir.join("ta-lib"))
+                .status()
+                .expect("Failed to run make install command");
+        }
     }
 
     println!("cargo:rustc-link-lib=static=ta_lib");
