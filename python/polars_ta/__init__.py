@@ -155,6 +155,76 @@ class TAExpr:
             is_elementwise=False,
         )
 
+    def avgprice(
+        self,
+        high: IntoExpr = pl.col("high"),
+        low: IntoExpr = pl.col("low"),
+        close: IntoExpr = pl.col("close"),
+    ):
+        """Average Price (Price Transform)
+
+        pl.col("close").ta.avgprice("high", "low", "close")
+
+        Inputs:
+            prices: ['open', 'high', 'low', 'close']
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[high, low, close],
+            symbol="avgprice",
+            is_elementwise=False,
+        )
+
+    def medprice(self, low: IntoExpr = pl.col("low")):
+        """Median Price (Price Transform)
+        pl.col("high").ta.medprice("low")
+
+        Inputs:
+            prices: ['high', 'low']
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[low],
+            symbol="medprice",
+            is_elementwise=False,
+        )
+
+    def typprice(self, high: IntoExpr = pl.col("high"), low: IntoExpr = pl.col("low")):
+        """Typical Price (Price Transform)
+        pl.col("close").ta.typprice("high", "low")
+
+        Inputs:
+            prices: ['high', 'low', 'close']
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[high, low],
+            symbol="typprice",
+            is_elementwise=False,
+        )
+
+    def wclprice(self, high: IntoExpr = pl.col("high"), low: IntoExpr = pl.col("low")):
+        """Weighted Close Price (Price Transform)
+        pl.col("close").ta.wclprice("high", "low")
+
+        Inputs:
+            prices: ['high', 'low', 'close']
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[high, low],
+            symbol="wclprice",
+            is_elementwise=False,
+        )
+
     def beta(self, real: IntoExpr, timeperiod: int = 5):
         """Beta (Statistic Functions)
         pl.col("close").ta.beta(pl.col("high"), timeperiod=5)

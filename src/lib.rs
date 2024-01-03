@@ -3,6 +3,7 @@ mod overlap;
 mod cycle;
 mod momentum;
 mod pattern;
+mod transform;
 mod statistic;
 mod volatility;
 mod volume;
