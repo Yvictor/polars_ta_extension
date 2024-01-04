@@ -1,0 +1,48 @@
+{
+	"CDL": {
+		"prefix": "CDL",
+		"body": [
+			"#[polars_expr(output_type=Int32)]",
+			"fn $1(inputs: &[Series]) -> PolarsResult<Series> {",
+			"let open = &mut inputs[0].to_float()?.rechunk();",
+			"let high = &mut inputs[1].to_float()?.rechunk();",
+			"let low = &mut inputs[2].to_float()?.rechunk();",
+			"let close = &mut inputs[3].to_float()?.rechunk();",
+			"let (open_ptr, _open) = get_series_f64_ptr(open)?;",
+			"let (high_ptr, _high) = get_series_f64_ptr(high)?;",
+			"let (low_ptr, _low) = get_series_f64_ptr(low)?;",
+			"let (close_ptr, _close) = get_series_f64_ptr(close)?;",
+			"let len = close.len();"
+			""
+			"let res = ta_$1(open_ptr, high_ptr, low_ptr, close_ptr, len);"
+			"match res {",
+				"Ok(out) => Ok(Int32Chunked::new("", out).into_series()),",
+				"Err(ret_code) => ta_code2err(ret_code),",
+			"}",
+			"}",
+		],
+	},
+	"CDLK": {
+		"prefix": "CDLK",
+		"body": [
+			"#[polars_expr(output_type=Int32)]",
+			"fn $1(inputs: &[Series], kwargs: CDLKwargs) -> PolarsResult<Series> {",
+			"let open = &mut inputs[0].to_float()?.rechunk();",
+			"let high = &mut inputs[1].to_float()?.rechunk();",
+			"let low = &mut inputs[2].to_float()?.rechunk();",
+			"let close = &mut inputs[3].to_float()?.rechunk();",
+			"let (open_ptr, _open) = get_series_f64_ptr(open)?;",
+			"let (high_ptr, _high) = get_series_f64_ptr(high)?;",
+			"let (low_ptr, _low) = get_series_f64_ptr(low)?;",
+			"let (close_ptr, _close) = get_series_f64_ptr(close)?;",
+			"let len = close.len();"
+			""
+			"let res = ta_$1(open_ptr, high_ptr, low_ptr, close_ptr, len, , &kwargs);"
+			"match res {",
+				"Ok(out) => Ok(Int32Chunked::new("", out).into_series()),",
+				"Err(ret_code) => ta_code2err(ret_code),",
+			"}",
+			"}",
+		],
+	}
+}
