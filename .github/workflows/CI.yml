@@ -78,9 +78,13 @@ jobs:
         with:
           version: latest
           platform: ${{ matrix.target }}
+      - name: Setup | Rust
+        uses: ATiltedTree/setup-rust@v1
+      - name: Setup | Maturin
+        run: cargo install maturin
       - uses: ilammy/msvc-dev-cmd@v1
         with:
-          arch: ${{ matrix.arch }}
+          arch: ${{ matrix.target }}
       - name: check nmake
         run: |
           nmake.exe
