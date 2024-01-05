@@ -81,6 +81,9 @@ jobs:
       - uses: ilammy/msvc-dev-cmd@v1
         with:
           arch: ${{ matrix.arch }}
+      - name: check nmake
+        run: |
+          nmake
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
