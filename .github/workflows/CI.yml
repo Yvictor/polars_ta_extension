@@ -80,6 +80,8 @@ jobs:
           platform: ${{ matrix.target }}
       - name: Setup | Rust
         uses: ATiltedTree/setup-rust@v1
+        with:
+          rust-version: stable
       - name: Setup | Maturin
         run: cargo install maturin
       - uses: ilammy/msvc-dev-cmd@v1
