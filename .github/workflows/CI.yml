@@ -83,7 +83,7 @@ jobs:
           arch: ${{ matrix.arch }}
       - name: check nmake
         run: |
-          nmake
+          nmake.exe
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
