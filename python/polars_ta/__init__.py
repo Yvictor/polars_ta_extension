@@ -18,6 +18,746 @@ class TAExpr:
     def __init__(self, expr: pl.Expr):
         self._expr = expr
 
+    def adx(
+        self, high: IntoExpr = pl.col("high"), low: IntoExpr = pl.col("low"), timeperiod: int = 14
+    ) -> pl.Expr:
+        """Average Directional Movement Index (Momentum Indicators)
+        pl.col("close").ta.adx("high", "low", timeperiod=14)
+
+        Inputs:
+            prices: ['high', 'low', 'close']
+        Parameters:
+            timeperiod: 14
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[high, low],
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="adx",
+            is_elementwise=False,
+        )
+
+    def adxr(
+        self, high: IntoExpr = pl.col("high"), low: IntoExpr = pl.col("low"), timeperiod: int = 14
+    ) -> pl.Expr:
+        """Average Directional Movement Index Rating (Momentum Indicators)
+        pl.col("close").ta.adxr("high", "low", timeperiod=14)
+
+        Inputs:
+            prices: ['high', 'low', 'close']
+        Parameters:
+            timeperiod: 14
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[high, low],
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="adxr",
+            is_elementwise=False,
+        )
+
+    def apo(self, fastperiod: int = 12, slowperiod: int = 26, matype: int = 0) -> pl.Expr:
+        """Absolute Price Oscillator (Momentum Indicators)
+        pl.col("close").ta.apo(fastperiod=12, slowperiod=26, matype=0)
+
+        Inputs:
+            prices: ['close']
+        Parameters:
+            fastperiod: 12
+            slowperiod: 26
+            matype: 0
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[],
+            kwargs={
+                "fastperiod": fastperiod,
+                "slowperiod": slowperiod,
+                "matype": matype,
+            },
+            symbol="apo",
+            is_elementwise=False,
+        )
+
+    def aroon(self, low: IntoExpr = pl.col("low"), timeperiod: int = 14) -> pl.Expr:
+        """Aroon (Momentum Indicators)
+        pl.col("high").ta.aroon("low", timeperiod=14)
+        Inputs:
+            prices: ['high', 'low']
+        Parameters:
+            timeperiod: 14
+        Outputs:
+            aroondown
+            aroonup
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[low],
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="aroon",
+            is_elementwise=False,
+        )
+
+    def aroonosc(self, low: IntoExpr = pl.col("low"), timeperiod: int = 14) -> pl.Expr:
+        """Aroon Oscillator (Momentum Indicators)
+        pl.col("high").ta.aroonosc("low", timeperiod=14)
+
+        Inputs:
+            prices: ['high', 'low']
+        Parameters:
+            timeperiod: 14
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[low],
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="aroonosc",
+            is_elementwise=False,
+        )
+
+    def bop(
+        self,
+        high: IntoExpr = pl.col("high"),
+        low: IntoExpr = pl.col("low"),
+        close: IntoExpr = pl.col("close"),
+    ) -> pl.Expr:
+        """Balance Of Power (Momentum Indicators)
+        pl.col("open").ta.bop("high", "low", "close")
+
+        Inputs:
+            prices: ['open', 'high', 'low', 'close']
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[high, low, close],
+            symbol="bop",
+            is_elementwise=False,
+        )
+
+    def cci(
+        self, high: IntoExpr = pl.col("high"), low: IntoExpr = pl.col("low"), timeperiod: int = 14
+    ) -> pl.Expr:
+        """Commodity Channel Index (Momentum Indicators)
+        pl.col("close").ta.cci("high", "low", timeperiod=14)
+
+        Inputs:
+            prices: ['high', 'low', 'close']
+        Parameters:
+            timeperiod: 14
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[high, low],
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="cci",
+            is_elementwise=False,
+        )
+
+    def cmo(self, timeperiod: int = 14) -> pl.Expr:
+        """Chande Momentum Oscillator (Momentum Indicators)
+        pl.col("close").ta.cmo(timeperiod=14)
+
+        Inputs:
+            prices: ['close']
+        Parameters:
+            timeperiod: 14
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[],
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="cmo",
+            is_elementwise=False,
+        )
+
+    def dx(
+        self, high: IntoExpr = pl.col("high"), low: IntoExpr = pl.col("low"), timeperiod: int = 14
+    ) -> pl.Expr:
+        """Directional Movement Index (Momentum Indicators)
+        pl.col("close").ta.dx("high", "low", timeperiod=14)
+
+        Inputs:
+            prices: ['high', 'low', 'close']
+        Parameters:
+            timeperiod: 14
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[high, low],
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="dx",
+            is_elementwise=False,
+        )
+
+    def macd(self, fastperiod: int = 12, slowperiod: int = 26, signalperiod: int = 9) -> pl.Expr:
+        """Moving Average Convergence/Divergence (Momentum Indicators)
+        pl.col("close").ta.macd(fastperiod=12, slowperiod=26, signalperiod=9)
+
+        Inputs:
+            prices: ['close']
+        Parameters:
+            fastperiod: 12
+            slowperiod: 26
+            signalperiod: 9
+        Outputs:
+            macd
+            macdsignal
+            macdhist
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[],
+            kwargs={
+                "fastperiod": fastperiod,
+                "slowperiod": slowperiod,
+                "signalperiod": signalperiod,
+            },
+            symbol="macd",
+            is_elementwise=False,
+        )
+
+    def macdext(
+        self,
+        fastperiod: int = 12,
+        slowperiod: int = 26,
+        signalperiod: int = 9,
+        fastmatype: int = 0,
+        slowmatype: int = 0,
+        signalmatype: int = 0,
+    ) -> pl.Expr:
+        """MACD with controllable MA type (Momentum Indicators)
+        pl.col("close").ta.macdext(fastperiod=12, slowperiod=26, signalperiod=9, fastmatype=0, slowmatype=0, signalmatype=0)
+
+        Inputs:
+            prices: ['close']
+        Parameters:
+            fastperiod: 12
+            slowperiod: 26
+            signalperiod: 9
+            fastmatype: 0
+            slowmatype: 0
+            signalmatype: 0
+        Outputs:
+            macd
+            macdsignal
+            macdhist
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[],
+            kwargs={
+                "fastperiod": fastperiod,
+                "slowperiod": slowperiod,
+                "signalperiod": signalperiod,
+                "fastmatype": fastmatype,
+                "slowmatype": slowmatype,
+                "signalmatype": signalmatype,
+            },
+            symbol="macdext",
+            is_elementwise=False,
+        )
+
+    def macdfix(self, signalperiod: int = 9) -> pl.Expr:
+        """Moving Average Convergence/Divergence Fix 12/26 (Momentum Indicators)
+        pl.col("close").ta.macdfix(signalperiod=9)
+
+        Inputs:
+            prices: ['close']
+        Parameters:
+            signalperiod: 9
+        Outputs:
+            macd
+            macdsignal
+            macdhist
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[],
+            kwargs={
+                "signalperiod": signalperiod,
+            },
+            symbol="macdfix",
+            is_elementwise=False,
+        )
+
+    def mfi(
+        self,
+        high: IntoExpr = pl.col("high"),
+        low: IntoExpr = pl.col("low"),
+        volume: IntoExpr = pl.col("volume"),
+        timeperiod: int = 14,
+    ) -> pl.Expr:
+        """Money Flow Index (Momentum Indicators)
+        pl.col("close").ta.mfi("high", "low", "volume", timeperiod=14)
+
+        Inputs:
+            prices: ['high', 'low', 'close', 'volume']
+        Parameters:
+            timeperiod: 14
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[high, low, volume],
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="mfi",
+            is_elementwise=False,
+        )
+
+    def minus_di(
+        self, high: IntoExpr = pl.col("high"), low: IntoExpr = pl.col("low"), timeperiod: int = 14
+    ) -> pl.Expr:
+        """Minus Directional Indicator (Momentum Indicators)
+        pl.col("close").ta.minus_di("high", "low", timeperiod=14)
+
+        Inputs:
+            prices: ['high', 'low', 'close']
+        Parameters:
+            timeperiod: 14
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[high, low],
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="minus_di",
+            is_elementwise=False,
+        )
+
+    def minus_dm(self, low: IntoExpr = pl.col("low"), timeperiod: int = 14) -> pl.Expr:
+        """Minus Directional Movement (Momentum Indicators)
+        pl.col("high").ta.minus_dm("low", timeperiod=14)
+
+        Inputs:
+            prices: ['high', 'low']
+        Parameters:
+            timeperiod: 14
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[low],
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="minus_dm",
+            is_elementwise=False,
+        )
+
+    def mom(self, timeperiod: int = 10) -> pl.Expr:
+        """Momentum (Momentum Indicators)
+        pl.col("close").ta.mom(timeperiod=10)
+
+        Inputs:
+            prices: ['close']
+        Parameters:
+            timeperiod: 10
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[],
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="mom",
+            is_elementwise=False,
+        )
+
+    def plus_di(
+        self, high: IntoExpr = pl.col("high"), low: IntoExpr = pl.col("low"), timeperiod: int = 14
+    ) -> pl.Expr:
+        """Plus Directional Indicator (Momentum Indicators)
+        pl.col("close").ta.plus_di("high", "low", timeperiod=14)
+
+        Inputs:
+            prices: ['high', 'low', 'close']
+        Parameters:
+            timeperiod: 14
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[high, low],
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="plus_di",
+            is_elementwise=False,
+        )
+
+    def plus_dm(self, low: IntoExpr = pl.col("low"), timeperiod: int = 14) -> pl.Expr:
+        """Plus Directional Movement (Momentum Indicators)
+        pl.col("high").ta.plus_dm("low", timeperiod=14)
+
+        Inputs:
+            prices: ['high', 'low']
+        Parameters:
+            timeperiod: 14
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[low],
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="plus_dm",
+            is_elementwise=False,
+        )
+
+    def ppo(self, fastperiod: int = 12, slowperiod: int = 26, matype: int = 0) -> pl.Expr:
+        """Percentage Price Oscillator (Momentum Indicators)
+        pl.col("close").ta.ppo(fastperiod=12, slowperiod=26, matype=0)
+
+        Inputs:
+            prices: ['close']
+        Parameters:
+            fastperiod: 12
+            slowperiod: 26
+            matype: 0
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[],
+            kwargs={
+                "fastperiod": fastperiod,
+                "slowperiod": slowperiod,
+                "matype": matype,
+            },
+            symbol="ppo",
+            is_elementwise=False,
+        )
+
+    def roc(self, timeperiod: int = 10) -> pl.Expr:
+        """Rate of change : ((price/prevPrice)-1)*100 (Momentum Indicators)
+        pl.col("close").ta.roc(timeperiod=10)
+
+        Inputs:
+            prices: ['close']
+        Parameters:
+            timeperiod: 10
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[],
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="roc",
+            is_elementwise=False,
+        )
+
+    def rocp(self, timeperiod: int = 10) -> pl.Expr:
+        """Rate of change Percentage: (price-prevPrice)/prevPrice (Momentum Indicators)
+        pl.col("close").ta.rocp(timeperiod=10)
+
+        Inputs:
+            prices: ['close']
+        Parameters:
+            timeperiod: 10
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[],
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="rocp",
+            is_elementwise=False,
+        )
+
+    def rocr(self, timeperiod: int = 10) -> pl.Expr:
+        """Rate of change ratio: (price/prevPrice) (Momentum Indicators)
+        pl.col("close").ta.rocr(timeperiod=10)
+
+        Inputs:
+            prices: ['close']
+        Parameters:
+            timeperiod: 10
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[],
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="rocr",
+            is_elementwise=False,
+        )
+
+    def rocr100(self, timeperiod: int = 10) -> pl.Expr:
+        """Rate of change ratio 100 scale: (price/prevPrice)*100 (Momentum Indicators)
+        pl.col("close").ta.rocr100(timeperiod=10)
+
+        Inputs:
+            prices: ['close']
+        Parameters:
+            timeperiod: 10
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[],
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="rocr100",
+            is_elementwise=False,
+        )
+
+    def rsi(self, timeperiod: int = 14) -> pl.Expr:
+        """Relative Strength Index (Momentum Indicators)
+        pl.col("close").ta.rsi(timeperiod=14)
+
+        Inputs:
+            prices: ['close']
+        Parameters:
+            timeperiod: 14
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[],
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="rsi",
+            is_elementwise=False,
+        )
+
+    def stoch(
+        self,
+        high: IntoExpr = pl.col("high"),
+        low: IntoExpr = pl.col("low"),
+        fastk_period: int = 5,
+        slowk_period: int = 3,
+        slowk_matype: int = 0,
+        slowd_period: int = 3,
+        slowd_matype: int = 0,
+    ) -> pl.Expr:
+        """Stochastic (Momentum Indicators)
+        pl.col("close").ta.stoch("high", "low", fastk_period=5, slowk_period=3, slowk_matype=0, slowd_period=3, slowd_matype=0)
+
+        Inputs:
+            prices: ['high', 'low', 'close']
+        Parameters:
+            fastk_period: 5
+            slowk_period: 3
+            slowk_matype: 0
+            slowd_period: 3
+            slowd_matype: 0
+        Outputs:
+            slowk
+            slowd
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[high, low],
+            kwargs={
+                "fastk_period": fastk_period,
+                "slowk_period": slowk_period,
+                "slowk_matype": slowk_matype,
+                "slowd_period": slowd_period,
+                "slowd_matype": slowd_matype,
+            },
+            symbol="stoch",
+            is_elementwise=False,
+        )
+
+    def stochf(
+        self,
+        high: IntoExpr = pl.col("high"),
+        low: IntoExpr = pl.col("low"),
+        fastk_period: int = 5,
+        fastd_period: int = 3,
+        fastd_matype: int = 0,
+    ) -> pl.Expr:
+        """Stochastic Fast (Momentum Indicators)
+        pl.col("close").ta.stochf("high", "low", fastk_period=5, fastd_period=3, fastd_matype=0)
+
+        Inputs:
+            prices: ['high', 'low', 'close']
+        Parameters:
+            fastk_period: 5
+            fastd_period: 3
+            fastd_matype: 0
+        Outputs:
+            fastk
+            fastd
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[high, low],
+            kwargs={
+                "fastk_period": fastk_period,
+                "fastd_period": fastd_period,
+                "fastd_matype": fastd_matype,
+            },
+            symbol="stochf",
+            is_elementwise=False,
+        )
+
+    def stochrsi(
+        self,
+        timeperiod: int = 14,
+        fastk_period: int = 5,
+        fastd_period: int = 3,
+        fastd_matype: int = 0,
+    ) -> pl.Expr:
+        """Stochastic Relative Strength Index (Momentum Indicators)
+        pl.col("close").ta.stochrsi(timeperiod=14, fastk_period=5, fastd_period=3, fastd_matype=0)
+
+        Inputs:
+            prices: ['close']
+        Parameters:
+            timeperiod: 14
+            fastk_period: 5
+            fastd_period: 3
+            fastd_matype: 0
+        Outputs:
+            fastk
+            fastd
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[],
+            kwargs={
+                "timeperiod": timeperiod,
+                "fastk_period": fastk_period,
+                "fastd_period": fastd_period,
+                "fastd_matype": fastd_matype,
+            },
+            symbol="stochrsi",
+            is_elementwise=False,
+        )
+
+    def trix(self, timeperiod: int = 30) -> pl.Expr:
+        """1-day Rate-Of-Change (ROC) of a Triple Smooth EMA (Momentum Indicators)
+        pl.col("close").ta.trix(timeperiod=30)
+
+        Inputs:
+            prices: ['close']
+        Parameters:
+            timeperiod: 30
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[],
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="trix",
+            is_elementwise=False,
+        )
+
+    def ultosc(
+        self,
+        high: IntoExpr = pl.col("high"),
+        low: IntoExpr = pl.col("low"),
+        timeperiod1: int = 7,
+        timeperiod2: int = 14,
+        timeperiod3: int = 28,
+    ) -> pl.Expr:
+        """Ultimate Oscillator (Momentum Indicators)
+        pl.col("close").ta.ultosc("high", "low", timeperiod1=7, timeperiod2=14, timeperiod3=28)
+
+        Inputs:
+            prices: ['open', 'high', 'low', 'close']
+        Parameters:
+            timeperiod1: 7
+            timeperiod2: 14
+            timeperiod3: 28
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[high, low],
+            kwargs={
+                "timeperiod1": timeperiod1,
+                "timeperiod2": timeperiod2,
+                "timeperiod3": timeperiod3,
+            },
+            symbol="ultosc",
+            is_elementwise=False,
+        )
+
+    def willr(
+        self, high: IntoExpr = pl.col("high"), low: IntoExpr = pl.col("low"), timeperiod: int = 14
+    ) -> pl.Expr:
+        """Williams' %R (Momentum Indicators)
+        pl.col("close").ta.willr("high", "low", timeperiod=14)
+
+        Inputs:
+            prices: ['high', 'low', 'close']
+        Parameters:
+            timeperiod: 14
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[high, low],
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="willr",
+            is_elementwise=False,
+        )
+
     def bbands(
         self, timeperiod: int = 5, nbdevup: float = 2.0, nbdevdn: float = 2.0, ma_type: int = 0
     ) -> pl.Expr:
@@ -463,50 +1203,6 @@ class TAExpr:
         return self._expr.register_plugin(
             lib=lib,
             symbol="ht_dcperiod",
-            is_elementwise=False,
-        )
-
-    def adx(
-        self, high: IntoExpr = pl.col("high"), low: IntoExpr = pl.col("low"), timeperiod: int = 14
-    ) -> pl.Expr:
-        """Average Directional Movement Index (Momentum Indicators)
-        pl.col("close").ta.adx("high", "low", [, timeperiod=?])
-
-        Inputs:
-            prices: ['high', 'low', 'close']
-        Parameters:
-            timeperiod: 14
-        Outputs:
-            real
-        """
-        return self._expr.register_plugin(
-            lib=lib,
-            args=[high, low],
-            kwargs={
-                "timeperiod": timeperiod,
-            },
-            symbol="adx",
-            is_elementwise=False,
-        )
-
-    def aroon(self, low: IntoExpr = pl.col("low"), timeperiod: int = 14) -> pl.Expr:
-        """Aroon (Momentum Indicators)
-        pl.col("high").ta.aroon("low", [, timeperiod=?])
-        Inputs:
-            prices: ['high', 'low']
-        Parameters:
-            timeperiod: 14
-        Outputs:
-            aroondown
-            aroonup
-        """
-        return self._expr.register_plugin(
-            lib=lib,
-            args=[low],
-            kwargs={
-                "timeperiod": timeperiod,
-            },
-            symbol="aroon",
             is_elementwise=False,
         )
 

@@ -1,4 +1,4 @@
-use crate::utils::make_vec;
+use crate::{utils::make_vec, common::TimePeriodKwargs};
 use serde::Deserialize;
 use talib_sys::{
     TA_BBANDS_Lookback, TA_DEMA_Lookback, TA_EMA_Lookback, TA_HT_TRENDLINE_Lookback, TA_Integer,
@@ -8,6 +8,7 @@ use talib_sys::{
     TA_BBANDS, TA_DEMA, TA_EMA, TA_HT_TRENDLINE, TA_KAMA, TA_MA, TA_MAMA, TA_MAVP, TA_MIDPOINT,
     TA_MIDPRICE, TA_SAR, TA_SAREXT, TA_SMA, TA_T3, TA_TEMA, TA_TRIMA, TA_WMA,
 };
+
 
 #[derive(Deserialize)]
 pub struct BBANDSKwargs {
@@ -73,10 +74,6 @@ pub fn ta_bbands(
     }
 }
 
-#[derive(Deserialize)]
-pub struct TimePeriodKwargs {
-    timeperiod: i32,
-}
 
 pub fn ta_dema(
     real_ptr: *const f64,

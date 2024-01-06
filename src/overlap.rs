@@ -1,11 +1,11 @@
 use crate::utils::{get_series_f64_ptr, ta_code2err};
 use polars::prelude::*;
 use pyo3_polars::derive::polars_expr;
-
+use talib::common::TimePeriodKwargs;
 use talib::overlap::{
     ta_bbands, ta_dema, ta_ema, ta_ht_trendline, ta_kama, ta_ma, ta_mama, ta_mavp, ta_midpoint,
     ta_midprice, ta_sar, ta_sarext, ta_sma, ta_t3, ta_tema, ta_trima, ta_wma, BBANDSKwargs,
-    MaKwargs, MamaKwargs, MavpKwargs, SarExtKwargs, SarKwargs, T3Kwargs, TimePeriodKwargs,
+    MaKwargs, MamaKwargs, MavpKwargs, SarExtKwargs, SarKwargs, T3Kwargs,
 };
 
 pub fn bbands_output(_: &[Field]) -> PolarsResult<Field> {

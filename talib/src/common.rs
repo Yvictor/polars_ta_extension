@@ -1,5 +1,5 @@
 use std::ffi::CStr;
-
+use serde::Deserialize;
 use talib_sys::{
     // TA_GetCompatibility,
     // TA_GetUnstablePeriod,
@@ -31,4 +31,10 @@ pub fn ta_version() -> String {
     let version = unsafe { TA_GetVersionString() };
     let version = unsafe { CStr::from_ptr(version) };
     version.to_string_lossy().into_owned()
+}
+
+
+#[derive(Deserialize)]
+pub struct TimePeriodKwargs {
+    pub timeperiod: i32,
 }
