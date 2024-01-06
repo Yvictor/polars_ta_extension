@@ -40,11 +40,15 @@ impl ParseCallbacks for DerivesCallback {
 fn main() {
     #[cfg(target_os = "windows")]
     let ta_lib_gz = format!("ta-lib-{TA_LIB_VER}-msvc.zip");
+    #[cfg(target_os = "windows")]
+    let ta_lib_url = format!("https://github.com/Yvictor/misc/releases/download/v1.0/{ta_lib_gz}");
     #[cfg(target_family = "unix")]
     let ta_lib_gz = format!("ta-lib-{TA_LIB_VER}-src.tar.gz");
+    #[cfg(target_family = "unix")]
     let ta_lib_url = format!(
         "https://sourceforge.net/projects/ta-lib/files/ta-lib/{TA_LIB_VER}/{ta_lib_gz}/download"
     );
+
     let cwd = env::current_dir().unwrap();
     let deps_dir = PathBuf::from(
         &env::var("DEPS_PATH").unwrap_or(cwd.join("dependencies").display().to_string()),
@@ -112,7 +116,8 @@ fn main() {
                 std::fs::copy(
                     ta_lib_path.join("ta_libc_crd.lib"),
                     ta_lib_path.join("ta_lib.lib"),
-                ).unwrap();
+                )
+                .unwrap();
             }
         } else {
             let mut archive = tar::Archive::new(flate2::read::GzDecoder::new(file_gz));
@@ -129,18 +134,18 @@ fn main() {
                 })
                 .filter_map(|e| e.ok())
                 .for_each(|x| println!("> {}", x.display()));
-    
+
             Command::new("./configure")
                 .arg(format!("--prefix={}", deps_dir.display()))
                 .current_dir(&tmp_dir.join("ta-lib"))
                 .status()
                 .expect("Failed to run configure command");
-    
+
             Command::new("make")
                 .current_dir(&tmp_dir.join("ta-lib"))
                 .status()
                 .expect("Failed to run make command");
-    
+
             Command::new("make")
                 .arg("install")
                 .current_dir(&tmp_dir.join("ta-lib"))
