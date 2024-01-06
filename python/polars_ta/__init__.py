@@ -12,6 +12,7 @@ lib = _get_shared_lib_location(__file__)
 initialize()
 atexit.register(shutdown)
 
+
 @pl.api.register_expr_namespace("ta")
 class TAExpr:
     def __init__(self, expr: pl.Expr):
@@ -20,7 +21,21 @@ class TAExpr:
     def bbands(
         self, timeperiod: int = 5, nbdevup: float = 2.0, nbdevdn: float = 2.0, ma_type: int = 0
     ) -> pl.Expr:
-        """bbands"""
+        """Bollinger Bands (Overlap Studies)
+        ta.pol("close").ta.bbands(timeperiod=5, nbdevup=2.0, nbdevdn=2.0, ma_type=0)
+
+        Inputs:
+            real: (any ndarray)
+        Parameters:
+            timeperiod: 5
+            nbdevup: 2.0
+            nbdevdn: 2.0
+            ma_type: 0
+        Outputs:
+            upperband: real
+            middleband: real
+            lowerband: real
+        """
         return self._expr.register_plugin(
             lib=lib,
             args=[],
@@ -38,8 +53,15 @@ class TAExpr:
         self,
         timeperiod: int = 30,
     ) -> pl.Expr:
-        """
-        This example shows how arguments other than `Series` can be used.
+        """Double Exponential Moving Average (Overlap Studies)
+        ta.pol("close").ta.ema(timeperiod=30)
+
+        Inputs:
+            real: (any ndarray)
+        Parameters:
+            timeperiod: 30
+        Outputs:
+            real
         """
         return self._expr.register_plugin(
             lib=lib,
@@ -48,6 +70,361 @@ class TAExpr:
                 "timeperiod": timeperiod,
             },
             symbol="ema",
+            is_elementwise=False,
+        )
+
+    def dema(self, timeperiod: int = 30) -> pl.Expr:
+        """Double Exponential Moving Average (Overlap Studies)
+        ta.pol("close").ta.dema(timeperiod=30)
+
+        Inputs:
+            real: (any ndarray)
+        Parameters:
+            timeperiod: 30
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[],
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="dema",
+            is_elementwise=False,
+        )
+
+    def ht_trendline(self) -> pl.Expr:
+        """Hilbert Transform - Instantaneous Trendline (Overlap Studies)
+        ta.pol("close").ta.ht_trendline()
+
+        Inputs:
+            real: (any ndarray)
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            symbol="ht_trendline",
+            is_elementwise=False,
+        )
+
+    def kama(self, timeperiod: int = 30) -> pl.Expr:
+        """Kaufman Adaptive Moving Average (Overlap Studies)
+        ta.pol("close").ta.kama(timeperiod=30)
+
+        Inputs:
+            real: (any ndarray)
+        Parameters:
+            timeperiod: 30
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[],
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="kama",
+            is_elementwise=False,
+        )
+
+    def ma(self, timeperiod: int = 30, matype: int = 0) -> pl.Expr:
+        """Moving average (Overlap Studies)
+        ta.pol("close").ta.ma(timeperiod=30, matype=0)
+
+        Inputs:
+            real: (any ndarray)
+        Parameters:
+            timeperiod: 30
+            matype: 0
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[],
+            kwargs={
+                "timeperiod": timeperiod,
+                "matype": matype,
+            },
+            symbol="ma",
+            is_elementwise=False,
+        )
+
+    def mama(self, fastlimit: float = 0.5, slowlimit: float = 0.05) -> pl.Expr:
+        """MESA Adaptive Moving Average (Overlap Studies)
+        ta.pol("close").ta.mama(fastlimit=0.5, slowlimit=0.05)
+
+        Inputs:
+            real: (any ndarray)
+        Parameters:
+            fastlimit: 0.5
+            slowlimit: 0.05
+        Outputs:
+            mama: real
+            fama: real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[],
+            kwargs={
+                "fastlimit": fastlimit,
+                "slowlimit": slowlimit,
+            },
+            symbol="mama",
+            is_elementwise=False,
+        )
+
+    def mavp(
+        self, periods: IntoExpr, minperiod: int = 2, maxperiod: int = 30, matype: int = 0
+    ) -> pl.Expr:
+        """Moving average with variable period (Overlap Studies)
+        ta.pol("close").ta.mavp(periods, minperiod=2, maxperiod=30, matype=0)
+
+        Inputs:
+            real: (any ndarray)
+            periods: (any ndarray)
+        Parameters:
+            minperiod: 2
+            maxperiod: 30
+            matype: 0
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[periods],
+            kwargs={
+                "minperiod": minperiod,
+                "maxperiod": maxperiod,
+                "matype": matype,
+            },
+            symbol="mavp",
+            is_elementwise=False,
+        )
+
+    def midpoint(self, timeperiod: int = 14) -> pl.Expr:
+        """MidPoint over period (Overlap Studies)
+        ta.pol("close").ta.midpoint(timeperiod=14)
+
+        Inputs:
+            real: (any ndarray)
+        Parameters:
+            timeperiod: 14
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[],
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="midpoint",
+            is_elementwise=False,
+        )
+
+    def midprice(self, low: IntoExpr = pl.col("low"), timeperiod: int = 14) -> pl.Expr:
+        """Midpoint Price over period (Overlap Studies)
+        ta.pol("high").ta.midprice(pl.col("low"), timeperiod=14)
+
+        Inputs:
+            high: (any ndarray)
+            low: (any ndarray)
+        Parameters:
+            timeperiod: 14
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[low],
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="midprice",
+            is_elementwise=False,
+        )
+
+    def sar(
+        self, low: IntoExpr = pl.col("low"), acceleration: float = 0.02, maximum: float = 0.2
+    ) -> pl.Expr:
+        """Parabolic SAR (Overlap Studies)
+        ta.pol("high").ta.sar(pl.col("low"), acceleration=0.02, maximum=0.2)
+
+        Inputs:
+            high: (any ndarray)
+            low: (any ndarray)
+        Parameters:
+            acceleration: 0.02
+            maximum: 0.2
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[low],
+            kwargs={
+                "acceleration": acceleration,
+                "maximum": maximum,
+            },
+            symbol="sar",
+            is_elementwise=False,
+        )
+
+    def sarext(
+        self,
+        low: IntoExpr = pl.col("low"),
+        startvalue: float = 0.0,
+        offsetonreverse: float = 0.0,
+        accelerationinitlong: float = 0.02,
+        accelerationlong: float = 0.02,
+        accelerationmaxlong: float = 0.2,
+        accelerationinitshort: float = 0.02,
+        accelerationshort: float = 0.02,
+        accelerationmaxshort: float = 0.2,
+    ) -> pl.Expr:
+        """Parabolic SAR - Extended (Overlap Studies)
+        ta.pol("high").ta.sarext(pl.col("low"), accelerationinitlong=0.02, accelerationlong=0.02)
+
+        Inputs:
+            high: (any ndarray)
+            low: (any ndarray)
+        Parameters:
+            startvalue: 0.0
+            offsetonreverse: 0.0
+            accelerationinitlong: 0.02
+            accelerationlong: 0.02
+            accelerationmaxlong: 0.2
+            accelerationinitshort: 0.02
+            accelerationshort: 0.02
+            accelerationmaxshort: 0.2
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[low],
+            kwargs={
+                "startvalue": startvalue,
+                "offsetonreverse": offsetonreverse,
+                "accelerationinitlong": accelerationinitlong,
+                "accelerationlong": accelerationlong,
+                "accelerationmaxlong": accelerationmaxlong,
+                "accelerationinitshort": accelerationinitshort,
+                "accelerationshort": accelerationshort,
+                "accelerationmaxshort": accelerationmaxshort,
+            },
+            symbol="sarext",
+            is_elementwise=False,
+        )
+
+    def sma(self, timeperiod: int = 30) -> pl.Expr:
+        """Simple Moving Average (Overlap Studies)
+        ta.pol("close").ta.sma(timeperiod=30)
+
+        Inputs:
+            real: (any ndarray)
+        Parameters:
+            timeperiod: 30
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[],
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="sma",
+            is_elementwise=False,
+        )
+
+    def t3(self, timeperiod: int = 5, vfactor: float = 0.7) -> pl.Expr:
+        """Triple Exponential Moving Average T3 (Overlap Studies)
+        ta.pol("close").ta.t3(timeperiod=5, vfactor=0.7)
+
+        Inputs:
+            real: (any ndarray)
+        Parameters:
+            timeperiod: 5
+            vfactor: 0.7
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[],
+            kwargs={
+                "timeperiod": timeperiod,
+                "vfactor": vfactor,
+            },
+            symbol="t3",
+            is_elementwise=False,
+        )
+
+    def tema(self, timeperiod: int = 30) -> pl.Expr:
+        """Triple Exponential Moving Average (Overlap Studies)
+        ta.pol("close").ta.tema(timeperiod=30)
+
+        Inputs:
+            real: (any ndarray)
+        Parameters:
+            timeperiod: 30
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[],
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="tema",
+            is_elementwise=False,
+        )
+
+    def trima(self, timeperiod: int = 30) -> pl.Expr:
+        """Triangular Moving Average (Overlap Studies)
+        ta.pol("close").ta.trima(timeperiod=30)
+
+        Inputs:
+            real: (any ndarray)
+        Parameters:
+            timeperiod: 30
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[],
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="trima",
+            is_elementwise=False,
+        )
+
+    def wma(self, timeperiod: int = 30) -> pl.Expr:
+        """Weighted Moving Average (Overlap Studies)
+        ta.pol("close").ta.wma(timeperiod=30)
+
+        Inputs:
+            real: (any ndarray)
+        Parameters:
+            timeperiod: 30
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[],
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="wma",
             is_elementwise=False,
         )
 

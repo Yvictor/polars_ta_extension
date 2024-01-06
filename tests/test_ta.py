@@ -18,14 +18,205 @@ def df_ohlc():
     volume_series = pl.Series("volume", volume)
     return pl.DataFrame([close_series, high_series, low_series, open_series, volume_series])
 
+
 def test_version():
     assert plta.__talib_version__[:5] == "0.4.0"
+
+def test_ta_has_impl():
+    pass
+
+
+def test_bbands_eq(df_ohlc: pl.DataFrame):
+    not_eq = df_ohlc.with_columns(
+        pl.col("close").ta.bbands(3).struct.field("upperband").alias("expr"),
+        talib.BBANDS(df_ohlc["close"], timeperiod=3, nbdevup=2, nbdevdn=2)[0].alias("talib"),
+    ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+
+    assert not_eq == 0
+
+    not_eq = df_ohlc.with_columns(
+        pl.col("close").ta.bbands(3).struct.field("middleband").alias("expr"),
+        talib.BBANDS(df_ohlc["close"], timeperiod=3, nbdevup=2, nbdevdn=2)[1].alias("talib"),
+    ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+
+    assert not_eq == 0
+
+    not_eq = df_ohlc.with_columns(
+        pl.col("close").ta.bbands(3).struct.field("lowerband").alias("expr"),
+        talib.BBANDS(df_ohlc["close"], timeperiod=3, nbdevup=2, nbdevdn=2)[2].alias("talib"),
+    ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+
+    assert not_eq == 0
+
 
 def test_ema_eq(df_ohlc: pl.DataFrame):
     not_eq = df_ohlc.with_columns(
         pl.col("close").ta.ema(3).alias("ema3"),
         talib.EMA(df_ohlc["close"], timeperiod=3).alias("EMA3"),
     ).select(((pl.col("ema3") != pl.col("EMA3")).sum()).alias("not_eq"))["not_eq"][0]
+    assert not_eq == 0
+
+
+def test_dema_eq(df_ohlc: pl.DataFrame):
+    not_eq = df_ohlc.with_columns(
+        pl.col("close").ta.dema(3).alias("dema3"),
+        talib.DEMA(df_ohlc["close"], timeperiod=3).alias("DEMA3"),
+    ).select(((pl.col("dema3") != pl.col("DEMA3")).sum()).alias("not_eq"))["not_eq"][0]
+    assert not_eq == 0
+
+
+def test_ht_trendline_eq(df_ohlc: pl.DataFrame):
+    not_eq = df_ohlc.with_columns(
+        pl.col("close").ta.ht_trendline().alias("expr"),
+        talib.HT_TRENDLINE(df_ohlc["close"]).alias("talib"),
+    ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+
+    assert not_eq == 0
+
+
+def test_kama_eq(df_ohlc: pl.DataFrame):
+    not_eq = df_ohlc.with_columns(
+        pl.col("close").ta.kama(3).alias("kama3"),
+        talib.KAMA(df_ohlc["close"], timeperiod=3).alias("KAMA3"),
+    ).select(((pl.col("kama3") != pl.col("KAMA3")).sum()).alias("not_eq"))["not_eq"][0]
+    assert not_eq == 0
+
+
+def test_ma_eq(df_ohlc: pl.DataFrame):
+    not_eq = df_ohlc.with_columns(
+        pl.col("close").ta.ma(3).alias("ma3"),
+        talib.MA(df_ohlc["close"], timeperiod=3, matype=0).alias("MA3"),
+    ).select(((pl.col("ma3") != pl.col("MA3")).sum()).alias("not_eq"))["not_eq"][0]
+    assert not_eq == 0
+
+
+def test_mama_eq(df_ohlc: pl.DataFrame):
+    not_eq = df_ohlc.with_columns(
+        pl.col("close").ta.mama().struct.field("mama").alias("expr"),
+        talib.MAMA(df_ohlc["close"])[0].alias("talib"),
+    ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+
+    assert not_eq == 0
+
+    not_eq = df_ohlc.with_columns(
+        pl.col("close").ta.mama().struct.field("fama").alias("expr"),
+        talib.MAMA(df_ohlc["close"])[1].alias("talib"),
+    ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+
+    assert not_eq == 0
+
+
+def test_mavp_eq(df_ohlc: pl.DataFrame):
+    not_eq = df_ohlc.with_columns(
+        pl.col("close")
+        .ta.mavp(
+            (pl.col("volume") / pl.col("volume").max()) * 10, minperiod=2, maxperiod=30, matype=0
+        )
+        .alias("mavp3"),
+        talib.MAVP(
+            df_ohlc["close"],
+            (df_ohlc["volume"] / df_ohlc["volume"].max()) * 10,
+            minperiod=2,
+            maxperiod=30,
+            matype=0,
+        ).alias("MAVP3"),
+    ).select(((pl.col("mavp3") != pl.col("MAVP3")).sum()).alias("not_eq"))["not_eq"][0]
+    assert not_eq == 0
+
+
+def test_midpoint_eq(df_ohlc: pl.DataFrame):
+    not_eq = df_ohlc.with_columns(
+        pl.col("close").ta.midpoint(3).alias("midpoint3"),
+        talib.MIDPOINT(df_ohlc["close"], timeperiod=3).alias("MIDPOINT3"),
+    ).select(((pl.col("midpoint3") != pl.col("MIDPOINT3")).sum()).alias("not_eq"))["not_eq"][0]
+    assert not_eq == 0
+
+
+def test_midprice_eq(df_ohlc: pl.DataFrame):
+    not_eq = df_ohlc.with_columns(
+        pl.col("high").ta.midprice(pl.col("low"), 3).alias("midprice3"),
+        talib.MIDPRICE(df_ohlc["high"], df_ohlc["low"], timeperiod=3).alias("MIDPRICE3"),
+    ).select(((pl.col("midprice3") != pl.col("MIDPRICE3")).sum()).alias("not_eq"))["not_eq"][0]
+    assert not_eq == 0
+
+
+def test_sar_eq(df_ohlc: pl.DataFrame):
+    not_eq = df_ohlc.with_columns(
+        pl.col("high").ta.sar(pl.col("low"), acceleration=0.02, maximum=0.2).alias("expr"),
+        talib.SAR(df_ohlc["high"], df_ohlc["low"], acceleration=0.02, maximum=0.2).alias("talib"),
+    ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+    assert not_eq == 0
+
+
+def test_sarext_eq(df_ohlc: pl.DataFrame):
+    not_eq = df_ohlc.with_columns(
+        pl.col("high")
+        .ta.sarext(
+            pl.col("low"),
+            startvalue=0.0,
+            offsetonreverse=0.0,
+            accelerationinitlong=0.02,
+            accelerationlong=0.02,
+            accelerationmaxlong=0.2,
+            accelerationinitshort=0.02,
+            accelerationshort=0.02,
+            accelerationmaxshort=0.2,
+        )
+        .alias("expr"),
+        talib.SAREXT(
+            df_ohlc["high"],
+            df_ohlc["low"],
+            startvalue=0.0,
+            offsetonreverse=0.0,
+            accelerationinitlong=0.02,
+            accelerationlong=0.02,
+            accelerationmaxlong=0.2,
+            accelerationinitshort=0.02,
+            accelerationshort=0.02,
+            accelerationmaxshort=0.2,
+        ).alias("talib"),
+    ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+
+    assert not_eq == 0
+
+
+def test_sma_eq(df_ohlc: pl.DataFrame):
+    not_eq = df_ohlc.with_columns(
+        pl.col("close").ta.sma(3).alias("sma3"),
+        talib.SMA(df_ohlc["close"], timeperiod=3).alias("SMA3"),
+    ).select(((pl.col("sma3") != pl.col("SMA3")).sum()).alias("not_eq"))["not_eq"][0]
+    assert not_eq == 0
+
+
+def test_t3_eq(df_ohlc: pl.DataFrame):
+    not_eq = df_ohlc.with_columns(
+        pl.col("close").ta.t3(timeperiod=3, vfactor=0).alias("t33"),
+        talib.T3(df_ohlc["close"], timeperiod=3, vfactor=0).alias("T33"),
+    ).select(((pl.col("t33") != pl.col("T33")).sum()).alias("not_eq"))["not_eq"][0]
+    assert not_eq == 0
+
+
+def test_tema_eq(df_ohlc: pl.DataFrame):
+    not_eq = df_ohlc.with_columns(
+        pl.col("close").ta.tema(3).alias("tema3"),
+        talib.TEMA(df_ohlc["close"], timeperiod=3).alias("TEMA3"),
+    ).select(((pl.col("tema3") != pl.col("TEMA3")).sum()).alias("not_eq"))["not_eq"][0]
+    assert not_eq == 0
+
+
+def test_trima_eq(df_ohlc: pl.DataFrame):
+    not_eq = df_ohlc.with_columns(
+        pl.col("close").ta.trima(3).alias("trima3"),
+        talib.TRIMA(df_ohlc["close"], timeperiod=3).alias("TRIMA3"),
+    ).select(((pl.col("trima3") != pl.col("TRIMA3")).sum()).alias("not_eq"))["not_eq"][0]
+    assert not_eq == 0
+
+
+def test_wma_eq(df_ohlc: pl.DataFrame):
+    not_eq = df_ohlc.with_columns(
+        pl.col("close").ta.wma(3).alias("wma3"),
+        talib.WMA(df_ohlc["close"], timeperiod=3).alias("WMA3"),
+    ).select(((pl.col("wma3") != pl.col("WMA3")).sum()).alias("not_eq"))["not_eq"][0]
     assert not_eq == 0
 
 
