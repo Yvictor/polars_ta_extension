@@ -121,16 +121,16 @@ fn main() {
                 )
                 .unwrap();
                 let ta_lib_path = PathBuf::from(&ta_library_path);
-                let dir_content = fs_extra::dir::get_dir_content(ta_lib_path.clone()).unwrap();
-                println!("ta_lib_path: {:?}", ta_lib_path);
-                for f in dir_content.directories {
-                    println!("{}", f);
-                }
-                for f in dir_content.files {
-                    println!("{}", f);
-                }
+                // let dir_content = fs_extra::dir::get_dir_content(ta_lib_path.clone()).unwrap();
+                // println!("ta_lib_path: {:?}", ta_lib_path);
+                // for f in dir_content.directories {
+                //     println!("{}", f);
+                // }
+                // for f in dir_content.files {
+                //     println!("{}", f);
+                // }
                 std::fs::copy(
-                    ta_lib_path.join("ta_libc_crd.lib"),
+                    ta_lib_path.join("ta_libc_cdr.lib"),
                     ta_lib_path.join("ta_lib.lib"),
                 )
                 .unwrap();
