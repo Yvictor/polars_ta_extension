@@ -88,9 +88,9 @@ jobs:
           args: --release --out dist --find-interpreter
           sccache: 'true'
         env:
-          DEPS_PATH: ${{ github.workspace }}/dependencies
-          TA_INCLUDE_PATH: ${{ github.workspace }}/dependencies/include
-          TA_LIBRARY_PATH: ${{ github.workspace }}/dependencies/lib
+          DEPS_PATH: ${{ github.workspace }}\dependencies
+          TA_INCLUDE_PATH: ${{ github.workspace }}\dependencies\include
+          TA_LIBRARY_PATH: ${{ github.workspace }}\dependencies\lib
       - name: Upload wheels
         uses: actions/upload-artifact@v3
         with:
