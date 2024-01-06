@@ -28,6 +28,7 @@ module-name = "polars_ta._polars_ta"
 [project.optional-dependencies]
 dev = [
     "pytest >= 7.4.1",
+    "maturin[patchelf]",
     "polars",
     "numpy",
     "memray",

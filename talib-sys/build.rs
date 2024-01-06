@@ -94,7 +94,7 @@ fn main() {
             .unwrap();
             fs_extra::dir::copy(
                 &tmp_dir.join("ta-lib").join("c").join("include"),
-                ta_include_path.clone(),
+                deps_dir.clone(),
                 &fs_extra::dir::CopyOptions::new().skip_exist(true),
             )
             .unwrap();
