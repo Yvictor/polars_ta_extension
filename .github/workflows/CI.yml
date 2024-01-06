@@ -35,6 +35,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install .[dev]
           pytest
+        env:
+          DEPS_PATH: ${{ github.workspace }}/dependencies
+          TA_INCLUDE_PATH: ${{ github.workspace }}/dependencies/include
+          TA_LIBRARY_PATH: ${{ github.workspace }}/dependencies/lib
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:

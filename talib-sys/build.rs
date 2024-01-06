@@ -68,50 +68,52 @@ fn main() {
     if !lib_path.exists() {
         let mut file_gz = std::fs::File::open(file_gz_path).unwrap();
         if os == "windows" {
-            let metadata = std::fs::File::metadata(&file_gz).expect("unable to read metadata");
-            let mut buf = vec![0; metadata.len() as usize];
-            file_gz.read(&mut buf).expect("buffer overflow");
-            zip_extract::extract(Cursor::new(buf), &tmp_dir, false).unwrap();
-            Command::new("nmake")
-                .current_dir(
-                    &tmp_dir
-                        .join("ta-lib")
-                        .join("c")
-                        .join("make")
-                        .join("cdr")
-                        .join("win32")
-                        .join("msvc"),
+            if !lib_path.join("ta_lib.lib").exists() {
+                let metadata = std::fs::File::metadata(&file_gz).expect("unable to read metadata");
+                let mut buf = vec![0; metadata.len() as usize];
+                file_gz.read(&mut buf).expect("buffer overflow");
+                zip_extract::extract(Cursor::new(buf), &tmp_dir, false).unwrap();
+                Command::new("nmake")
+                    .current_dir(
+                        &tmp_dir
+                            .join("ta-lib")
+                            .join("c")
+                            .join("make")
+                            .join("cdr")
+                            .join("win32")
+                            .join("msvc"),
+                    )
+                    .status()
+                    .expect("Failed to run make command");
+                // nmake and clang
+                // set LIBCLANG_PATH=bin
+                fs_extra::dir::copy(
+                    &tmp_dir.join("ta-lib").join("c").join("lib"),
+                    deps_dir.clone(),
+                    &fs_extra::dir::CopyOptions::new().skip_exist(true),
                 )
-                .status()
-                .expect("Failed to run make command");
-            // nmake and clang
-            // set LIBCLANG_PATH=bin
-            fs_extra::dir::copy(
-                &tmp_dir.join("ta-lib").join("c").join("lib"),
-                deps_dir.clone(),
-                &fs_extra::dir::CopyOptions::new().skip_exist(true),
-            )
-            .unwrap();
-            fs_extra::dir::copy(
-                &tmp_dir.join("ta-lib").join("c").join("include"),
-                deps_dir.clone(),
-                &fs_extra::dir::CopyOptions::new().skip_exist(true),
-            )
-            .unwrap();
-            let _ = std::fs::create_dir_all(PathBuf::from(&ta_include_path).join("ta-lib"));
-            fs_extra::dir::copy(
-                &PathBuf::from(&ta_include_path),
-                PathBuf::from(&ta_include_path).join("ta-lib"),
-                &fs_extra::dir::CopyOptions::new()
-                    .skip_exist(true)
-                    .content_only(true),
-            )
-            .unwrap();
-            let ta_lib_path = PathBuf::from(&ta_library_path);
-            let _ = std::fs::copy(
-                ta_lib_path.join("ta_libc_crd.lib"),
-                ta_lib_path.join("ta_lib.lib"),
-            );
+                .unwrap();
+                fs_extra::dir::copy(
+                    &tmp_dir.join("ta-lib").join("c").join("include"),
+                    deps_dir.clone(),
+                    &fs_extra::dir::CopyOptions::new().skip_exist(true),
+                )
+                .unwrap();
+                let _ = std::fs::create_dir_all(PathBuf::from(&ta_include_path).join("ta-lib"));
+                fs_extra::dir::copy(
+                    &PathBuf::from(&ta_include_path),
+                    PathBuf::from(&ta_include_path).join("ta-lib"),
+                    &fs_extra::dir::CopyOptions::new()
+                        .skip_exist(true)
+                        .content_only(true),
+                )
+                .unwrap();
+                let ta_lib_path = PathBuf::from(&ta_library_path);
+                std::fs::copy(
+                    ta_lib_path.join("ta_libc_crd.lib"),
+                    ta_lib_path.join("ta_lib.lib"),
+                ).unwrap();
+            }
         } else {
             let mut archive = tar::Archive::new(flate2::read::GzDecoder::new(file_gz));
             archive
