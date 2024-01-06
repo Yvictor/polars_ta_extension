@@ -94,9 +94,17 @@ fn main() {
                 fs_extra::dir::copy(
                     &tmp_dir.join("ta-lib").join("c").join("lib"),
                     deps_dir.clone(),
-                    &fs_extra::dir::CopyOptions::new().skip_exist(true),
+                    &fs_extra::dir::CopyOptions::new().overwrite(true).skip_exist(true),
                 )
                 .unwrap();
+                let dir_content = fs_extra::dir::get_dir_content(deps_dir.clone()).unwrap();
+                println!("deps_dir: {:?}", deps_dir);
+                for f in dir_content.directories {
+                    println!("{}", f);
+                }
+                for f in dir_content.files {
+                    println!("{}", f);
+                }
                 fs_extra::dir::copy(
                     &tmp_dir.join("ta-lib").join("c").join("include"),
                     deps_dir.clone(),
@@ -113,6 +121,14 @@ fn main() {
                 )
                 .unwrap();
                 let ta_lib_path = PathBuf::from(&ta_library_path);
+                let dir_content = fs_extra::dir::get_dir_content(ta_lib_path.clone()).unwrap();
+                println!("ta_lib_path: {:?}", ta_lib_path);
+                for f in dir_content.directories {
+                    println!("{}", f);
+                }
+                for f in dir_content.files {
+                    println!("{}", f);
+                }
                 std::fs::copy(
                     ta_lib_path.join("ta_libc_crd.lib"),
                     ta_lib_path.join("ta_lib.lib"),
