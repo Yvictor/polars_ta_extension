@@ -120,6 +120,7 @@ jobs:
         run: |
           python --version
           which python
+          pip install -U pip
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
