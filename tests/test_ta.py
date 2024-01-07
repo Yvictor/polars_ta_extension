@@ -2,6 +2,7 @@ import pytest
 import polars as pl
 import polars_ta as plta
 import talib
+from talib import abstract
 
 
 @pytest.fixture
@@ -24,7 +25,467 @@ def test_version():
 
 
 def test_ta_has_impl():
-    pass
+    for fn in talib.get_functions():
+        assert hasattr(plta, fn.lower())
+
+
+def test_get_functions():
+    for plfn, fn in zip(plta.get_functions(), talib.get_functions()):
+        assert plfn == fn.lower()
+
+
+def test_get_function_groups():
+    for pl_g, g in zip(plta.get_function_groups(), talib.get_function_groups()):
+        assert pl_g == g
+        for plfn, fn in zip(plta.get_function_groups()[pl_g], talib.get_function_groups()[g]):
+            assert plfn == fn.lower()
+
+
+def test_abstract_ht_dcperiod_eq(df_ohlc: pl.DataFrame):
+    not_eq = df_ohlc.with_columns(
+        plta.ht_dcperiod().alias("expr"),
+        abstract.HT_DCPERIOD(df_ohlc).alias("talib"),
+    ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+    assert not_eq == 0
+
+
+def test_abstract_ht_dcphase_eq(df_ohlc: pl.DataFrame):
+    not_eq = df_ohlc.with_columns(
+        plta.ht_dcphase().alias("expr"),
+        abstract.HT_DCPHASE(df_ohlc).alias("talib"),
+    ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+    assert not_eq == 0
+
+
+def test_abstract_ht_phasor_eq(df_ohlc: pl.DataFrame):
+    not_eq = df_ohlc.with_columns(
+        plta.ht_phasor().struct.field("inphase").alias("expr"),
+        abstract.HT_PHASOR(df_ohlc)["inphase"].alias("talib"),
+    ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+
+    assert not_eq == 0
+
+    not_eq = df_ohlc.with_columns(
+        plta.ht_phasor().struct.field("quadrature").alias("expr"),
+        abstract.HT_PHASOR(df_ohlc)["quadrature"].alias("talib"),
+    ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+
+    assert not_eq == 0
+
+
+def test_abstract_ht_sine_eq(df_ohlc: pl.DataFrame):
+    not_eq = df_ohlc.with_columns(
+        plta.ht_sine().struct.field("sine").alias("expr"),
+        abstract.HT_SINE(df_ohlc)["sine"].alias("talib"),
+    ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+
+    assert not_eq == 0
+
+    not_eq = df_ohlc.with_columns(
+        plta.ht_sine().struct.field("leadsine").alias("expr"),
+        abstract.HT_SINE(df_ohlc)["leadsine"].alias("talib"),
+    ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+
+    assert not_eq == 0
+
+
+def test_abstract_ht_trendmode_eq(df_ohlc: pl.DataFrame):
+    not_eq = df_ohlc.with_columns(
+        plta.ht_trendmode().alias("expr"),
+        abstract.HT_TRENDMODE(df_ohlc).alias("talib"),
+    ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+
+    assert not_eq == 0
+
+
+def test_abstract_add_eq(df_ohlc: pl.DataFrame):
+    not_eq = df_ohlc.with_columns(
+        plta.add().alias("expr"),
+        abstract.ADD(df_ohlc).alias("talib"),
+    ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+
+    assert not_eq == 0
+
+
+def test_abstract_div_eq(df_ohlc: pl.DataFrame):
+    not_eq = df_ohlc.with_columns(
+        plta.div().alias("expr"),
+        abstract.DIV(df_ohlc).alias("talib"),
+    ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+
+    assert not_eq == 0
+
+
+def test_abstract_max_eq(df_ohlc: pl.DataFrame):
+    not_eq = df_ohlc.with_columns(
+        plta.max().alias("expr"),
+        abstract.MAX(df_ohlc).alias("talib"),
+    ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+
+    assert not_eq == 0
+
+
+def test_abstract_maxindex_eq(df_ohlc: pl.DataFrame):
+    not_eq = df_ohlc.with_columns(
+        plta.maxindex().alias("expr"),
+        abstract.MAXINDEX(df_ohlc).alias("talib"),
+    ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+
+    assert not_eq == 0
+
+
+def test_abstract_min_eq(df_ohlc: pl.DataFrame):
+    not_eq = df_ohlc.with_columns(
+        plta.min().alias("expr"),
+        abstract.MIN(df_ohlc).alias("talib"),
+    ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+
+    assert not_eq == 0
+
+
+def test_abstract_minindex_eq(df_ohlc: pl.DataFrame):
+    not_eq = df_ohlc.with_columns(
+        plta.minindex().alias("expr"),
+        abstract.MININDEX(df_ohlc).alias("talib"),
+    ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+
+    assert not_eq == 0
+
+
+def test_abstract_minmax_eq(df_ohlc: pl.DataFrame):
+    not_eq = df_ohlc.with_columns(
+        plta.minmax().struct.field("min").alias("expr"),
+        abstract.MINMAX(df_ohlc)["min"].alias("talib"),
+    ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+
+    assert not_eq == 0
+
+    not_eq = df_ohlc.with_columns(
+        plta.minmax().struct.field("max").alias("expr"),
+        abstract.MINMAX(df_ohlc)["max"].alias("talib"),
+    ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+
+    assert not_eq == 0
+
+
+def test_abstract_minmaxindex_eq(df_ohlc: pl.DataFrame):
+    not_eq = df_ohlc.with_columns(
+        plta.minmaxindex().struct.field("minidx").alias("expr"),
+        abstract.MINMAXINDEX(df_ohlc)["minidx"].alias("talib"),
+    ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+
+    assert not_eq == 0
+
+    not_eq = df_ohlc.with_columns(
+        plta.minmaxindex().struct.field("maxidx").alias("expr"),
+        abstract.MINMAXINDEX(df_ohlc)["maxidx"].alias("talib"),
+    ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+
+    assert not_eq == 0
+
+
+def test_abstract_mult_eq(df_ohlc: pl.DataFrame):
+    not_eq = df_ohlc.with_columns(
+        plta.mult().alias("expr"),
+        abstract.MULT(df_ohlc).alias("talib"),
+    ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+
+    assert not_eq == 0
+
+
+def test_abstract_sub_eq(df_ohlc: pl.DataFrame):
+    not_eq = df_ohlc.with_columns(
+        plta.sub().alias("expr"),
+        abstract.SUB(df_ohlc).alias("talib"),
+    ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+
+    assert not_eq == 0
+
+
+def test_abstract_sum_eq(df_ohlc: pl.DataFrame):
+    not_eq = df_ohlc.with_columns(
+        plta.sum().alias("expr"),
+        abstract.SUM(df_ohlc).alias("talib"),
+    ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+    assert not_eq == 0
+
+
+@pytest.mark.parametrize(
+    "func",
+    [
+        "acos",
+        "asin",
+        "atan",
+        "ceil",
+        "cos",
+        "cosh",
+        "exp",
+        "floor",
+        "ln",
+        "log10",
+        "sin",
+        "sinh",
+        "sqrt",
+        "tan",
+        "tanh",
+    ],
+)
+def test_abstract_math_transform_eq(df_ohlc: pl.DataFrame, func: str):
+    not_eq = df_ohlc.with_columns(
+        getattr(plta, func)().alias("expr"),
+        getattr(abstract, func.upper())(df_ohlc).alias("talib"),
+    ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+
+    assert not_eq == 0
+
+
+@pytest.mark.parametrize(
+    "func",
+    [
+        "adx",
+        "adxr",
+        "apo",
+        "aroon",
+        "aroonosc",
+        "bop",
+        "cci",
+        "cmo",
+        "dx",
+        "macd",
+        "macdext",
+        "macdfix",
+        "mfi",
+        "minus_di",
+        "minus_dm",
+        "mom",
+        "plus_di",
+        "plus_dm",
+        "ppo",
+        "roc",
+        "rocp",
+        "rocr",
+        "rocr100",
+        "rsi",
+        "stoch",
+        "stochf",
+        "stochrsi",
+        "trix",
+        "ultosc",
+        "willr",
+    ],
+)
+def test_abstract_momentum_eq(df_ohlc: pl.DataFrame, func: str):
+    expected = getattr(abstract, func.upper())(df_ohlc)
+    if isinstance(expected, pl.Series):
+        not_eq = df_ohlc.with_columns(
+            getattr(plta, func)().alias("expr"),
+            expected.alias("talib"),
+        ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+        assert not_eq == 0
+    else:
+        res = df_ohlc.select(getattr(plta, func)().alias("expr")).unnest("expr")
+        assert res.equals(expected)
+
+
+@pytest.mark.parametrize(
+    "func",
+    [
+        "bbands",
+        "dema",
+        "ema",
+        "ht_trendline",
+        "kama",
+        "ma",
+        "mama",
+        "mavp",
+        "midpoint",
+        "midprice",
+        "sar",
+        "sarext",
+        "sma",
+        "t3",
+        "tema",
+        "trima",
+        "wma",
+    ],
+)
+def test_abstract_overlap_eq(df_ohlc: pl.DataFrame, func: str):
+    if func == "mavp":
+        expected = getattr(abstract, func.upper())(
+            df_ohlc.with_columns(pl.col("volume").alias("periods"))
+        )
+        expr = getattr(plta, func)(periods=pl.col("volume"))
+    else:
+        expected = getattr(abstract, func.upper())(df_ohlc)
+        expr = getattr(plta, func)()
+    if isinstance(expected, pl.Series):
+        not_eq = df_ohlc.with_columns(
+            expr.alias("expr"),
+            expected.alias("talib"),
+        ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+        assert not_eq == 0
+    else:
+        res = df_ohlc.select(getattr(plta, func)().alias("expr")).unnest("expr")
+        assert res.equals(expected)
+
+
+@pytest.mark.parametrize(
+    "func",
+    [
+        "cdl2crows",
+        "cdl3blackcrows",
+        "cdl3inside",
+        "cdl3linestrike",
+        "cdl3outside",
+        "cdl3starsinsouth",
+        "cdl3whitesoldiers",
+        "cdlabandonedbaby",
+        "cdladvanceblock",
+        "cdlbelthold",
+        "cdlbreakaway",
+        "cdlclosingmarubozu",
+        "cdlconcealbabyswall",
+        "cdlcounterattack",
+        "cdldarkcloudcover",
+        "cdldoji",
+        "cdldojistar",
+        "cdldragonflydoji",
+        "cdlengulfing",
+        "cdleveningdojistar",
+        "cdleveningstar",
+        "cdlgapsidesidewhite",
+        "cdlgravestonedoji",
+        "cdlhammer",
+        "cdlhangingman",
+        "cdlharami",
+        "cdlharamicross",
+        "cdlhighwave",
+        "cdlhikkake",
+        "cdlhikkakemod",
+        "cdlhomingpigeon",
+        "cdlidentical3crows",
+        "cdlinneck",
+        "cdlinvertedhammer",
+        "cdlkicking",
+        "cdlkickingbylength",
+        "cdlladderbottom",
+        "cdllongleggeddoji",
+        "cdllongline",
+        "cdlmarubozu",
+        "cdlmatchinglow",
+        "cdlmathold",
+        "cdlmorningdojistar",
+        "cdlmorningstar",
+        "cdlonneck",
+        "cdlpiercing",
+        "cdlrickshawman",
+        "cdlrisefall3methods",
+        "cdlseparatinglines",
+        "cdlshootingstar",
+        "cdlshortline",
+        "cdlspinningtop",
+        "cdlstalledpattern",
+        "cdlsticksandwich",
+        "cdltakuri",
+        "cdltasukigap",
+        "cdlthrusting",
+        "cdltristar",
+        "cdlunique3river",
+        "cdlupsidegap2crows",
+        "cdlxsidegap3methods",
+    ],
+)
+def test_abstract_pattern_eq(df_ohlc: pl.DataFrame, func: str):
+    expected = getattr(abstract, func.upper())(df_ohlc)
+    expr = getattr(plta, func)()
+    if isinstance(expected, pl.Series):
+        not_eq = df_ohlc.with_columns(
+            expr.alias("expr"),
+            expected.alias("talib"),
+        ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+        assert not_eq == 0
+    else:
+        res = df_ohlc.select(getattr(plta, func)().alias("expr")).unnest("expr")
+        assert res.equals(expected)
+
+
+@pytest.mark.parametrize("func", ["avgprice", "medprice", "typprice", "wclprice"])
+def test_abstract_price_transform_eq(df_ohlc: pl.DataFrame, func: str):
+    expected = getattr(abstract, func.upper())(df_ohlc)
+    expr = getattr(plta, func)()
+    if isinstance(expected, pl.Series):
+        not_eq = df_ohlc.with_columns(
+            expr.alias("expr"),
+            expected.alias("talib"),
+        ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+        assert not_eq == 0
+    else:
+        res = df_ohlc.select(getattr(plta, func)().alias("expr")).unnest("expr")
+        assert res.equals(expected)
+
+
+@pytest.mark.parametrize(
+    "func",
+    [
+        "beta",
+        "correl",
+        "linearreg",
+        "linearreg_angle",
+        "linearreg_intercept",
+        "linearreg_slope",
+        "stddev",
+        "tsf",
+        "var",
+    ],
+)
+def test_abstract_statistic_eq(df_ohlc: pl.DataFrame, func: str):
+    expected = getattr(abstract, func.upper())(df_ohlc)
+    expr = getattr(plta, func)()
+    if isinstance(expected, pl.Series):
+        not_eq = df_ohlc.with_columns(
+            expr.alias("expr"),
+            expected.alias("talib"),
+        ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+        assert not_eq == 0
+    else:
+        res = df_ohlc.select(getattr(plta, func)().alias("expr")).unnest("expr")
+        assert res.equals(expected)
+
+
+@pytest.mark.parametrize(
+    "func",
+    ["atr", "natr", "trange"],
+)
+def test_abstract_volatility_eq(df_ohlc: pl.DataFrame, func: str):
+    expected = getattr(abstract, func.upper())(df_ohlc)
+    expr = getattr(plta, func)()
+    if isinstance(expected, pl.Series):
+        not_eq = df_ohlc.with_columns(
+            expr.alias("expr"),
+            expected.alias("talib"),
+        ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+        assert not_eq == 0
+    else:
+        res = df_ohlc.select(getattr(plta, func)().alias("expr")).unnest("expr")
+        assert res.equals(expected)
+
+
+@pytest.mark.parametrize(
+    "func",
+    ["ad", "adosc", "obv"],
+)
+def test_abstract_volume_eq(df_ohlc: pl.DataFrame, func: str):
+    expected = getattr(abstract, func.upper())(df_ohlc)
+    expr = getattr(plta, func)()
+    if isinstance(expected, pl.Series):
+        not_eq = df_ohlc.with_columns(
+            expr.alias("expr"),
+            expected.alias("talib"),
+        ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+        assert not_eq == 0
+    else:
+        res = df_ohlc.select(getattr(plta, func)().alias("expr")).unnest("expr")
+        assert res.equals(expected)
 
 
 def test_ht_dcperiod_eq(df_ohlc: pl.DataFrame):
@@ -1120,7 +1581,7 @@ def test_natr_eq(df_ohlc: pl.DataFrame):
 
 def test_ad_eq(df_ohlc: pl.DataFrame):
     not_eq = df_ohlc.with_columns(
-        pl.col("high").ta.ad(pl.col("low"), pl.col("close"), pl.col("volume")).alias("expr"),
+        pl.col("close").ta.ad(pl.col("high"), pl.col("low"), pl.col("volume")).alias("expr"),
         talib.AD(df_ohlc["high"], df_ohlc["low"], df_ohlc["close"], df_ohlc["volume"]).alias(
             "talib"
         ),

@@ -19,9 +19,9 @@ fn obv(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Float64)]
 fn ad(inputs: &[Series]) -> PolarsResult<Series> {
-    let high = &mut inputs[0].to_float()?.rechunk();
-    let low = &mut inputs[1].to_float()?.rechunk();
-    let close = &mut inputs[2].to_float()?.rechunk();
+    let high = &mut inputs[1].to_float()?.rechunk();
+    let low = &mut inputs[2].to_float()?.rechunk();
+    let close = &mut inputs[0].to_float()?.rechunk();
     let volume = &mut inputs[3].to_float()?.rechunk();
     let (high_ptr, _high) = get_series_f64_ptr(high)?;
     let (low_ptr, _low) = get_series_f64_ptr(low)?;
