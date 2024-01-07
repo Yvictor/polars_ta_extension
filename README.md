@@ -81,164 +81,164 @@ plta.get_function_groups()
 
 ##### Overlap Studies
 ```
-BBANDS               Bollinger Bands
-DEMA                 Double Exponential Moving Average
-EMA                  Exponential Moving Average
-HT_TRENDLINE         Hilbert Transform - Instantaneous Trendline
-KAMA                 Kaufman Adaptive Moving Average
-MA                   Moving average
-MAMA                 MESA Adaptive Moving Average
-MAVP                 Moving average with variable period
-MIDPOINT             MidPoint over period
-MIDPRICE             Midpoint Price over period
-SAR                  Parabolic SAR
-SAREXT               Parabolic SAR - Extended
-SMA                  Simple Moving Average
-T3                   Triple Exponential Moving Average (T3)
-TEMA                 Triple Exponential Moving Average
-TRIMA                Triangular Moving Average
-WMA                  Weighted Moving Average
+bbands               Bollinger Bands
+dema                 Double Exponential Moving Average
+ema                  Exponential Moving Average
+ht_trendline         Hilbert Transform - Instantaneous Trendline
+kama                 Kaufman Adaptive Moving Average
+ma                   Moving average
+mama                 MESA Adaptive Moving Average
+mavp                 Moving average with variable period
+midpoint             MidPoint over period
+midprice             Midpoint Price over period
+sar                  Parabolic SAR
+sarext               Parabolic SAR - Extended
+sma                  Simple Moving Average
+t3                   Triple Exponential Moving Average (T3)
+tema                 Triple Exponential Moving Average
+trima                Triangular Moving Average
+wma                  Weighted Moving Average
 ```
 
 ##### Momentum Indicators
 ```
-ADX                  Average Directional Movement Index
-ADXR                 Average Directional Movement Index Rating
-APO                  Absolute Price Oscillator
-AROON                Aroon
-AROONOSC             Aroon Oscillator
-BOP                  Balance Of Power
-CCI                  Commodity Channel Index
-CMO                  Chande Momentum Oscillator
-DX                   Directional Movement Index
-MACD                 Moving Average Convergence/Divergence
-MACDEXT              MACD with controllable MA type
-MACDFIX              Moving Average Convergence/Divergence Fix 12/26
-MFI                  Money Flow Index
-MINUS_DI             Minus Directional Indicator
-MINUS_DM             Minus Directional Movement
-MOM                  Momentum
-PLUS_DI              Plus Directional Indicator
-PLUS_DM              Plus Directional Movement
-PPO                  Percentage Price Oscillator
-ROC                  Rate of change : ((price/prevPrice)-1)*100
-ROCP                 Rate of change Percentage: (price-prevPrice)/prevPrice
-ROCR                 Rate of change ratio: (price/prevPrice)
-ROCR100              Rate of change ratio 100 scale: (price/prevPrice)*100
-RSI                  Relative Strength Index
-STOCH                Stochastic
-STOCHF               Stochastic Fast
-STOCHRSI             Stochastic Relative Strength Index
-TRIX                 1-day Rate-Of-Change (ROC) of a Triple Smooth EMA
-ULTOSC               Ultimate Oscillator
-WILLR                Williams' %R
+Aadx                  Average Directional Movement Index
+adxr                 Average Directional Movement Index Rating
+apo                  Absolute Price Oscillator
+aroon                Aroon
+aroonosc             Aroon Oscillator
+bop                  Balance Of Power
+cci                  Commodity Channel Index
+cmo                  Chande Momentum Oscillator
+dx                   Directional Movement Index
+macd                 Moving Average Convergence/Divergence
+macdext              MACD with controllable MA type
+macdfix              Moving Average Convergence/Divergence Fix 12/26
+mfi                  Money Flow Index
+minus_di             Minus Directional Indicator
+minus_dm             Minus Directional Movement
+mom                  Momentum
+plus_di              Plus Directional Indicator
+plus_dm              Plus Directional Movement
+ppo                  Percentage Price Oscillator
+roc                  Rate of change : ((price/prevPrice)-1)*100
+rocp                 Rate of change Percentage: (price-prevPrice)/prevPrice
+rocr                 Rate of change ratio: (price/prevPrice)
+rocr100              Rate of change ratio 100 scale: (price/prevPrice)*100
+rsi                  Relative Strength Index
+stoch                Stochastic
+stochf               Stochastic Fast
+stochrsi             Stochastic Relative Strength Index
+trix                 1-day Rate-Of-Change (ROC) of a Triple Smooth EMA
+ultosc               Ultimate Oscillator
+willr                Williams' %R
 ```
 
 ##### Volume Indicators
 ```
-AD                   Chaikin A/D Line
-ADOSC                Chaikin A/D Oscillator
-OBV                  On Balance Volume
+ad                   Chaikin A/D Line
+adosc                Chaikin A/D Oscillator
+obv                  On Balance Volume
 ```
 
 ##### Cycle Indicators
 ```
-HT_DCPERIOD          Hilbert Transform - Dominant Cycle Period
-HT_DCPHASE           Hilbert Transform - Dominant Cycle Phase
-HT_PHASOR            Hilbert Transform - Phasor Components
-HT_SINE              Hilbert Transform - SineWave
-HT_TRENDMODE         Hilbert Transform - Trend vs Cycle Mode
+ht_dcperiod          Hilbert Transform - Dominant Cycle Period
+ht_dcphase           Hilbert Transform - Dominant Cycle Phase
+ht_phasor            Hilbert Transform - Phasor Components
+ht_sine              Hilbert Transform - SineWave
+ht_trendmode         Hilbert Transform - Trend vs Cycle Mode
 ```
 
 ##### Price Transform
 ```
-AVGPRICE             Average Price
-MEDPRICE             Median Price
-TYPPRICE             Typical Price
-WCLPRICE             Weighted Close Price
+avgprice             Average Price
+medprice             Median Price
+typprice             Typical Price
+wclprice             Weighted Close Price
 ```
 
 ##### Volatility Indicators
 ```
-ATR                  Average True Range
-NATR                 Normalized Average True Range
-TRANGE               True Range
+atr                  Average True Range
+natr                 Normalized Average True Range
+trange               True Range
 ```
 
 ##### Pattern Recognition
 ```
-CDL2CROWS            Two Crows
-CDL3BLACKCROWS       Three Black Crows
-CDL3INSIDE           Three Inside Up/Down
-CDL3LINESTRIKE       Three-Line Strike
-CDL3OUTSIDE          Three Outside Up/Down
-CDL3STARSINSOUTH     Three Stars In The South
-CDL3WHITESOLDIERS    Three Advancing White Soldiers
-CDLABANDONEDBABY     Abandoned Baby
-CDLADVANCEBLOCK      Advance Block
-CDLBELTHOLD          Belt-hold
-CDLBREAKAWAY         Breakaway
-CDLCLOSINGMARUBOZU   Closing Marubozu
-CDLCONCEALBABYSWALL  Concealing Baby Swallow
-CDLCOUNTERATTACK     Counterattack
-CDLDARKCLOUDCOVER    Dark Cloud Cover
-CDLDOJI              Doji
-CDLDOJISTAR          Doji Star
-CDLDRAGONFLYDOJI     Dragonfly Doji
-CDLENGULFING         Engulfing Pattern
-CDLEVENINGDOJISTAR   Evening Doji Star
-CDLEVENINGSTAR       Evening Star
-CDLGAPSIDESIDEWHITE  Up/Down-gap side-by-side white lines
-CDLGRAVESTONEDOJI    Gravestone Doji
-CDLHAMMER            Hammer
-CDLHANGINGMAN        Hanging Man
-CDLHARAMI            Harami Pattern
-CDLHARAMICROSS       Harami Cross Pattern
-CDLHIGHWAVE          High-Wave Candle
-CDLHIKKAKE           Hikkake Pattern
-CDLHIKKAKEMOD        Modified Hikkake Pattern
-CDLHOMINGPIGEON      Homing Pigeon
-CDLIDENTICAL3CROWS   Identical Three Crows
-CDLINNECK            In-Neck Pattern
-CDLINVERTEDHAMMER    Inverted Hammer
-CDLKICKING           Kicking
-CDLKICKINGBYLENGTH   Kicking - bull/bear determined by the longer marubozu
-CDLLADDERBOTTOM      Ladder Bottom
-CDLLONGLEGGEDDOJI    Long Legged Doji
-CDLLONGLINE          Long Line Candle
-CDLMARUBOZU          Marubozu
-CDLMATCHINGLOW       Matching Low
-CDLMATHOLD           Mat Hold
-CDLMORNINGDOJISTAR   Morning Doji Star
-CDLMORNINGSTAR       Morning Star
-CDLONNECK            On-Neck Pattern
-CDLPIERCING          Piercing Pattern
-CDLRICKSHAWMAN       Rickshaw Man
-CDLRISEFALL3METHODS  Rising/Falling Three Methods
-CDLSEPARATINGLINES   Separating Lines
-CDLSHOOTINGSTAR      Shooting Star
-CDLSHORTLINE         Short Line Candle
-CDLSPINNINGTOP       Spinning Top
-CDLSTALLEDPATTERN    Stalled Pattern
-CDLSTICKSANDWICH     Stick Sandwich
-CDLTAKURI            Takuri (Dragonfly Doji with very long lower shadow)
-CDLTASUKIGAP         Tasuki Gap
-CDLTHRUSTING         Thrusting Pattern
-CDLTRISTAR           Tristar Pattern
-CDLUNIQUE3RIVER      Unique 3 River
-CDLUPSIDEGAP2CROWS   Upside Gap Two Crows
-CDLXSIDEGAP3METHODS  Upside/Downside Gap Three Methods
+cdl2crows            Two Crows
+cdl3blackcrows       Three Black Crows
+cdl3inside           Three Inside Up/Down
+cdl3linestrike       Three-Line Strike
+cdl3outside          Three Outside Up/Down
+cdl3starsinsoutH     Three Stars In The South
+cdl3whitesoldieRS    Three Advancing White Soldiers
+cdlabandonedbabY     Abandoned Baby
+cdladvanceblock      Advance Block
+cdlbelthold          Belt-hold
+cdlbreakaway         Breakaway
+cdlclosingmarubOZU   Closing Marubozu
+cdlconcealbabysWALL  Concealing Baby Swallow
+cdlcounterattacK     Counterattack
+cdldarkcloudcovER    Dark Cloud Cover
+cdldoji              Doji
+cdldojistar          Doji Star
+cdldragonflydojI     Dragonfly Doji
+cdlengulfing         Engulfing Pattern
+cdleveningdojisTAR   Evening Doji Star
+cdleveningstar       Evening Star
+cdlgapsidesidewHITE  Up/Down-gap side-by-side white lines
+cdlgravestonedoJI    Gravestone Doji
+cdlhammer            Hammer
+cdlhangingman        Hanging Man
+cdlharami            Harami Pattern
+cdlharamicross       Harami Cross Pattern
+cdlhighwave          High-Wave Candle
+cdlhikkake           Hikkake Pattern
+cdlhikkakemod        Modified Hikkake Pattern
+cdlhomingpigeon      Homing Pigeon
+cdlidentical3crOWS   Identical Three Crows
+cdlinneck            In-Neck Pattern
+cdlinvertedhammER    Inverted Hammer
+cdlkicking           Kicking
+cdlkickingbylenGTH   Kicking - bull/bear determined by the longer marubozu
+cdlladderbottom      Ladder Bottom
+cdllongleggeddoJI    Long Legged Doji
+cdllongline          Long Line Candle
+cdlmarubozu          Marubozu
+cdlmatchinglow       Matching Low
+cdlmathold           Mat Hold
+cdlmorningdojisTAR   Morning Doji Star
+cdlmorningstar       Morning Star
+cdlonneck            On-Neck Pattern
+cdlpiercing          Piercing Pattern
+cdlrickshawman       Rickshaw Man
+cdlrisefall3metHODS  Rising/Falling Three Methods
+cdlseparatingliNES   Separating Lines
+cdlshootingstar      Shooting Star
+cdlshortline         Short Line Candle
+cdlspinningtop       Spinning Top
+cdlstalledpatteRN    Stalled Pattern
+cdlsticksandwicH     Stick Sandwich
+cdltakuri            Takuri (Dragonfly Doji with very long lower shadow)
+cdltasukigap         Tasuki Gap
+cdlthrusting         Thrusting Pattern
+cdltristar           Tristar Pattern
+cdlunique3river      Unique 3 River
+cdlupsidegap2crOWS   Upside Gap Two Crows
+cdlxsidegap3metHODS  Upside/Downside Gap Three Methods
 ```
 
 ##### Statistic Functions
 ```
-BETA                 Beta
-CORREL               Pearson's Correlation Coefficient (r)
-LINEARREG            Linear Regression
-LINEARREG_ANGLE      Linear Regression Angle
-LINEARREG_INTERCEPT  Linear Regression Intercept
-LINEARREG_SLOPE      Linear Regression Slope
-STDDEV               Standard Deviation
-TSF                  Time Series Forecast
-VAR                  Variance
+beta                 Beta
+correl               Pearson's Correlation Coefficient (r)
+linearreg            Linear Regression
+linearreg_angle      Linear Regression Angle
+linearreg_intercept  Linear Regression Intercept
+linearreg_slope      Linear Regression Slope
+stddev               Standard Deviation
+tsf                  Time Series Forecast
+var                  Variance
 ```
