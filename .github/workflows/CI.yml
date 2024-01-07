@@ -75,7 +75,7 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        target: [x64]
+        target: [x64, x86]
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
@@ -110,17 +110,12 @@ jobs:
     runs-on: macos-latest
     strategy:
       matrix:
-        target: [x86_64] 
-        #, aarch64]
+        target: [x86_64, aarch64]
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
         with:
           python-version: '3.10'
-      - name: Install Clang
-        run: |
-          brew install gcc@7
-          brew install llvm
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
