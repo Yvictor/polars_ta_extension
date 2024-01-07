@@ -27,6 +27,63 @@ def test_ta_has_impl():
     pass
 
 
+def test_ht_dcperiod_eq(df_ohlc: pl.DataFrame):
+    not_eq = df_ohlc.with_columns(
+        pl.col("close").ta.ht_dcperiod().alias("expr"),
+        talib.HT_DCPERIOD(df_ohlc["close"]).alias("talib"),
+    ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+    assert not_eq == 0
+
+
+def test_ht_dcphase_eq(df_ohlc: pl.DataFrame):
+    not_eq = df_ohlc.with_columns(
+        pl.col("close").ta.ht_dcphase().alias("expr"),
+        talib.HT_DCPHASE(df_ohlc["close"]).alias("talib"),
+    ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+    assert not_eq == 0
+
+
+def test_ht_phasor_eq(df_ohlc: pl.DataFrame):
+    not_eq = df_ohlc.with_columns(
+        pl.col("close").ta.ht_phasor().struct.field("inphase").alias("expr"),
+        talib.HT_PHASOR(df_ohlc["close"])[0].alias("talib"),
+    ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+
+    assert not_eq == 0
+
+    not_eq = df_ohlc.with_columns(
+        pl.col("close").ta.ht_phasor().struct.field("quadrature").alias("expr"),
+        talib.HT_PHASOR(df_ohlc["close"])[1].alias("talib"),
+    ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+
+    assert not_eq == 0
+
+
+def test_ht_sine_eq(df_ohlc: pl.DataFrame):
+    not_eq = df_ohlc.with_columns(
+        pl.col("close").ta.ht_sine().struct.field("sine").alias("expr"),
+        talib.HT_SINE(df_ohlc["close"])[0].alias("talib"),
+    ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+
+    assert not_eq == 0
+
+    not_eq = df_ohlc.with_columns(
+        pl.col("close").ta.ht_sine().struct.field("leadsine").alias("expr"),
+        talib.HT_SINE(df_ohlc["close"])[1].alias("talib"),
+    ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+
+    assert not_eq == 0
+
+
+def test_ht_trendmode_eq(df_ohlc: pl.DataFrame):
+    not_eq = df_ohlc.with_columns(
+        pl.col("close").ta.ht_trendmode().alias("expr"),
+        talib.HT_TRENDMODE(df_ohlc["close"]).alias("talib"),
+    ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+
+    assert not_eq == 0
+
+
 def test_add_eq(df_ohlc: pl.DataFrame):
     not_eq = df_ohlc.with_columns(
         pl.col("close").ta.add(pl.col("open")).alias("expr"),
@@ -906,14 +963,6 @@ def test_wma_eq(df_ohlc: pl.DataFrame):
         pl.col("close").ta.wma(3).alias("wma3"),
         talib.WMA(df_ohlc["close"], timeperiod=3).alias("WMA3"),
     ).select(((pl.col("wma3") != pl.col("WMA3")).sum()).alias("not_eq"))["not_eq"][0]
-    assert not_eq == 0
-
-
-def test_ht_dcperiod_eq(df_ohlc: pl.DataFrame):
-    not_eq = df_ohlc.with_columns(
-        pl.col("close").ta.ht_dcperiod().alias("expr"),
-        talib.HT_DCPERIOD(df_ohlc["close"]).alias("talib"),
-    ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
     assert not_eq == 0
 
 

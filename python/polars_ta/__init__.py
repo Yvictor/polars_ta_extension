@@ -18,6 +18,83 @@ class TAExpr:
     def __init__(self, expr: pl.Expr):
         self._expr = expr
 
+    def ht_dcperiod(self) -> pl.Expr:
+        """Hilbert Transform - Dominant Cycle Period (Cycle Indicators)
+        pl.col("close").ta.ht_dcperiod()
+
+        Inputs:
+            real: (any ndarray)
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            symbol="ht_dcperiod",
+            is_elementwise=False,
+        )
+
+    def ht_dcphase(self) -> pl.Expr:
+        """Hilbert Transform - Dominant Cycle Phase (Cycle Indicators)
+        pl.col("close").ta.ht_dcphase()
+
+        Inputs:
+            real: (any ndarray)
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            symbol="ht_dcphase",
+            is_elementwise=False,
+        )
+
+    def ht_phasor(self) -> pl.Expr:
+        """Hilbert Transform - Phasor Components (Cycle Indicators)
+        pl.col("close").ta.ht_phasor()
+
+        Inputs:
+            real: (any ndarray)
+        Outputs:
+            inphase
+            quadrature
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            symbol="ht_phasor",
+            is_elementwise=False,
+        )
+
+    def ht_sine(self) -> pl.Expr:
+        """Hilbert Transform - SineWave (Cycle Indicators)
+        pl.col("close").ta.ht_sine()
+
+        Inputs:
+            real: (any ndarray)
+        Outputs:
+            sine
+            leadsine
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            symbol="ht_sine",
+            is_elementwise=False,
+        )
+
+    def ht_trendmode(self) -> pl.Expr:
+        """Hilbert Transform - Trend vs Cycle Mode (Cycle Indicators)
+        pl.col("close").ta.ht_trendmode()
+
+        Inputs:
+            real: (any ndarray)
+        Outputs:
+            integer
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            symbol="ht_trendmode",
+            is_elementwise=False,
+        )
+
     def add(self, b: IntoExpr) -> pl.Expr:
         """Vectorized addition
         pl.col("a").ta.add(pl.col("b"))
@@ -235,7 +312,7 @@ class TAExpr:
             symbol="acos",
             is_elementwise=False,
         )
-    
+
     def asin(self) -> pl.Expr:
         """Vectorized asin
         pl.col("a").ta.asin()
@@ -250,7 +327,7 @@ class TAExpr:
             symbol="asin",
             is_elementwise=False,
         )
-    
+
     def atan(self) -> pl.Expr:
         """Vectorized atan
         pl.col("a").ta.atan()
@@ -265,7 +342,7 @@ class TAExpr:
             symbol="atan",
             is_elementwise=False,
         )
-    
+
     def ceil(self) -> pl.Expr:
         """Vectorized ceil
         pl.col("a").ta.ceil()
@@ -280,7 +357,7 @@ class TAExpr:
             symbol="ceil",
             is_elementwise=False,
         )
-    
+
     def cos(self) -> pl.Expr:
         """Vectorized cos
         pl.col("a").ta.cos()
@@ -295,7 +372,7 @@ class TAExpr:
             symbol="cos",
             is_elementwise=False,
         )
-    
+
     def cosh(self) -> pl.Expr:
         """Vectorized cosh
         pl.col("a").ta.cosh()
@@ -310,7 +387,7 @@ class TAExpr:
             symbol="cosh",
             is_elementwise=False,
         )
-    
+
     def exp(self) -> pl.Expr:
         """Vectorized exp
         pl.col("a").ta.exp()
@@ -325,7 +402,7 @@ class TAExpr:
             symbol="exp",
             is_elementwise=False,
         )
-    
+
     def floor(self) -> pl.Expr:
         """Vectorized floor
         pl.col("a").ta.floor()
@@ -340,7 +417,7 @@ class TAExpr:
             symbol="floor",
             is_elementwise=False,
         )
-    
+
     def ln(self) -> pl.Expr:
         """Vectorized ln
         pl.col("a").ta.ln()
@@ -355,7 +432,7 @@ class TAExpr:
             symbol="ln",
             is_elementwise=False,
         )
-    
+
     def log10(self) -> pl.Expr:
         """Vectorized log10
         pl.col("a").ta.log10()
@@ -370,7 +447,7 @@ class TAExpr:
             symbol="log10",
             is_elementwise=False,
         )
-    
+
     def sin(self) -> pl.Expr:
         """Vectorized sin
         pl.col("a").ta.sin()
@@ -385,7 +462,7 @@ class TAExpr:
             symbol="sin",
             is_elementwise=False,
         )
-    
+
     def sinh(self) -> pl.Expr:
         """Vectorized sinh
         pl.col("a").ta.sinh()
@@ -400,7 +477,7 @@ class TAExpr:
             symbol="sinh",
             is_elementwise=False,
         )
-    
+
     def sqrt(self) -> pl.Expr:
         """Vectorized sqrt
         pl.col("a").ta.sqrt()
@@ -415,7 +492,7 @@ class TAExpr:
             symbol="sqrt",
             is_elementwise=False,
         )
-    
+
     def tan(self) -> pl.Expr:
         """Vectorized tan
         pl.col("a").ta.tan()
@@ -430,7 +507,7 @@ class TAExpr:
             symbol="tan",
             is_elementwise=False,
         )
-    
+
     def tanh(self) -> pl.Expr:
         """Vectorized tanh
         pl.col("a").ta.tanh()
@@ -445,7 +522,6 @@ class TAExpr:
             symbol="tanh",
             is_elementwise=False,
         )
-    
 
     def adx(
         self, high: IntoExpr = pl.col("high"), low: IntoExpr = pl.col("low"), timeperiod: int = 14
@@ -1617,21 +1693,6 @@ class TAExpr:
                 "timeperiod": timeperiod,
             },
             symbol="natr",
-            is_elementwise=False,
-        )
-
-    def ht_dcperiod(self) -> pl.Expr:
-        """Hilbert Transform - Dominant Cycle Period (Cycle Indicators)
-        pl.col("close").ta.ht_dcperiod()
-
-        Inputs:
-            real: (any ndarray)
-        Outputs:
-            real
-        """
-        return self._expr.register_plugin(
-            lib=lib,
-            symbol="ht_dcperiod",
             is_elementwise=False,
         )
 

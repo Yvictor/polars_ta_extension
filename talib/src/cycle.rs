@@ -1,5 +1,9 @@
 use crate::utils::make_vec;
 use talib_sys::{TA_HT_DCPERIOD_Lookback, TA_Integer, TA_RetCode, TA_HT_DCPERIOD};
+use talib_sys::{TA_HT_DCPHASE_Lookback, TA_HT_DCPHASE};
+use talib_sys::{TA_HT_PHASOR_Lookback, TA_HT_PHASOR};
+use talib_sys::{TA_HT_SINE_Lookback, TA_HT_SINE};
+use talib_sys::{TA_HT_TRENDMODE_Lookback, TA_HT_TRENDMODE};
 
 pub fn ta_ht_dcperiod(real_ptr: *const f64, len: usize) -> Result<Vec<f64>, TA_RetCode> {
     let mut out_begin: TA_Integer = 0;
@@ -8,6 +12,146 @@ pub fn ta_ht_dcperiod(real_ptr: *const f64, len: usize) -> Result<Vec<f64>, TA_R
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_HT_DCPERIOD(
+            0,
+            len as i32 - 1,
+            real_ptr,
+            &mut out_begin,
+            &mut out_size,
+            ptr,
+        )
+    };
+    let out_size = (out_begin + out_size) as usize;
+    match ret_code {
+        TA_RetCode::TA_SUCCESS => {
+            if out_size != 0 {
+                unsafe {
+                    out.set_len(out_size);
+                }
+            } else {
+                unsafe {
+                    out.set_len(len);
+                }
+            }
+            Ok(out)
+        }
+        _ => Err(ret_code),
+    }
+}
+
+pub fn ta_ht_dcphase(real_ptr: *const f64, len: usize) -> Result<Vec<f64>, TA_RetCode> {
+    let mut out_begin: TA_Integer = 0;
+    let mut out_size: TA_Integer = 0;
+    let lookback = unsafe { TA_HT_DCPHASE_Lookback() };
+    let (mut out, ptr) = make_vec(len, lookback);
+    let ret_code = unsafe {
+        TA_HT_DCPHASE(
+            0,
+            len as i32 - 1,
+            real_ptr,
+            &mut out_begin,
+            &mut out_size,
+            ptr,
+        )
+    };
+    let out_size = (out_begin + out_size) as usize;
+    match ret_code {
+        TA_RetCode::TA_SUCCESS => {
+            if out_size != 0 {
+                unsafe {
+                    out.set_len(out_size);
+                }
+            } else {
+                unsafe {
+                    out.set_len(len);
+                }
+            }
+            Ok(out)
+        }
+        _ => Err(ret_code),
+    }
+}
+
+pub fn ta_ht_phasor(real_ptr: *const f64, len: usize) -> Result<(Vec<f64>, Vec<f64>), TA_RetCode> {
+    let mut out_begin: TA_Integer = 0;
+    let mut out_size: TA_Integer = 0;
+    let lookback = unsafe { TA_HT_PHASOR_Lookback() };
+    let (mut out_in_phase, ptr_in_phase) = make_vec(len, lookback);
+    let (mut out_quadrature, ptr_quadrature) = make_vec(len, lookback);
+    let ret_code = unsafe {
+        TA_HT_PHASOR(
+            0,
+            len as i32 - 1,
+            real_ptr,
+            &mut out_begin,
+            &mut out_size,
+            ptr_in_phase,
+            ptr_quadrature,
+        )
+    };
+    let out_size = (out_begin + out_size) as usize;
+    match ret_code {
+        TA_RetCode::TA_SUCCESS => {
+            if out_size != 0 {
+                unsafe {
+                    out_in_phase.set_len(out_size);
+                    out_quadrature.set_len(out_size);
+                }
+            } else {
+                unsafe {
+                    out_in_phase.set_len(len);
+                    out_quadrature.set_len(len);
+                }
+            }
+            Ok((out_in_phase, out_quadrature))
+        }
+        _ => Err(ret_code),
+    }
+}
+
+pub fn ta_ht_sine(real_ptr: *const f64, len: usize) -> Result<(Vec<f64>, Vec<f64>), TA_RetCode> {
+    let mut out_begin: TA_Integer = 0;
+    let mut out_size: TA_Integer = 0;
+    let lookback = unsafe { TA_HT_SINE_Lookback() };
+    let (mut out_sine, ptr_sine) = make_vec(len, lookback);
+    let (mut out_leadsine, ptr_leadsine) = make_vec(len, lookback);
+    let ret_code = unsafe {
+        TA_HT_SINE(
+            0,
+            len as i32 - 1,
+            real_ptr,
+            &mut out_begin,
+            &mut out_size,
+            ptr_sine,
+            ptr_leadsine,
+        )
+    };
+    let out_size = (out_begin + out_size) as usize;
+    match ret_code {
+        TA_RetCode::TA_SUCCESS => {
+            if out_size != 0 {
+                unsafe {
+                    out_sine.set_len(out_size);
+                    out_leadsine.set_len(out_size);
+                }
+            } else {
+                unsafe {
+                    out_sine.set_len(len);
+                    out_leadsine.set_len(len);
+                }
+            }
+            Ok((out_sine, out_leadsine))
+        }
+        _ => Err(ret_code),
+    }
+}
+
+pub fn ta_ht_trendmode(real_ptr: *const f64, len: usize) -> Result<Vec<i32>, TA_RetCode> {
+    let mut out_begin: TA_Integer = 0;
+    let mut out_size: TA_Integer = 0;
+    let lookback = unsafe { TA_HT_TRENDMODE_Lookback() };
+    let (mut out, ptr) = make_vec(len, lookback);
+    let ret_code = unsafe {
+        TA_HT_TRENDMODE(
             0,
             len as i32 - 1,
             real_ptr,
