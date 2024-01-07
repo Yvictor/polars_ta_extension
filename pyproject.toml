@@ -17,8 +17,9 @@ authors = [
 dependencies = [
     "polars >= 0.20",
 ] 
-
-keywords = ["polars-extension", "talib", "technical-analysis"]
+description = "Polars extension for Ta-Lib: Support Ta-Lib functions in Polars expressions"
+readme = "README.md"
+keywords = ["polars-extension", "talib", "technical-analysis", "TA-Lib", "polars", "rust", "polars-expr"]
 
 [tool.maturin]
 python-source = "python"
