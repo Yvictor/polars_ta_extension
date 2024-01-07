@@ -1,11 +1,11 @@
 [package]
-name = "polars_ta"
+name = "polars_talib"
 version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [lib]
-name = "_polars_ta"
+name = "_polars_talib"
 crate-type = ["cdylib"]
 
 

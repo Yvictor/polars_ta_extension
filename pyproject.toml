@@ -3,7 +3,7 @@ requires = ["maturin>=1.4,<2.0"]
 build-backend = "maturin"
 
 [project]
-name = "polars_ta"
+name = "polars_talib"
 requires-python = ">=3.7"
 classifiers = [
     "Programming Language :: Rust",
@@ -24,7 +24,7 @@ keywords = ["polars-extension", "talib", "technical-analysis", "TA-Lib", "polars
 [tool.maturin]
 python-source = "python"
 features = ["pyo3/extension-module"]
-module-name = "polars_ta._polars_ta"
+module-name = "polars_talib._polars_talib"
 
 [project.optional-dependencies]
 dev = [

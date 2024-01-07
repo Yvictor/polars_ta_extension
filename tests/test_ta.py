@@ -1,6 +1,6 @@
 import pytest
 import polars as pl
-import polars_ta as plta
+import polars_talib as plta
 import talib
 from talib import abstract
 
