@@ -52,7 +52,7 @@ fn version() -> PyResult<String> {
 
 /// A Python module implemented in Rust.
 #[pymodule]
-#[pyo3(name = "_polars_ta")]
+#[pyo3(name = "_polars_talib")]
 fn polars_ta(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(initialize, m)?)?;
     m.add_function(wrap_pyfunction!(shutdown, m)?)?;
