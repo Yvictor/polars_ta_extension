@@ -1,6 +1,6 @@
 
 import polars as pl
-import polars_ta
+import polars_talib
 import talib
 
 
