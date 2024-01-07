@@ -18,6 +18,435 @@ class TAExpr:
     def __init__(self, expr: pl.Expr):
         self._expr = expr
 
+    def add(self, b: IntoExpr) -> pl.Expr:
+        """Vectorized addition
+        pl.col("a").ta.add(pl.col("b"))
+
+        Inputs:
+            a: (any ndarray)
+            b: (any ndarray)
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[b],
+            symbol="add",
+            is_elementwise=False,
+        )
+
+    def div(self, b: IntoExpr) -> pl.Expr:
+        """Vectorized division
+        pl.col("a").ta.div(pl.col("b"))
+
+        Inputs:
+            a: (any ndarray)
+            b: (any ndarray)
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[b],
+            symbol="div",
+            is_elementwise=False,
+        )
+
+    def max(self, timeperiod: int = 30) -> pl.Expr:
+        """Highest value over a specified period (Math Operators)
+        pl.col("close").ta.max(timeperiod=30)
+
+        Inputs:
+            prices: ['close']
+        Parameters:
+            timeperiod: 30
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[],
+            kwargs={"timeperiod": timeperiod},
+            symbol="max",
+            is_elementwise=False,
+        )
+
+    def maxindex(self, timeperiod: int = 30) -> pl.Expr:
+        """Index of highest value over a specified period (Math Operators)
+        pl.col("close").ta.maxindex(timeperiod=30)
+
+        Inputs:
+            prices: ['close']
+        Parameters:
+            timeperiod: 30
+        Outputs:
+            integer
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[],
+            kwargs={"timeperiod": timeperiod},
+            symbol="maxindex",
+            is_elementwise=False,
+        )
+
+    def min(self, timeperiod: int = 30) -> pl.Expr:
+        """Lowest value over a specified period (Math Operators)
+        pl.col("close").ta.min(timeperiod=30)
+
+        Inputs:
+            prices: ['close']
+        Parameters:
+            timeperiod: 30
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[],
+            kwargs={"timeperiod": timeperiod},
+            symbol="min",
+            is_elementwise=False,
+        )
+
+    def minindex(self, timeperiod: int = 30) -> pl.Expr:
+        """Index of lowest value over a specified period (Math Operators)
+        pl.col("close").ta.minindex(timeperiod=30)
+
+        Inputs:
+            prices: ['close']
+        Parameters:
+            timeperiod: 30
+        Outputs:
+            integer
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[],
+            kwargs={"timeperiod": timeperiod},
+            symbol="minindex",
+            is_elementwise=False,
+        )
+
+    def minmax(self, timeperiod: int = 30) -> pl.Expr:
+        """Lowest and highest values over a specified period (Math Operators)
+        pl.col("close").ta.minmax(timeperiod=30)
+
+        Inputs:
+            prices: ['close']
+        Parameters:
+            timeperiod: 30
+        Outputs:
+            min
+            max
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[],
+            kwargs={"timeperiod": timeperiod},
+            symbol="minmax",
+            is_elementwise=False,
+        )
+
+    def minmaxindex(self, timeperiod: int = 30) -> pl.Expr:
+        """Indexes of lowest and highest values over a specified period (Math Operators)
+        pl.col("close").ta.minmaxindex(timeperiod=30)
+
+        Inputs:
+            prices: ['close']
+        Parameters:
+            timeperiod: 30
+        Outputs:
+            minidx
+            maxidx
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[],
+            kwargs={"timeperiod": timeperiod},
+            symbol="minmaxindex",
+            is_elementwise=False,
+        )
+
+    def mult(self, b: IntoExpr) -> pl.Expr:
+        """Vectorized multiplication
+        pl.col("a").ta.mult(pl.col("b"))
+
+        Inputs:
+            a: (any ndarray)
+            b: (any ndarray)
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[b],
+            symbol="mult",
+            is_elementwise=False,
+        )
+
+    def sub(self, b: IntoExpr) -> pl.Expr:
+        """Vectorized subtraction
+        pl.col("a").ta.sub(pl.col("b"))
+
+        Inputs:
+            a: (any ndarray)
+            b: (any ndarray)
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[b],
+            symbol="sub",
+            is_elementwise=False,
+        )
+
+    def sum(self, timeperiod: int = 30) -> pl.Expr:
+        """Summation (Math Operators)
+        pl.col("close").ta.sum(timeperiod=30)
+
+        Inputs:
+            prices: ['close']
+        Parameters:
+            timeperiod: 30
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            args=[],
+            kwargs={"timeperiod": timeperiod},
+            symbol="sum",
+            is_elementwise=False,
+        )
+
+    def acos(self) -> pl.Expr:
+        """Vectorized acos
+        pl.col("a").ta.acos()
+
+        Inputs:
+            a: (any ndarray)
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            symbol="acos",
+            is_elementwise=False,
+        )
+    
+    def asin(self) -> pl.Expr:
+        """Vectorized asin
+        pl.col("a").ta.asin()
+
+        Inputs:
+            a: (any ndarray)
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            symbol="asin",
+            is_elementwise=False,
+        )
+    
+    def atan(self) -> pl.Expr:
+        """Vectorized atan
+        pl.col("a").ta.atan()
+
+        Inputs:
+            a: (any ndarray)
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            symbol="atan",
+            is_elementwise=False,
+        )
+    
+    def ceil(self) -> pl.Expr:
+        """Vectorized ceil
+        pl.col("a").ta.ceil()
+
+        Inputs:
+            a: (any ndarray)
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            symbol="ceil",
+            is_elementwise=False,
+        )
+    
+    def cos(self) -> pl.Expr:
+        """Vectorized cos
+        pl.col("a").ta.cos()
+
+        Inputs:
+            a: (any ndarray)
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            symbol="cos",
+            is_elementwise=False,
+        )
+    
+    def cosh(self) -> pl.Expr:
+        """Vectorized cosh
+        pl.col("a").ta.cosh()
+
+        Inputs:
+            a: (any ndarray)
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            symbol="cosh",
+            is_elementwise=False,
+        )
+    
+    def exp(self) -> pl.Expr:
+        """Vectorized exp
+        pl.col("a").ta.exp()
+
+        Inputs:
+            a: (any ndarray)
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            symbol="exp",
+            is_elementwise=False,
+        )
+    
+    def floor(self) -> pl.Expr:
+        """Vectorized floor
+        pl.col("a").ta.floor()
+
+        Inputs:
+            a: (any ndarray)
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            symbol="floor",
+            is_elementwise=False,
+        )
+    
+    def ln(self) -> pl.Expr:
+        """Vectorized ln
+        pl.col("a").ta.ln()
+
+        Inputs:
+            a: (any ndarray)
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            symbol="ln",
+            is_elementwise=False,
+        )
+    
+    def log10(self) -> pl.Expr:
+        """Vectorized log10
+        pl.col("a").ta.log10()
+
+        Inputs:
+            a: (any ndarray)
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            symbol="log10",
+            is_elementwise=False,
+        )
+    
+    def sin(self) -> pl.Expr:
+        """Vectorized sin
+        pl.col("a").ta.sin()
+
+        Inputs:
+            a: (any ndarray)
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            symbol="sin",
+            is_elementwise=False,
+        )
+    
+    def sinh(self) -> pl.Expr:
+        """Vectorized sinh
+        pl.col("a").ta.sinh()
+
+        Inputs:
+            a: (any ndarray)
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            symbol="sinh",
+            is_elementwise=False,
+        )
+    
+    def sqrt(self) -> pl.Expr:
+        """Vectorized sqrt
+        pl.col("a").ta.sqrt()
+
+        Inputs:
+            a: (any ndarray)
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            symbol="sqrt",
+            is_elementwise=False,
+        )
+    
+    def tan(self) -> pl.Expr:
+        """Vectorized tan
+        pl.col("a").ta.tan()
+
+        Inputs:
+            a: (any ndarray)
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            symbol="tan",
+            is_elementwise=False,
+        )
+    
+    def tanh(self) -> pl.Expr:
+        """Vectorized tanh
+        pl.col("a").ta.tanh()
+
+        Inputs:
+            a: (any ndarray)
+        Outputs:
+            real
+        """
+        return self._expr.register_plugin(
+            lib=lib,
+            symbol="tanh",
+            is_elementwise=False,
+        )
+    
+
     def adx(
         self, high: IntoExpr = pl.col("high"), low: IntoExpr = pl.col("low"), timeperiod: int = 14
     ) -> pl.Expr:
