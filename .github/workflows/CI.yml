@@ -110,17 +110,18 @@ jobs:
     runs-on: macos-latest
     strategy:
       matrix:
-        target: [x86_64, aarch64]
+        target: [x86_64]
+        #, aarch64]
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
         with:
           python-version: '3.10'
-      - name: check python version
-        run: |
-          python --version
-          which python
-          pip install -U pip
+      # - name: check python version
+      #   run: |
+      #     python --version
+      #     which python
+      #     python -m pip install -U pip
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
