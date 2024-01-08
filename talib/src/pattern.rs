@@ -1,4 +1,4 @@
-use crate::utils::make_vec;
+use crate::utils::{check_begin_idx4, make_vec};
 use serde::Deserialize;
 use talib_sys::{TA_CDL2CROWS_Lookback, TA_CDL2CROWS};
 use talib_sys::{TA_CDL3BLACKCROWS_Lookback, TA_CDL3BLACKCROWS};
@@ -77,27 +77,29 @@ pub fn ta_cdl2crows(
 ) -> Result<Vec<i32>, TA_RetCode> {
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
-    let lookback = unsafe { TA_CDL2CROWS_Lookback() };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDL2CROWS_Lookback() };
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_CDL2CROWS(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
                 unsafe {
-                    out.set_len(out_size);
+                    out.set_len(out_size_begin);
                 }
             } else {
                 unsafe {
@@ -119,27 +121,29 @@ pub fn ta_cdl3blackcrows(
 ) -> Result<Vec<i32>, TA_RetCode> {
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
-    let lookback = unsafe { TA_CDL3BLACKCROWS_Lookback() };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDL3BLACKCROWS_Lookback() };
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_CDL3BLACKCROWS(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
                 unsafe {
-                    out.set_len(out_size);
+                    out.set_len(out_size_begin);
                 }
             } else {
                 unsafe {
@@ -161,27 +165,29 @@ pub fn ta_cdl3inside(
 ) -> Result<Vec<i32>, TA_RetCode> {
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
-    let lookback = unsafe { TA_CDL3INSIDE_Lookback() };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDL3INSIDE_Lookback() };
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_CDL3INSIDE(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
                 unsafe {
-                    out.set_len(out_size);
+                    out.set_len(out_size_begin);
                 }
             } else {
                 unsafe {
@@ -203,28 +209,30 @@ pub fn ta_cdl3linestrike(
 ) -> Result<Vec<i32>, TA_RetCode> {
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
-    let lookback = unsafe { TA_CDL3LINESTRIKE_Lookback() };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDL3LINESTRIKE_Lookback() };
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_CDL3LINESTRIKE(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
 
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
                 unsafe {
-                    out.set_len(out_size);
+                    out.set_len(out_size_begin);
                 }
             } else {
                 unsafe {
@@ -247,28 +255,30 @@ pub fn ta_cdl3outside(
 ) -> Result<Vec<i32>, TA_RetCode> {
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
-    let lookback = unsafe { TA_CDL3OUTSIDE_Lookback() };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDL3OUTSIDE_Lookback() };
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_CDL3OUTSIDE(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
 
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
                 unsafe {
-                    out.set_len(out_size);
+                    out.set_len(out_size_begin);
                 }
             } else {
                 unsafe {
@@ -291,28 +301,30 @@ pub fn ta_cdl3starsinsouth(
 ) -> Result<Vec<i32>, TA_RetCode> {
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
-    let lookback = unsafe { TA_CDL3STARSINSOUTH_Lookback() };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDL3STARSINSOUTH_Lookback() };
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_CDL3STARSINSOUTH(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
 
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
                 unsafe {
-                    out.set_len(out_size);
+                    out.set_len(out_size_begin);
                 }
             } else {
                 unsafe {
@@ -335,28 +347,30 @@ pub fn ta_cdl3whitesoldiers(
 ) -> Result<Vec<i32>, TA_RetCode> {
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
-    let lookback = unsafe { TA_CDL3WHITESOLDIERS_Lookback() };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDL3WHITESOLDIERS_Lookback() };
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_CDL3WHITESOLDIERS(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
 
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
                 unsafe {
-                    out.set_len(out_size);
+                    out.set_len(out_size_begin);
                 }
             } else {
                 unsafe {
@@ -370,7 +384,6 @@ pub fn ta_cdl3whitesoldiers(
     }
 }
 
-
 pub fn ta_cdlabandonedbaby(
     open_ptr: *const f64,
     high_ptr: *const f64,
@@ -381,28 +394,30 @@ pub fn ta_cdlabandonedbaby(
 ) -> Result<Vec<i32>, TA_RetCode> {
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
-    let lookback = unsafe { TA_CDLABANDONEDBABY_Lookback(kwargs.penetration) };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDLABANDONEDBABY_Lookback(kwargs.penetration) };
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_CDLABANDONEDBABY(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             kwargs.penetration,
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
                 unsafe {
-                    out.set_len(out_size);
+                    out.set_len(out_size_begin);
                 }
             } else {
                 unsafe {
@@ -426,31 +441,33 @@ pub fn ta_cdladvanceblock(
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
 
-    let lookback = unsafe { TA_CDLADVANCEBLOCK_Lookback() };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDLADVANCEBLOCK_Lookback() };
 
     let (mut out, ptr) = make_vec(len, lookback);
 
     let ret_code = unsafe {
         TA_CDLADVANCEBLOCK(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
 
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
 
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
                 unsafe {
-                    out.set_len(out_size);
+                    out.set_len(out_size_begin);
                 }
             } else {
                 unsafe {
@@ -474,28 +491,30 @@ pub fn ta_cdlbelthold(
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
 
-    let lookback = unsafe { TA_CDLBELTHOLD_Lookback() };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDLBELTHOLD_Lookback() };
     let (mut out, ptr) = make_vec(len, lookback);
 
     let ret_code = unsafe {
         TA_CDLBELTHOLD(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
                 unsafe {
-                    out.set_len(out_size);
+                    out.set_len(out_size_begin);
                 }
             } else {
                 unsafe {
@@ -520,31 +539,33 @@ pub fn ta_cdlbreakaway(
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
 
-    let lookback = unsafe { TA_CDLBREAKAWAY_Lookback() };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDLBREAKAWAY_Lookback() };
 
     let (mut out, ptr) = make_vec(len, lookback);
 
     let ret_code = unsafe {
         TA_CDLBREAKAWAY(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
 
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
 
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
                 unsafe {
-                    out.set_len(out_size);
+                    out.set_len(out_size_begin);
                 }
             } else {
                 unsafe {
@@ -568,31 +589,33 @@ pub fn ta_cdlclosingmarubozu(
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
 
-    let lookback = unsafe { TA_CDLCLOSINGMARUBOZU_Lookback() };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDLCLOSINGMARUBOZU_Lookback() };
 
     let (mut out, ptr) = make_vec(len, lookback);
 
     let ret_code = unsafe {
         TA_CDLCLOSINGMARUBOZU(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
 
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
 
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
                 unsafe {
-                    out.set_len(out_size);
+                    out.set_len(out_size_begin);
                 }
             } else {
                 unsafe {
@@ -617,30 +640,32 @@ pub fn ta_cdlconcealbabyswall(
 
     let mut out_size: TA_Integer = 0;
 
-    let lookback = unsafe { TA_CDLCONCEALBABYSWALL_Lookback() };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDLCONCEALBABYSWALL_Lookback() };
 
     let (mut out, ptr) = make_vec(len, lookback);
 
     let ret_code = unsafe {
         TA_CDLCONCEALBABYSWALL(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
 
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
 
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
-                unsafe { out.set_len(out_size) };
+                unsafe { out.set_len(out_size_begin) };
             } else {
                 unsafe { out.set_len(len) };
             }
@@ -663,30 +688,32 @@ pub fn ta_cdlcounterattack(
 
     let mut out_size: TA_Integer = 0;
 
-    let lookback = unsafe { TA_CDLCOUNTERATTACK_Lookback() };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDLCOUNTERATTACK_Lookback() };
 
     let (mut out, ptr) = make_vec(len, lookback);
 
     let ret_code = unsafe {
         TA_CDLCOUNTERATTACK(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
 
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
 
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
-                unsafe { out.set_len(out_size) };
+                unsafe { out.set_len(out_size_begin) };
             } else {
                 unsafe { out.set_len(len) };
             }
@@ -709,18 +736,20 @@ pub fn ta_cdldarkcloudcover(
 
     let mut out_size: TA_Integer = 0;
 
-    let lookback = unsafe { TA_CDLDARKCLOUDCOVER_Lookback(kwargs.penetration) };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDLDARKCLOUDCOVER_Lookback(kwargs.penetration) };
 
     let (mut out, ptr) = make_vec(len, lookback);
 
     let ret_code = unsafe {
         TA_CDLDARKCLOUDCOVER(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             kwargs.penetration,
             &mut out_begin,
             &mut out_size,
@@ -728,14 +757,14 @@ pub fn ta_cdldarkcloudcover(
         )
     };
 
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
 
     // println!("out_size: {}", out_size);
 
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
-                unsafe { out.set_len(out_size) };
+                unsafe { out.set_len(out_size_begin) };
             } else {
                 unsafe { out.set_len(len) };
             }
@@ -758,18 +787,20 @@ pub fn ta_cdldojistar(
 
     let mut out_size: TA_Integer = 0;
 
-    let lookback = unsafe { TA_CDLDOJISTAR_Lookback() };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDLDOJISTAR_Lookback() };
 
     let (mut out, ptr) = make_vec(len, lookback);
 
     let ret_code = unsafe {
         TA_CDLDOJISTAR(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
@@ -779,14 +810,14 @@ pub fn ta_cdldojistar(
     // println!("out_begin: {}", out_begin);
     // println!("out_size: {}", out_size);
 
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
 
     // println!("out_size: {}", out_size);
 
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
-                unsafe { out.set_len(out_size) };
+                unsafe { out.set_len(out_size_begin) };
             } else {
                 unsafe { out.set_len(len) };
             }
@@ -808,30 +839,32 @@ pub fn ta_cdldoji(
 
     let mut out_size: TA_Integer = 0;
 
-    let lookback = unsafe { TA_CDLDOJI_Lookback() };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDLDOJI_Lookback() };
 
     let (mut out, ptr) = make_vec(len, lookback);
 
     let ret_code = unsafe {
         TA_CDLDOJI(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
 
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
                 unsafe {
-                    out.set_len(out_size);
+                    out.set_len(out_size_begin);
                 }
             } else {
                 unsafe {
@@ -856,30 +889,32 @@ pub fn ta_cdldragonflydoji(
 
     let mut out_size: TA_Integer = 0;
 
-    let lookback = unsafe { TA_CDLDRAGONFLYDOJI_Lookback() };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDLDRAGONFLYDOJI_Lookback() };
 
     let (mut out, ptr) = make_vec(len, lookback);
 
     let ret_code = unsafe {
         TA_CDLDRAGONFLYDOJI(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
 
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
                 unsafe {
-                    out.set_len(out_size);
+                    out.set_len(out_size_begin);
                 }
             } else {
                 unsafe {
@@ -904,30 +939,32 @@ pub fn ta_cdlengulfing(
 
     let mut out_size: TA_Integer = 0;
 
-    let lookback = unsafe { TA_CDLENGULFING_Lookback() };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDLENGULFING_Lookback() };
 
     let (mut out, ptr) = make_vec(len, lookback);
 
     let ret_code = unsafe {
         TA_CDLENGULFING(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
 
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
                 unsafe {
-                    out.set_len(out_size);
+                    out.set_len(out_size_begin);
                 }
             } else {
                 unsafe {
@@ -939,8 +976,6 @@ pub fn ta_cdlengulfing(
         _ => Err(ret_code),
     }
 }
-
-
 
 pub fn ta_cdleveningdojistar(
     open_ptr: *const f64,
@@ -954,18 +989,20 @@ pub fn ta_cdleveningdojistar(
 
     let mut out_size: TA_Integer = 0;
 
-    let lookback = unsafe { TA_CDLEVENINGDOJISTAR_Lookback(kwargs.penetration) };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDLEVENINGDOJISTAR_Lookback(kwargs.penetration) };
 
     let (mut out, ptr) = make_vec(len, lookback);
 
     let ret_code = unsafe {
         TA_CDLEVENINGDOJISTAR(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             kwargs.penetration,
             &mut out_begin,
             &mut out_size,
@@ -973,12 +1010,12 @@ pub fn ta_cdleveningdojistar(
         )
     };
 
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
                 unsafe {
-                    out.set_len(out_size);
+                    out.set_len(out_size_begin);
                 }
             } else {
                 unsafe {
@@ -1004,18 +1041,20 @@ pub fn ta_cdleveningstar(
 
     let mut out_size: TA_Integer = 0;
 
-    let lookback = unsafe { TA_CDLEVENINGSTAR_Lookback(kwargs.penetration) };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDLEVENINGSTAR_Lookback(kwargs.penetration) };
 
     let (mut out, ptr) = make_vec(len, lookback);
 
     let ret_code = unsafe {
         TA_CDLEVENINGSTAR(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             kwargs.penetration,
             &mut out_begin,
             &mut out_size,
@@ -1023,12 +1062,12 @@ pub fn ta_cdleveningstar(
         )
     };
 
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
                 unsafe {
-                    out.set_len(out_size);
+                    out.set_len(out_size_begin);
                 }
             } else {
                 unsafe {
@@ -1051,28 +1090,30 @@ pub fn ta_cdlgapsidesidewhite(
 ) -> Result<Vec<i32>, TA_RetCode> {
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
-    let lookback = unsafe { TA_CDLGAPSIDESIDEWHITE_Lookback() };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDLGAPSIDESIDEWHITE_Lookback() };
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_CDLGAPSIDESIDEWHITE(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
     // println!("out_size: {}", out_size);
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
                 unsafe {
-                    out.set_len(out_size);
+                    out.set_len(out_size_begin);
                     // println!("out.len(): {}", out.len());
                 }
             } else {
@@ -1099,29 +1140,31 @@ pub fn ta_cdlgravestonedoji(
 
     let mut out_size: TA_Integer = 0;
 
-    let lookback = unsafe { TA_CDLGRAVESTONEDOJI_Lookback() };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDLGRAVESTONEDOJI_Lookback() };
 
     let (mut out, ptr) = make_vec(len, lookback);
 
     let ret_code = unsafe {
         TA_CDLGRAVESTONEDOJI(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
 
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
-                unsafe { out.set_len(out_size) };
+                unsafe { out.set_len(out_size_begin) };
             } else {
                 unsafe { out.set_len(len) };
             }
@@ -1144,29 +1187,31 @@ pub fn ta_cdlhammer(
 
     let mut out_size: TA_Integer = 0;
 
-    let lookback = unsafe { TA_CDLHAMMER_Lookback() };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDLHAMMER_Lookback() };
 
     let (mut out, ptr) = make_vec(len, lookback);
 
     let ret_code = unsafe {
         TA_CDLHAMMER(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
 
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
-                unsafe { out.set_len(out_size) };
+                unsafe { out.set_len(out_size_begin) };
             } else {
                 unsafe { out.set_len(len) };
             }
@@ -1188,29 +1233,31 @@ pub fn ta_cdlhangingman(
 
     let mut out_size: TA_Integer = 0;
 
-    let lookback = unsafe { TA_CDLHANGINGMAN_Lookback() };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDLHANGINGMAN_Lookback() };
 
     let (mut out, ptr) = make_vec(len, lookback);
 
     let ret_code = unsafe {
         TA_CDLHANGINGMAN(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
 
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
-                unsafe { out.set_len(out_size) };
+                unsafe { out.set_len(out_size_begin) };
             } else {
                 unsafe { out.set_len(len) };
             }
@@ -1231,28 +1278,30 @@ pub fn ta_cdlharamicross(
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
 
-    let lookback = unsafe { TA_CDLHARAMICROSS_Lookback() };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDLHARAMICROSS_Lookback() };
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_CDLHARAMICROSS(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
 
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
 
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
-                unsafe { out.set_len(out_size) };
+                unsafe { out.set_len(out_size_begin) };
             } else {
                 unsafe { out.set_len(len) };
             }
@@ -1274,30 +1323,32 @@ pub fn ta_cdlharami(
 
     let mut out_size: TA_Integer = 0;
 
-    let lookback = unsafe { TA_CDLHARAMI_Lookback() };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDLHARAMI_Lookback() };
 
     let (mut out, ptr) = make_vec(len, lookback);
 
     let ret_code = unsafe {
         TA_CDLHARAMI(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
 
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
 
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
-                unsafe { out.set_len(out_size) };
+                unsafe { out.set_len(out_size_begin) };
             } else {
                 unsafe { out.set_len(len) };
             }
@@ -1322,28 +1373,30 @@ pub fn ta_cdlhighwave(
 
     let mut out_size: TA_Integer = 0;
 
-    let lookback = unsafe { TA_CDLHIGHWAVE_Lookback() };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDLHIGHWAVE_Lookback() };
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_CDLHIGHWAVE(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
 
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
                 unsafe {
-                    out.set_len(out_size);
+                    out.set_len(out_size_begin);
                     // println!("out.len(): {}", out.len());
                 }
             } else {
@@ -1369,18 +1422,20 @@ pub fn ta_cdlhikkakemod(
 
     let mut out_size: TA_Integer = 0;
 
-    let lookback = unsafe { TA_CDLHIKKAKEMOD_Lookback() };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDLHIKKAKEMOD_Lookback() };
 
     let (mut out, ptr) = make_vec(len, lookback);
 
     let ret_code = unsafe {
         TA_CDLHIKKAKEMOD(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
@@ -1390,14 +1445,14 @@ pub fn ta_cdlhikkakemod(
     // println!("out_begin: {}", out_begin);
     // println!("out_size: {}", out_size);
 
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
 
     // println!("out_size: {}", out_size);
 
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
-                unsafe { out.set_len(out_size) };
+                unsafe { out.set_len(out_size_begin) };
             } else {
                 unsafe { out.set_len(len) };
             }
@@ -1422,7 +1477,9 @@ pub fn ta_cdlhikkake(
 
     let mut out_size: TA_Integer = 0;
 
-    let lookback = unsafe { TA_CDLHIKKAKE_Lookback() };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDLHIKKAKE_Lookback() };
 
     // println!("lookback: {}", lookback);
 
@@ -1433,11 +1490,11 @@ pub fn ta_cdlhikkake(
     let ret_code = unsafe {
         TA_CDLHIKKAKE(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
@@ -1447,14 +1504,14 @@ pub fn ta_cdlhikkake(
     // println!("out_begin: {}", out_begin);
     // println!("out_size: {}", out_size);
 
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
 
     // println!("out_size: {}", out_size);
 
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
-                unsafe { out.set_len(out_size) };
+                unsafe { out.set_len(out_size_begin) };
             } else {
                 unsafe { out.set_len(len) };
             }
@@ -1480,7 +1537,9 @@ pub fn ta_cdlhomingpigeon(
 
     let mut out_size: TA_Integer = 0;
 
-    let lookback = unsafe { TA_CDLHOMINGPIGEON_Lookback() };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDLHOMINGPIGEON_Lookback() };
 
     // println!("lookback: {}", lookback);
 
@@ -1491,11 +1550,11 @@ pub fn ta_cdlhomingpigeon(
     let ret_code = unsafe {
         TA_CDLHOMINGPIGEON(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
@@ -1505,14 +1564,14 @@ pub fn ta_cdlhomingpigeon(
     // println!("out_begin: {}", out_begin);
     // println!("out_size: {}", out_size);
 
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
 
     // println!("out_size: {}", out_size);
 
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
-                unsafe { out.set_len(out_size) };
+                unsafe { out.set_len(out_size_begin) };
             } else {
                 unsafe { out.set_len(len) };
             }
@@ -1537,28 +1596,30 @@ pub fn ta_cdlidentical3crows(
 
     let mut out_size: TA_Integer = 0;
 
-    let lookback = unsafe { TA_CDLIDENTICAL3CROWS_Lookback() };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDLIDENTICAL3CROWS_Lookback() };
 
     let (mut out, ptr) = make_vec(len, lookback);
 
     let ret_code = unsafe {
         TA_CDLIDENTICAL3CROWS(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
-                unsafe { out.set_len(out_size) };
+                unsafe { out.set_len(out_size_begin) };
             } else {
                 unsafe { out.set_len(len) };
             }
@@ -1584,28 +1645,30 @@ pub fn ta_cdlinneck(
 
     let mut out_size: TA_Integer = 0;
 
-    let lookback = unsafe { TA_CDLINNECK_Lookback() };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDLINNECK_Lookback() };
 
     let (mut out, ptr) = make_vec(len, lookback);
 
     let ret_code = unsafe {
         TA_CDLINNECK(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
-                unsafe { out.set_len(out_size) };
+                unsafe { out.set_len(out_size_begin) };
             } else {
                 unsafe { out.set_len(len) };
             }
@@ -1631,28 +1694,30 @@ pub fn ta_cdlinvertedhammer(
 
     let mut out_size: TA_Integer = 0;
 
-    let lookback = unsafe { TA_CDLINVERTEDHAMMER_Lookback() };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDLINVERTEDHAMMER_Lookback() };
 
     let (mut out, ptr) = make_vec(len, lookback);
 
     let ret_code = unsafe {
         TA_CDLINVERTEDHAMMER(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
-                unsafe { out.set_len(out_size) };
+                unsafe { out.set_len(out_size_begin) };
             } else {
                 unsafe { out.set_len(len) };
             }
@@ -1678,28 +1743,30 @@ pub fn ta_cdlkickingbylength(
 
     let mut out_size: TA_Integer = 0;
 
-    let lookback = unsafe { TA_CDLKICKINGBYLENGTH_Lookback() };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDLKICKINGBYLENGTH_Lookback() };
 
     let (mut out, ptr) = make_vec(len, lookback);
 
     let ret_code = unsafe {
         TA_CDLKICKINGBYLENGTH(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
-                unsafe { out.set_len(out_size) };
+                unsafe { out.set_len(out_size_begin) };
             } else {
                 unsafe { out.set_len(len) };
             }
@@ -1725,31 +1792,33 @@ pub fn ta_cdlkicking(
 
     let mut out_size: TA_Integer = 0;
 
-    let lookback = unsafe { TA_CDLKICKING_Lookback() };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDLKICKING_Lookback() };
 
     let (mut out, ptr) = make_vec(len, lookback);
 
     let ret_code = unsafe {
         TA_CDLKICKING(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             // println!("out_begin: {}", out_begin);
             // println!("out_size: {}", out_size);
 
             if out_size != 0 {
-                unsafe { out.set_len(out_size) };
+                unsafe { out.set_len(out_size_begin) };
             } else {
                 unsafe { out.set_len(len) };
             }
@@ -1775,24 +1844,26 @@ pub fn ta_cdlladderbottom(
 
     let mut out_size: TA_Integer = 0;
 
-    let lookback = unsafe { TA_CDLLADDERBOTTOM_Lookback() };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDLLADDERBOTTOM_Lookback() };
 
     let (mut out, ptr) = make_vec(len, lookback);
 
     let ret_code = unsafe {
         TA_CDLLADDERBOTTOM(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
     // println!("out_begin: {}", out_begin);
     // println!("out_size: {}", out_size);
 
@@ -1802,7 +1873,7 @@ pub fn ta_cdlladderbottom(
             // println!("out_size: {}", out_size);
 
             if out_size != 0 {
-                unsafe { out.set_len(out_size) };
+                unsafe { out.set_len(out_size_begin) };
             } else {
                 unsafe { out.set_len(len) };
             }
@@ -1825,30 +1896,32 @@ pub fn ta_cdllongleggeddoji(
 
     let mut out_size: TA_Integer = 0;
 
-    let lookback = unsafe { TA_CDLLONGLEGGEDDOJI_Lookback() };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDLLONGLEGGEDDOJI_Lookback() };
 
     let (mut out, ptr) = make_vec(len, lookback);
 
     let ret_code = unsafe {
         TA_CDLLONGLEGGEDDOJI(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
 
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
 
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
-                unsafe { out.set_len(out_size) };
+                unsafe { out.set_len(out_size_begin) };
             } else {
                 unsafe { out.set_len(len) };
             }
@@ -1871,25 +1944,27 @@ pub fn ta_cdllongline(
 
     let mut out_size: TA_Integer = 0;
 
-    let lookback = unsafe { TA_CDLLONGLINE_Lookback() };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDLLONGLINE_Lookback() };
 
     let (mut out, ptr) = make_vec(len, lookback);
 
     let ret_code = unsafe {
         TA_CDLLONGLINE(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
 
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
 
     // println!("out_begin: {}", out_begin);
     // println!("out_size: {}", out_size);
@@ -1897,7 +1972,7 @@ pub fn ta_cdllongline(
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
-                unsafe { out.set_len(out_size) };
+                unsafe { out.set_len(out_size_begin) };
             } else {
                 unsafe { out.set_len(len) };
             }
@@ -1917,27 +1992,29 @@ pub fn ta_cdlmarubozu(
 ) -> Result<Vec<i32>, TA_RetCode> {
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
-    let lookback = unsafe { TA_CDLMARUBOZU_Lookback() };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDLMARUBOZU_Lookback() };
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_CDLMARUBOZU(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
 
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
-                unsafe { out.set_len(out_size) };
+                unsafe { out.set_len(out_size_begin) };
             } else {
                 unsafe { out.set_len(len) };
             }
@@ -1956,27 +2033,29 @@ pub fn ta_cdlmatchinglow(
 ) -> Result<Vec<i32>, TA_RetCode> {
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
-    let lookback = unsafe { TA_CDLMATCHINGLOW_Lookback() };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDLMATCHINGLOW_Lookback() };
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_CDLMATCHINGLOW(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
 
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
-                unsafe { out.set_len(out_size) }
+                unsafe { out.set_len(out_size_begin) }
             } else {
                 unsafe { out.set_len(len) }
             }
@@ -1985,8 +2064,6 @@ pub fn ta_cdlmatchinglow(
         _ => Err(ret_code),
     }
 }
-
-
 
 pub fn ta_cdlmathold(
     open_ptr: *const f64,
@@ -1998,28 +2075,30 @@ pub fn ta_cdlmathold(
 ) -> Result<Vec<i32>, TA_RetCode> {
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
-    let lookback = unsafe { TA_CDLMATHOLD_Lookback(kwargs.penetration) };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDLMATHOLD_Lookback(kwargs.penetration) };
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_CDLMATHOLD(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             kwargs.penetration,
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
 
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
-                unsafe { out.set_len(out_size) }
+                unsafe { out.set_len(out_size_begin) }
             } else {
                 unsafe { out.set_len(len) }
             }
@@ -2028,8 +2107,6 @@ pub fn ta_cdlmathold(
         _ => Err(ret_code),
     }
 }
-
-
 
 pub fn ta_cdlmorningdojistar(
     open_ptr: *const f64,
@@ -2041,28 +2118,30 @@ pub fn ta_cdlmorningdojistar(
 ) -> Result<Vec<i32>, TA_RetCode> {
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
-    let lookback = unsafe { TA_CDLMORNINGDOJISTAR_Lookback(kwargs.penetration) };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDLMORNINGDOJISTAR_Lookback(kwargs.penetration) };
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_CDLMORNINGDOJISTAR(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             kwargs.penetration,
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
 
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
-                unsafe { out.set_len(out_size) }
+                unsafe { out.set_len(out_size_begin) }
             } else {
                 unsafe { out.set_len(len) }
             }
@@ -2082,31 +2161,30 @@ pub fn ta_cdlmorningstar(
 ) -> Result<Vec<i32>, TA_RetCode> {
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
-
-    let lookback = unsafe {
-        TA_CDLMORNINGSTAR_Lookback(kwargs.penetration)
-    };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDLMORNINGSTAR_Lookback(kwargs.penetration) };
     let (mut out, ptr) = make_vec(len, lookback);
 
     let ret_code = unsafe {
         TA_CDLMORNINGSTAR(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             kwargs.penetration,
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
-                unsafe { out.set_len(out_size) };
+                unsafe { out.set_len(out_size_begin) };
             } else {
                 unsafe { out.set_len(len) };
             }
@@ -2125,30 +2203,31 @@ pub fn ta_cdlonneck(
 ) -> Result<Vec<i32>, TA_RetCode> {
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
-    
-    let lookback = unsafe { TA_CDLONNECK_Lookback() };
+
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDLONNECK_Lookback() };
     let (mut out, ptr) = make_vec(len, lookback);
-    
+
     let ret_code = unsafe {
         TA_CDLONNECK(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
-            
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
-    let out_size = (out_begin + out_size) as usize;
-    
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
+
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
-                unsafe { out.set_len(out_size) }
+                unsafe { out.set_len(out_size_begin) }
             } else {
                 unsafe { out.set_len(len) }
             }
@@ -2168,29 +2247,29 @@ pub fn ta_cdlpiercing(
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
 
-    let lookback = unsafe { 
-        TA_CDLPIERCING_Lookback()
-    };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDLPIERCING_Lookback() };
     let (mut out, ptr) = make_vec(len, lookback);
 
     let ret_code = unsafe {
         TA_CDLPIERCING(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
-                unsafe { out.set_len(out_size) };
+                unsafe { out.set_len(out_size_begin) };
             } else {
                 unsafe { out.set_len(len) };
             }
@@ -2211,28 +2290,28 @@ pub fn ta_cdlrickshawman(
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
 
-    let lookback = unsafe {
-        TA_CDLRICKSHAWMAN_Lookback()
-    };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDLRICKSHAWMAN_Lookback() };
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_CDLRICKSHAWMAN(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
-                unsafe { out.set_len(out_size) };
+                unsafe { out.set_len(out_size_begin) };
             } else {
                 unsafe { out.set_len(len) };
             }
@@ -2253,31 +2332,32 @@ pub fn ta_cdlrisefall3methods(
 
     let mut out_size: TA_Integer = 0;
 
-    let lookback = unsafe {
-        TA_CDLRISEFALL3METHODS_Lookback()
-    };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - 1 - begin_idx;
+
+    let lookback = begin_idx + unsafe { TA_CDLRISEFALL3METHODS_Lookback() };
 
     let (mut out, ptr) = make_vec(len, lookback);
 
     let ret_code = unsafe {
         TA_CDLRISEFALL3METHODS(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
 
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
-                unsafe { out.set_len(out_size) };
+                unsafe { out.set_len(out_size_begin) };
             } else {
                 unsafe { out.set_len(len) };
             }
@@ -2300,18 +2380,20 @@ pub fn ta_cdlseparatinglines(
 
     let mut out_size: TA_Integer = 0;
 
-    let lookback = unsafe { TA_CDLSEPARATINGLINES_Lookback() };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDLSEPARATINGLINES_Lookback() };
 
     let (mut out, ptr) = make_vec(len, lookback);
 
     let ret_code = unsafe {
         TA_CDLSEPARATINGLINES(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
@@ -2321,7 +2403,7 @@ pub fn ta_cdlseparatinglines(
     // println!("out_begin: {}", out_begin);
     // println!("out_size: {}", out_size);
 
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
 
     // println!("out_size: {}", out_size);
 
@@ -2330,7 +2412,7 @@ pub fn ta_cdlseparatinglines(
             // println!("out_size: {}", out_size);
 
             if out_size != 0 {
-                unsafe { out.set_len(out_size) };
+                unsafe { out.set_len(out_size_begin) };
             } else {
                 unsafe { out.set_len(len) };
                 // println!("out.len(): {}", out.len());
@@ -2354,18 +2436,20 @@ pub fn ta_cdlshootingstar(
 
     let mut out_size: TA_Integer = 0;
 
-    let lookback = unsafe { TA_CDLSHOOTINGSTAR_Lookback() };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDLSHOOTINGSTAR_Lookback() };
 
     let (mut out, ptr) = make_vec(len, lookback);
 
     let ret_code = unsafe {
         TA_CDLSHOOTINGSTAR(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
@@ -2375,7 +2459,7 @@ pub fn ta_cdlshootingstar(
     // println!("out_begin: {}", out_begin);
     // println!("out_size: {}", out_size);
 
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
 
     // println!("out_size: {}", out_size);
 
@@ -2384,7 +2468,7 @@ pub fn ta_cdlshootingstar(
             // println!("out_size: {}", out_size);
 
             if out_size != 0 {
-                unsafe { out.set_len(out_size) };
+                unsafe { out.set_len(out_size_begin) };
             } else {
                 unsafe { out.set_len(len) };
                 // println!("out.len(): {}", out.len());
@@ -2406,26 +2490,28 @@ pub fn ta_cdlshortline(
 ) -> Result<Vec<i32>, TA_RetCode> {
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
-    let lookback = unsafe { TA_CDLSHORTLINE_Lookback() };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDLSHORTLINE_Lookback() };
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_CDLSHORTLINE(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
-                unsafe { out.set_len(out_size) };
+                unsafe { out.set_len(out_size_begin) };
             } else {
                 unsafe { out.set_len(len) };
                 // println!("out.len(): {}", out.len());
@@ -2447,26 +2533,28 @@ pub fn ta_cdlspinningtop(
 ) -> Result<Vec<i32>, TA_RetCode> {
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
-    let lookback = unsafe { TA_CDLSPINNINGTOP_Lookback() };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDLSPINNINGTOP_Lookback() };
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_CDLSPINNINGTOP(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
-                unsafe { out.set_len(out_size) };
+                unsafe { out.set_len(out_size_begin) };
             } else {
                 unsafe { out.set_len(len) };
                 // println!("out.len(): {}", out.len());
@@ -2488,26 +2576,28 @@ pub fn ta_cdlstalledpattern(
 ) -> Result<Vec<i32>, TA_RetCode> {
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
-    let lookback = unsafe { TA_CDLSTALLEDPATTERN_Lookback() };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDLSTALLEDPATTERN_Lookback() };
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_CDLSTALLEDPATTERN(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
-                unsafe { out.set_len(out_size) };
+                unsafe { out.set_len(out_size_begin) };
             } else {
                 unsafe { out.set_len(len) };
                 // println!("out.len(): {}", out.len());
@@ -2529,26 +2619,28 @@ pub fn ta_cdlsticksandwich(
 ) -> Result<Vec<i32>, TA_RetCode> {
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
-    let lookback = unsafe { TA_CDLSTICKSANDWICH_Lookback() };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDLSTICKSANDWICH_Lookback() };
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_CDLSTICKSANDWICH(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
-                unsafe { out.set_len(out_size) };
+                unsafe { out.set_len(out_size_begin) };
             } else {
                 unsafe { out.set_len(len) };
                 // println!("out.len(): {}", out.len());
@@ -2570,22 +2662,24 @@ pub fn ta_cdltakuri(
 ) -> Result<Vec<i32>, TA_RetCode> {
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
-    let lookback = unsafe { TA_CDLTAKURI_Lookback() };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDLTAKURI_Lookback() };
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_CDLTAKURI(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
     // println!("out_begin: {}", out_begin);
     // println!("out_size: {}", out_size);
 
@@ -2594,7 +2688,7 @@ pub fn ta_cdltakuri(
             // println!("out_size: {}", out_size);
 
             if out_size != 0 {
-                unsafe { out.set_len(out_size) };
+                unsafe { out.set_len(out_size_begin) };
             } else {
                 unsafe { out.set_len(len) };
                 // println!("out.len(): {}", out.len());
@@ -2616,22 +2710,24 @@ pub fn ta_cdltasukigap(
 ) -> Result<Vec<i32>, TA_RetCode> {
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
-    let lookback = unsafe { TA_CDLTASUKIGAP_Lookback() };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDLTASUKIGAP_Lookback() };
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_CDLTASUKIGAP(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
 
     // println!("out_begin: {}", out_begin);
     // println!("out_size: {}", out_size);
@@ -2641,7 +2737,7 @@ pub fn ta_cdltasukigap(
             // println!("out_size: {}", out_size);
 
             if out_size != 0 {
-                unsafe { out.set_len(out_size) };
+                unsafe { out.set_len(out_size_begin) };
             } else {
                 unsafe { out.set_len(len) };
 
@@ -2663,22 +2759,24 @@ pub fn ta_cdlthrusting(
 ) -> Result<Vec<i32>, TA_RetCode> {
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
-    let lookback = unsafe { TA_CDLTHRUSTING_Lookback() };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDLTHRUSTING_Lookback() };
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_CDLTHRUSTING(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
 
     // println!("out_begin: {}", out_begin);
     // println!("out_size: {}", out_size);
@@ -2688,7 +2786,7 @@ pub fn ta_cdlthrusting(
             // println!("out_size: {}", out_size);
 
             if out_size != 0 {
-                unsafe { out.set_len(out_size) };
+                unsafe { out.set_len(out_size_begin) };
             } else {
                 unsafe { out.set_len(len) };
 
@@ -2710,22 +2808,24 @@ pub fn ta_cdltristar(
 ) -> Result<Vec<i32>, TA_RetCode> {
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
-    let lookback = unsafe { TA_CDLTRISTAR_Lookback() };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDLTRISTAR_Lookback() };
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_CDLTRISTAR(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
 
     // println!("out_begin: {}", out_begin);
     // println!("out_size: {}", out_size);
@@ -2735,7 +2835,7 @@ pub fn ta_cdltristar(
             // println!("out_size: {}", out_size);
 
             if out_size != 0 {
-                unsafe { out.set_len(out_size) };
+                unsafe { out.set_len(out_size_begin) };
             } else {
                 unsafe { out.set_len(len) };
 
@@ -2757,27 +2857,29 @@ pub fn ta_cdlunique3river(
 ) -> Result<Vec<i32>, TA_RetCode> {
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
-    let lookback = unsafe { TA_CDLUNIQUE3RIVER_Lookback() };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDLUNIQUE3RIVER_Lookback() };
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_CDLUNIQUE3RIVER(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
 
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
-                unsafe { out.set_len(out_size) };
+                unsafe { out.set_len(out_size_begin) };
             } else {
                 unsafe { out.set_len(len) };
             }
@@ -2798,27 +2900,29 @@ pub fn ta_cdlupsidegap2crows(
 ) -> Result<Vec<i32>, TA_RetCode> {
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
-    let lookback = unsafe { TA_CDLUPSIDEGAP2CROWS_Lookback() };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDLUPSIDEGAP2CROWS_Lookback() };
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_CDLUPSIDEGAP2CROWS(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
 
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
-                unsafe { out.set_len(out_size) };
+                unsafe { out.set_len(out_size_begin) };
             } else {
                 unsafe { out.set_len(len) };
             }
@@ -2839,27 +2943,29 @@ pub fn ta_cdlxsidegap3methods(
 ) -> Result<Vec<i32>, TA_RetCode> {
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
-    let lookback = unsafe { TA_CDLXSIDEGAP3METHODS_Lookback() };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CDLXSIDEGAP3METHODS_Lookback() };
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_CDLXSIDEGAP3METHODS(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
 
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
-                unsafe { out.set_len(out_size) };
+                unsafe { out.set_len(out_size_begin) };
             } else {
                 unsafe { out.set_len(len) };
             }

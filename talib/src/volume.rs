@@ -1,4 +1,4 @@
-use crate::utils::make_vec;
+use crate::utils::{make_vec, check_begin_idx4, check_begin_idx2};
 use serde::Deserialize;
 use talib_sys::{TA_ADOSC_Lookback, TA_AD_Lookback, TA_OBV_Lookback, TA_AD, TA_ADOSC, TA_OBV};
 use talib_sys::{TA_Integer, TA_RetCode};
@@ -12,27 +12,29 @@ pub fn ta_ad(
 ) -> Result<Vec<f64>, TA_RetCode> {
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
-    let lookback = unsafe { TA_AD_Lookback() };
+    let begin_idx = check_begin_idx4(len, high_ptr, low_ptr, close_ptr, volume_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_AD_Lookback() };
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_AD(
             0,
-            len as i32 - 1,
-            high_ptr,
-            low_ptr,
-            close_ptr,
-            volume_ptr,
+            end_idx,
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
+            volume_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
                 unsafe {
-                    out.set_len(out_size);
+                    out.set_len(out_size_begin);
                 }
             } else {
                 unsafe {
@@ -61,16 +63,18 @@ pub fn ta_adosc(
 ) -> Result<Vec<f64>, TA_RetCode> {
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
-    let lookback = unsafe { TA_ADOSC_Lookback(kwargs.fastperiod, kwargs.slowperiod) };
+    let begin_idx = check_begin_idx4(len, high_ptr, low_ptr, close_ptr, volume_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_ADOSC_Lookback(kwargs.fastperiod, kwargs.slowperiod) };
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_ADOSC(
             0,
-            len as i32 - 1,
-            high_ptr,
-            low_ptr,
-            close_ptr,
-            volume_ptr,
+            end_idx,
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
+            volume_ptr.offset(begin_idx as isize),
             kwargs.fastperiod,
             kwargs.slowperiod,
             &mut out_begin,
@@ -78,12 +82,12 @@ pub fn ta_adosc(
             ptr,
         )
     };
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
                 unsafe {
-                    out.set_len(out_size);
+                    out.set_len(out_size_begin);
                 }
             } else {
                 unsafe {
@@ -103,25 +107,27 @@ pub fn ta_obv(
 ) -> Result<Vec<f64>, TA_RetCode> {
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
-    let lookback = unsafe { TA_OBV_Lookback() };
+    let begin_idx = check_begin_idx2(len, real_ptr, volume_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_OBV_Lookback() };
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_OBV(
             0,
-            len as i32 - 1,
-            real_ptr,
-            volume_ptr,
+            end_idx,
+            real_ptr.offset(begin_idx as isize),
+            volume_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
                 unsafe {
-                    out.set_len(out_size);
+                    out.set_len(out_size_begin);
                 }
             } else {
                 unsafe {

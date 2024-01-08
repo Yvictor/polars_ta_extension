@@ -1,4 +1,4 @@
-use crate::utils::make_vec;
+use crate::utils::{check_begin_idx2, check_begin_idx3, check_begin_idx4, make_vec};
 use talib_sys::{TA_AVGPRICE_Lookback, TA_Integer, TA_RetCode, TA_AVGPRICE};
 use talib_sys::{TA_MEDPRICE_Lookback, TA_MEDPRICE};
 use talib_sys::{TA_TYPPRICE_Lookback, TA_TYPPRICE};
@@ -13,27 +13,29 @@ pub fn ta_avgprice(
 ) -> Result<Vec<f64>, TA_RetCode> {
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
-    let lookback = unsafe { TA_AVGPRICE_Lookback() };
+    let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_AVGPRICE_Lookback() };
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_AVGPRICE(
             0,
-            len as i32 - 1,
-            open_ptr,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
                 unsafe {
-                    out.set_len(out_size);
+                    out.set_len(out_size_begin);
                 }
             } else {
                 unsafe {
@@ -53,25 +55,27 @@ pub fn ta_medprice(
 ) -> Result<Vec<f64>, TA_RetCode> {
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
-    let lookback = unsafe { TA_MEDPRICE_Lookback() };
+    let begin_idx = check_begin_idx2(len, high_ptr, low_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_MEDPRICE_Lookback() };
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_MEDPRICE(
             0,
-            len as i32 - 1,
-            high_ptr,
-            low_ptr,
+            end_idx,
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
                 unsafe {
-                    out.set_len(out_size);
+                    out.set_len(out_size_begin);
                 }
             } else {
                 unsafe {
@@ -92,26 +96,28 @@ pub fn ta_typprice(
 ) -> Result<Vec<f64>, TA_RetCode> {
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
-    let lookback = unsafe { TA_TYPPRICE_Lookback() };
+    let begin_idx = check_begin_idx3(len, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_TYPPRICE_Lookback() };
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_TYPPRICE(
             0,
-            len as i32 - 1,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
                 unsafe {
-                    out.set_len(out_size);
+                    out.set_len(out_size_begin);
                 }
             } else {
                 unsafe {
@@ -122,7 +128,7 @@ pub fn ta_typprice(
         }
         _ => Err(ret_code),
     }
-}   
+}
 
 pub fn ta_wclprice(
     high_ptr: *const f64,
@@ -132,26 +138,28 @@ pub fn ta_wclprice(
 ) -> Result<Vec<f64>, TA_RetCode> {
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
-    let lookback = unsafe { TA_WCLPRICE_Lookback() };
+    let begin_idx = check_begin_idx3(len, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_WCLPRICE_Lookback() };
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_WCLPRICE(
             0,
-            len as i32 - 1,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
                 unsafe {
-                    out.set_len(out_size);
+                    out.set_len(out_size_begin);
                 }
             } else {
                 unsafe {

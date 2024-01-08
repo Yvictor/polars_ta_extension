@@ -1,4 +1,4 @@
-use crate::utils::make_vec;
+use crate::utils::{check_begin_idx3, make_vec};
 use serde::Deserialize;
 use talib_sys::{
     TA_ATR_Lookback, TA_Integer, TA_NATR_Lookback, TA_RetCode, TA_TRANGE_Lookback, TA_ATR, TA_NATR,
@@ -19,27 +19,29 @@ pub fn ta_atr(
 ) -> Result<Vec<f64>, TA_RetCode> {
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
-    let lookback = unsafe { TA_ATR_Lookback(kwargs.timeperiod) };
+    let begin_idx = check_begin_idx3(len, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_ATR_Lookback(kwargs.timeperiod) };
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_ATR(
             0,
-            len as i32 - 1,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             kwargs.timeperiod,
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
                 unsafe {
-                    out.set_len(out_size);
+                    out.set_len(out_size_begin);
                 }
             } else {
                 unsafe {
@@ -60,26 +62,28 @@ pub fn ta_trange(
 ) -> Result<Vec<f64>, TA_RetCode> {
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
-    let lookback = unsafe { TA_TRANGE_Lookback() };
+    let begin_idx = check_begin_idx3(len, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_TRANGE_Lookback() };
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_TRANGE(
             0,
-            len as i32 - 1,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
                 unsafe {
-                    out.set_len(out_size);
+                    out.set_len(out_size_begin);
                 }
             } else {
                 unsafe {
@@ -91,7 +95,6 @@ pub fn ta_trange(
         _ => Err(ret_code),
     }
 }
-
 
 #[derive(Deserialize)]
 pub struct NATRKwargs {
@@ -107,27 +110,29 @@ pub fn ta_natr(
 ) -> Result<Vec<f64>, TA_RetCode> {
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
-    let lookback = unsafe { TA_NATR_Lookback(kwargs.timeperiod) };
+    let begin_idx = check_begin_idx3(len, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_NATR_Lookback(kwargs.timeperiod) };
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_NATR(
             0,
-            len as i32 - 1,
-            high_ptr,
-            low_ptr,
-            close_ptr,
+            end_idx,
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
             kwargs.timeperiod,
             &mut out_begin,
             &mut out_size,
             ptr,
         )
     };
-    let out_size = (out_begin + out_size) as usize;
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
     match ret_code {
         TA_RetCode::TA_SUCCESS => {
             if out_size != 0 {
                 unsafe {
-                    out.set_len(out_size);
+                    out.set_len(out_size_begin);
                 }
             } else {
                 unsafe {
