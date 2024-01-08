@@ -102,7 +102,7 @@ wma                  Weighted Moving Average
 
 ##### Momentum Indicators
 ```
-Aadx                  Average Directional Movement Index
+adx                  Average Directional Movement Index
 adxr                 Average Directional Movement Index Rating
 apo                  Absolute Price Oscillator
 aroon                Aroon
