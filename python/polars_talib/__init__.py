@@ -190,6 +190,27 @@ def get_function_groups():
     return __function_groups__.copy()
 
 
+def get_functions_output_struct():
+    """
+    Returns a dict with keys of function names and keys of the output struct
+    """
+    return {
+        "ht_phasor": ["inphase", "quadrature"],
+        "ht_sine": ["sine", "leadsine"],
+        "minmax": ["min", "max"],
+        "minmaxindex": ["minidx", "maxidx"],
+        "aroon": ["aroondown", "aroonup"],
+        "macd": ["macd", "macdsignal", "macdhist"],
+        "macdext": ["macd", "macdsignal", "macdhist"],
+        "macdfix": ["macd", "macdsignal", "macdhist"],
+        "stoch": ["slowk", "slowd"],
+        "stochf": ["fastk", "fastd"],
+        "stochrsi": ["fastk", "fastd"],
+        "bbands": ["upperband", "middleband", "lowerband"],
+        "mama": ["mama", "fama"],
+    }
+
+
 @pl.api.register_expr_namespace("ta")
 class TAExpr:
     def __init__(self, expr: pl.Expr):
