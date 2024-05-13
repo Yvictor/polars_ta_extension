@@ -46,7 +46,7 @@ jobs:
           args: --release --out dist --find-interpreter
           sccache: 'true'
           manylinux: auto
-          docker-options: -e LIBCLANG_PATH=/opt/rh/llvm-toolset-7/root/usr/lib64/ -e LIBCLANG_STATIC_PATH=/opt/rh/llvm-toolset-7/root/usr/lib64/ -e CLANG_PATH=/opt/rh/llvm-toolset-7/root/usr/bin/clang
+          docker-options: -e LIBCLANG_PATH=/usr/lib/llvm-14/lib/ -e LIBCLANG_STATIC_PATH=/usr/lib/llvm-14/lib/ -e CLANG_PATH=/usr/lib/llvm-14/bin/clang
           before-script-linux: |
             # If we're running on rhel centos, install needed packages.
             if command -v yum &> /dev/null; then
