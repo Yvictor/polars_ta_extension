@@ -181,7 +181,6 @@ fn main() {
         .clang_arg(format!("-I{}", ta_include_path))
         .clang_arg("-I../dependencies/include")
         .clang_arg("-v")
-        .clang_arg("--no-size_t-is-usize")
         // Generate rustified enums
         // .newtype_enum("*")
         // .bitfield_enum("*")
