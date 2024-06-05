@@ -54,6 +54,46 @@ df.with_columns(
     ),
 )
 ```
+## Performance
+
+### Polars with polars_talib
+``` python
+%%timeit
+df = p.with_columns(
+    plta.sma(timeperiod=5).over("Symbol").alias("sma5"),
+    plta.macd(fastperiod=10, slowperiod=20, signalperiod=5).over("Symbol").alias("macd"),
+    plta.stoch(pl.col("high"), pl.col("low"), pl.col("close"), fastk_period=14, slowk_period=7, slowd_period=7).over("Symbol").alias("stoch"),
+    plta.wclprice().over("Symbol").alias("wclprice"),
+).with_columns(
+    pl.col("macd").struct.field("macd"),
+    pl.col("macd").struct.field("macdsignal"),
+    pl.col("macd").struct.field("macdhist"),
+    pl.col("stoch").struct.field("slowk"),
+    pl.col("stoch").struct.field("slowd"),
+).select(
+    pl.exclude("stoch")
+).filter(
+    pl.col("Symbol") == "AAPL"
+).collect()
+```
+
+135 ms ± 5.6 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+
+### Pandas with talib
+```python
+%%timeit
+df["sma5"] = df.groupby("Ticker")["close"].transform(lambda x: ta.SMA(x, timeperiod=5))
+df["macd"] = df.groupby("Ticker")["close"].transform(lambda x: ta.MACD(x, fastperiod=10, slowperiod=20, signalperiod=5)[0])
+df["macdsignal"] = df.groupby("Ticker")["close"].transform(lambda x: ta.MACD(x, fastperiod=10, slowperiod=20, signalperiod=5)[1])
+df["macdhist"] = df.groupby("Ticker")["close"].transform(lambda x: ta.MACD(x, fastperiod=10, slowperiod=20, signalperiod=5)[2])
+df["slowk"] = df.groupby("Ticker").apply(lambda x: ta.STOCH(x, fastk_period=14, slowk_period=7, slowd_period=7)).droplevel(0)["slowk"] 
+df["slowd"] = df.groupby("Ticker").apply(lambda x: ta.STOCH(x, fastk_period=14, slowk_period=7, slowd_period=7)).droplevel(0)["slowd"]
+df["wclprice"] = df.groupby("Ticker").apply(lambda x: ta.WCLPRICE(x)).droplevel(0)
+df.loc["AAPL"]
+```
+19.2 s ± 367 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+
+It's about 150x faster, see more detail in [basic.ipynb](./examples/basic.ipynb)
 
 ## Supported Indicators and Functions
 
