@@ -1,14 +1,14 @@
 import atexit
+from pathlib import Path
 import polars as pl
 from polars.type_aliases import IntoExpr
-from polars.utils.udfs import _get_shared_lib_location
 from ._polars_talib import initialize, shutdown, version
 
 
 __talib_version__ = version()
 
 # Boilerplate needed to inform Polars of the location of binary wheel.
-lib = _get_shared_lib_location(__file__)
+lib = Path(__file__).parent
 initialize()
 atexit.register(shutdown)
 
