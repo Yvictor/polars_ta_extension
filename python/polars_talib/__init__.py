@@ -1,14 +1,21 @@
 import atexit
 import polars as pl
-from polars.type_aliases import IntoExpr
-from polars.utils.udfs import _get_shared_lib_location
+from .utils import register_plugin, parse_version
 from ._polars_talib import initialize, shutdown, version
+from pathlib import Path
 
 
 __talib_version__ = version()
 
 # Boilerplate needed to inform Polars of the location of binary wheel.
-lib = _get_shared_lib_location(__file__)
+if parse_version(pl.__version__) < parse_version("0.20.16"):
+    from polars.utils.udfs import _get_shared_lib_location
+    from polars.type_aliases import IntoExpr
+    lib: str | Path = _get_shared_lib_location(__file__)
+else:
+    from polars._typing import IntoExpr
+    lib = Path(__file__).parent
+
 initialize()
 atexit.register(shutdown)
 
@@ -225,10 +232,11 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
-            lib=lib,
+        return register_plugin(
+            args=[self._expr],
             symbol="ht_dcperiod",
             is_elementwise=False,
+            lib=lib,
         )
 
     def ht_dcphase(self) -> pl.Expr:
@@ -240,7 +248,8 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
             symbol="ht_dcphase",
             is_elementwise=False,
@@ -256,7 +265,8 @@ class TAExpr:
             inphase
             quadrature
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
             symbol="ht_phasor",
             is_elementwise=False,
@@ -272,7 +282,8 @@ class TAExpr:
             sine
             leadsine
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
             symbol="ht_sine",
             is_elementwise=False,
@@ -287,7 +298,8 @@ class TAExpr:
         Outputs:
             integer
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
             symbol="ht_trendmode",
             is_elementwise=False,
@@ -303,9 +315,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, b],
             lib=lib,
-            args=[b],
             symbol="add",
             is_elementwise=False,
         )
@@ -320,9 +332,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, b],
             lib=lib,
-            args=[b],
             symbol="div",
             is_elementwise=False,
         )
@@ -338,9 +350,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
-            args=[],
             kwargs={"timeperiod": timeperiod},
             symbol="max",
             is_elementwise=False,
@@ -357,9 +369,9 @@ class TAExpr:
         Outputs:
             integer
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
-            args=[],
             kwargs={"timeperiod": timeperiod},
             symbol="maxindex",
             is_elementwise=False,
@@ -376,9 +388,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
-            args=[],
             kwargs={"timeperiod": timeperiod},
             symbol="min",
             is_elementwise=False,
@@ -395,9 +407,9 @@ class TAExpr:
         Outputs:
             integer
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
-            args=[],
             kwargs={"timeperiod": timeperiod},
             symbol="minindex",
             is_elementwise=False,
@@ -415,9 +427,9 @@ class TAExpr:
             min
             max
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
-            args=[],
             kwargs={"timeperiod": timeperiod},
             symbol="minmax",
             is_elementwise=False,
@@ -435,9 +447,9 @@ class TAExpr:
             minidx
             maxidx
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
-            args=[],
             kwargs={"timeperiod": timeperiod},
             symbol="minmaxindex",
             is_elementwise=False,
@@ -453,9 +465,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, b],
             lib=lib,
-            args=[b],
             symbol="mult",
             is_elementwise=False,
         )
@@ -470,9 +482,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, b],
             lib=lib,
-            args=[b],
             symbol="sub",
             is_elementwise=False,
         )
@@ -488,9 +500,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
-            args=[],
             kwargs={"timeperiod": timeperiod},
             symbol="sum",
             is_elementwise=False,
@@ -505,7 +517,8 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
             symbol="acos",
             is_elementwise=False,
@@ -520,7 +533,8 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
             symbol="asin",
             is_elementwise=False,
@@ -535,7 +549,8 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
             symbol="atan",
             is_elementwise=False,
@@ -550,7 +565,8 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
             symbol="ceil",
             is_elementwise=False,
@@ -565,7 +581,8 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
             symbol="cos",
             is_elementwise=False,
@@ -580,7 +597,8 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
             symbol="cosh",
             is_elementwise=False,
@@ -595,7 +613,8 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
             symbol="exp",
             is_elementwise=False,
@@ -610,7 +629,8 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
             symbol="floor",
             is_elementwise=False,
@@ -625,7 +645,8 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
             symbol="ln",
             is_elementwise=False,
@@ -640,7 +661,8 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
             symbol="log10",
             is_elementwise=False,
@@ -655,7 +677,8 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
             symbol="sin",
             is_elementwise=False,
@@ -670,7 +693,8 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
             symbol="sinh",
             is_elementwise=False,
@@ -685,7 +709,8 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
             symbol="sqrt",
             is_elementwise=False,
@@ -700,7 +725,8 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
             symbol="tan",
             is_elementwise=False,
@@ -715,7 +741,8 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
             symbol="tanh",
             is_elementwise=False,
@@ -734,9 +761,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low],
             lib=lib,
-            args=[high, low],
             kwargs={
                 "timeperiod": timeperiod,
             },
@@ -757,9 +784,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low],
             lib=lib,
-            args=[high, low],
             kwargs={
                 "timeperiod": timeperiod,
             },
@@ -780,9 +807,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
-            args=[],
             kwargs={
                 "fastperiod": fastperiod,
                 "slowperiod": slowperiod,
@@ -803,9 +830,9 @@ class TAExpr:
             aroondown
             aroonup
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, low],
             lib=lib,
-            args=[low],
             kwargs={
                 "timeperiod": timeperiod,
             },
@@ -824,9 +851,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, low],
             lib=lib,
-            args=[low],
             kwargs={
                 "timeperiod": timeperiod,
             },
@@ -848,9 +875,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             symbol="bop",
             is_elementwise=False,
         )
@@ -868,9 +895,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low],
             lib=lib,
-            args=[high, low],
             kwargs={
                 "timeperiod": timeperiod,
             },
@@ -889,9 +916,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
-            args=[],
             kwargs={
                 "timeperiod": timeperiod,
             },
@@ -912,9 +939,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low],
             lib=lib,
-            args=[high, low],
             kwargs={
                 "timeperiod": timeperiod,
             },
@@ -937,9 +964,9 @@ class TAExpr:
             macdsignal
             macdhist
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
-            args=[],
             kwargs={
                 "fastperiod": fastperiod,
                 "slowperiod": slowperiod,
@@ -975,9 +1002,9 @@ class TAExpr:
             macdsignal
             macdhist
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
-            args=[],
             kwargs={
                 "fastperiod": fastperiod,
                 "slowperiod": slowperiod,
@@ -1003,9 +1030,9 @@ class TAExpr:
             macdsignal
             macdhist
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
-            args=[],
             kwargs={
                 "signalperiod": signalperiod,
             },
@@ -1030,9 +1057,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, volume],
             lib=lib,
-            args=[high, low, volume],
             kwargs={
                 "timeperiod": timeperiod,
             },
@@ -1053,9 +1080,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low],
             lib=lib,
-            args=[high, low],
             kwargs={
                 "timeperiod": timeperiod,
             },
@@ -1074,9 +1101,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, low],
             lib=lib,
-            args=[low],
             kwargs={
                 "timeperiod": timeperiod,
             },
@@ -1095,9 +1122,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
-            args=[],
             kwargs={
                 "timeperiod": timeperiod,
             },
@@ -1118,9 +1145,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low],
             lib=lib,
-            args=[high, low],
             kwargs={
                 "timeperiod": timeperiod,
             },
@@ -1139,9 +1166,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, low],
             lib=lib,
-            args=[low],
             kwargs={
                 "timeperiod": timeperiod,
             },
@@ -1162,9 +1189,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
-            args=[],
             kwargs={
                 "fastperiod": fastperiod,
                 "slowperiod": slowperiod,
@@ -1185,9 +1212,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
-            args=[],
             kwargs={
                 "timeperiod": timeperiod,
             },
@@ -1206,9 +1233,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
-            args=[],
             kwargs={
                 "timeperiod": timeperiod,
             },
@@ -1227,9 +1254,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
-            args=[],
             kwargs={
                 "timeperiod": timeperiod,
             },
@@ -1248,9 +1275,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
-            args=[],
             kwargs={
                 "timeperiod": timeperiod,
             },
@@ -1269,9 +1296,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
-            args=[],
             kwargs={
                 "timeperiod": timeperiod,
             },
@@ -1304,9 +1331,9 @@ class TAExpr:
             slowk
             slowd
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low],
             lib=lib,
-            args=[high, low],
             kwargs={
                 "fastk_period": fastk_period,
                 "slowk_period": slowk_period,
@@ -1339,9 +1366,9 @@ class TAExpr:
             fastk
             fastd
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low],
             lib=lib,
-            args=[high, low],
             kwargs={
                 "fastk_period": fastk_period,
                 "fastd_period": fastd_period,
@@ -1372,9 +1399,9 @@ class TAExpr:
             fastk
             fastd
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
-            args=[],
             kwargs={
                 "timeperiod": timeperiod,
                 "fastk_period": fastk_period,
@@ -1396,9 +1423,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
-            args=[],
             kwargs={
                 "timeperiod": timeperiod,
             },
@@ -1426,9 +1453,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low],
             lib=lib,
-            args=[high, low],
             kwargs={
                 "timeperiod1": timeperiod1,
                 "timeperiod2": timeperiod2,
@@ -1451,9 +1478,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low],
             lib=lib,
-            args=[high, low],
             kwargs={
                 "timeperiod": timeperiod,
             },
@@ -1479,9 +1506,9 @@ class TAExpr:
             middleband: real
             lowerband: real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
-            args=[],
             kwargs={
                 "timeperiod": timeperiod,
                 "nbdevup": nbdevup,
@@ -1506,9 +1533,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
-            args=[],
             kwargs={
                 "timeperiod": timeperiod,
             },
@@ -1527,9 +1554,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
-            args=[],
             kwargs={
                 "timeperiod": timeperiod,
             },
@@ -1546,7 +1573,8 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
             symbol="ht_trendline",
             is_elementwise=False,
@@ -1563,9 +1591,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
-            args=[],
             kwargs={
                 "timeperiod": timeperiod,
             },
@@ -1585,9 +1613,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
-            args=[],
             kwargs={
                 "timeperiod": timeperiod,
                 "matype": matype,
@@ -1609,9 +1637,9 @@ class TAExpr:
             mama: real
             fama: real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
-            args=[],
             kwargs={
                 "fastlimit": fastlimit,
                 "slowlimit": slowlimit,
@@ -1636,9 +1664,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, periods],
             lib=lib,
-            args=[periods],
             kwargs={
                 "minperiod": minperiod,
                 "maxperiod": maxperiod,
@@ -1659,9 +1687,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
-            args=[],
             kwargs={
                 "timeperiod": timeperiod,
             },
@@ -1681,9 +1709,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, low],
             lib=lib,
-            args=[low],
             kwargs={
                 "timeperiod": timeperiod,
             },
@@ -1706,9 +1734,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, low],
             lib=lib,
-            args=[low],
             kwargs={
                 "acceleration": acceleration,
                 "maximum": maximum,
@@ -1747,9 +1775,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, low],
             lib=lib,
-            args=[low],
             kwargs={
                 "startvalue": startvalue,
                 "offsetonreverse": offsetonreverse,
@@ -1775,9 +1803,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
-            args=[],
             kwargs={
                 "timeperiod": timeperiod,
             },
@@ -1797,9 +1825,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
-            args=[],
             kwargs={
                 "timeperiod": timeperiod,
                 "vfactor": vfactor,
@@ -1819,9 +1847,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
-            args=[],
             kwargs={
                 "timeperiod": timeperiod,
             },
@@ -1840,9 +1868,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
-            args=[],
             kwargs={
                 "timeperiod": timeperiod,
             },
@@ -1861,9 +1889,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
-            args=[],
             kwargs={
                 "timeperiod": timeperiod,
             },
@@ -1884,9 +1912,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low],
             lib=lib,
-            args=[high, low],
             kwargs={
                 "timeperiod": timeperiod,
             },
@@ -1909,9 +1937,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             symbol="cdl2crows",
             is_elementwise=False,
         )
@@ -1931,9 +1959,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             symbol="cdl3blackcrows",
             is_elementwise=False,
         )
@@ -1953,9 +1981,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             symbol="cdl3inside",
             is_elementwise=False,
         )
@@ -1975,9 +2003,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             symbol="cdl3linestrike",
             is_elementwise=False,
         )
@@ -1997,9 +2025,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             symbol="cdl3outside",
             is_elementwise=False,
         )
@@ -2019,9 +2047,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             symbol="cdl3starsinsouth",
             is_elementwise=False,
         )
@@ -2041,9 +2069,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             symbol="cdl3whitesoldiers",
             is_elementwise=False,
         )
@@ -2066,9 +2094,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             kwargs={
                 "penetration": penetration,
             },
@@ -2091,9 +2119,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             symbol="cdladvanceblock",
             is_elementwise=False,
         )
@@ -2113,9 +2141,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             symbol="cdlbelthold",
             is_elementwise=False,
         )
@@ -2135,9 +2163,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             symbol="cdlbreakaway",
             is_elementwise=False,
         )
@@ -2157,9 +2185,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             symbol="cdlclosingmarubozu",
             is_elementwise=False,
         )
@@ -2179,9 +2207,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             symbol="cdlconcealbabyswall",
             is_elementwise=False,
         )
@@ -2201,9 +2229,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             symbol="cdlcounterattack",
             is_elementwise=False,
         )
@@ -2226,9 +2254,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             kwargs={
                 "penetration": penetration,
             },
@@ -2251,9 +2279,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             symbol="cdldoji",
             is_elementwise=False,
         )
@@ -2273,9 +2301,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             symbol="cdldojistar",
             is_elementwise=False,
         )
@@ -2295,9 +2323,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             symbol="cdldragonflydoji",
             is_elementwise=False,
         )
@@ -2317,9 +2345,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             symbol="cdlengulfing",
             is_elementwise=False,
         )
@@ -2342,9 +2370,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             kwargs={
                 "penetration": penetration,
             },
@@ -2370,9 +2398,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             kwargs={
                 "penetration": penetration,
             },
@@ -2395,9 +2423,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             symbol="cdlgapsidesidewhite",
             is_elementwise=False,
         )
@@ -2417,9 +2445,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             symbol="cdlgravestonedoji",
             is_elementwise=False,
         )
@@ -2439,9 +2467,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             symbol="cdlhammer",
             is_elementwise=False,
         )
@@ -2461,9 +2489,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             symbol="cdlhangingman",
             is_elementwise=False,
         )
@@ -2483,9 +2511,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             symbol="cdlharami",
             is_elementwise=False,
         )
@@ -2505,9 +2533,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             symbol="cdlharamicross",
             is_elementwise=False,
         )
@@ -2527,9 +2555,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             symbol="cdlhighwave",
             is_elementwise=False,
         )
@@ -2549,9 +2577,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             symbol="cdlhikkake",
             is_elementwise=False,
         )
@@ -2571,9 +2599,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             symbol="cdlhikkakemod",
             is_elementwise=False,
         )
@@ -2593,9 +2621,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             symbol="cdlhomingpigeon",
             is_elementwise=False,
         )
@@ -2615,9 +2643,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             symbol="cdlidentical3crows",
             is_elementwise=False,
         )
@@ -2637,9 +2665,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             symbol="cdlinneck",
             is_elementwise=False,
         )
@@ -2659,9 +2687,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             symbol="cdlinvertedhammer",
             is_elementwise=False,
         )
@@ -2681,9 +2709,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             symbol="cdlkicking",
             is_elementwise=False,
         )
@@ -2703,9 +2731,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             symbol="cdlkickingbylength",
             is_elementwise=False,
         )
@@ -2725,9 +2753,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             symbol="cdlladderbottom",
             is_elementwise=False,
         )
@@ -2747,9 +2775,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             symbol="cdllongleggeddoji",
             is_elementwise=False,
         )
@@ -2769,9 +2797,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             symbol="cdllongline",
             is_elementwise=False,
         )
@@ -2791,9 +2819,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             symbol="cdlmarubozu",
             is_elementwise=False,
         )
@@ -2813,9 +2841,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             symbol="cdlmatchinglow",
             is_elementwise=False,
         )
@@ -2838,9 +2866,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             kwargs={
                 "penetration": penetration,
             },
@@ -2866,9 +2894,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             kwargs={
                 "penetration": penetration,
             },
@@ -2894,9 +2922,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             kwargs={
                 "penetration": penetration,
             },
@@ -2919,9 +2947,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             symbol="cdlonneck",
             is_elementwise=False,
         )
@@ -2941,9 +2969,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             symbol="cdlpiercing",
             is_elementwise=False,
         )
@@ -2963,9 +2991,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             symbol="cdlrickshawman",
             is_elementwise=False,
         )
@@ -2985,9 +3013,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             symbol="cdlrisefall3methods",
             is_elementwise=False,
         )
@@ -3007,9 +3035,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             symbol="cdlseparatinglines",
             is_elementwise=False,
         )
@@ -3029,9 +3057,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             symbol="cdlshootingstar",
             is_elementwise=False,
         )
@@ -3051,9 +3079,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             symbol="cdlshortline",
             is_elementwise=False,
         )
@@ -3073,9 +3101,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             symbol="cdlspinningtop",
             is_elementwise=False,
         )
@@ -3095,9 +3123,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             symbol="cdlstalledpattern",
             is_elementwise=False,
         )
@@ -3117,9 +3145,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             symbol="cdlsticksandwich",
             is_elementwise=False,
         )
@@ -3139,9 +3167,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             symbol="cdltakuri",
             is_elementwise=False,
         )
@@ -3161,9 +3189,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             symbol="cdltasukigap",
             is_elementwise=False,
         )
@@ -3183,9 +3211,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             symbol="cdlthrusting",
             is_elementwise=False,
         )
@@ -3205,9 +3233,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             symbol="cdltristar",
             is_elementwise=False,
         )
@@ -3227,9 +3255,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             symbol="cdlunique3river",
             is_elementwise=False,
         )
@@ -3249,9 +3277,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             symbol="cdlupsidegap2crows",
             is_elementwise=False,
         )
@@ -3271,9 +3299,9 @@ class TAExpr:
             integer (values are -100, 0 or 100)
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             symbol="cdlxsidegap3methods",
             is_elementwise=False,
         )
@@ -3293,9 +3321,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, close],
             lib=lib,
-            args=[high, low, close],
             symbol="avgprice",
             is_elementwise=False,
         )
@@ -3309,9 +3337,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, low],
             lib=lib,
-            args=[low],
             symbol="medprice",
             is_elementwise=False,
         )
@@ -3325,9 +3353,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low],
             lib=lib,
-            args=[high, low],
             symbol="typprice",
             is_elementwise=False,
         )
@@ -3341,9 +3369,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low],
             lib=lib,
-            args=[high, low],
             symbol="wclprice",
             is_elementwise=False,
         )
@@ -3359,9 +3387,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, real],
             lib=lib,
-            args=[real],
             kwargs={
                 "timeperiod": timeperiod,
             },
@@ -3380,9 +3408,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, real],
             lib=lib,
-            args=[real],
             kwargs={
                 "timeperiod": timeperiod,
             },
@@ -3400,9 +3428,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
-            args=[],
             kwargs={
                 "timeperiod": timeperiod,
             },
@@ -3420,9 +3448,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
-            args=[],
             kwargs={
                 "timeperiod": timeperiod,
             },
@@ -3440,9 +3468,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
-            args=[],
             kwargs={
                 "timeperiod": timeperiod,
             },
@@ -3460,9 +3488,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
-            args=[],
             kwargs={
                 "timeperiod": timeperiod,
             },
@@ -3481,9 +3509,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
-            args=[],
             kwargs={
                 "timeperiod": timeperiod,
                 "nbdev": nbdev,
@@ -3502,9 +3530,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
-            args=[],
             kwargs={
                 "timeperiod": timeperiod,
             },
@@ -3523,9 +3551,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr],
             lib=lib,
-            args=[],
             kwargs={
                 "timeperiod": timeperiod,
                 "nbdev": nbdev,
@@ -3544,9 +3572,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, volume],
             lib=lib,
-            args=[volume],
             symbol="obv",
             is_elementwise=False,
         )
@@ -3561,9 +3589,9 @@ class TAExpr:
         pl.col("close").ta.ad(pl.col("high"), pl.col("low"), pl.col("volume"))
 
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, volume],
             lib=lib,
-            args=[high, low, volume],
             symbol="ad",
             is_elementwise=False,
         )
@@ -3585,9 +3613,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low, volume],
             lib=lib,
-            args=[high, low, volume],
             kwargs={
                 "fastperiod": fastperiod,
                 "slowperiod": slowperiod,
@@ -3609,9 +3637,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low],
             lib=lib,
-            args=[high, low],
             kwargs={
                 "timeperiod": timeperiod,
             },
@@ -3628,9 +3656,9 @@ class TAExpr:
         Outputs:
             real
         """
-        return self._expr.register_plugin(
+        return register_plugin(
+            args=[self._expr, high, low],
             lib=lib,
-            args=[high, low],
             symbol="trange",
             is_elementwise=False,
         )
