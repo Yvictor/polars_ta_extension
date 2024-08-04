@@ -4,6 +4,7 @@ import polars as pl
 from polars._typing import IntoExpr
 from polars.plugins import register_plugin_function
 from ._polars_talib import initialize, shutdown, version
+import numpy as np
 
 
 __talib_version__ = version()
@@ -98,6 +99,7 @@ __function_groups__ = {
         "tema",
         "trima",
         "wma",
+        "hma"
     ],
     "Pattern Recognition": [
         "cdl2crows",
@@ -1812,6 +1814,21 @@ class TAExpr:
             kwargs={"timeperiod": timeperiod},
             is_elementwise=False,
         )
+
+    def hma(self, period: int = 16) -> pl.Expr:
+        """Hull Moving Average
+        ta.pol("close").ta.hma(period=16)
+        Inputs:
+            real: (any ndarray)
+        Parameters:
+            period: 10
+        Outputs:
+            real
+        """
+        wma_half = self.wma(timeperiod=period // 2)
+        wma_full = self.wma(timeperiod=period)
+        return (2 * wma_half - wma_full).ta.wma(timeperiod=int(np.sqrt(period)))
+
 
     def cdl2crows(
             self,
@@ -4857,6 +4874,20 @@ def wma(
     """
     return real.ta.wma(timeperiod=timeperiod)
 
+def hma(
+    real: IntoExpr = pl.col("close"),
+    period: int = 16,
+) -> pl.Expr:
+    """Hull Moving Average
+    pl.col("close").ta.hma(period=16)
+    Inputs:
+        real
+    Parameters:
+        period: 16
+    Outputs:
+        real
+    """
+    return real.ta.hma(period=period)
 
 def cdl2crows(
     open: IntoExpr = pl.col("open"),
