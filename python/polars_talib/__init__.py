@@ -1,7 +1,6 @@
 import atexit
 import polars as pl
-from polars.type_aliases import IntoExpr
-from .utils import register_plugin, parse_version
+from .utils import register_plugin, parse_version, IntoExpr
 from ._polars_talib import initialize, shutdown, version
 from pathlib import Path
 

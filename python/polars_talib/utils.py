@@ -5,8 +5,20 @@ from typing import TYPE_CHECKING, Sequence, Any
 
 import polars as pl
 
+def parse_version(version: Sequence[str | int]) -> tuple[int, ...]:
+    # Simple version parser; split into a tuple of ints for comparison.
+    # vendored from Polars
+    if isinstance(version, str):
+        version = version.split(".")
+    return tuple(int(re.sub(r"\D", "", str(v))) for v in version)
+
 if TYPE_CHECKING:
-    from polars.type_aliases import IntoExpr, PolarsDataType
+    if parse_version(pl.__version__) < parse_version("0.20.16"):
+        from polars.type_aliases import IntoExpr, PolarsDataType
+    else:
+        from polars._typing import IntoExpr, PolarsDataType
+        # future versions of Polars use the following import
+        # from polars.typing import IntoExpr, PolarsDataType
     from pathlib import Path
 
 
@@ -81,9 +93,3 @@ def register_plugin(
         returns_scalar=returns_scalar,
     )
 
-def parse_version(version: Sequence[str | int]) -> tuple[int, ...]:
-    # Simple version parser; split into a tuple of ints for comparison.
-    # vendored from Polars
-    if isinstance(version, str):
-        version = version.split(".")
-    return tuple(int(re.sub(r"\D", "", str(v))) for v in version)
