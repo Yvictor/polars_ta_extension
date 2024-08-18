@@ -120,7 +120,7 @@ jobs:
           githubToken: ${{ github.token }}
           install: |
             apt-get update
-            apt-get install -y libclang-dev python3 python3-pip curl libssl-dev openssl
+            apt-get install -y libclang-dev build-essential python3 python3-pip curl
             curl https://sh.rustup.rs -sSf | sh -s -- --default-toolchain stable -y
             echo 'source $HOME/.cargo/env' >> $HOME/.bashrc
             pip install maturin
