@@ -100,6 +100,40 @@ jobs:
           name: wheels
           path: dist
 
+  linux-arm:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target: [aarch64]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+      - uses: uraimo/run-on-arch-action@v2.7.2
+        with:
+          arch: ${{ matrix.target }}
+          distro: ubuntu20.04
+          githubToken: ${{ github.token }}
+          install: |
+            apt-get update
+            apt-get install -y libclang-dev python3 python3-pip curl libssl-dev openssl
+            curl https://sh.rustup.rs -sSf | sh -s -- --default-toolchain stable -y
+            echo 'source $HOME/.cargo/env' >> $HOME/.bashrc
+            pip install maturin
+          run: |
+            source $HOME/.cargo/env
+            maturin build --release --out dist --find-interpreter
+      - name: Upload wheels
+        uses: actions/upload-artifact@v3
+        with:
+          name: wheels
+          path: dist
+
+
   windows:
     runs-on: windows-latest
     strategy:
