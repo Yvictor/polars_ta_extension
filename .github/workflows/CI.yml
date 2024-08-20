@@ -119,6 +119,7 @@ jobs:
           args: --release --out dist --find-interpreter
           sccache: 'true'
           container: ghcr.io/rust-cross/manylinux_2_28-cross:aarch64
+          rust-toolchain: stable-aarch64-unknown-linux-gnu
         env:
           DEPS_PATH: ${{ github.workspace }}/dependencies
           TA_INCLUDE_PATH: ${{ github.workspace }}/dependencies/include
