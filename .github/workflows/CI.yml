@@ -130,6 +130,9 @@ jobs:
             pip install maturin
           run: |
             source $HOME/.cargo/env
+            echo "env DEPS_PATH: $DEPS_PATH"
+            echo "env TA_INCLUDE_PATH: $TA_INCLUDE_PATH"
+            echo "env TA_LIBRARY_PATH: $TA_LIBRARY_PATH"
             maturin build --release --out dist --find-interpreter
       - name: Upload wheels
         uses: actions/upload-artifact@v3
