@@ -41,12 +41,12 @@ fn main() {
     #[cfg(target_os = "windows")]
     let ta_lib_gz = format!("ta-lib-{TA_LIB_VER}-msvc.zip");
     #[cfg(target_os = "windows")]
-    let ta_lib_url = format!("https://github.com/Yvictor/misc/releases/download/v1.0/{ta_lib_gz}");
+    let ta_lib_url = format!("https://github.com/Yvictor/polars_ta_extension/releases/download/0.1.0/{ta_lib_gz}");
     #[cfg(target_family = "unix")]
     let ta_lib_gz = format!("ta-lib-{TA_LIB_VER}-src.tar.gz");
     #[cfg(target_family = "unix")]
     let ta_lib_url = format!(
-        "https://sourceforge.net/projects/ta-lib/files/ta-lib/{TA_LIB_VER}/{ta_lib_gz}/download"
+        "https://github.com/Yvictor/polars_ta_extension/releases/download/0.1.0/{ta_lib_gz}"
     );
 
     let cwd = env::current_dir().unwrap();
