@@ -118,6 +118,10 @@ jobs:
           arch: ${{ matrix.target }}
           distro: ubuntu20.04
           githubToken: ${{ github.token }}
+          env: |
+            DEPS_PATH: ${{ github.workspace }}/dependencies
+            TA_INCLUDE_PATH: ${{ github.workspace }}/dependencies/include
+            TA_LIBRARY_PATH: ${{ github.workspace }}/dependencies/lib
           install: |
             apt-get update
             apt-get install -y libclang-dev build-essential python3 python3-pip curl
