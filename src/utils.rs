@@ -1,5 +1,15 @@
+use polars::datatypes::DataType;
 use polars::prelude::{Float64Chunked, IntoSeries, PolarsError, PolarsResult, Series};
 use talib_sys::TA_RetCode;
+
+pub fn cast_series_to_f64(series: &Series) -> Series {
+    match series.dtype() {
+        DataType::Float64 => Ok(series.clone()),
+        _ => series.cast(&DataType::Float64),
+    }
+    .unwrap()
+    .rechunk()
+}
 
 pub fn get_series_f64_ptr(series: &mut Series) -> PolarsResult<(*const f64, Option<Series>)> {
     if series.has_validity() {
