@@ -4,9 +4,8 @@ import polars_talib as plta
 import talib
 from talib import abstract
 
-
 @pytest.fixture
-def df_ohlc():
+def df_base():
     _open = [8688.0, 8718.0, 8840.0, 8781.0, 8949.0, 9340.0, 8951.0, 9190.0, 9161.0, 9175.0] * 5
     close = [8843.0, 8810.0, 8850.0, 8829.0, 9200.0, 8951.0, 9190.0, 9115.0, 9073.0, 9230.0] * 5
     high = [8939.0, 8870.0, 9005.0, 8870.0, 9200.0, 9340.0, 9190.0, 9195.0, 9190.0, 9230.0] * 5
@@ -19,6 +18,17 @@ def df_ohlc():
     volume_series = pl.Series("volume", volume)
     return pl.DataFrame([close_series, high_series, low_series, open_series, volume_series])
 
+
+@pytest.fixture(params=["float64", "float32"])
+def df_ohlc(request, df_base: pl.DataFrame):
+    dtype = pl.Float64 if request.param == "float64" else pl.Float32
+    return df_base.with_columns(
+        pl.col("open").cast(dtype),
+        pl.col("high").cast(dtype),
+        pl.col("low").cast(dtype),
+        pl.col("close").cast(dtype),
+        # pl.col("volume").cast(dtype),
+    )
 
 def test_version():
     assert plta.__talib_version__[:5] == "0.4.0"

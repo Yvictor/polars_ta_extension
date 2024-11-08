@@ -100,35 +100,35 @@ jobs:
           name: wheels
           path: dist
 
-  linux-arm:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        target: [aarch64]
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v4
-        with:
-          python-version: "3.10"
-      - name: Setup QEMU
-        uses: docker/setup-qemu-action@v1
-      - name: Build wheels
-        uses: PyO3/maturin-action@v1
-        with:
-          target: ${{ matrix.target }}
-          args: --release --out dist --find-interpreter
-          sccache: 'true'
-          container: ghcr.io/rust-cross/manylinux_2_28-cross:aarch64
-          rust-toolchain: stable-aarch64-unknown-linux-gnu
-        env:
-          DEPS_PATH: ${{ github.workspace }}/dependencies
-          TA_INCLUDE_PATH: ${{ github.workspace }}/dependencies/include
-          TA_LIBRARY_PATH: ${{ github.workspace }}/dependencies/lib
-      - name: Upload wheels
-        uses: actions/upload-artifact@v3
-        with:
-          name: wheels
-          path: dist
+  # linux-arm:
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     matrix:
+  #       target: [aarch64]
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: actions/setup-python@v4
+  #       with:
+  #         python-version: "3.10"
+  #     - name: Setup QEMU
+  #       uses: docker/setup-qemu-action@v1
+  #     - name: Build wheels
+  #       uses: PyO3/maturin-action@v1
+  #       with:
+  #         target: ${{ matrix.target }}
+  #         args: --release --out dist --find-interpreter
+  #         sccache: 'true'
+  #         container: ghcr.io/rust-cross/manylinux_2_28-cross:aarch64
+  #         rust-toolchain: stable-aarch64-unknown-linux-gnu
+  #       env:
+  #         DEPS_PATH: ${{ github.workspace }}/dependencies
+  #         TA_INCLUDE_PATH: ${{ github.workspace }}/dependencies/include
+  #         TA_LIBRARY_PATH: ${{ github.workspace }}/dependencies/lib
+  #     - name: Upload wheels
+  #       uses: actions/upload-artifact@v3
+  #       with:
+  #         name: wheels
+  #         path: dist
 
 
   windows:

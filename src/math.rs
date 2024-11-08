@@ -1,4 +1,4 @@
-use crate::utils::{get_series_f64_ptr, ta_code2err};
+use crate::utils::{cast_series_to_f64, get_series_f64_ptr, ta_code2err};
 use polars::prelude::*;
 use pyo3_polars::derive::polars_expr;
 use talib::common::TimePeriodKwargs;
@@ -14,8 +14,8 @@ use talib::math::{
 
 #[polars_expr(output_type=Float64)]
 fn add(inputs: &[Series]) -> PolarsResult<Series> {
-    let input1 = &mut inputs[0].to_float()?.rechunk();
-    let input2 = &mut inputs[1].to_float()?.rechunk();
+    let input1 = &mut cast_series_to_f64(&inputs[0])?;
+    let input2 = &mut cast_series_to_f64(&inputs[1])?;
     let (input1_ptr, _input1) = get_series_f64_ptr(input1)?;
     let (input2_ptr, _input2) = get_series_f64_ptr(input2)?;
     let len = input1.len();
@@ -28,8 +28,8 @@ fn add(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Float64)]
 fn div(inputs: &[Series]) -> PolarsResult<Series> {
-    let input1 = &mut inputs[0].to_float()?.rechunk();
-    let input2 = &mut inputs[1].to_float()?.rechunk();
+    let input1 = &mut cast_series_to_f64(&inputs[0])?;
+    let input2 = &mut cast_series_to_f64(&inputs[1])?;
     let (input1_ptr, _input1) = get_series_f64_ptr(input1)?;
     let (input2_ptr, _input2) = get_series_f64_ptr(input2)?;
     let len = input1.len();
@@ -42,7 +42,7 @@ fn div(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Float64)]
 fn max(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
-    let input = &mut inputs[0].to_float()?.rechunk();
+    let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
     let len = input.len();
     let res = ta_max(input_ptr, len, &kwargs);
@@ -54,7 +54,7 @@ fn max(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Int32)]
 fn maxindex(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
-    let input = &mut inputs[0].to_float()?.rechunk();
+    let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
     let len = input.len();
     let res = ta_maxindex(input_ptr, len, &kwargs);
@@ -66,7 +66,7 @@ fn maxindex(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series>
 
 #[polars_expr(output_type=Float64)]
 fn min(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
-    let input = &mut inputs[0].to_float()?.rechunk();
+    let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
     let len = input.len();
     let res = ta_min(input_ptr, len, &kwargs);
@@ -78,7 +78,7 @@ fn min(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Int32)]
 fn minindex(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
-    let input = &mut inputs[0].to_float()?.rechunk();
+    let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
     let len = input.len();
     let res = ta_minindex(input_ptr, len, &kwargs);
@@ -97,7 +97,7 @@ pub fn minmax_output(_: &[Field]) -> PolarsResult<Field> {
 
 #[polars_expr(output_type_func=minmax_output)]
 fn minmax(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
-    let input = &mut inputs[0].to_float()?.rechunk();
+    let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
 
     let len = input.len();
@@ -122,7 +122,7 @@ pub fn minmaxindex_output(_: &[Field]) -> PolarsResult<Field> {
 
 #[polars_expr(output_type_func=minmaxindex_output)]
 fn minmaxindex(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
-    let input = &mut inputs[0].to_float()?.rechunk();
+    let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
 
     let len = input.len();
@@ -140,8 +140,8 @@ fn minmaxindex(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Seri
 
 #[polars_expr(output_type=Float64)]
 fn mult(inputs: &[Series]) -> PolarsResult<Series> {
-    let input1 = &mut inputs[0].to_float()?.rechunk();
-    let input2 = &mut inputs[1].to_float()?.rechunk();
+    let input1 = &mut cast_series_to_f64(&inputs[0])?;
+    let input2 = &mut cast_series_to_f64(&inputs[1])?;
     let (input1_ptr, _input1) = get_series_f64_ptr(input1)?;
     let (input2_ptr, _input2) = get_series_f64_ptr(input2)?;
     let len = input1.len();
@@ -154,8 +154,8 @@ fn mult(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Float64)]
 fn sub(inputs: &[Series]) -> PolarsResult<Series> {
-    let input1 = &mut inputs[0].to_float()?.rechunk();
-    let input2 = &mut inputs[1].to_float()?.rechunk();
+    let input1 = &mut cast_series_to_f64(&inputs[0])?;
+    let input2 = &mut cast_series_to_f64(&inputs[1])?;
     let (input1_ptr, _input1) = get_series_f64_ptr(input1)?;
     let (input2_ptr, _input2) = get_series_f64_ptr(input2)?;
     let len = input1.len();
@@ -168,7 +168,7 @@ fn sub(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Float64)]
 fn sum(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
-    let input = &mut inputs[0].to_float()?.rechunk();
+    let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
 
     let len = input.len();
@@ -181,7 +181,7 @@ fn sum(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Float64)]
 fn acos(inputs: &[Series]) -> PolarsResult<Series> {
-    let input = &mut inputs[0].to_float()?.rechunk();
+    let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
 
     let len = input.len();
@@ -197,7 +197,7 @@ fn acos(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Float64)]
 fn asin(inputs: &[Series]) -> PolarsResult<Series> {
-    let input = &mut inputs[0].to_float()?.rechunk();
+    let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
 
     let len = input.len();
@@ -213,7 +213,7 @@ fn asin(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Float64)]
 fn atan(inputs: &[Series]) -> PolarsResult<Series> {
-    let input = &mut inputs[0].to_float()?.rechunk();
+    let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
 
     let len = input.len();
@@ -229,7 +229,7 @@ fn atan(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Float64)]
 fn ceil(inputs: &[Series]) -> PolarsResult<Series> {
-    let input = &mut inputs[0].to_float()?.rechunk();
+    let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
 
     let len = input.len();
@@ -245,7 +245,7 @@ fn ceil(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Float64)]
 fn cos(inputs: &[Series]) -> PolarsResult<Series> {
-    let input = &mut inputs[0].to_float()?.rechunk();
+    let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
 
     let len = input.len();
@@ -261,7 +261,7 @@ fn cos(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Float64)]
 fn cosh(inputs: &[Series]) -> PolarsResult<Series> {
-    let input = &mut inputs[0].to_float()?.rechunk();
+    let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
 
     let len = input.len();
@@ -277,7 +277,7 @@ fn cosh(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Float64)]
 fn exp(inputs: &[Series]) -> PolarsResult<Series> {
-    let input = &mut inputs[0].to_float()?.rechunk();
+    let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
 
     let len = input.len();
@@ -290,7 +290,7 @@ fn exp(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Float64)]
 fn floor(inputs: &[Series]) -> PolarsResult<Series> {
-    let input = &mut inputs[0].to_float()?.rechunk();
+    let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
 
     let len = input.len();
@@ -303,7 +303,7 @@ fn floor(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Float64)]
 fn ln(inputs: &[Series]) -> PolarsResult<Series> {
-    let input = &mut inputs[0].to_float()?.rechunk();
+    let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
 
     let len = input.len();
@@ -316,7 +316,7 @@ fn ln(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Float64)]
 fn log10(inputs: &[Series]) -> PolarsResult<Series> {
-    let input = &mut inputs[0].to_float()?.rechunk();
+    let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
 
     let len = input.len();
@@ -329,7 +329,7 @@ fn log10(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Float64)]
 fn sin(inputs: &[Series]) -> PolarsResult<Series> {
-    let input = &mut inputs[0].to_float()?.rechunk();
+    let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
 
     let len = input.len();
@@ -342,7 +342,7 @@ fn sin(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Float64)]
 fn sinh(inputs: &[Series]) -> PolarsResult<Series> {
-    let input = &mut inputs[0].to_float()?.rechunk();
+    let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
 
     let len = input.len();
@@ -355,7 +355,7 @@ fn sinh(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Float64)]
 fn sqrt(inputs: &[Series]) -> PolarsResult<Series> {
-    let input = &mut inputs[0].to_float()?.rechunk();
+    let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
 
     let len = input.len();
@@ -368,7 +368,7 @@ fn sqrt(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Float64)]
 fn tan(inputs: &[Series]) -> PolarsResult<Series> {
-    let input = &mut inputs[0].to_float()?.rechunk();
+    let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
 
     let len = input.len();
@@ -381,7 +381,7 @@ fn tan(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Float64)]
 fn tanh(inputs: &[Series]) -> PolarsResult<Series> {
-    let input = &mut inputs[0].to_float()?.rechunk();
+    let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
 
     let len = input.len();
