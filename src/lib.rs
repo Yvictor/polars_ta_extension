@@ -1,5 +1,5 @@
-mod cycle;
-mod math;
+pub mod cycle;
+pub mod math;
 pub mod momentum;
 pub mod overlap;
 pub mod pattern;
