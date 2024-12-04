@@ -6,9 +6,10 @@ use std::io::{Cursor, Read};
 use std::process::Command;
 use std::{io::Write, path::PathBuf};
 
-const TA_LIB_VER: &str = "0.4.0";
+// const TA_LIB_VER: &str = "0.4.0";  // mac或者linux环境
 // const TA_LIB_TGZ: &str = "ta-lib-0.4.0-src.tar.gz";
-
+// const TA_LIB_VER: &str = "x64";  // 64位 windows
+// const TA_LIB_VER: &str = "x32"; // 32位 windows
 #[derive(Debug)]
 struct DerivesCallback;
 
@@ -38,15 +39,20 @@ impl ParseCallbacks for DerivesCallback {
 }
 
 fn main() {
+    let mut ta_lib_ver: &str = "0.4.0"; 
+    let os = std::env::consts::OS;
+    if os == "windows" {
+        ta_lib_ver = "x64";  // 默认64位 windows
+    } 
     #[cfg(target_os = "windows")]
-    let ta_lib_gz = format!("ta-lib-{TA_LIB_VER}-msvc.zip");
+    let ta_lib_gz = format!("ta-lib-{ta_lib_ver}.zip");
     #[cfg(target_os = "windows")]
-    let ta_lib_url = format!("https://github.com/Yvictor/polars_ta_extension/releases/download/0.1.0/{ta_lib_gz}");
+    let ta_lib_url = format!("https://github.com/ztNozdormu/polars_ta_extension/releases/download/v0.1.0/{ta_lib_gz}");
     #[cfg(target_family = "unix")]
-    let ta_lib_gz = format!("ta-lib-{TA_LIB_VER}-src.tar.gz");
+    let ta_lib_gz = format!("ta-lib-{ta_lib_ver}-src.tar.gz");
     #[cfg(target_family = "unix")]
     let ta_lib_url = format!(
-        "https://github.com/Yvictor/polars_ta_extension/releases/download/0.1.0/{ta_lib_gz}"
+        "https://github.com/ztNozdormu/polars_ta_extension/releases/download/v0.1.0/{ta_lib_gz}"
     );
 
     let cwd = env::current_dir().unwrap();
@@ -57,6 +63,7 @@ fn main() {
     let file_gz_path = tmp_dir.join(ta_lib_gz);
     let ta_library_path =
         env::var("TA_LIBRARY_PATH").unwrap_or(cwd.join("dependencies/lib").display().to_string());
+        println!("ta_library_path: {:?}", ta_library_path);
     let ta_include_path = env::var("TA_INCLUDE_PATH")
         .unwrap_or(cwd.join("dependencies/include").display().to_string());
     if !file_gz_path.exists() {
@@ -68,10 +75,11 @@ fn main() {
         file_gz.sync_data().unwrap();
     }
     let lib_path = PathBuf::from(ta_library_path.clone());
-    let os = std::env::consts::OS;
+
     if !lib_path.exists() {
         let mut file_gz = std::fs::File::open(file_gz_path).unwrap();
         if os == "windows" {
+            // ta_lib.lib和C:\ta-lib\c\lib\ta_libc_cdr.lib 是同一个文件
             if !lib_path.join("ta_lib.lib").exists() {
                 let metadata = std::fs::File::metadata(&file_gz).expect("unable to read metadata");
                 let mut buf = vec![0; metadata.len() as usize];
