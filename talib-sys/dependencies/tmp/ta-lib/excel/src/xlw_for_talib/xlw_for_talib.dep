@@ -1,0 +1,39 @@
+# Microsoft Developer Studio Generated Dependency File, included by xlw_for_talib.mak
+
+.\Win32StreamBuf.cpp : \
+	".\Win32StreamBuf.h"\
+	".\Win32StreamBuf.inl"\
+	
+
+.\xlw_for_talib.cpp : \
+	"..\..\..\c\include\ta_abstract.h"\
+	"..\..\..\c\include\ta_common.h"\
+	"..\..\..\c\include\ta_defs.h"\
+	"..\..\..\c\include\ta_func.h"\
+	"..\..\..\c\include\ta_libc.h"\
+	"..\..\..\c\src\ta_abstract\excel_glue.c"\
+	"..\..\..\c\src\ta_common\ta_memory.h"\
+	"..\xlw\config.mgw.h"\
+	"..\xlw\config.msvc.h"\
+	"..\xlw\EXCEL32_API.h"\
+	"..\xlw\macros.h"\
+	"..\xlw\port.h"\
+	"..\xlw\pragmas.h"\
+	"..\xlw\xlcall32.h"\
+	"..\xlw\XlfAbstractCmdDesc.h"\
+	"..\xlw\XlfArgDesc.h"\
+	"..\xlw\XlfArgDescList.h"\
+	"..\xlw\XlfCmdDesc.h"\
+	"..\xlw\XlfExcel.h"\
+	"..\xlw\XlfExcel.inl"\
+	"..\xlw\XlfException.h"\
+	"..\xlw\XlfException.inl"\
+	"..\xlw\XlfFuncDesc.h"\
+	"..\xlw\XlfOper.h"\
+	"..\xlw\XlfOper.inl"\
+	"..\xlw\XlfRef.h"\
+	"..\xlw\XlfRef.inl"\
+	"..\xlw\xlw.h"\
+	".\Win32StreamBuf.h"\
+	".\Win32StreamBuf.inl"\
+	

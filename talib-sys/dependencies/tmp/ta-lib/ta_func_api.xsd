@@ -1,0 +1,240 @@
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    elementFormDefault="qualified">
+
+  <xsd:element name="FinancialFunctions">
+    <!--Each function is embedded in the <FinancialFunction> tags. There are
+        no limits to the number of functions in the xml document.-->
+    <xsd:complexType>
+      <xsd:sequence minOccurs="1" maxOccurs="unbounded">
+        <xsd:element name="FinancialFunction"  type="FinancialFunctionType"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+
+  <!--Each function needs some input. This type defines to what category
+      each input belongs to.-->
+  <xsd:simpleType name="RequiredInputType">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="Open" />
+      <xsd:enumeration value="High" />
+      <xsd:enumeration value="Low" />
+      <xsd:enumeration value="Close" />
+      <xsd:enumeration value="Volume" />
+      <xsd:enumeration value="Open Interest" />
+      <xsd:enumeration value="Double Array" />
+      <xsd:enumeration value="Integer Array" />
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <!--Different MA types for optional input.-->
+  <xsd:simpleType name="MAType">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="0" id="SMA" />
+      <xsd:enumeration value="1" id="EMA" />
+      <xsd:enumeration value="2" id="WMA" />
+      <xsd:enumeration value="3" id="DEMA" />
+      <xsd:enumeration value="4" id="TEMA" />
+      <xsd:enumeration value="5" id="TRIMA" />
+      <xsd:enumeration value="6" id="KAMA" />
+      <xsd:enumeration value="7" id="MAMA" />
+      <xsd:enumeration value="8" id="T3" />
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <!--Each function needs some input. This type defines to what category
+      each input belongs to.-->
+  <xsd:simpleType name="OptionalInputType">
+    <xsd:restriction base="xsd:string">
+      <!--A single 64-bit floating point value-->
+      <xsd:enumeration value="Double" />
+      <!--A singe 32-bit integer value-->
+      <xsd:enumeration value="Integer" />
+      <!--A type of moving average.-->
+      <xsd:enumeration value="MA Type" />
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <!--Each function needs at least one output. This type defines to what
+      category each output belongs to.-->
+  <xsd:simpleType name="OutputType">
+    <xsd:restriction base="xsd:string">
+      <!--Array of 64-bit floating point values.-->
+      <xsd:enumeration value="Double Array" />
+      <!--Array of 32-bit integer values.-->
+      <xsd:enumeration value="Integer Array" />
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <!--Each function has to be categorized. That way the functions can be
+      presented to the user in an ordered way.-->
+  <xsd:simpleType name="GroupId">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="Math Operators" />
+      <xsd:enumeration value="Math Transform" />
+      <xsd:enumeration value="Overlap Studies" />
+      <xsd:enumeration value="Volatility Indicators" />
+      <xsd:enumeration value="Momentum Indicators" />
+      <xsd:enumeration value="Cycle Indicators" />
+      <xsd:enumeration value="Volume Indicators" />
+      <xsd:enumeration value="Pattern Recognition" />
+      <xsd:enumeration value="Statistic Functions" />
+      <xsd:enumeration value="Price Transform" />
+      <xsd:enumeration value="Undefined" />
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <!--Optional flags for the function.-->
+  <xsd:simpleType name="FunctionFlags">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="Overlap" />
+      <xsd:enumeration value="Volume" />
+      <xsd:enumeration value="Candlestick" />
+	    <xsd:enumeration value="Unstable Period" />
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <!--Optional flags for the output values.-->
+  <xsd:simpleType name="OutputFlags">
+    <xsd:restriction base="xsd:string">
+	    <xsd:enumeration value="Line" />
+	    <xsd:enumeration value="Dotted Line" />
+	    <xsd:enumeration value="Dashed Line" />
+	    <xsd:enumeration value="Dots" />
+	    <xsd:enumeration value="Histogram" />
+      <xsd:enumeration value="Pattern Bool" />
+      <xsd:enumeration value="Pattern Bull Bear" />
+      <xsd:enumeration value="Pattern Strength" />
+      <xsd:enumeration value="Positive" />
+      <xsd:enumeration value="Negative" />
+      <xsd:enumeration value="Zero" />
+      <xsd:enumeration value="Upper Limit" />
+      <xsd:enumeration value="Lower Limit" />
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <!--This defines the actual function.-->
+  <xsd:complexType name="FinancialFunctionType">
+    <xsd:sequence>
+      <!--Each function needs a short name. That name has to match
+            the corresponding TA-Lib function.-->
+      <xsd:element name="Abbreviation" type="xsd:string" minOccurs="1" maxOccurs="1" />
+      <!--This is the full name of the function.-->
+      <xsd:element name="CamelCaseName" type="xsd:string" minOccurs="1" maxOccurs="1" />
+      <!--A short description what the function is doing. This should be
+            really short as it can be used for tooltips.-->
+      <xsd:element name="ShortDescription" type="xsd:string" minOccurs="1" maxOccurs="1" />
+      <!--A detailed description of the function. This can be displayed to
+            the user if he wants more information. Not currently used.
+      <xsd:element name="LongDescription" type="xsd:string" minOccurs="0" maxOccurs="1" />-->
+      <!--The group the function belongs to.-->
+      <xsd:element name="GroupId" type="GroupId" minOccurs="1" maxOccurs="1" />
+      <!--Flags that can be attached to the function.-->
+      <xsd:element name="Flags" minOccurs="0" maxOccurs="1">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="Flag" type="FunctionFlags" minOccurs="1" maxOccurs="unbounded"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <!--This section defines all the input arguments.-->
+      <xsd:element name="RequiredInputArguments" minOccurs="1" maxOccurs="1">
+        <xsd:complexType>
+          <xsd:sequence>
+            <!--This defines a required argument. There are only 6 input types
+                  so the maximum occurence is 6.-->
+            <xsd:element name="RequiredInputArgument" minOccurs="1" maxOccurs="6">
+              <xsd:complexType>
+                <xsd:sequence>
+                  <!--Type of the input. See type definition RequiredInputType above.-->
+                  <xsd:element name="Type" type="RequiredInputType" minOccurs="1" maxOccurs="1" />
+                  <!--The name of the input.-->
+                  <xsd:element name="Name" type="xsd:string" minOccurs="1" maxOccurs="1" />
+                </xsd:sequence>
+              </xsd:complexType>
+            </xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="OptionalInputArguments" minOccurs="0" maxOccurs="1">
+        <xsd:complexType>
+          <xsd:sequence>
+            <!--This defines an optional argument of which there can be an
+                  unlimited number.-->
+            <xsd:element name="OptionalInputArgument" minOccurs="1" maxOccurs="unbounded">
+              <xsd:complexType>
+                <xsd:sequence>
+                  <!--The name of the input.-->
+                  <xsd:element name="Name" type="xsd:string" minOccurs="1" maxOccurs="1" />
+				          <!--A short description what the parameter is. This should be
+						          really short as it can be used for tooltips.-->
+				          <xsd:element name="ShortDescription" type="xsd:string" minOccurs="1" maxOccurs="1" />
+				          <!--A detailed description of the parameter. This can be displayed to
+						          the user if he wants more information.-->
+				          <xsd:element name="LongDescription" type="xsd:string" minOccurs="0" maxOccurs="1" />
+                  <!--Type of the input. See type definition InputType above.-->
+                  <xsd:element name="Type" type="OptionalInputType" minOccurs="1" maxOccurs="1" />
+                  <!--If the input type is Double or Integer then a range can
+                        be defined for it. This tag is optional.-->
+                  <xsd:element name="Range" minOccurs="0" maxOccurs="1">
+                    <xsd:complexType>
+                      <xsd:sequence>
+                        <!--The minimum value that can be used for the input value.-->
+                        <xsd:element name="Minimum" type="xsd:string" minOccurs="1" maxOccurs="1" />
+                        <!--The maximum value that can be used for the output value.-->
+                        <xsd:element name="Maximum" type="xsd:string" minOccurs="1" maxOccurs="1" />
+                        <!--Precision - only for Double Range-->
+                        <xsd:element name="Precision" type="xsd:string" minOccurs="0" maxOccurs="1" />
+                        <!--Used for parameter optimizations.-->
+                        <xsd:element name="SuggestedStart" type="xsd:string" minOccurs="1" maxOccurs="1" />
+                        <!-- Used for parameter optimizations.-->
+                        <xsd:element name="SuggestedEnd" type="xsd:string" minOccurs="1" maxOccurs="1" />
+                        <!-- Used for parameter optimizations.-->
+                        <xsd:element name="SuggestedIncrement" type="xsd:string" minOccurs="1" maxOccurs="1" />
+                      </xsd:sequence>
+                    </xsd:complexType>
+                  </xsd:element>
+
+                  <!--Default value. For an integer or decimal list this value
+                        is one of the Name tags of an list element.-->
+                  <xsd:element name="DefaultValue" type="xsd:string" minOccurs="0" maxOccurs="1" />
+                </xsd:sequence>
+              </xsd:complexType>
+            </xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <!--Defines all the output arguments.-->
+      <xsd:element name="OutputArguments" minOccurs="1" maxOccurs="1">
+        <xsd:complexType>
+          <xsd:sequence>
+            <!--Defines one output argument.-->
+            <xsd:element name="OutputArgument" minOccurs="1" maxOccurs="unbounded">
+              <xsd:complexType>
+                <xsd:sequence>
+                  <!--The type of the output argument. For possible values
+                        see type definition OutputType above.-->
+                  <xsd:element name="Type" type="OutputType" minOccurs="1" maxOccurs="1" />
+                  <!--Name of the output.-->
+                  <xsd:element name="Name" type="xsd:string" minOccurs="1" maxOccurs="1" />
+                  <!--Flags that can be attached to the output.-->
+                  <xsd:element name="Flags" minOccurs="1" maxOccurs="1">
+                    <xsd:complexType>
+                      <xsd:sequence>
+                        <xsd:element name="Flag" type="OutputFlags" minOccurs="1" maxOccurs="unbounded"/>
+                      </xsd:sequence>
+                    </xsd:complexType>
+                  </xsd:element>
+                </xsd:sequence>
+              </xsd:complexType>
+            </xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+</xsd:schema>
+
+ 

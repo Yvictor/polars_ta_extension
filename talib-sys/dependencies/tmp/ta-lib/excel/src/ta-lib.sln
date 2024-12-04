@@ -1,0 +1,29 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xlw", "ta-lib.vcproj", "{67445AE6-EB56-41C0-B54E-BA6995B67EFA}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xlw_for_talib", "xlw_for_talib\xlw_for_talib.vcproj", "{61D92552-E65C-400F-9FBB-EA963ED367CD}"
+	ProjectSection(ProjectDependencies) = postProject
+		{67445AE6-EB56-41C0-B54E-BA6995B67EFA} = {67445AE6-EB56-41C0-B54E-BA6995B67EFA}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Release Reverse|Win32 = Release Reverse|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{67445AE6-EB56-41C0-B54E-BA6995B67EFA}.Release Reverse|Win32.ActiveCfg = Release Reverse|Win32
+		{67445AE6-EB56-41C0-B54E-BA6995B67EFA}.Release Reverse|Win32.Build.0 = Release Reverse|Win32
+		{67445AE6-EB56-41C0-B54E-BA6995B67EFA}.Release|Win32.ActiveCfg = Release|Win32
+		{67445AE6-EB56-41C0-B54E-BA6995B67EFA}.Release|Win32.Build.0 = Release|Win32
+		{61D92552-E65C-400F-9FBB-EA963ED367CD}.Release Reverse|Win32.ActiveCfg = Release Reverse|Win32
+		{61D92552-E65C-400F-9FBB-EA963ED367CD}.Release Reverse|Win32.Build.0 = Release Reverse|Win32
+		{61D92552-E65C-400F-9FBB-EA963ED367CD}.Release|Win32.ActiveCfg = Release|Win32
+		{61D92552-E65C-400F-9FBB-EA963ED367CD}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
