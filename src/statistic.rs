@@ -16,7 +16,7 @@ pub fn beta(inputs: &[Series], kwargs: BetaKwargs) -> PolarsResult<Series> {
     let len = real0.len();
     let res = ta_beta(real0_ptr, real1_ptr, len, &kwargs);
     match res {
-        Ok(out) => Ok(Float64Chunked::from_vec("", out).into_series()),
+        Ok(out) => Ok(Float64Chunked::from_vec("".into(), out).into_series()),
         Err(ret_code) => ta_code2err(ret_code),
     }
 }
@@ -30,7 +30,7 @@ pub fn correl(inputs: &[Series], kwargs: CorrelKwargs) -> PolarsResult<Series> {
     let len = real0.len();
     let res = ta_correl(real0_ptr, real1_ptr, len, &kwargs);
     match res {
-        Ok(out) => Ok(Float64Chunked::from_vec("", out).into_series()),
+        Ok(out) => Ok(Float64Chunked::from_vec("".into(), out).into_series()),
         Err(ret_code) => ta_code2err(ret_code),
     }
 }
@@ -42,7 +42,7 @@ pub fn linearreg(inputs: &[Series], kwargs: LinearRegKwargs) -> PolarsResult<Ser
     let len = real.len();
     let res = ta_linearreg(real_ptr, len, &kwargs);
     match res {
-        Ok(out) => Ok(Float64Chunked::from_vec("", out).into_series()),
+        Ok(out) => Ok(Float64Chunked::from_vec("".into(), out).into_series()),
         Err(ret_code) => ta_code2err(ret_code),
     }
 }
@@ -54,7 +54,7 @@ pub fn linearreg_angle(inputs: &[Series], kwargs: LinearRegAngleKwargs) -> Polar
     let len = real.len();
     let res = ta_linearreg_angle(real_ptr, len, &kwargs);
     match res {
-        Ok(out) => Ok(Float64Chunked::from_vec("", out).into_series()),
+        Ok(out) => Ok(Float64Chunked::from_vec("".into(), out).into_series()),
         Err(ret_code) => ta_code2err(ret_code),
     }
 }
@@ -69,7 +69,7 @@ pub fn linearreg_intercept(
     let len = real.len();
     let res = ta_linearreg_intercept(real_ptr, len, &kwargs);
     match res {
-        Ok(out) => Ok(Float64Chunked::from_vec("", out).into_series()),
+        Ok(out) => Ok(Float64Chunked::from_vec("".into(), out).into_series()),
         Err(ret_code) => ta_code2err(ret_code),
     }
 }
@@ -81,7 +81,7 @@ pub fn linearreg_slope(inputs: &[Series], kwargs: LinearRegSlopeKwargs) -> Polar
     let len = real.len();
     let res = ta_linearreg_slope(real_ptr, len, &kwargs);
     match res {
-        Ok(out) => Ok(Float64Chunked::from_vec("", out).into_series()),
+        Ok(out) => Ok(Float64Chunked::from_vec("".into(), out).into_series()),
         Err(ret_code) => ta_code2err(ret_code),
     }
 }
@@ -94,7 +94,7 @@ pub fn stddev(inputs: &[Series], kwargs: StdDevKwargs) -> PolarsResult<Series> {
     let res = ta_stddev(real_ptr, len, &kwargs);
     match res {
         Ok(out) => {
-            let out_ser = Float64Chunked::from_vec("", out);
+            let out_ser = Float64Chunked::from_vec("".into(), out);
             Ok(out_ser.into_series())
         }
         Err(ret_code) => ta_code2err(ret_code),
@@ -109,7 +109,7 @@ pub fn tsf(inputs: &[Series], kwargs: TsfKwargs) -> PolarsResult<Series> {
     let res = ta_tsf(real_ptr, len, &kwargs);
     match res {
         Ok(out) => {
-            let out_ser = Float64Chunked::from_vec("", out);
+            let out_ser = Float64Chunked::from_vec("".into(), out);
             Ok(out_ser.into_series())
         }
         Err(ret_code) => ta_code2err(ret_code),
@@ -124,7 +124,7 @@ pub fn var(inputs: &[Series], kwargs: VarKwargs) -> PolarsResult<Series> {
     let res = ta_var(real_ptr, len, &kwargs);
     match res {
         Ok(out) => {
-            let out_ser = Float64Chunked::from_vec("", out);
+            let out_ser = Float64Chunked::from_vec("".into(), out);
             Ok(out_ser.into_series())
         }
         Err(ret_code) => ta_code2err(ret_code),

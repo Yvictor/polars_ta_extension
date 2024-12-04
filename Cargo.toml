@@ -12,7 +12,8 @@ edition = "2021"
 [dependencies]
 # pyo3 = { version = "*", features = ["extension-module"] }
 # pyo3-polars = { version = "0.10.0", features = ["derive"] }
-polars = {version = "0.36.2", features = ["lazy","dtype-struct"]}
+# polars = {version = "0.36.2", features = ["lazy","dtype-struct"]}
+polars = {version = "0.44.2", features = ["lazy","dtype-struct"]}
 # "performant", "lazy", "dtype-array"
 serde = { version = "*", features = ["derive"] }
 talib-sys = { path = "talib-sys"}

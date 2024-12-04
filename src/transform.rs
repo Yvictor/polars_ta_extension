@@ -18,7 +18,7 @@ pub fn avgprice(inputs: &[Series]) -> PolarsResult<Series> {
     let len = open.len();
     let res = ta_avgprice(open_ptr, high_ptr, low_ptr, close_ptr, len);
     match res {
-        Ok(out) => Ok(Float64Chunked::from_vec("", out).into_series()),
+        Ok(out) => Ok(Float64Chunked::from_vec("".into(), out).into_series()),
         Err(ret_code) => ta_code2err(ret_code),
     }
 }
@@ -32,7 +32,7 @@ pub fn medprice(inputs: &[Series]) -> PolarsResult<Series> {
     let len = high.len();
     let res = ta_medprice(high_ptr, low_ptr, len);
     match res {
-        Ok(out) => Ok(Float64Chunked::from_vec("", out).into_series()),
+        Ok(out) => Ok(Float64Chunked::from_vec("".into(), out).into_series()),
         Err(ret_code) => ta_code2err(ret_code),
     }
 }
@@ -48,7 +48,7 @@ pub fn typprice(inputs: &[Series]) -> PolarsResult<Series> {
     let len = high.len();
     let res = ta_typprice(high_ptr, low_ptr, close_ptr, len);
     match res {
-        Ok(out) => Ok(Float64Chunked::from_vec("", out).into_series()),
+        Ok(out) => Ok(Float64Chunked::from_vec("".into(), out).into_series()),
         Err(ret_code) => ta_code2err(ret_code),
     }
 }
@@ -64,7 +64,7 @@ pub fn wclprice(inputs: &[Series]) -> PolarsResult<Series> {
     let len = high.len();
     let res = ta_wclprice(high_ptr, low_ptr, close_ptr, len);
     match res {
-        Ok(out) => Ok(Float64Chunked::from_vec("", out).into_series()),
+        Ok(out) => Ok(Float64Chunked::from_vec("".into(), out).into_series()),
         Err(ret_code) => ta_code2err(ret_code),
     }
 }

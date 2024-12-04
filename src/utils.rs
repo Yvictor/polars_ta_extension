@@ -1,5 +1,5 @@
 use polars::datatypes::DataType;
-use polars::prelude::{Float64Chunked, IntoSeries, PolarsError, PolarsResult, Series};
+use polars::prelude::{ChunkFillNullValue, Float64Chunked, IntoSeries, PolarsError, PolarsResult, Series};
 use talib_sys::TA_RetCode;
 
 pub fn cast_series_to_f64(series: &Series) -> PolarsResult<Series> {
@@ -10,14 +10,28 @@ pub fn cast_series_to_f64(series: &Series) -> PolarsResult<Series> {
     .rechunk())
 }
 
+// pub fn get_series_f64_ptr(series: &mut Series) -> PolarsResult<(*const f64, Option<Series>)> {
+//     if series.has_validity() {
+//         let v: Float64Chunked = series
+//             .f64()?
+//             .apply_generic(|x| Some(x.unwrap_or(std::f64::NAN)));
+//         let mut ser = v.into_series();
+//         Ok((ser.as_single_ptr()? as *const f64, Some(ser)))
+//     } else {
+//         Ok((series.as_single_ptr()? as *const f64, None))
+//     }
+// }
+
 pub fn get_series_f64_ptr(series: &mut Series) -> PolarsResult<(*const f64, Option<Series>)> {
-    if series.has_validity() {
+    if series.null_count() > 0 {
+        // 如果包含无效值，将其转换为 NaN
         let v: Float64Chunked = series
             .f64()?
-            .apply_generic(|x| Some(x.unwrap_or(std::f64::NAN)));
+            .fill_null_with_values(std::f64::NAN)?;
         let mut ser = v.into_series();
         Ok((ser.as_single_ptr()? as *const f64, Some(ser)))
     } else {
+        // 没有无效值，直接返回原始数据的指针
         Ok((series.as_single_ptr()? as *const f64, None))
     }
 }

@@ -11,7 +11,7 @@ pub fn obv(inputs: &[Series]) -> PolarsResult<Series> {
     let len = close.len();
     let res = ta_obv(close_ptr, volume_ptr, len);
     match res {
-        Ok(out) => Ok(Float64Chunked::from_vec("", out).into_series()),
+        Ok(out) => Ok(Float64Chunked::from_vec("".into(), out).into_series()),
         Err(ret_code) => ta_code2err(ret_code),
     }
 }
@@ -29,7 +29,7 @@ pub fn ad(inputs: &[Series]) -> PolarsResult<Series> {
     let len = high.len();
     let res = ta_ad(high_ptr, low_ptr, close_ptr, volume_ptr, len);
     match res {
-        Ok(out) => Ok(Float64Chunked::from_vec("", out).into_series()),
+        Ok(out) => Ok(Float64Chunked::from_vec("".into(), out).into_series()),
         Err(ret_code) => ta_code2err(ret_code),
     }
 }
@@ -47,7 +47,7 @@ pub fn adosc(inputs: &[Series], kwargs: ADOSCKwargs) -> PolarsResult<Series> {
     let len = high.len();
     let res = ta_adosc(high_ptr, low_ptr, close_ptr, volume_ptr, len, &kwargs);
     match res {
-        Ok(out) => Ok(Float64Chunked::from_vec("", out).into_series()),
+        Ok(out) => Ok(Float64Chunked::from_vec("".into(), out).into_series()),
         Err(ret_code) => ta_code2err(ret_code),
     }
 }

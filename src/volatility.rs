@@ -13,7 +13,7 @@ pub fn atr(inputs: &[Series], kwargs: ATRKwargs) -> PolarsResult<Series> {
     let len = close.len();
     let res = ta_atr(high_ptr, low_ptr, close_ptr, len, &kwargs);
     match res {
-        Ok(out) => Ok(Float64Chunked::from_vec("", out).into_series()),
+        Ok(out) => Ok(Float64Chunked::from_vec("".into(), out).into_series()),
         Err(ret_code) => ta_code2err(ret_code),
     }
 }
@@ -29,7 +29,7 @@ pub fn trange(inputs: &[Series]) -> PolarsResult<Series> {
     let len = close.len();
     let res = ta_trange(high_ptr, low_ptr, close_ptr, len);
     match res {
-        Ok(out) => Ok(Float64Chunked::from_vec("", out).into_series()),
+        Ok(out) => Ok(Float64Chunked::from_vec("".into(), out).into_series()),
         Err(ret_code) => ta_code2err(ret_code),
     }
 }
@@ -48,7 +48,7 @@ pub fn natr(inputs: &[Series], kwargs: NATRKwargs) -> PolarsResult<Series> {
 
     match res {
         Ok(out) => {
-            let out_ser = Float64Chunked::from_vec("", out);
+            let out_ser = Float64Chunked::from_vec("".into(), out);
             Ok(out_ser.into_series())
         }
         Err(ret_code) => ta_code2err(ret_code),

@@ -8,11 +8,11 @@ use talib::overlap::{
 };
 // pub 
 pub fn bbands_output(_: &[Field]) -> PolarsResult<Field> {
-    let u = Field::new("upperband", DataType::Float64);
-    let m = Field::new("middleband", DataType::Float64);
-    let l = Field::new("lowerband", DataType::Float64);
+    let u = Field::new("upperband".into(), DataType::Float64);
+    let m = Field::new("middleband".into(), DataType::Float64);
+    let l = Field::new("lowerband".into(), DataType::Float64);
     let v: Vec<Field> = vec![u, m, l];
-    Ok(Field::new("", DataType::Struct(v)))
+    Ok(Field::new("".into(), DataType::Struct(v)))
 }
 
 // #[polars_expr(output_type_func=bbands_output)]
@@ -23,10 +23,10 @@ pub fn bbands(inputs: &[Series], kwargs: BBANDSKwargs) -> PolarsResult<Series> {
     let res = ta_bbands(input_ptr, len, &kwargs);
     match res {
         Ok((outrealupperband, outrealmiddleband, outreallowerband)) => {
-            let u = Series::from_vec("upperband", outrealupperband);
-            let m = Series::from_vec("middleband", outrealmiddleband);
-            let l = Series::from_vec("lowerband", outreallowerband);
-            let out = StructChunked::new("", &[u, m, l])?;
+            let u = Series::from_vec("upperband".into(), outrealupperband);
+            let m = Series::from_vec("middleband".into(), outrealmiddleband);
+            let l = Series::from_vec("lowerband".into(), outreallowerband);
+            let out = Series::new("upperband_middleband_lowerband".into(), &[u, m, l]);
             Ok(out.into_series())
         }
         Err(ret_code) => ta_code2err(ret_code),
@@ -38,12 +38,12 @@ pub fn ema(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> 
     let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
     let len = input.len();
-    // println!("has_validity: {}", input.has_validity());
-    // println!("len: {}", input.len());
-    // println!("null_count: {}", input.null_count());
+    // println!("has_validity: {}".into(), input.has_validity());
+    // println!("len: {}".into(), input.len());
+    // println!("null_count: {}".into(), input.null_count());
     let res = ta_ema(input_ptr, len, &kwargs);
     match res {
-        Ok(out) => Ok(Float64Chunked::from_vec("", out).into_series()),
+        Ok(out) => Ok(Float64Chunked::from_vec("".into(), out).into_series()),
         Err(ret_code) => ta_code2err(ret_code),
     }
 }
@@ -55,7 +55,7 @@ pub fn dema(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series>
     let len = input.len();
     let res = ta_dema(input_ptr, len, &kwargs);
     match res {
-        Ok(out) => Ok(Float64Chunked::from_vec("", out).into_series()),
+        Ok(out) => Ok(Float64Chunked::from_vec("".into(), out).into_series()),
         Err(ret_code) => ta_code2err(ret_code),
     }
 }
@@ -67,7 +67,7 @@ pub fn ht_trendline(inputs: &[Series]) -> PolarsResult<Series> {
     let len = input.len();
     let res = ta_ht_trendline(input_ptr, len);
     match res {
-        Ok(out) => Ok(Float64Chunked::from_vec("", out).into_series()),
+        Ok(out) => Ok(Float64Chunked::from_vec("".into(), out).into_series()),
         Err(ret_code) => ta_code2err(ret_code),
     }
 }
@@ -79,7 +79,7 @@ pub fn kama(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series>
     let len = input.len();
     let res = ta_kama(input_ptr, len, &kwargs);
     match res {
-        Ok(out) => Ok(Float64Chunked::from_vec("", out).into_series()),
+        Ok(out) => Ok(Float64Chunked::from_vec("".into(), out).into_series()),
         Err(ret_code) => ta_code2err(ret_code),
     }
 }
@@ -91,16 +91,16 @@ pub fn ma(inputs: &[Series], kwargs: MaKwargs) -> PolarsResult<Series> {
     let len = input.len();
     let res = ta_ma(input_ptr, len, &kwargs);
     match res {
-        Ok(out) => Ok(Float64Chunked::from_vec("", out).into_series()),
+        Ok(out) => Ok(Float64Chunked::from_vec("".into(), out).into_series()),
         Err(ret_code) => ta_code2err(ret_code),
     }
 }
 // pub 
 pub fn mama_output(_: &[Field]) -> PolarsResult<Field> {
-    let m = Field::new("mama", DataType::Float64);
-    let f = Field::new("fama", DataType::Float64);
+    let m = Field::new("mama".into(), DataType::Float64);
+    let f = Field::new("fama".into(), DataType::Float64);
     let v: Vec<Field> = vec![m, f];
-    Ok(Field::new("", DataType::Struct(v)))
+    Ok(Field::new("".into(), DataType::Struct(v)))
 }
 
 // #[polars_expr(output_type_func=mama_output)]
@@ -111,9 +111,11 @@ pub fn mama(inputs: &[Series], kwargs: MamaKwargs) -> PolarsResult<Series> {
     let res = ta_mama(input_ptr, len, &kwargs);
     match res {
         Ok((outrealmama, outrealfama)) => {
-            let m = Series::from_vec("mama", outrealmama);
-            let f = Series::from_vec("fama", outrealfama);
-            let out = StructChunked::new("", &[m, f])?;
+            let m = Series::from_vec("mama".into(), outrealmama);
+            let f = Series::from_vec("fama".into(), outrealfama);
+            // TODO 后面升级从 Polars 0.43.0 开始，Series::from_vec 被替代为 Series::new
+            // let out = StructChunked::new(<&str as Into<T>>::into(""), &[m, f])?;
+            let out = Series::new("mama_fama".into(), &[m, f]);
             Ok(out.into_series())
         }
         Err(ret_code) => ta_code2err(ret_code),
@@ -129,7 +131,7 @@ pub fn mavp(inputs: &[Series], kwargs: MavpKwargs) -> PolarsResult<Series> {
     let len = input.len();
     let res = ta_mavp(input_ptr, in_time_period_ptr, len, &kwargs);
     match res {
-        Ok(out) => Ok(Float64Chunked::from_vec("", out).into_series()),
+        Ok(out) => Ok(Float64Chunked::from_vec("".into(), out).into_series()),
         Err(ret_code) => ta_code2err(ret_code),
     }
 }
@@ -141,7 +143,7 @@ pub fn midpoint(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Ser
     let len = input.len();
     let res = ta_midpoint(input_ptr, len, &kwargs);
     match res {
-        Ok(out) => Ok(Float64Chunked::from_vec("", out).into_series()),
+        Ok(out) => Ok(Float64Chunked::from_vec("".into(), out).into_series()),
         Err(ret_code) => ta_code2err(ret_code),
     }
 }
@@ -155,7 +157,7 @@ pub fn midprice(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Ser
     let len = high.len();
     let res = ta_midprice(high_ptr, low_ptr, len, &kwargs);
     match res {
-        Ok(out) => Ok(Float64Chunked::from_vec("", out).into_series()),
+        Ok(out) => Ok(Float64Chunked::from_vec("".into(), out).into_series()),
         Err(ret_code) => ta_code2err(ret_code),
     }
 }
@@ -169,7 +171,7 @@ pub fn sar(inputs: &[Series], kwargs: SarKwargs) -> PolarsResult<Series> {
     let len = high.len();
     let res = ta_sar(high_ptr, low_ptr, len, &kwargs);
     match res {
-        Ok(out) => Ok(Float64Chunked::from_vec("", out).into_series()),
+        Ok(out) => Ok(Float64Chunked::from_vec("".into(), out).into_series()),
         Err(ret_code) => ta_code2err(ret_code),
     }
 }
@@ -183,7 +185,7 @@ pub fn sarext(inputs: &[Series], kwargs: SarExtKwargs) -> PolarsResult<Series> {
     let len = high.len();
     let res = ta_sarext(high_ptr, low_ptr, len, &kwargs);
     match res {
-        Ok(out) => Ok(Float64Chunked::from_vec("", out).into_series()),
+        Ok(out) => Ok(Float64Chunked::from_vec("".into(), out).into_series()),
         Err(ret_code) => ta_code2err(ret_code),
     }
 }
@@ -195,7 +197,7 @@ pub fn sma(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> 
     let len = input.len();
     let res = ta_sma(in_real_ptr, len, &kwargs);
     match res {
-        Ok(out) => Ok(Float64Chunked::from_vec("", out).into_series()),
+        Ok(out) => Ok(Float64Chunked::from_vec("".into(), out).into_series()),
         Err(ret_code) => ta_code2err(ret_code),
     }
 }
@@ -207,7 +209,7 @@ pub fn t3(inputs: &[Series], kwargs: T3Kwargs) -> PolarsResult<Series> {
     let len = input.len();
     let res = ta_t3(in_real_ptr, len, &kwargs);
     match res {
-        Ok(out) => Ok(Float64Chunked::from_vec("", out).into_series()),
+        Ok(out) => Ok(Float64Chunked::from_vec("".into(), out).into_series()),
         Err(ret_code) => ta_code2err(ret_code),
     }
 }
@@ -219,7 +221,7 @@ pub fn tema(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series>
     let len = input.len();
     let res = ta_tema(in_real_ptr, len, &kwargs);
     match res {
-        Ok(out) => Ok(Float64Chunked::from_vec("", out).into_series()),
+        Ok(out) => Ok(Float64Chunked::from_vec("".into(), out).into_series()),
         Err(ret_code) => ta_code2err(ret_code),
     }
 }
@@ -231,7 +233,7 @@ pub fn trima(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series
     let len = input.len();
     let res = ta_trima(in_real_ptr, len, &kwargs);
     match res {
-        Ok(out) => Ok(Float64Chunked::from_vec("", out).into_series()),
+        Ok(out) => Ok(Float64Chunked::from_vec("".into(), out).into_series()),
         Err(ret_code) => ta_code2err(ret_code),
     }
 }
@@ -243,7 +245,7 @@ pub fn wma(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> 
     let len = input.len();
     let res = ta_wma(in_real_ptr, len, &kwargs);
     match res {
-        Ok(out) => Ok(Float64Chunked::from_vec("", out).into_series()),
+        Ok(out) => Ok(Float64Chunked::from_vec("".into(), out).into_series()),
         Err(ret_code) => ta_code2err(ret_code),
     }
 }
