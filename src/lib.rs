@@ -10,7 +10,7 @@ pub mod volatility;
 pub mod volume;
 use talib::common::{ta_initialize, ta_shutdown, ta_version,TimePeriodKwargs};
 // use talib_sys::{TA_Initialize, TA_Shutdown, TA_RetCode};
-pub use polars::prelude::*;
+pub use polars::*;
 
 #[cfg(target_os = "linux")]
 use jemallocator::Jemalloc;
