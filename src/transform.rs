@@ -1,12 +1,11 @@
 use crate::utils::{cast_series_to_f64, get_series_f64_ptr, ta_code2err};
 use polars::prelude::*;
-use pyo3_polars::derive::polars_expr;
 use talib::transform::ta_avgprice;
 use talib::transform::ta_medprice;
 use talib::transform::ta_typprice;
 use talib::transform::ta_wclprice;
 
-#[polars_expr(output_type=Float64)]
+// #[polars_expr(output_type=Float64)]
 fn avgprice(inputs: &[Series]) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -24,7 +23,7 @@ fn avgprice(inputs: &[Series]) -> PolarsResult<Series> {
     }
 }
 
-#[polars_expr(output_type=Float64)]
+// #[polars_expr(output_type=Float64)]
 fn medprice(inputs: &[Series]) -> PolarsResult<Series> {
     let high = &mut cast_series_to_f64(&inputs[0])?;
     let low = &mut cast_series_to_f64(&inputs[1])?;
@@ -38,7 +37,7 @@ fn medprice(inputs: &[Series]) -> PolarsResult<Series> {
     }
 }
 
-#[polars_expr(output_type=Float64)]
+// #[polars_expr(output_type=Float64)]
 fn typprice(inputs: &[Series]) -> PolarsResult<Series> {
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -54,7 +53,7 @@ fn typprice(inputs: &[Series]) -> PolarsResult<Series> {
     }
 }
 
-#[polars_expr(output_type=Float64)]
+// #[polars_expr(output_type=Float64)]
 fn wclprice(inputs: &[Series]) -> PolarsResult<Series> {
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;

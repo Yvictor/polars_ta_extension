@@ -1,6 +1,5 @@
 use crate::utils::{cast_series_to_f64, get_series_f64_ptr, ta_code2err};
 use polars::prelude::*;
-use pyo3_polars::derive::polars_expr;
 use talib::pattern::ta_cdlxsidegap3methods;
 use talib::pattern::CDLKwargs;
 use talib::pattern::{ta_cdl2crows, ta_cdl3blackcrows, ta_cdl3inside};
@@ -25,7 +24,7 @@ use talib::pattern::{ta_cdlspinningtop, ta_cdlstalledpattern, ta_cdlsticksandwic
 use talib::pattern::{ta_cdltakuri, ta_cdltasukigap, ta_cdlthrusting};
 use talib::pattern::{ta_cdltristar, ta_cdlunique3river, ta_cdlupsidegap2crows};
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdl2crows(inputs: &[Series]) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -43,7 +42,7 @@ fn cdl2crows(inputs: &[Series]) -> PolarsResult<Series> {
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdl3blackcrows(inputs: &[Series]) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -61,7 +60,7 @@ fn cdl3blackcrows(inputs: &[Series]) -> PolarsResult<Series> {
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdl3inside(inputs: &[Series]) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -79,7 +78,7 @@ fn cdl3inside(inputs: &[Series]) -> PolarsResult<Series> {
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdl3linestrike(inputs: &[Series]) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -97,7 +96,7 @@ fn cdl3linestrike(inputs: &[Series]) -> PolarsResult<Series> {
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdl3outside(inputs: &[Series]) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -115,7 +114,7 @@ fn cdl3outside(inputs: &[Series]) -> PolarsResult<Series> {
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdl3starsinsouth(inputs: &[Series]) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -135,7 +134,7 @@ fn cdl3starsinsouth(inputs: &[Series]) -> PolarsResult<Series> {
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdl3whitesoldiers(inputs: &[Series]) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -155,7 +154,7 @@ fn cdl3whitesoldiers(inputs: &[Series]) -> PolarsResult<Series> {
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdlabandonedbaby(inputs: &[Series], kwargs: CDLKwargs) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -174,7 +173,7 @@ fn cdlabandonedbaby(inputs: &[Series], kwargs: CDLKwargs) -> PolarsResult<Series
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdladvanceblock(inputs: &[Series]) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -194,7 +193,7 @@ fn cdladvanceblock(inputs: &[Series]) -> PolarsResult<Series> {
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdlbelthold(inputs: &[Series]) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -214,7 +213,7 @@ fn cdlbelthold(inputs: &[Series]) -> PolarsResult<Series> {
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdlbreakaway(inputs: &[Series]) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -234,7 +233,7 @@ fn cdlbreakaway(inputs: &[Series]) -> PolarsResult<Series> {
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdlclosingmarubozu(inputs: &[Series]) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -254,7 +253,7 @@ fn cdlclosingmarubozu(inputs: &[Series]) -> PolarsResult<Series> {
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdlconcealbabyswall(inputs: &[Series]) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -274,7 +273,7 @@ fn cdlconcealbabyswall(inputs: &[Series]) -> PolarsResult<Series> {
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdlcounterattack(inputs: &[Series]) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -294,7 +293,7 @@ fn cdlcounterattack(inputs: &[Series]) -> PolarsResult<Series> {
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdldarkcloudcover(inputs: &[Series], kwargs: CDLKwargs) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -313,7 +312,7 @@ fn cdldarkcloudcover(inputs: &[Series], kwargs: CDLKwargs) -> PolarsResult<Serie
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdldoji(inputs: &[Series]) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -333,7 +332,7 @@ fn cdldoji(inputs: &[Series]) -> PolarsResult<Series> {
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdldojistar(inputs: &[Series]) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -352,7 +351,7 @@ fn cdldojistar(inputs: &[Series]) -> PolarsResult<Series> {
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdldragonflydoji(inputs: &[Series]) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -371,7 +370,7 @@ fn cdldragonflydoji(inputs: &[Series]) -> PolarsResult<Series> {
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdlengulfing(inputs: &[Series]) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -390,7 +389,7 @@ fn cdlengulfing(inputs: &[Series]) -> PolarsResult<Series> {
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdleveningdojistar(inputs: &[Series], kwargs: CDLKwargs) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -409,7 +408,7 @@ fn cdleveningdojistar(inputs: &[Series], kwargs: CDLKwargs) -> PolarsResult<Seri
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdleveningstar(inputs: &[Series], kwargs: CDLKwargs) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -428,7 +427,7 @@ fn cdleveningstar(inputs: &[Series], kwargs: CDLKwargs) -> PolarsResult<Series> 
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdlgapsidesidewhite(inputs: &[Series]) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -447,7 +446,7 @@ fn cdlgapsidesidewhite(inputs: &[Series]) -> PolarsResult<Series> {
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdlgravestonedoji(inputs: &[Series]) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -466,7 +465,7 @@ fn cdlgravestonedoji(inputs: &[Series]) -> PolarsResult<Series> {
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdlhammer(inputs: &[Series]) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -485,7 +484,7 @@ fn cdlhammer(inputs: &[Series]) -> PolarsResult<Series> {
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdlhangingman(inputs: &[Series]) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -504,7 +503,7 @@ fn cdlhangingman(inputs: &[Series]) -> PolarsResult<Series> {
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdlharami(inputs: &[Series]) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -523,7 +522,7 @@ fn cdlharami(inputs: &[Series]) -> PolarsResult<Series> {
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdlharamicross(inputs: &[Series]) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -542,7 +541,7 @@ fn cdlharamicross(inputs: &[Series]) -> PolarsResult<Series> {
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdlhighwave(inputs: &[Series]) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -561,7 +560,7 @@ fn cdlhighwave(inputs: &[Series]) -> PolarsResult<Series> {
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdlhikkake(inputs: &[Series]) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -580,7 +579,7 @@ fn cdlhikkake(inputs: &[Series]) -> PolarsResult<Series> {
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdlhikkakemod(inputs: &[Series]) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -599,7 +598,7 @@ fn cdlhikkakemod(inputs: &[Series]) -> PolarsResult<Series> {
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdlhomingpigeon(inputs: &[Series]) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -618,7 +617,7 @@ fn cdlhomingpigeon(inputs: &[Series]) -> PolarsResult<Series> {
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdlidentical3crows(inputs: &[Series]) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -637,7 +636,7 @@ fn cdlidentical3crows(inputs: &[Series]) -> PolarsResult<Series> {
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdlinneck(inputs: &[Series]) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -656,7 +655,7 @@ fn cdlinneck(inputs: &[Series]) -> PolarsResult<Series> {
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdlinvertedhammer(inputs: &[Series]) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -675,7 +674,7 @@ fn cdlinvertedhammer(inputs: &[Series]) -> PolarsResult<Series> {
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdlkicking(inputs: &[Series]) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -694,7 +693,7 @@ fn cdlkicking(inputs: &[Series]) -> PolarsResult<Series> {
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdlkickingbylength(inputs: &[Series]) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -713,7 +712,7 @@ fn cdlkickingbylength(inputs: &[Series]) -> PolarsResult<Series> {
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdlladderbottom(inputs: &[Series]) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -732,7 +731,7 @@ fn cdlladderbottom(inputs: &[Series]) -> PolarsResult<Series> {
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdllongleggeddoji(inputs: &[Series]) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -751,7 +750,7 @@ fn cdllongleggeddoji(inputs: &[Series]) -> PolarsResult<Series> {
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdllongline(inputs: &[Series]) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -770,7 +769,7 @@ fn cdllongline(inputs: &[Series]) -> PolarsResult<Series> {
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdlmarubozu(inputs: &[Series]) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -789,7 +788,7 @@ fn cdlmarubozu(inputs: &[Series]) -> PolarsResult<Series> {
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdlmatchinglow(inputs: &[Series]) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -808,7 +807,7 @@ fn cdlmatchinglow(inputs: &[Series]) -> PolarsResult<Series> {
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdlmathold(inputs: &[Series], kwargs: CDLKwargs) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -827,7 +826,7 @@ fn cdlmathold(inputs: &[Series], kwargs: CDLKwargs) -> PolarsResult<Series> {
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdlmorningdojistar(inputs: &[Series], kwargs: CDLKwargs) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -846,7 +845,7 @@ fn cdlmorningdojistar(inputs: &[Series], kwargs: CDLKwargs) -> PolarsResult<Seri
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdlmorningstar(inputs: &[Series], kwargs: CDLKwargs) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -865,7 +864,7 @@ fn cdlmorningstar(inputs: &[Series], kwargs: CDLKwargs) -> PolarsResult<Series> 
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdlonneck(inputs: &[Series]) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -884,7 +883,7 @@ fn cdlonneck(inputs: &[Series]) -> PolarsResult<Series> {
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdlpiercing(inputs: &[Series]) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -903,7 +902,7 @@ fn cdlpiercing(inputs: &[Series]) -> PolarsResult<Series> {
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdlrickshawman(inputs: &[Series]) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -922,7 +921,7 @@ fn cdlrickshawman(inputs: &[Series]) -> PolarsResult<Series> {
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdlrisefall3methods(inputs: &[Series]) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -941,7 +940,7 @@ fn cdlrisefall3methods(inputs: &[Series]) -> PolarsResult<Series> {
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdlseparatinglines(inputs: &[Series]) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -960,7 +959,7 @@ fn cdlseparatinglines(inputs: &[Series]) -> PolarsResult<Series> {
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdlshootingstar(inputs: &[Series]) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -979,7 +978,7 @@ fn cdlshootingstar(inputs: &[Series]) -> PolarsResult<Series> {
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdlshortline(inputs: &[Series]) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -998,7 +997,7 @@ fn cdlshortline(inputs: &[Series]) -> PolarsResult<Series> {
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdlspinningtop(inputs: &[Series]) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -1017,7 +1016,7 @@ fn cdlspinningtop(inputs: &[Series]) -> PolarsResult<Series> {
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdlstalledpattern(inputs: &[Series]) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -1036,7 +1035,7 @@ fn cdlstalledpattern(inputs: &[Series]) -> PolarsResult<Series> {
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdlsticksandwich(inputs: &[Series]) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -1055,7 +1054,7 @@ fn cdlsticksandwich(inputs: &[Series]) -> PolarsResult<Series> {
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdltakuri(inputs: &[Series]) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -1074,7 +1073,7 @@ fn cdltakuri(inputs: &[Series]) -> PolarsResult<Series> {
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdltasukigap(inputs: &[Series]) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -1093,7 +1092,7 @@ fn cdltasukigap(inputs: &[Series]) -> PolarsResult<Series> {
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdlthrusting(inputs: &[Series]) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -1112,7 +1111,7 @@ fn cdlthrusting(inputs: &[Series]) -> PolarsResult<Series> {
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdltristar(inputs: &[Series]) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -1131,7 +1130,7 @@ fn cdltristar(inputs: &[Series]) -> PolarsResult<Series> {
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdlunique3river(inputs: &[Series]) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -1150,7 +1149,7 @@ fn cdlunique3river(inputs: &[Series]) -> PolarsResult<Series> {
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdlupsidegap2crows(inputs: &[Series]) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -1169,7 +1168,7 @@ fn cdlupsidegap2crows(inputs: &[Series]) -> PolarsResult<Series> {
     }
 }
 
-#[polars_expr(output_type=Int32)]
+// #[polars_expr(output_type=Int32)]
 fn cdlxsidegap3methods(inputs: &[Series]) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
