@@ -6,7 +6,7 @@ use talib::overlap::{
     ta_midprice, ta_sar, ta_sarext, ta_sma, ta_t3, ta_tema, ta_trima, ta_wma, BBANDSKwargs,
     MaKwargs, MamaKwargs, MavpKwargs, SarExtKwargs, SarKwargs, T3Kwargs,
 };
-
+// pub 
 pub fn bbands_output(_: &[Field]) -> PolarsResult<Field> {
     let u = Field::new("upperband", DataType::Float64);
     let m = Field::new("middleband", DataType::Float64);
@@ -16,7 +16,7 @@ pub fn bbands_output(_: &[Field]) -> PolarsResult<Field> {
 }
 
 // #[polars_expr(output_type_func=bbands_output)]
-fn bbands(inputs: &[Series], kwargs: BBANDSKwargs) -> PolarsResult<Series> {
+pub fn bbands(inputs: &[Series], kwargs: BBANDSKwargs) -> PolarsResult<Series> {
     let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
     let len = input.len();
@@ -34,7 +34,7 @@ fn bbands(inputs: &[Series], kwargs: BBANDSKwargs) -> PolarsResult<Series> {
 }
 
 // #[polars_expr(output_type=Float64)]
-fn ema(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
+pub fn ema(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
     let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
     let len = input.len();
@@ -49,7 +49,7 @@ fn ema(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
 }
 
 // #[polars_expr(output_type=Float64)]
-fn dema(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
+pub fn dema(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
     let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
     let len = input.len();
@@ -61,7 +61,7 @@ fn dema(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
 }
 
 // #[polars_expr(output_type=Float64)]
-fn ht_trendline(inputs: &[Series]) -> PolarsResult<Series> {
+pub fn ht_trendline(inputs: &[Series]) -> PolarsResult<Series> {
     let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
     let len = input.len();
@@ -73,7 +73,7 @@ fn ht_trendline(inputs: &[Series]) -> PolarsResult<Series> {
 }
 
 // #[polars_expr(output_type=Float64)]
-fn kama(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
+pub fn kama(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
     let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
     let len = input.len();
@@ -85,7 +85,7 @@ fn kama(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
 }
 
 // #[polars_expr(output_type=Float64)]
-fn ma(inputs: &[Series], kwargs: MaKwargs) -> PolarsResult<Series> {
+pub fn ma(inputs: &[Series], kwargs: MaKwargs) -> PolarsResult<Series> {
     let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
     let len = input.len();
@@ -95,7 +95,7 @@ fn ma(inputs: &[Series], kwargs: MaKwargs) -> PolarsResult<Series> {
         Err(ret_code) => ta_code2err(ret_code),
     }
 }
-
+// pub 
 pub fn mama_output(_: &[Field]) -> PolarsResult<Field> {
     let m = Field::new("mama", DataType::Float64);
     let f = Field::new("fama", DataType::Float64);
@@ -104,7 +104,7 @@ pub fn mama_output(_: &[Field]) -> PolarsResult<Field> {
 }
 
 // #[polars_expr(output_type_func=mama_output)]
-fn mama(inputs: &[Series], kwargs: MamaKwargs) -> PolarsResult<Series> {
+pub fn mama(inputs: &[Series], kwargs: MamaKwargs) -> PolarsResult<Series> {
     let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
     let len = input.len();
@@ -121,7 +121,7 @@ fn mama(inputs: &[Series], kwargs: MamaKwargs) -> PolarsResult<Series> {
 }
 
 // #[polars_expr(output_type=Float64)]
-fn mavp(inputs: &[Series], kwargs: MavpKwargs) -> PolarsResult<Series> {
+pub fn mavp(inputs: &[Series], kwargs: MavpKwargs) -> PolarsResult<Series> {
     let input = &mut cast_series_to_f64(&inputs[0])?;
     let in_time_period = &mut cast_series_to_f64(&inputs[1])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
@@ -135,7 +135,7 @@ fn mavp(inputs: &[Series], kwargs: MavpKwargs) -> PolarsResult<Series> {
 }
 
 // #[polars_expr(output_type=Float64)]
-fn midpoint(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
+pub fn midpoint(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
     let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
     let len = input.len();
@@ -147,7 +147,7 @@ fn midpoint(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series>
 }
 
 // #[polars_expr(output_type=Float64)]
-fn midprice(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
+pub fn midprice(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
     let high = &mut cast_series_to_f64(&inputs[0])?;
     let low = &mut cast_series_to_f64(&inputs[1])?;
     let (high_ptr, _high) = get_series_f64_ptr(high)?;
@@ -161,7 +161,7 @@ fn midprice(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series>
 }
 
 // #[polars_expr(output_type=Float64)]
-fn sar(inputs: &[Series], kwargs: SarKwargs) -> PolarsResult<Series> {
+pub fn sar(inputs: &[Series], kwargs: SarKwargs) -> PolarsResult<Series> {
     let high = &mut cast_series_to_f64(&inputs[0])?;
     let low = &mut cast_series_to_f64(&inputs[1])?;
     let (high_ptr, _high) = get_series_f64_ptr(high)?;
@@ -175,7 +175,7 @@ fn sar(inputs: &[Series], kwargs: SarKwargs) -> PolarsResult<Series> {
 }
 
 // #[polars_expr(output_type=Float64)]
-fn sarext(inputs: &[Series], kwargs: SarExtKwargs) -> PolarsResult<Series> {
+pub fn sarext(inputs: &[Series], kwargs: SarExtKwargs) -> PolarsResult<Series> {
     let high = &mut cast_series_to_f64(&inputs[0])?;
     let low = &mut cast_series_to_f64(&inputs[1])?;
     let (high_ptr, _high) = get_series_f64_ptr(high)?;
@@ -189,7 +189,7 @@ fn sarext(inputs: &[Series], kwargs: SarExtKwargs) -> PolarsResult<Series> {
 }
 
 // #[polars_expr(output_type=Float64)]
-fn sma(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
+pub fn sma(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
     let input = &mut cast_series_to_f64(&inputs[0])?;
     let (in_real_ptr, _in_real) = get_series_f64_ptr(input)?;
     let len = input.len();
@@ -201,7 +201,7 @@ fn sma(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
 }
 
 // #[polars_expr(output_type=Float64)]
-fn t3(inputs: &[Series], kwargs: T3Kwargs) -> PolarsResult<Series> {
+pub fn t3(inputs: &[Series], kwargs: T3Kwargs) -> PolarsResult<Series> {
     let input = &mut cast_series_to_f64(&inputs[0])?;
     let (in_real_ptr, _in_real) = get_series_f64_ptr(input)?;
     let len = input.len();
@@ -213,7 +213,7 @@ fn t3(inputs: &[Series], kwargs: T3Kwargs) -> PolarsResult<Series> {
 }
 
 // #[polars_expr(output_type=Float64)]
-fn tema(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
+pub fn tema(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
     let input = &mut cast_series_to_f64(&inputs[0])?;
     let (in_real_ptr, _in_real) = get_series_f64_ptr(input)?;
     let len = input.len();
@@ -225,7 +225,7 @@ fn tema(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
 }
 
 // #[polars_expr(output_type=Float64)]
-fn trima(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
+pub fn trima(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
     let input = &mut cast_series_to_f64(&inputs[0])?;
     let (in_real_ptr, _in_real) = get_series_f64_ptr(input)?;
     let len = input.len();
@@ -237,7 +237,7 @@ fn trima(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
 }
 
 // #[polars_expr(output_type=Float64)]
-fn wma(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
+pub fn wma(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
     let input = &mut cast_series_to_f64(&inputs[0])?;
     let (in_real_ptr, _in_real) = get_series_f64_ptr(input)?;
     let len = input.len();

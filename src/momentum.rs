@@ -13,7 +13,7 @@ use talib::momentum::{
 };
 
 // #[polars_expr(output_type=Float64)]
-fn adx(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
+pub fn adx(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
     let close = &mut cast_series_to_f64(&inputs[0])?;
@@ -29,7 +29,7 @@ fn adx(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
 }
 
 // #[polars_expr(output_type=Float64)]
-fn adxr(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
+pub fn adxr(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
     let close = &mut cast_series_to_f64(&inputs[0])?;
@@ -45,7 +45,7 @@ fn adxr(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
 }
 
 // #[polars_expr(output_type=Float64)]
-fn apo(inputs: &[Series], kwargs: ApoKwargs) -> PolarsResult<Series> {
+pub fn apo(inputs: &[Series], kwargs: ApoKwargs) -> PolarsResult<Series> {
     let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
     let len = input.len();
@@ -55,7 +55,7 @@ fn apo(inputs: &[Series], kwargs: ApoKwargs) -> PolarsResult<Series> {
         Err(ret_code) => ta_code2err(ret_code),
     }
 }
-
+// pub
 pub fn arron_output(_: &[Field]) -> PolarsResult<Field> {
     let d = Field::new("aroondown", DataType::Float64);
     let u = Field::new("aroonup", DataType::Float64);
@@ -64,7 +64,7 @@ pub fn arron_output(_: &[Field]) -> PolarsResult<Field> {
 }
 
 // #[polars_expr(output_type_func=arron_output)]
-fn aroon(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
+pub fn aroon(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
     let high = &mut cast_series_to_f64(&inputs[0])?;
     let low = &mut cast_series_to_f64(&inputs[1])?;
     let (high_ptr, _high) = get_series_f64_ptr(high)?;
@@ -83,7 +83,7 @@ fn aroon(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
 }
 
 // #[polars_expr(output_type=Float64)]
-fn aroonosc(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
+pub fn aroonosc(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
     let high = &mut cast_series_to_f64(&inputs[0])?;
     let low = &mut cast_series_to_f64(&inputs[1])?;
     let (high_ptr, _high) = get_series_f64_ptr(high)?;
@@ -97,7 +97,7 @@ fn aroonosc(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series>
 }
 
 // #[polars_expr(output_type=Float64)]
-fn bop(inputs: &[Series]) -> PolarsResult<Series> {
+pub fn bop(inputs: &[Series]) -> PolarsResult<Series> {
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -115,7 +115,7 @@ fn bop(inputs: &[Series]) -> PolarsResult<Series> {
 }
 
 // #[polars_expr(output_type=Float64)]
-fn cci(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
+pub fn cci(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
     let close = &mut cast_series_to_f64(&inputs[0])?;
@@ -131,7 +131,7 @@ fn cci(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
 }
 
 // #[polars_expr(output_type=Float64)]
-fn cmo(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
+pub fn cmo(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
     let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
     let len = input.len();
@@ -143,7 +143,7 @@ fn cmo(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
 }
 
 // #[polars_expr(output_type=Float64)]
-fn dx(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
+pub fn dx(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
     let close = &mut cast_series_to_f64(&inputs[0])?;
@@ -157,7 +157,7 @@ fn dx(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
         Err(ret_code) => ta_code2err(ret_code),
     }
 }
-
+// pub
 pub fn macd_output(_: &[Field]) -> PolarsResult<Field> {
     let macd = Field::new("macd", DataType::Float64);
     let macdsignal = Field::new("macdsignal", DataType::Float64);
@@ -167,7 +167,7 @@ pub fn macd_output(_: &[Field]) -> PolarsResult<Field> {
 }
 
 // #[polars_expr(output_type_func=macd_output)]
-fn macd(inputs: &[Series], kwargs: MacdKwargs) -> PolarsResult<Series> {
+pub fn macd(inputs: &[Series], kwargs: MacdKwargs) -> PolarsResult<Series> {
     let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
     let len = input.len();
@@ -185,7 +185,7 @@ fn macd(inputs: &[Series], kwargs: MacdKwargs) -> PolarsResult<Series> {
 }
 
 // #[polars_expr(output_type_func=macd_output)]
-fn macdext(inputs: &[Series], kwargs: MacdExtKwargs) -> PolarsResult<Series> {
+pub fn macdext(inputs: &[Series], kwargs: MacdExtKwargs) -> PolarsResult<Series> {
     let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
     let len = input.len();
@@ -203,7 +203,7 @@ fn macdext(inputs: &[Series], kwargs: MacdExtKwargs) -> PolarsResult<Series> {
 }
 
 // #[polars_expr(output_type_func=macd_output)]
-fn macdfix(inputs: &[Series], kwargs: MacdFixKwargs) -> PolarsResult<Series> {
+pub fn macdfix(inputs: &[Series], kwargs: MacdFixKwargs) -> PolarsResult<Series> {
     let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
     let len = input.len();
@@ -221,7 +221,7 @@ fn macdfix(inputs: &[Series], kwargs: MacdFixKwargs) -> PolarsResult<Series> {
 }
 
 // #[polars_expr(output_type=Float64)]
-fn mfi(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
+pub fn mfi(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
     let close = &mut cast_series_to_f64(&inputs[0])?;
@@ -239,7 +239,7 @@ fn mfi(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
 }
 
 // #[polars_expr(output_type=Float64)]
-fn minus_di(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
+pub fn minus_di(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
     let close = &mut cast_series_to_f64(&inputs[0])?;
@@ -255,7 +255,7 @@ fn minus_di(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series>
 }
 
 // #[polars_expr(output_type=Float64)]
-fn minus_dm(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
+pub fn minus_dm(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
     let high = &mut cast_series_to_f64(&inputs[0])?;
     let low = &mut cast_series_to_f64(&inputs[1])?;
     let (high_ptr, _high) = get_series_f64_ptr(high)?;
@@ -269,7 +269,7 @@ fn minus_dm(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series>
 }
 
 // #[polars_expr(output_type=Float64)]
-fn mom(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
+pub fn mom(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
     let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
     let len = input.len();
@@ -281,7 +281,7 @@ fn mom(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
 }
 
 // #[polars_expr(output_type=Float64)]
-fn plus_di(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
+pub fn plus_di(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
     let close = &mut cast_series_to_f64(&inputs[0])?;
@@ -297,7 +297,7 @@ fn plus_di(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> 
 }
 
 // #[polars_expr(output_type=Float64)]
-fn plus_dm(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
+pub fn plus_dm(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
     let high = &mut cast_series_to_f64(&inputs[0])?;
     let low = &mut cast_series_to_f64(&inputs[1])?;
     let (high_ptr, _high) = get_series_f64_ptr(high)?;
@@ -311,7 +311,7 @@ fn plus_dm(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> 
 }
 
 // #[polars_expr(output_type=Float64)]
-fn ppo(inputs: &[Series], kwargs: PpoKwargs) -> PolarsResult<Series> {
+pub fn ppo(inputs: &[Series], kwargs: PpoKwargs) -> PolarsResult<Series> {
     let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
     let len = input.len();
@@ -323,7 +323,7 @@ fn ppo(inputs: &[Series], kwargs: PpoKwargs) -> PolarsResult<Series> {
 }
 
 // #[polars_expr(output_type=Float64)]
-fn roc(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
+pub fn roc(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
     let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
     let len = input.len();
@@ -335,7 +335,7 @@ fn roc(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
 }
 
 // #[polars_expr(output_type=Float64)]
-fn rocp(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
+pub fn rocp(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
     let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
     let len = input.len();
@@ -347,7 +347,7 @@ fn rocp(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
 }
 
 // #[polars_expr(output_type=Float64)]
-fn rocr(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
+pub fn rocr(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
     let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
     let len = input.len();
@@ -359,7 +359,7 @@ fn rocr(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
 }
 
 // #[polars_expr(output_type=Float64)]
-fn rocr100(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
+pub fn rocr100(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
     let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
     let len = input.len();
@@ -371,7 +371,7 @@ fn rocr100(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> 
 }
 
 // #[polars_expr(output_type=Float64)]
-fn rsi(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
+pub fn rsi(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
     let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
     let len = input.len();
@@ -381,7 +381,7 @@ fn rsi(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
         Err(ret_code) => ta_code2err(ret_code),
     }
 }
-
+// pub
 pub fn stoch_output(_: &[Field]) -> PolarsResult<Field> {
     let slowk = Field::new("slowk", DataType::Float64);
     let slowd = Field::new("slowd", DataType::Float64);
@@ -390,7 +390,7 @@ pub fn stoch_output(_: &[Field]) -> PolarsResult<Field> {
 }
 
 // #[polars_expr(output_type_func=stoch_output)]
-fn stoch(inputs: &[Series], kwargs: StochKwargs) -> PolarsResult<Series> {
+pub fn stoch(inputs: &[Series], kwargs: StochKwargs) -> PolarsResult<Series> {
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
     let close = &mut cast_series_to_f64(&inputs[0])?;
@@ -409,7 +409,7 @@ fn stoch(inputs: &[Series], kwargs: StochKwargs) -> PolarsResult<Series> {
         Err(ret_code) => ta_code2err(ret_code),
     }
 }
-
+// pub
 pub fn stochf_output(_: &[Field]) -> PolarsResult<Field> {
     let fastk = Field::new("fastk", DataType::Float64);
     let fastd = Field::new("fastd", DataType::Float64);
@@ -418,7 +418,7 @@ pub fn stochf_output(_: &[Field]) -> PolarsResult<Field> {
 }
 
 // #[polars_expr(output_type_func=stochf_output)]
-fn stochf(inputs: &[Series], kwargs: StochfKwargs) -> PolarsResult<Series> {
+pub fn stochf(inputs: &[Series], kwargs: StochfKwargs) -> PolarsResult<Series> {
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
     let close = &mut cast_series_to_f64(&inputs[0])?;
@@ -439,7 +439,7 @@ fn stochf(inputs: &[Series], kwargs: StochfKwargs) -> PolarsResult<Series> {
 }
 
 // #[polars_expr(output_type_func=stochf_output)]
-fn stochrsi(inputs: &[Series], kwargs: StochRsiKwargs) -> PolarsResult<Series> {
+pub fn stochrsi(inputs: &[Series], kwargs: StochRsiKwargs) -> PolarsResult<Series> {
     let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
     let len = input.len();
@@ -456,7 +456,7 @@ fn stochrsi(inputs: &[Series], kwargs: StochRsiKwargs) -> PolarsResult<Series> {
 }
 
 // #[polars_expr(output_type=Float64)]
-fn trix(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
+pub fn trix(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
     let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
     let len = input.len();
@@ -471,7 +471,7 @@ fn trix(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
 }
 
 // #[polars_expr(output_type=Float64)]
-fn ultosc(inputs: &[Series], kwargs: UltOscKwargs) -> PolarsResult<Series> {
+pub fn ultosc(inputs: &[Series], kwargs: UltOscKwargs) -> PolarsResult<Series> {
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
     let close = &mut cast_series_to_f64(&inputs[0])?;
@@ -490,7 +490,7 @@ fn ultosc(inputs: &[Series], kwargs: UltOscKwargs) -> PolarsResult<Series> {
 }
 
 // #[polars_expr(output_type=Float64)]
-fn willr(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
+pub fn willr(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
     let close = &mut cast_series_to_f64(&inputs[0])?;

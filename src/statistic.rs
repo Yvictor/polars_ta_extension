@@ -8,7 +8,7 @@ use talib::statistic::{
 };
 
 // #[polars_expr(output_type=Float64)]
-fn beta(inputs: &[Series], kwargs: BetaKwargs) -> PolarsResult<Series> {
+pub fn beta(inputs: &[Series], kwargs: BetaKwargs) -> PolarsResult<Series> {
     let real0 = &mut cast_series_to_f64(&inputs[0])?;
     let real1 = &mut cast_series_to_f64(&inputs[1])?;
     let (real0_ptr, _real0) = get_series_f64_ptr(real0)?;
@@ -22,7 +22,7 @@ fn beta(inputs: &[Series], kwargs: BetaKwargs) -> PolarsResult<Series> {
 }
 
 // #[polars_expr(output_type=Float64)]
-fn correl(inputs: &[Series], kwargs: CorrelKwargs) -> PolarsResult<Series> {
+pub fn correl(inputs: &[Series], kwargs: CorrelKwargs) -> PolarsResult<Series> {
     let real0 = &mut cast_series_to_f64(&inputs[0])?;
     let real1 = &mut cast_series_to_f64(&inputs[1])?;
     let (real0_ptr, _real0) = get_series_f64_ptr(real0)?;
@@ -36,7 +36,7 @@ fn correl(inputs: &[Series], kwargs: CorrelKwargs) -> PolarsResult<Series> {
 }
 
 // #[polars_expr(output_type=Float64)]
-fn linearreg(inputs: &[Series], kwargs: LinearRegKwargs) -> PolarsResult<Series> {
+pub fn linearreg(inputs: &[Series], kwargs: LinearRegKwargs) -> PolarsResult<Series> {
     let real = &mut cast_series_to_f64(&inputs[0])?;
     let (real_ptr, _real) = get_series_f64_ptr(real)?;
     let len = real.len();
@@ -48,7 +48,7 @@ fn linearreg(inputs: &[Series], kwargs: LinearRegKwargs) -> PolarsResult<Series>
 }
 
 // #[polars_expr(output_type=Float64)]
-fn linearreg_angle(inputs: &[Series], kwargs: LinearRegAngleKwargs) -> PolarsResult<Series> {
+pub fn linearreg_angle(inputs: &[Series], kwargs: LinearRegAngleKwargs) -> PolarsResult<Series> {
     let real = &mut cast_series_to_f64(&inputs[0])?;
     let (real_ptr, _real) = get_series_f64_ptr(real)?;
     let len = real.len();
@@ -60,7 +60,7 @@ fn linearreg_angle(inputs: &[Series], kwargs: LinearRegAngleKwargs) -> PolarsRes
 }
 
 // #[polars_expr(output_type=Float64)]
-fn linearreg_intercept(
+pub fn linearreg_intercept(
     inputs: &[Series],
     kwargs: LinearRegInterceptKwargs,
 ) -> PolarsResult<Series> {
@@ -75,7 +75,7 @@ fn linearreg_intercept(
 }
 
 // #[polars_expr(output_type=Float64)]
-fn linearreg_slope(inputs: &[Series], kwargs: LinearRegSlopeKwargs) -> PolarsResult<Series> {
+pub fn linearreg_slope(inputs: &[Series], kwargs: LinearRegSlopeKwargs) -> PolarsResult<Series> {
     let real = &mut cast_series_to_f64(&inputs[0])?;
     let (real_ptr, _real) = get_series_f64_ptr(real)?;
     let len = real.len();
@@ -87,7 +87,7 @@ fn linearreg_slope(inputs: &[Series], kwargs: LinearRegSlopeKwargs) -> PolarsRes
 }
 
 // #[polars_expr(output_type=Float64)]
-fn stddev(inputs: &[Series], kwargs: StdDevKwargs) -> PolarsResult<Series> {
+pub fn stddev(inputs: &[Series], kwargs: StdDevKwargs) -> PolarsResult<Series> {
     let real = &mut cast_series_to_f64(&inputs[0])?;
     let (real_ptr, _real) = get_series_f64_ptr(real)?;
     let len = real.len();
@@ -102,7 +102,7 @@ fn stddev(inputs: &[Series], kwargs: StdDevKwargs) -> PolarsResult<Series> {
 }
 
 // #[polars_expr(output_type=Float64)]
-fn tsf(inputs: &[Series], kwargs: TsfKwargs) -> PolarsResult<Series> {
+pub fn tsf(inputs: &[Series], kwargs: TsfKwargs) -> PolarsResult<Series> {
     let real = &mut cast_series_to_f64(&inputs[0])?;
     let (real_ptr, _real) = get_series_f64_ptr(real)?;
     let len = real.len();
@@ -117,7 +117,7 @@ fn tsf(inputs: &[Series], kwargs: TsfKwargs) -> PolarsResult<Series> {
 }
 
 // #[polars_expr(output_type=Float64)]
-fn var(inputs: &[Series], kwargs: VarKwargs) -> PolarsResult<Series> {
+pub fn var(inputs: &[Series], kwargs: VarKwargs) -> PolarsResult<Series> {
     let real = &mut cast_series_to_f64(&inputs[0])?;
     let (real_ptr, _real) = get_series_f64_ptr(real)?;
     let len = real.len();

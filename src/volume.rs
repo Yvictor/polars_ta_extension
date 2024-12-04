@@ -3,7 +3,7 @@ use polars::prelude::*;
 use talib::volume::{ta_ad, ta_adosc, ta_obv, ADOSCKwargs};
 
 // #[polars_expr(output_type=Float64)]
-fn obv(inputs: &[Series]) -> PolarsResult<Series> {
+pub fn obv(inputs: &[Series]) -> PolarsResult<Series> {
     let close = &mut cast_series_to_f64(&inputs[0])?;
     let volume = &mut cast_series_to_f64(&inputs[1])?;
     let (close_ptr, _close) = get_series_f64_ptr(close)?;
@@ -17,7 +17,7 @@ fn obv(inputs: &[Series]) -> PolarsResult<Series> {
 }
 
 // #[polars_expr(output_type=Float64)]
-fn ad(inputs: &[Series]) -> PolarsResult<Series> {
+pub fn ad(inputs: &[Series]) -> PolarsResult<Series> {
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
     let close = &mut cast_series_to_f64(&inputs[0])?;
@@ -35,7 +35,7 @@ fn ad(inputs: &[Series]) -> PolarsResult<Series> {
 }
 
 // #[polars_expr(output_type=Float64)]
-fn adosc(inputs: &[Series], kwargs: ADOSCKwargs) -> PolarsResult<Series> {
+pub fn adosc(inputs: &[Series], kwargs: ADOSCKwargs) -> PolarsResult<Series> {
     let close = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;

@@ -1,16 +1,16 @@
 mod cycle;
 mod math;
-mod momentum;
-mod overlap;
-mod pattern;
-mod statistic;
-mod transform;
-mod utils;
-mod volatility;
-mod volume;
+pub mod momentum;
+pub mod overlap;
+pub mod pattern;
+pub mod statistic;
+pub mod transform;
+pub mod utils;
+pub mod volatility;
+pub mod volume;
 use talib::common::{ta_initialize, ta_shutdown, ta_version};
 // use talib_sys::{TA_Initialize, TA_Shutdown, TA_RetCode};
-use polars::prelude::*;
+pub use polars::prelude::*;
 
 #[cfg(target_os = "linux")]
 use jemallocator::Jemalloc;
