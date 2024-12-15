@@ -12,7 +12,7 @@ Cargo.lock
 
 # MSVC Windows builds of rustc generate these, which store debugging information
 *.pdb
-# dependencies
+dependencies
 
 
 # Byte-compiled / optimized / DLL files
