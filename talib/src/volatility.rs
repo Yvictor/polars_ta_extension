@@ -4,10 +4,12 @@ use talib_sys::{
     TA_ATR_Lookback, TA_Integer, TA_NATR_Lookback, TA_RetCode, TA_TRANGE_Lookback, TA_ATR, TA_NATR,
     TA_TRANGE,
 };
+use derive_builder::Builder;
 
-#[derive(Deserialize)]
+#[derive(Builder, Deserialize)]
 pub struct ATRKwargs {
-    timeperiod: i32,
+    #[builder(default = "14")]
+    pub timeperiod: i32,
 }
 
 pub fn ta_atr(
@@ -96,9 +98,10 @@ pub fn ta_trange(
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Builder, Deserialize)]
 pub struct NATRKwargs {
-    timeperiod: i32,
+    #[builder(default = "14")]
+    pub timeperiod: i32,
 }
 
 pub fn ta_natr(

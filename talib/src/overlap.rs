@@ -1,5 +1,6 @@
 use crate::common::TimePeriodKwargs;
 use crate::utils::{check_begin_idx1, check_begin_idx2, make_vec};
+use derive_builder::Builder;
 use serde::Deserialize;
 use talib_sys::{
     TA_BBANDS_Lookback, TA_DEMA_Lookback, TA_EMA_Lookback, TA_HT_TRENDLINE_Lookback, TA_Integer,
@@ -10,12 +11,15 @@ use talib_sys::{
     TA_MIDPRICE, TA_SAR, TA_SAREXT, TA_SMA, TA_T3, TA_TEMA, TA_TRIMA, TA_WMA,
 };
 
-#[derive(Deserialize)]
+#[derive(Builder, Deserialize)]
 pub struct BBANDSKwargs {
-    timeperiod: i32,
-    nbdevup: f64,
-    nbdevdn: f64,
-    matype: TA_MAType,
+    #[builder(default = "5")]
+    pub timeperiod: i32,
+    #[builder(default = "2.0")]
+    pub nbdevup: f64,
+    #[builder(default = "2.0")]
+    pub nbdevdn: f64,
+    pub matype: TA_MAType,
 }
 
 pub fn ta_bbands(
@@ -232,10 +236,11 @@ pub fn ta_kama(
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Builder, Deserialize)]
 pub struct MaKwargs {
-    timeperiod: i32,
-    matype: TA_MAType,
+    #[builder(default = "30")]
+    pub timeperiod: i32,
+    pub matype: TA_MAType,
 }
 
 pub fn ta_ma(real_ptr: *const f64, len: usize, kwargs: &MaKwargs) -> Result<Vec<f64>, TA_RetCode> {
@@ -275,10 +280,12 @@ pub fn ta_ma(real_ptr: *const f64, len: usize, kwargs: &MaKwargs) -> Result<Vec<
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Builder, Deserialize)]
 pub struct MamaKwargs {
-    fastlimit: f64,
-    slowlimit: f64,
+    #[builder(default = "0.5")]
+    pub fastlimit: f64,
+    #[builder(default = "0.05")]
+    pub slowlimit: f64,
 }
 
 pub fn ta_mama(
@@ -327,11 +334,13 @@ pub fn ta_mama(
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Builder, Deserialize)]
 pub struct MavpKwargs {
-    minperiod: i32,
-    maxperiod: i32,
-    matype: TA_MAType,
+    #[builder(default = "3")]
+    pub minperiod: i32,
+    #[builder(default = "30")]
+    pub maxperiod: i32,
+    pub matype: TA_MAType,
 }
 
 pub fn ta_mavp(
@@ -461,10 +470,12 @@ pub fn ta_midprice(
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Builder, Deserialize)]
 pub struct SarKwargs {
-    acceleration: f64,
-    maximum: f64,
+    #[builder(default = "0.02")]
+    pub acceleration: f64,
+    #[builder(default = "0.2")]
+    pub maximum: f64,
 }
 
 pub fn ta_sar(
@@ -511,16 +522,24 @@ pub fn ta_sar(
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Builder, Deserialize)]
 pub struct SarExtKwargs {
-    startvalue: f64,
-    offsetonreverse: f64,
-    accelerationinitlong: f64,
-    accelerationlong: f64,
-    accelerationmaxlong: f64,
-    accelerationinitshort: f64,
-    accelerationshort: f64,
-    accelerationmaxshort: f64,
+    #[builder(default = "0.02")]
+    pub startvalue: f64,
+    #[builder(default = "0.02")]
+    pub offsetonreverse: f64,
+    #[builder(default = "0.02")]
+    pub accelerationinitlong: f64,
+    #[builder(default = "0.02")]
+    pub accelerationlong: f64,
+    #[builder(default = "0.02")]
+    pub accelerationmaxlong: f64,
+    #[builder(default = "0.02")]
+    pub accelerationinitshort: f64,
+    #[builder(default = "0.02")]
+    pub accelerationshort: f64,
+    #[builder(default = "0.02")]
+    pub accelerationmaxshort: f64,
 }
 
 pub fn ta_sarext(
@@ -627,10 +646,12 @@ pub fn ta_sma(
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Builder, Deserialize)]
 pub struct T3Kwargs {
-    timeperiod: i32,
-    vfactor: f64,
+    #[builder(default = "30")]
+    pub timeperiod: i32,
+    #[builder(default = "0.7")]
+    pub vfactor: f64,
 }
 
 pub fn ta_t3(real_ptr: *const f64, len: usize, kwargs: &T3Kwargs) -> Result<Vec<f64>, TA_RetCode> {

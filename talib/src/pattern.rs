@@ -1,4 +1,5 @@
 use crate::utils::{check_begin_idx4, make_vec};
+use derive_builder::Builder;
 use serde::Deserialize;
 use talib_sys::{TA_CDL2CROWS_Lookback, TA_CDL2CROWS};
 use talib_sys::{TA_CDL3BLACKCROWS_Lookback, TA_CDL3BLACKCROWS};
@@ -63,9 +64,10 @@ use talib_sys::{TA_CDLUPSIDEGAP2CROWS_Lookback, TA_CDLUPSIDEGAP2CROWS};
 use talib_sys::{TA_CDLXSIDEGAP3METHODS_Lookback, TA_CDLXSIDEGAP3METHODS};
 use talib_sys::{TA_Integer, TA_RetCode};
 
-#[derive(Deserialize)]
+#[derive(Builder, Deserialize)]
 pub struct CDLKwargs {
-    penetration: f64,
+    #[builder(default = "0.02")]
+    pub penetration: f64,
 }
 
 pub fn ta_cdl2crows(

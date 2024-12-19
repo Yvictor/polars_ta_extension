@@ -10,6 +10,7 @@ use talib_sys::{
     TA_GetVersionString,
     TA_Shutdown, //TA_SetCandleSettings, TA_ResetCandleSettings,
 };
+use derive_builder::Builder;
 
 pub fn ta_initialize() -> Result<(), TA_RetCode> {
     let ret_code = unsafe { TA_Initialize() };
@@ -34,7 +35,8 @@ pub fn ta_version() -> String {
 }
 
 
-#[derive(Deserialize)]
+#[derive(Builder, Deserialize)]
 pub struct TimePeriodKwargs {
+    #[builder(default = "30")]
     pub timeperiod: i32,
 }

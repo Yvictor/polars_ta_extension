@@ -1,4 +1,4 @@
-use talib::common::{TimePeriodKwargs, ta_initialize, ta_shutdown};
+use talib::common::{TimePeriodKwargs, TimePeriodKwargsBuilder, ta_initialize, ta_shutdown};
 use talib::momentum::ta_rsi;
 
 fn main() {
@@ -8,7 +8,9 @@ fn main() {
         1.087080, 1.087000, 1.086630, 1.086630, 1.086610, 1.086630, 1.086640, 1.086650, 1.086650,
         1.086670, 1.086630,
     ];
-    let kwargs = TimePeriodKwargs { timeperiod: 5 };
+    let _kwargs = TimePeriodKwargs { timeperiod: 5 };
+    // or 
+    let kwargs = TimePeriodKwargsBuilder::default().timeperiod(5).build().unwrap();
     let res = ta_rsi(close_prices.as_ptr(), close_prices.len(), &kwargs);
 
     match res {

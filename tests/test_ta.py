@@ -19,9 +19,9 @@ def df_base():
     return pl.DataFrame([close_series, high_series, low_series, open_series, volume_series])
 
 
-@pytest.fixture(params=["float64", "float32"])
+@pytest.fixture(params=[pl.Float64, pl.Float32])
 def df_ohlc(request, df_base: pl.DataFrame):
-    dtype = pl.Float64 if request.param == "float64" else pl.Float32
+    dtype = request.param
     return df_base.with_columns(
         pl.col("open").cast(dtype),
         pl.col("high").cast(dtype),

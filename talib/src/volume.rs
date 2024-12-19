@@ -2,6 +2,7 @@ use crate::utils::{make_vec, check_begin_idx4, check_begin_idx2};
 use serde::Deserialize;
 use talib_sys::{TA_ADOSC_Lookback, TA_AD_Lookback, TA_OBV_Lookback, TA_AD, TA_ADOSC, TA_OBV};
 use talib_sys::{TA_Integer, TA_RetCode};
+use derive_builder::Builder;
 
 pub fn ta_ad(
     high_ptr: *const f64,
@@ -47,10 +48,12 @@ pub fn ta_ad(
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Builder, Deserialize)]
 pub struct ADOSCKwargs {
-    fastperiod: i32,
-    slowperiod: i32,
+    #[builder(default = "3")]
+    pub fastperiod: i32,
+    #[builder(default = "10")]
+    pub slowperiod: i32,
 }
 
 pub fn ta_adosc(

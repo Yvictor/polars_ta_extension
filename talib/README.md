@@ -27,6 +27,11 @@ fn main() {
 
     // Specify the RSI calculation parameters
     let kwargs = TimePeriodKwargs { timeperiod: 5 };
+    // or with builder
+    let kwargs = TimePeriodKwargsBuilder::default()
+        .timeperiod(5)
+        .build()
+        .unwrap();
 
     // Calculate RSI
     let res = ta_rsi(close_prices.as_ptr(), close_prices.len(), &kwargs);

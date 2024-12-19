@@ -1,5 +1,6 @@
-use crate::utils::{check_begin_idx3, check_begin_idx4, check_begin_idx1, check_begin_idx2};
+use crate::utils::{check_begin_idx1, check_begin_idx2, check_begin_idx3, check_begin_idx4};
 use crate::{common::TimePeriodKwargs, utils::make_vec};
+use derive_builder::Builder;
 use serde::Deserialize;
 use talib_sys::{TA_ADXR_Lookback, TA_ADXR};
 use talib_sys::{TA_ADX_Lookback, TA_ADX};
@@ -43,7 +44,7 @@ pub fn ta_adx(
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
     let begin_idx = check_begin_idx3(len, high_ptr, low_ptr, close_ptr) as i32;
-    let end_idx = len as i32 - begin_idx -1;
+    let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_ADX_Lookback(kwargs.timeperiod) };
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
@@ -87,7 +88,7 @@ pub fn ta_adxr(
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
     let begin_idx = check_begin_idx3(len, high_ptr, low_ptr, close_ptr) as i32;
-    let end_idx = len as i32 - begin_idx -1;
+    let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_ADXR_Lookback(kwargs.timeperiod) };
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
@@ -121,9 +122,11 @@ pub fn ta_adxr(
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Builder, Deserialize)]
 pub struct ApoKwargs {
+    #[builder(default = "12")]
     pub fastperiod: i32,
+    #[builder(default = "26")]
     pub slowperiod: i32,
     pub matype: TA_MAType,
 }
@@ -136,8 +139,9 @@ pub fn ta_apo(
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
     let begin_idx = check_begin_idx1(len, input_ptr) as i32;
-    let end_idx = len as i32 - begin_idx -1;
-    let lookback = begin_idx + unsafe { TA_APO_Lookback(kwargs.fastperiod, kwargs.slowperiod, kwargs.matype) };
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback =
+        begin_idx + unsafe { TA_APO_Lookback(kwargs.fastperiod, kwargs.slowperiod, kwargs.matype) };
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_APO(
@@ -179,7 +183,7 @@ pub fn ta_aroon(
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
     let begin_idx = check_begin_idx2(len, high_ptr, low_ptr) as i32;
-    let end_idx = len as i32 - begin_idx -1;
+    let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_AROON_Lookback(kwargs.timeperiod) };
     let (mut outaroondown, ptr1) = make_vec(len, lookback);
     let (mut outaroonup, ptr2) = make_vec(len, lookback);
@@ -225,7 +229,7 @@ pub fn ta_aroonosc(
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
     let begin_idx = check_begin_idx2(len, high_ptr, low_ptr) as i32;
-    let end_idx = len as i32 - begin_idx -1;
+    let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_AROONOSC_Lookback(kwargs.timeperiod) };
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
@@ -268,7 +272,7 @@ pub fn ta_bop(
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
     let begin_idx = check_begin_idx4(len, open_ptr, high_ptr, low_ptr, close_ptr) as i32;
-    let end_idx = len as i32 - begin_idx -1;
+    let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_BOP_Lookback() };
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
@@ -306,7 +310,7 @@ pub fn ta_cci(
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
     let begin_idx = check_begin_idx3(len, high_ptr, low_ptr, close_ptr) as i32;
-    let end_idx = len as i32 - begin_idx -1;
+    let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_CCI_Lookback(kwargs.timeperiod) };
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
@@ -349,7 +353,7 @@ pub fn ta_cmo(
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
     let begin_idx = check_begin_idx1(len, input_ptr) as i32;
-    let end_idx = len as i32 - begin_idx -1;
+    let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_CMO_Lookback(kwargs.timeperiod) };
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
@@ -392,7 +396,7 @@ pub fn ta_dx(
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
     let begin_idx = check_begin_idx3(len, high_ptr, low_ptr, close_ptr) as i32;
-    let end_idx = len as i32 - begin_idx -1;
+    let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_DX_Lookback(kwargs.timeperiod) };
     let (mut outdx, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
@@ -427,10 +431,13 @@ pub fn ta_dx(
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Builder, Deserialize)]
 pub struct MacdKwargs {
+    #[builder(default = "12")]
     pub fastperiod: i32,
+    #[builder(default = "26")]
     pub slowperiod: i32,
+    #[builder(default = "9")]
     pub signalperiod: i32,
 }
 
@@ -442,9 +449,9 @@ pub fn ta_macd(
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
     let begin_idx = check_begin_idx1(len, input_ptr) as i32;
-    let end_idx = len as i32 - begin_idx -1;
-    let lookback = begin_idx +
-        unsafe { TA_MACD_Lookback(kwargs.fastperiod, kwargs.slowperiod, kwargs.signalperiod) };
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx
+        + unsafe { TA_MACD_Lookback(kwargs.fastperiod, kwargs.slowperiod, kwargs.signalperiod) };
     let (mut outmacd, ptr1) = make_vec(len, lookback);
     let (mut outmacdsignal, ptr2) = make_vec(len, lookback);
     let (mut outmacdhist, ptr3) = make_vec(len, lookback);
@@ -478,12 +485,16 @@ pub fn ta_macd(
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Builder, Deserialize)]
 pub struct MacdExtKwargs {
+    #[builder(default = "12")]
     pub fastperiod: i32,
+    #[builder(default = "1")]
     pub fastmatype: TA_MAType,
+    #[builder(default = "26")]
     pub slowperiod: i32,
     pub slowmatype: TA_MAType,
+    #[builder(default = "9")]
     pub signalperiod: i32,
     pub signalmatype: TA_MAType,
 }
@@ -496,17 +507,18 @@ pub fn ta_macdext(
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
     let begin_idx = check_begin_idx1(len, input_ptr) as i32;
-    let end_idx = len as i32 - begin_idx -1;
-    let lookback = begin_idx + unsafe {
-        TA_MACDEXT_Lookback(
-            kwargs.fastperiod,
-            kwargs.fastmatype,
-            kwargs.slowperiod,
-            kwargs.slowmatype,
-            kwargs.signalperiod,
-            kwargs.signalmatype,
-        )
-    };
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx
+        + unsafe {
+            TA_MACDEXT_Lookback(
+                kwargs.fastperiod,
+                kwargs.fastmatype,
+                kwargs.slowperiod,
+                kwargs.slowmatype,
+                kwargs.signalperiod,
+                kwargs.signalmatype,
+            )
+        };
     let (mut outmacd, ptr1) = make_vec(len, lookback);
     let (mut outmacdsignal, ptr2) = make_vec(len, lookback);
     let (mut outmacdhist, ptr3) = make_vec(len, lookback);
@@ -543,8 +555,9 @@ pub fn ta_macdext(
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Builder, Deserialize)]
 pub struct MacdFixKwargs {
+    #[builder(default = "9")]
     pub signalperiod: i32,
 }
 
@@ -556,7 +569,7 @@ pub fn ta_macdfix(
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
     let begin_idx = check_begin_idx1(len, input_ptr) as i32;
-    let end_idx = len as i32 - begin_idx -1;
+    let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_MACDFIX_Lookback(kwargs.signalperiod) };
     let (mut outmacd, ptr1) = make_vec(len, lookback);
     let (mut outmacdsignal, ptr2) = make_vec(len, lookback);
@@ -600,7 +613,7 @@ pub fn ta_mfi(
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
     let begin_idx = check_begin_idx4(len, high_ptr, low_ptr, close_ptr, volume_ptr) as i32;
-    let end_idx = len as i32 - begin_idx -1;
+    let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_MFI_Lookback(kwargs.timeperiod) };
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
@@ -646,7 +659,7 @@ pub fn ta_minus_di(
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
     let begin_idx = check_begin_idx3(len, high_ptr, low_ptr, close_ptr) as i32;
-    let end_idx = len as i32 - begin_idx -1;
+    let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_MINUS_DI_Lookback(kwargs.timeperiod) };
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
@@ -685,7 +698,7 @@ pub fn ta_minus_dm(
     let mut out_begin: TA_Integer = 0;
     let mut out_size = 0;
     let begin_idx = check_begin_idx2(len, high_ptr, low_ptr) as i32;
-    let end_idx = len as i32 - begin_idx -1;
+    let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_MINUS_DM_Lookback(kwargs.timeperiod) };
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
@@ -722,7 +735,7 @@ pub fn ta_mom(
     let mut out_begin = 0;
     let mut out_size = 0;
     let begin_idx = check_begin_idx1(len, input_ptr) as i32;
-    let end_idx = len as i32 - begin_idx -1;
+    let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_MOM_Lookback(kwargs.timeperiod) };
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
@@ -760,7 +773,7 @@ pub fn ta_plus_di(
     let mut out_begin = 0;
     let mut out_size = 0;
     let begin_idx = check_begin_idx3(len, high_ptr, low_ptr, close_ptr) as i32;
-    let end_idx = len as i32 - begin_idx -1;
+    let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_PLUS_DI_Lookback(kwargs.timeperiod) };
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
@@ -799,7 +812,7 @@ pub fn ta_plus_dm(
     let mut out_begin = 0;
     let mut out_size = 0;
     let begin_idx = check_begin_idx2(len, high_ptr, low_ptr) as i32;
-    let end_idx = len as i32 - begin_idx -1;
+    let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_PLUS_DM_Lookback(kwargs.timeperiod) };
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
@@ -828,9 +841,11 @@ pub fn ta_plus_dm(
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Builder, Deserialize)]
 pub struct PpoKwargs {
+    #[builder(default = "12")]
     pub fastperiod: i32,
+    #[builder(default = "26")]
     pub slowperiod: i32,
     pub matype: TA_MAType,
 }
@@ -843,8 +858,9 @@ pub fn ta_ppo(
     let mut out_begin = 0;
     let mut out_size = 0;
     let begin_idx = check_begin_idx1(len, input_ptr) as i32;
-    let end_idx = len as i32 - begin_idx -1;
-    let lookback = begin_idx + unsafe { TA_PPO_Lookback(kwargs.fastperiod, kwargs.slowperiod, kwargs.matype) };
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback =
+        begin_idx + unsafe { TA_PPO_Lookback(kwargs.fastperiod, kwargs.slowperiod, kwargs.matype) };
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_PPO(
@@ -881,7 +897,7 @@ pub fn ta_roc(
     let mut out_begin = 0;
     let mut out_size = 0;
     let begin_idx = check_begin_idx1(len, input_ptr) as i32;
-    let end_idx = len as i32 - begin_idx -1;
+    let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_ROC_Lookback(kwargs.timeperiod) };
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
@@ -918,7 +934,7 @@ pub fn ta_rocp(
     let mut out_begin = 0;
     let mut out_size = 0;
     let begin_idx = check_begin_idx1(len, input_ptr) as i32;
-    let end_idx = len as i32 - begin_idx -1;
+    let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_ROCP_Lookback(kwargs.timeperiod) };
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
@@ -955,7 +971,7 @@ pub fn ta_rocr(
     let mut out_begin = 0;
     let mut out_size = 0;
     let begin_idx = check_begin_idx1(len, input_ptr) as i32;
-    let end_idx = len as i32 - begin_idx -1;
+    let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_ROCR_Lookback(kwargs.timeperiod) };
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
@@ -992,7 +1008,7 @@ pub fn ta_rocr100(
     let mut out_begin = 0;
     let mut out_size = 0;
     let begin_idx = check_begin_idx1(len, input_ptr) as i32;
-    let end_idx = len as i32 - begin_idx -1;
+    let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_ROCR100_Lookback(kwargs.timeperiod) };
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
@@ -1029,7 +1045,7 @@ pub fn ta_rsi(
     let mut out_begin = 0;
     let mut out_size = 0;
     let begin_idx = check_begin_idx1(len, input_ptr) as i32;
-    let end_idx = len as i32 - begin_idx -1;
+    let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_RSI_Lookback(kwargs.timeperiod) };
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
@@ -1058,11 +1074,14 @@ pub fn ta_rsi(
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Builder, Deserialize)]
 pub struct StochKwargs {
+    #[builder(default = "12")]
     pub fastk_period: i32,
+    #[builder(default = "3")]
     pub slowk_period: i32,
     pub slowk_matype: TA_MAType,
+    #[builder(default = "3")]
     pub slowd_period: i32,
     pub slowd_matype: TA_MAType,
 }
@@ -1077,16 +1096,17 @@ pub fn ta_stoch(
     let mut out_begin = 0;
     let mut out_size = 0;
     let begin_idx = check_begin_idx3(len, high_ptr, low_ptr, close_ptr) as i32;
-    let end_idx = len as i32 - begin_idx -1;
-    let lookback = begin_idx + unsafe {
-        TA_STOCH_Lookback(
-            kwargs.fastk_period,
-            kwargs.slowk_period,
-            kwargs.slowk_matype,
-            kwargs.slowd_period,
-            kwargs.slowd_matype,
-        )
-    };
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx
+        + unsafe {
+            TA_STOCH_Lookback(
+                kwargs.fastk_period,
+                kwargs.slowk_period,
+                kwargs.slowk_matype,
+                kwargs.slowd_period,
+                kwargs.slowd_matype,
+            )
+        };
     let (mut outslowk, ptr1) = make_vec(len, lookback);
     let (mut outslowd, ptr2) = make_vec(len, lookback);
     let ret_code = unsafe {
@@ -1128,9 +1148,11 @@ pub fn ta_stoch(
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Builder, Deserialize)]
 pub struct StochfKwargs {
+    #[builder(default = "12")]
     pub fastk_period: i32,
+    #[builder(default = "3")]
     pub fastd_period: i32,
     pub fastd_matype: TA_MAType,
 }
@@ -1145,14 +1167,15 @@ pub fn ta_stochf(
     let mut out_begin = 0;
     let mut out_size = 0;
     let begin_idx = check_begin_idx3(len, high_ptr, low_ptr, close_ptr) as i32;
-    let end_idx = len as i32 - begin_idx -1;
-    let lookback = begin_idx + unsafe {
-        TA_STOCHF_Lookback(
-            kwargs.fastk_period,
-            kwargs.fastd_period,
-            kwargs.fastd_matype,
-        )
-    };
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx
+        + unsafe {
+            TA_STOCHF_Lookback(
+                kwargs.fastk_period,
+                kwargs.fastd_period,
+                kwargs.fastd_matype,
+            )
+        };
     let (mut outfastk, ptr1) = make_vec(len, lookback);
     let (mut outfastd, ptr2) = make_vec(len, lookback);
     let ret_code = unsafe {
@@ -1192,10 +1215,13 @@ pub fn ta_stochf(
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Builder, Deserialize)]
 pub struct StochRsiKwargs {
+    #[builder(default = "14")]
     pub timeperiod: i32,
+    #[builder(default = "9")]
     pub fastk_period: i32,
+    #[builder(default = "3")]
     pub fastd_period: i32,
     pub fastd_matype: TA_MAType,
 }
@@ -1208,15 +1234,16 @@ pub fn ta_stochrsi(
     let mut out_begin = 0;
     let mut out_size = 0;
     let begin_idx = check_begin_idx1(len, input_ptr) as i32;
-    let end_idx = len as i32 - begin_idx -1;
-    let lookback = begin_idx + unsafe {
-        TA_STOCHRSI_Lookback(
-            kwargs.timeperiod,
-            kwargs.fastk_period,
-            kwargs.fastd_period,
-            kwargs.fastd_matype,
-        )
-    };
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx
+        + unsafe {
+            TA_STOCHRSI_Lookback(
+                kwargs.timeperiod,
+                kwargs.fastk_period,
+                kwargs.fastd_period,
+                kwargs.fastd_matype,
+            )
+        };
     let (mut outfastk, ptr1) = make_vec(len, lookback);
     let (mut outfastd, ptr2) = make_vec(len, lookback);
     let ret_code = unsafe {
@@ -1291,10 +1318,13 @@ pub fn ta_trix(
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Builder, Deserialize)]
 pub struct UltOscKwargs {
+    #[builder(default = "7")]
     pub timeperiod1: i32,
+    #[builder(default = "14")]
     pub timeperiod2: i32,
+    #[builder(default = "28")]
     pub timeperiod3: i32,
 }
 
@@ -1308,9 +1338,9 @@ pub fn ta_ultosc(
     let mut out_begin = 0;
     let mut out_size = 0;
     let begin_idx = check_begin_idx3(len, high_ptr, low_ptr, close_ptr) as i32;
-    let end_idx = len as i32 - begin_idx -1;
-    let lookback = begin_idx +
-        unsafe { TA_ULTOSC_Lookback(kwargs.timeperiod1, kwargs.timeperiod2, kwargs.timeperiod3) };
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx
+        + unsafe { TA_ULTOSC_Lookback(kwargs.timeperiod1, kwargs.timeperiod2, kwargs.timeperiod3) };
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_ULTOSC(
@@ -1352,7 +1382,7 @@ pub fn ta_willr(
     let mut out_begin = 0;
     let mut out_size = 0;
     let begin_idx = check_begin_idx3(len, high_ptr, low_ptr, close_ptr) as i32;
-    let end_idx = len as i32 - begin_idx -1;
+    let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_WILLR_Lookback(kwargs.timeperiod) };
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {

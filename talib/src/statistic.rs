@@ -7,10 +7,12 @@ use talib_sys::{
     TA_LINEARREG, TA_LINEARREG_ANGLE, TA_LINEARREG_INTERCEPT, TA_LINEARREG_SLOPE, TA_STDDEV,
     TA_TSF, TA_VAR,
 };
+use derive_builder::Builder;
 
-#[derive(Deserialize)]
+#[derive(Builder, Deserialize)]
 pub struct BetaKwargs {
-    timeperiod: i32,
+    #[builder(default = "5")]
+    pub timeperiod: i32,
 }
 
 pub fn ta_beta(
@@ -55,9 +57,10 @@ pub fn ta_beta(
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Builder, Deserialize)]
 pub struct CorrelKwargs {
-    timeperiod: i32,
+    #[builder(default = "30")]
+    pub timeperiod: i32,
 }
 
 pub fn ta_correl(
@@ -102,9 +105,10 @@ pub fn ta_correl(
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Builder, Deserialize)]
 pub struct LinearRegKwargs {
-    timeperiod: i32,
+    #[builder(default = "14")]
+    pub timeperiod: i32,
 }
 
 pub fn ta_linearreg(
@@ -147,9 +151,10 @@ pub fn ta_linearreg(
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Builder, Deserialize)]
 pub struct LinearRegAngleKwargs {
-    timeperiod: i32,
+    #[builder(default = "14")]
+    pub timeperiod: i32,
 }
 
 pub fn ta_linearreg_angle(
@@ -192,9 +197,10 @@ pub fn ta_linearreg_angle(
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Builder, Deserialize)]
 pub struct LinearRegInterceptKwargs {
-    timeperiod: i32,
+    #[builder(default = "14")]
+    pub timeperiod: i32,
 }
 
 pub fn ta_linearreg_intercept(
@@ -237,9 +243,10 @@ pub fn ta_linearreg_intercept(
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Builder, Deserialize)]
 pub struct LinearRegSlopeKwargs {
-    timeperiod: i32,
+    #[builder(default = "14")]
+    pub timeperiod: i32,
 }
 
 pub fn ta_linearreg_slope(
@@ -282,10 +289,12 @@ pub fn ta_linearreg_slope(
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Builder, Deserialize)]
 pub struct StdDevKwargs {
-    timeperiod: i32,
-    nbdev: f64,
+    #[builder(default = "5")]
+    pub timeperiod: i32,
+    #[builder(default = "1.0")]
+    pub nbdev: f64,
 }
 
 pub fn ta_stddev(
@@ -328,9 +337,10 @@ pub fn ta_stddev(
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Builder, Deserialize)]
 pub struct TsfKwargs {
-    timeperiod: i32,
+    #[builder(default = "14")]
+    pub timeperiod: i32,
 }
 
 pub fn ta_tsf(
@@ -372,10 +382,12 @@ pub fn ta_tsf(
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Builder, Deserialize)]
 pub struct VarKwargs {
-    timeperiod: i32,
-    nbdev: f64,
+    #[builder(default = "5")]
+    pub timeperiod: i32,
+    #[builder(default = "1.0")]
+    pub nbdev: f64,
 }
 
 pub fn ta_var(
