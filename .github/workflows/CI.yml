@@ -131,6 +131,19 @@ jobs:
       - name: install tools
         run: |
           uv tool install maturin
+      - name: Install talib
+        run: |
+          wget https://github.com/Yvictor/polars_ta_extension/releases/download/0.1.0/ta-lib-0.4.0-src.tar.gz
+          tar -xzf ta-lib-0.4.0-src.tar.gz
+          cd ta-lib
+          ./configure
+          make
+          sudo make install
+          cd ..
+          rm -rf ta-lib
+        env:
+          TA_INCLUDE_PATH: ${{ github.workspace }}/dependencies/include
+          TA_LIBRARY_PATH: ${{ github.workspace }}/dependencies/lib
       - name: Build wheels
         run: |
           uv run maturin build --release --out dist --find-interpreter
