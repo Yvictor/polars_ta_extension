@@ -31,7 +31,7 @@ jobs:
         #, aarch64, armv7]
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.10'
       - name: Test
@@ -45,7 +45,7 @@ jobs:
           TA_LIBRARY_PATH: ${{ github.workspace }}/dependencies/lib
       - name: Build wheels for x86_64
         if: matrix.target == 'x86_64'
-        uses: PyO3/maturin-action@v1
+        uses: PyO3/maturin-action@v1.46.0
         with:
           target: ${{ matrix.target }}
           args: --release --out dist --find-interpreter
@@ -103,35 +103,45 @@ jobs:
           name: wheels
           path: dist
 
-  # linux-arm:
-  #   runs-on: ubuntu-latest
-  #   strategy:
-  #     matrix:
-  #       target: [aarch64]
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - uses: actions/setup-python@v4
-  #       with:
-  #         python-version: "3.10"
-  #     - name: Setup QEMU
-  #       uses: docker/setup-qemu-action@v1
-  #     - name: Build wheels
-  #       uses: PyO3/maturin-action@v1
-  #       with:
-  #         target: ${{ matrix.target }}
-  #         args: --release --out dist --find-interpreter
-  #         sccache: 'true'
-  #         container: ghcr.io/rust-cross/manylinux_2_28-cross:aarch64
-  #         rust-toolchain: stable-aarch64-unknown-linux-gnu
-  #       env:
-  #         DEPS_PATH: ${{ github.workspace }}/dependencies
-  #         TA_INCLUDE_PATH: ${{ github.workspace }}/dependencies/include
-  #         TA_LIBRARY_PATH: ${{ github.workspace }}/dependencies/lib
-  #     - name: Upload wheels
-  #       uses: actions/upload-artifact@v3
-  #       with:
-  #         name: wheels
-  #         path: dist
+  linux-arm:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target: [aarch64, armv7l]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - name: Build wheels
+        uses: PyO3/maturin-action@v1.46.0
+        with:
+          target: ${{ matrix.target }}
+          args: --release --out dist --find-interpreter
+          docker-options: -e LIBCLANG_PATH=/usr/lib/llvm-14/lib/ -e LIBCLANG_STATIC_PATH=/usr/lib/llvm-14/lib/ -e CLANG_PATH=/usr/lib/llvm-14/bin/clang
+          before-script-linux: |
+            # If we're running on rhel centos, install needed packages.
+            if command -v yum &> /dev/null; then
+                yum update -y && yum install -y perl-core openssl openssl-devel pkgconfig libatomic centos-release-scl llvm-toolset-7 && echo 'source scl_source enable llvm-toolset-7' >> ~/.bashrc 
+                # && source scl_source enable llvm-toolset-7
+                # If we're running on i686 we need to symlink libatomic
+                # in order to build openssl with -latomic flag.
+                if [[ ! -d "/usr/lib64" ]]; then
+                    ln -s /usr/lib/libatomic.so.1 /usr/lib/libatomic.so
+                fi
+            else
+                # If we're running on debian-based system.
+                apt update -y && apt-get install -y libssl-dev openssl pkg-config libclang-dev gcc-multilib
+            fi
+        env:
+          DEPS_PATH: ${{ github.workspace }}/dependencies
+          TA_INCLUDE_PATH: ${{ github.workspace }}/dependencies/include
+          TA_LIBRARY_PATH: ${{ github.workspace }}/dependencies/lib
+      - name: Upload wheels
+        uses: actions/upload-artifact@v3
+        with:
+          name: wheels
+          path: dist
 
 
   windows:
@@ -141,7 +151,7 @@ jobs:
         target: [x64, x86]
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.10'
           architecture: ${{ matrix.target }}
@@ -176,7 +186,7 @@ jobs:
         target: [x86_64, aarch64-apple-darwin]
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.10'
       # - name: check python version
