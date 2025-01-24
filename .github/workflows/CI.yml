@@ -133,14 +133,14 @@ jobs:
           uv tool install maturin
       - name: Install talib
         run: |
-          wget https://github.com/Yvictor/polars_ta_extension/releases/download/0.1.0/ta-lib-0.4.0-src.tar.gz
-          tar -xzf ta-lib-0.4.0-src.tar.gz
-          cd ta-lib
+          wget https://github.com/ta-lib/ta-lib/releases/download/v0.6.4/ta-lib-0.6.4-src.tar.gz
+          tar -xzf ta-lib-0.6.4-src.tar.gz
+          cd ta-lib-0.6.4
           ./configure
           make
           sudo make install
           cd ..
-          rm -rf ta-lib
+          rm -rf ta-lib-0.6.4
         env:
           TA_INCLUDE_PATH: ${{ github.workspace }}/dependencies/include
           TA_LIBRARY_PATH: ${{ github.workspace }}/dependencies/lib
