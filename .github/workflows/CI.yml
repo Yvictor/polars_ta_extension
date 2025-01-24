@@ -36,6 +36,19 @@ jobs:
           python-version: '3.10'
       - name: install uv
         uses: astral-sh/setup-uv@v5
+      - name: Install talib
+        run: |
+          wget https://sourceforge.net/projects/ta-lib/files/ta-lib/0.4.0/ta-lib-0.4.0-src.tar.gz/download
+          tar -xzf ta-lib-0.4.0-src.tar.gz
+          cd ta-lib
+          ./configure
+          make
+          sudo make install
+          cd ..
+          rm -rf ta-lib
+        env:
+          TA_INCLUDE_PATH: ${{ github.workspace }}/dependencies/include
+          TA_LIBRARY_PATH: ${{ github.workspace }}/dependencies/lib
       - name: Test
         run: |
           uv run pytest
