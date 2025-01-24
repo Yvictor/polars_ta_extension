@@ -39,7 +39,7 @@ dev = [
     "hypothesis",
     "pytest-memray==1.4.0; python_version >= '3.8'",
     "pytest-benchmark",
-    "ta-lib==0.6.1",
+    "ta-lib==0.5.3",
 ]
 
 
