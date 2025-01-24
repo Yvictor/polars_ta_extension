@@ -132,25 +132,8 @@ jobs:
         run: |
           uv tool install maturin
       - name: Build wheels
-        uses: PyO3/maturin-action@v1.46.0
-        with:
-          target: ${{ matrix.target }}
-          args: --release --out dist --find-interpreter
-          docker-options: -e LIBCLANG_PATH=/usr/lib/llvm-14/lib/ -e LIBCLANG_STATIC_PATH=/usr/lib/llvm-14/lib/ -e CLANG_PATH=/usr/lib/llvm-14/bin/clang
-          before-script-linux: |
-            # If we're running on rhel centos, install needed packages.
-            if command -v yum &> /dev/null; then
-                yum update -y && yum install -y perl-core openssl openssl-devel pkgconfig libatomic centos-release-scl llvm-toolset-7 && echo 'source scl_source enable llvm-toolset-7' >> ~/.bashrc 
-                # && source scl_source enable llvm-toolset-7
-                # If we're running on i686 we need to symlink libatomic
-                # in order to build openssl with -latomic flag.
-                if [[ ! -d "/usr/lib64" ]]; then
-                    ln -s /usr/lib/libatomic.so.1 /usr/lib/libatomic.so
-                fi
-            else
-                # If we're running on debian-based system.
-                apt update -y && apt-get install -y libssl-dev openssl pkg-config libclang-dev gcc-multilib
-            fi
+        run: |
+          uv run maturin build --release --out dist --find-interpreter
         env:
           DEPS_PATH: ${{ github.workspace }}/dependencies
           TA_INCLUDE_PATH: ${{ github.workspace }}/dependencies/include
