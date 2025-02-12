@@ -113,7 +113,7 @@ jobs:
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
-          name: wheels
+          name: wheels-${{ matrix.target }}
           path: dist
       - name: Test wheel installation
         run: |
@@ -159,7 +159,7 @@ jobs:
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
-          name: wheels
+          name: wheels-${{ matrix.target }}
           path: dist
       - name: Test wheel installation
         run: |
@@ -204,7 +204,7 @@ jobs:
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
-          name: wheels
+          name: wheels-${{ matrix.target }}
           path: dist
       - name: Test wheel installation
         run: |
@@ -239,7 +239,7 @@ jobs:
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
-          name: wheels
+          name: wheels-${{ matrix.target }}
           path: dist
       - name: Test wheel installation
         run: |
@@ -254,7 +254,9 @@ jobs:
     steps:
       - uses: actions/download-artifact@v3
         with:
-          name: wheels
+          path: dist
+          pattern: wheels-*
+          merge-multiple: true
       - name: Publish to PyPI
         uses: PyO3/maturin-action@v1
         env:
