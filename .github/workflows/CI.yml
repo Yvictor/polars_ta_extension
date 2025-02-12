@@ -115,6 +115,10 @@ jobs:
         with:
           name: wheels
           path: dist
+      - name: Test wheel installation
+        run: |
+          pip install dist/*.whl
+          python -c "import polars_ta; print('Import successful')"
 
   linux-arm:
     runs-on: ubuntu-24.04-arm
@@ -157,6 +161,10 @@ jobs:
         with:
           name: wheels
           path: dist
+      - name: Test wheel installation
+        run: |
+          pip install dist/*.whl
+          python -c "import polars_ta; print('Import successful')"
 
 
   windows:
@@ -198,6 +206,10 @@ jobs:
         with:
           name: wheels
           path: dist
+      - name: Test wheel installation
+        run: |
+          pip install dist/*.whl
+          python -c "import polars_ta; print('Import successful')"
 
   macos:
     runs-on: macos-latest
@@ -229,11 +241,15 @@ jobs:
         with:
           name: wheels
           path: dist
+      - name: Test wheel installation
+        run: |
+          pip install dist/*.whl
+          python -c "import polars_ta; print('Import successful')"
 
   release:
     name: Release
     runs-on: ubuntu-latest
-    if: "startsWith(github.ref, 'refs/tags/')"
+    if: startsWith(github.ref, 'refs/tags/')
     needs: [linux, macos, windows]
     steps:
       - uses: actions/download-artifact@v3

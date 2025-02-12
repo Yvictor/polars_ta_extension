@@ -171,3 +171,5 @@ cython_debug/
 
 # pytest benchmark
 .benchmarks
+
+.DS_Store
