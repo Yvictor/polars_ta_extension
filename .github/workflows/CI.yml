@@ -113,7 +113,7 @@ jobs:
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
-          name: wheels-${{ matrix.target }}
+          name: wheels-linux-${{ matrix.target }}
           path: dist
       - name: Test wheel installation
         run: |
@@ -159,7 +159,7 @@ jobs:
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
-          name: wheels-${{ matrix.target }}
+          name: wheels-linux-${{ matrix.target }}
           path: dist
       - name: Test wheel installation
         run: |
@@ -204,7 +204,7 @@ jobs:
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
-          name: wheels-${{ matrix.target }}
+          name: wheels-windows-${{ matrix.target }}
           path: dist
       - name: Test wheel installation
         run: |
@@ -239,7 +239,7 @@ jobs:
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
-          name: wheels-${{ matrix.target }}
+          name: wheels-macos-${{ matrix.target }}
           path: dist
       - name: Test wheel installation
         run: |
