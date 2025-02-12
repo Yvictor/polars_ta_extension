@@ -118,7 +118,7 @@ jobs:
       - name: Test wheel installation
         run: |
           pip install dist/*.whl
-          python -c "import polars_ta; print('Import successful')"
+          python -c "import polars_talib; print('Import successful')"
 
   linux-arm:
     runs-on: ubuntu-24.04-arm
@@ -164,7 +164,7 @@ jobs:
       - name: Test wheel installation
         run: |
           pip install dist/*.whl
-          python -c "import polars_ta; print('Import successful')"
+          python -c "import polars_talib; print('Import successful')"
 
 
   windows:
@@ -209,7 +209,7 @@ jobs:
       - name: Test wheel installation
         run: |
           pip install dist/*.whl
-          python -c "import polars_ta; print('Import successful')"
+          python -c "import polars_talib; print('Import successful')"
 
   macos:
     runs-on: macos-latest
@@ -244,7 +244,7 @@ jobs:
       - name: Test wheel installation
         run: |
           pip install dist/*.whl
-          python -c "import polars_ta; print('Import successful')"
+          python -c "import polars_talib; print('Import successful')"
 
   release:
     name: Release
