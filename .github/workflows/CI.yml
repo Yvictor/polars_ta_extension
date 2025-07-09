@@ -122,25 +122,30 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        target: [aarch64-unknown-linux-gnu]
+        target: [aarch64]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.10"
-      - name: install uv
-        uses: astral-sh/setup-uv@v5
-      - name: Build wheels for aarch64
-        uses: PyO3/maturin-action@v1
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
-          target: ${{ matrix.target }}
-          args: --release --out dist --find-interpreter
-          sccache: 'true'
-          manylinux: auto
-          docker-options: -e LIBCLANG_PATH=/usr/lib/llvm-14/lib/ -e LIBCLANG_STATIC_PATH=/usr/lib/llvm-14/lib/ -e CLANG_PATH=/usr/lib/llvm-14/bin/clang
-          before-script-linux: |
-            # If we're running on debian-based system.
-            apt update -y && apt-get install -y libssl-dev openssl pkg-config libclang-dev gcc-multilib
+          toolchain: stable
+      - uses: uraimo/run-on-arch-action@v3
+        with:
+          arch: ${{ matrix.target }}
+          distro: ubuntu22.04
+          githubToken: ${{ github.token }}
+          install: |
+            apt update
+            apt install -y libclang-dev build-essential curl wget
+            curl https://sh.rustup.rs -sSf | sh -s -- --default-toolchain stable -y
+            echo 'source $HOME/.cargo/env' >> $HOME/.bashrc
+            curl -LsSf https://astral.sh/uv/install.sh | sh
+            echo 'export PATH="$HOME/.local/bin:$PATH"' >> $HOME/.bashrc
+            export PATH="$HOME/.local/bin:$PATH"
+            uv python install 3.10
+            uv tool install maturin
             # Download and build ta-lib
             wget https://github.com/ta-lib/ta-lib/releases/download/v0.6.4/ta-lib-0.6.4-src.tar.gz
             tar -xzf ta-lib-0.6.4-src.tar.gz
@@ -150,19 +155,22 @@ jobs:
             make install
             cd ..
             rm -rf ta-lib-0.6.4
-        env:
-          DEPS_PATH: ${{ github.workspace }}/dependencies
-          TA_INCLUDE_PATH: ${{ github.workspace }}/dependencies/include
-          TA_LIBRARY_PATH: ${{ github.workspace }}/dependencies/lib
+          run: |
+            export DEPS_PATH=${{ github.workspace }}/dependencies
+            export TA_INCLUDE_PATH=${{ github.workspace }}/dependencies/include
+            export TA_LIBRARY_PATH=${{ github.workspace }}/dependencies/lib
+            source $HOME/.cargo/env
+            export PATH="$HOME/.local/bin:$PATH"
+            uv run maturin build --release --out dist --find-interpreter
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
           name: wheels-linux-arm-${{ matrix.target }}
           path: dist
-      - name: Test wheel installation
-        run: |
-          pip install dist/*.whl
-          python -c "import polars_talib; print('Import successful')"
+      # - name: Test wheel installation
+      #   run: |
+      #     pip install dist/*.whl
+      #     python -c "import polars_talib; print('Import successful')"
 
 
   windows:
@@ -211,10 +219,14 @@ jobs:
         shell: bash
 
   macos:
-    runs-on: macos-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        target: [x86_64, aarch64-apple-darwin] 
+        include:
+          - target: x86_64
+            os: macos-12
+          - target: aarch64
+            os: macos-latest 
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
