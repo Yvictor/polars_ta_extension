@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        target: [x86_64, aarch64-unknown-linux-gnu]
+        target: [x86_64]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -36,14 +36,14 @@ jobs:
         uses: astral-sh/setup-uv@v5
       - name: Install talib
         run: |
-          wget https://github.com/ta-lib/ta-lib/releases/download/v0.6.4/ta-lib-0.6.4-src.tar.gz
-          tar -xzf ta-lib-0.6.4-src.tar.gz
-          cd ta-lib-0.6.4
+          wget https://github.com/Yvictor/polars_ta_extension/releases/download/0.1.0/ta-lib-0.4.0-src.tar.gz
+          tar -xzf ta-lib-0.4.0-src.tar.gz
+          cd ta-lib
           ./configure
           make
           sudo make install
           cd ..
-          rm -rf ta-lib-0.6.4
+          rm -rf ta-lib
         env:
           TA_INCLUDE_PATH: ${{ github.workspace }}/dependencies/include
           TA_LIBRARY_PATH: ${{ github.workspace }}/dependencies/lib
@@ -52,13 +52,11 @@ jobs:
           uv run pytest
         env:
           DEPS_PATH: ${{ github.workspace }}/dependencies
-          TA_INCLUDE_PATH: /usr/local/include:${{ github.workspace }}/dependencies/include
-          TA_LIBRARY_PATH: /usr/local/lib:${{ github.workspace }}/dependencies/lib
-          LD_LIBRARY_PATH: /usr/local/lib:$LD_LIBRARY_PATH
-          PKG_CONFIG_PATH: /usr/local/lib/pkgconfig:$PKG_CONFIG_PATH
+          TA_INCLUDE_PATH: ${{ github.workspace }}/dependencies/include
+          TA_LIBRARY_PATH: ${{ github.workspace }}/dependencies/lib
       - name: Build wheels for x86_64
         if: matrix.target == 'x86_64'
-        uses: PyO3/maturin-action@v1
+        uses: PyO3/maturin-action@v1.46.0
         with:
           target: ${{ matrix.target }}
           args: --release --out dist --find-interpreter
@@ -113,7 +111,7 @@ jobs:
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
-          name: wheels-linux-${{ matrix.target }}
+          name: wheels
           path: dist
       - name: Test wheel installation
         run: |
@@ -159,7 +157,7 @@ jobs:
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
-          name: wheels-linux-${{ matrix.target }}
+          name: wheels
           path: dist
       - name: Test wheel installation
         run: |
@@ -204,7 +202,7 @@ jobs:
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
-          name: wheels-windows-${{ matrix.target }}
+          name: wheels
           path: dist
       - name: Test wheel installation
         run: |
@@ -212,46 +210,11 @@ jobs:
           python -c "import polars_talib; print('Import successful')"
         shell: bash
 
-  macos-intel:
-    runs-on: macos-13
-    strategy:
-      matrix:
-        target: [x86_64]
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.10'
-      - name: install uv
-        uses: astral-sh/setup-uv@v5
-      - name: install tools
-        run: |
-          uv tool install maturin
-      - name: Build wheels
-        uses: PyO3/maturin-action@v1
-        with:
-          target: ${{ matrix.target }}
-          args: --release --out dist --find-interpreter
-          sccache: 'true'
-        env:
-          DEPS_PATH: ${{ github.workspace }}/dependencies
-          TA_INCLUDE_PATH: ${{ github.workspace }}/dependencies/include
-          TA_LIBRARY_PATH: ${{ github.workspace }}/dependencies/lib
-      - name: Upload wheels
-        uses: actions/upload-artifact@v4
-        with:
-          name: wheels-macos-${{ matrix.target }}
-          path: dist
-      - name: Test wheel installation
-        run: |
-          pip install dist/*.whl
-          python -c "import polars_talib; print('Import successful')"
-
   macos:
     runs-on: macos-latest
     strategy:
       matrix:
-        target: [aarch64-apple-darwin] # x86_64, 
+        target: [x86_64, aarch64-apple-darwin] 
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -275,7 +238,7 @@ jobs:
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
-          name: wheels-macos-${{ matrix.target }}
+          name: wheels
           path: dist
       - name: Test wheel installation
         run: |
@@ -286,13 +249,11 @@ jobs:
     name: Release
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
-    needs: [linux, macos, windows, macos-intel, linux-arm]
+    needs: [linux, macos, windows, linux-arm]
     steps:
       - uses: actions/download-artifact@v4
         with:
-          path: dist
-          pattern: wheels-*
-          merge-multiple: true
+          name: wheels
       - name: Publish to PyPI
         uses: PyO3/maturin-action@v1
         env:
