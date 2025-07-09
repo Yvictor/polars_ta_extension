@@ -26,11 +26,9 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        target: [x86_64]
-        #, aarch64-unknown-linux-gnu]
-        #, aarch64, armv7]
+        target: [x86_64, aarch64-unknown-linux-gnu]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.10'
@@ -38,14 +36,14 @@ jobs:
         uses: astral-sh/setup-uv@v5
       - name: Install talib
         run: |
-          wget https://github.com/Yvictor/polars_ta_extension/releases/download/0.1.0/ta-lib-0.4.0-src.tar.gz
-          tar -xzf ta-lib-0.4.0-src.tar.gz
-          cd ta-lib
+          wget https://github.com/ta-lib/ta-lib/releases/download/v0.6.4/ta-lib-0.6.4-src.tar.gz
+          tar -xzf ta-lib-0.6.4-src.tar.gz
+          cd ta-lib-0.6.4
           ./configure
           make
           sudo make install
           cd ..
-          rm -rf ta-lib
+          rm -rf ta-lib-0.6.4
         env:
           TA_INCLUDE_PATH: ${{ github.workspace }}/dependencies/include
           TA_LIBRARY_PATH: ${{ github.workspace }}/dependencies/lib
@@ -58,7 +56,7 @@ jobs:
           TA_LIBRARY_PATH: ${{ github.workspace }}/dependencies/lib
       - name: Build wheels for x86_64
         if: matrix.target == 'x86_64'
-        uses: PyO3/maturin-action@v1.46.0
+        uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.target }}
           args: --release --out dist --find-interpreter
@@ -121,11 +119,10 @@ jobs:
           python -c "import polars_talib; print('Import successful')"
 
   linux-arm:
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        target: [aarch64]
-        # armv7l]
+        target: [aarch64-unknown-linux-gnu]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -133,25 +130,26 @@ jobs:
           python-version: "3.10"
       - name: install uv
         uses: astral-sh/setup-uv@v5
-      - name: install tools
-        run: |
-          uv tool install maturin
-      - name: Install talib
-        run: |
-          wget https://github.com/ta-lib/ta-lib/releases/download/v0.6.4/ta-lib-0.6.4-src.tar.gz
-          tar -xzf ta-lib-0.6.4-src.tar.gz
-          cd ta-lib-0.6.4
-          ./configure
-          make
-          sudo make install
-          cd ..
-          rm -rf ta-lib-0.6.4
-        env:
-          TA_INCLUDE_PATH: ${{ github.workspace }}/dependencies/include
-          TA_LIBRARY_PATH: ${{ github.workspace }}/dependencies/lib
-      - name: Build wheels
-        run: |
-          maturin build --release --out dist --find-interpreter
+      - name: Build wheels for aarch64
+        uses: PyO3/maturin-action@v1
+        with:
+          target: ${{ matrix.target }}
+          args: --release --out dist --find-interpreter
+          sccache: 'true'
+          manylinux: auto
+          docker-options: -e LIBCLANG_PATH=/usr/lib/llvm-14/lib/ -e LIBCLANG_STATIC_PATH=/usr/lib/llvm-14/lib/ -e CLANG_PATH=/usr/lib/llvm-14/bin/clang
+          before-script-linux: |
+            # If we're running on debian-based system.
+            apt update -y && apt-get install -y libssl-dev openssl pkg-config libclang-dev gcc-multilib
+            # Download and build ta-lib
+            wget https://github.com/ta-lib/ta-lib/releases/download/v0.6.4/ta-lib-0.6.4-src.tar.gz
+            tar -xzf ta-lib-0.6.4-src.tar.gz
+            cd ta-lib-0.6.4
+            ./configure
+            make
+            make install
+            cd ..
+            rm -rf ta-lib-0.6.4
         env:
           DEPS_PATH: ${{ github.workspace }}/dependencies
           TA_INCLUDE_PATH: ${{ github.workspace }}/dependencies/include
@@ -171,9 +169,9 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        target: [x64, x86]
+        target: [x64, arm64]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.10'
@@ -218,7 +216,7 @@ jobs:
       matrix:
         target: [x86_64]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.10'
@@ -253,7 +251,7 @@ jobs:
       matrix:
         target: [aarch64-apple-darwin] # x86_64, 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.10'
@@ -288,7 +286,7 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/')
     needs: [linux, macos, windows, macos-intel, linux-arm]
     steps:
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           path: dist
           pattern: wheels-*
