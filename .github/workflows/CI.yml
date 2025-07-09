@@ -167,10 +167,18 @@ jobs:
         with:
           name: wheels-linux-arm-${{ matrix.target }}
           path: dist
-      # - name: Test wheel installation
-      #   run: |
-      #     pip install dist/*.whl
-      #     python -c "import polars_talib; print('Import successful')"
+      - name: Test wheel installation
+        uses: uraimo/run-on-arch-action@v3
+        with:
+          arch: ${{ matrix.target }}
+          distro: ubuntu22.04
+          githubToken: ${{ github.token }}
+          install: |
+            apt update
+            apt install -y python3 python3-pip
+          run: |
+            pip3 install dist/*.whl
+            python3 -c "import polars_talib; print('Import successful')"
 
 
   windows:
@@ -212,21 +220,18 @@ jobs:
         with:
           name: wheels-windows-${{ matrix.target }}
           path: dist
-      - name: Test wheel installation
+      - name: Test wheel installation (x64 only)
+        if: matrix.target == 'x64'
         run: |
           pip install dist/*.whl
           python -c "import polars_talib; print('Import successful')"
         shell: bash
 
   macos:
-    runs-on: ${{ matrix.os }}
+    runs-on: macos-latest
     strategy:
       matrix:
-        include:
-          - target: x86_64
-            os: macos-12
-          - target: aarch64
-            os: macos-latest 
+        target: [x86_64, aarch64]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -252,7 +257,8 @@ jobs:
         with:
           name: wheels-macos-${{ matrix.target }}
           path: dist
-      - name: Test wheel installation
+      - name: Test wheel installation (aarch64 only)
+        if: matrix.target == 'aarch64'
         run: |
           pip install dist/*.whl
           python -c "import polars_talib; print('Import successful')"
