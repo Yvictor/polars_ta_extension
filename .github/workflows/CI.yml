@@ -138,7 +138,7 @@ jobs:
           githubToken: ${{ github.token }}
           install: |
             apt update
-            apt install -y libclang-dev build-essential curl wget
+            apt install -y libclang-dev build-essential curl wget pkg-config
             curl https://sh.rustup.rs -sSf | sh -s -- --default-toolchain stable -y
             echo 'source $HOME/.cargo/env' >> $HOME/.bashrc
             curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -150,17 +150,26 @@ jobs:
             wget https://github.com/ta-lib/ta-lib/releases/download/v0.6.4/ta-lib-0.6.4-src.tar.gz
             tar -xzf ta-lib-0.6.4-src.tar.gz
             cd ta-lib-0.6.4
-            ./configure
+            ./configure --prefix=/usr/local
             make
             make install
+            ldconfig
             cd ..
             rm -rf ta-lib-0.6.4
           run: |
-            export DEPS_PATH=${{ github.workspace }}/dependencies
-            export TA_INCLUDE_PATH=${{ github.workspace }}/dependencies/include
-            export TA_LIBRARY_PATH=${{ github.workspace }}/dependencies/lib
+            export DEPS_PATH=$PWD/dependencies
+            export TA_INCLUDE_PATH=$PWD/dependencies/include  
+            export TA_LIBRARY_PATH=$PWD/dependencies/lib
+            export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:/usr/lib/pkgconfig
+            export LIBRARY_PATH=/usr/local/lib:/usr/lib
             source $HOME/.cargo/env
             export PATH="$HOME/.local/bin:$PATH"
+            # Check if ta-lib is installed system-wide
+            if pkg-config --exists talib 2>/dev/null; then
+              echo "Using system ta-lib"
+              export TA_INCLUDE_PATH=$(pkg-config --cflags-only-I talib | sed 's/-I//g')
+              export TA_LIBRARY_PATH=$(pkg-config --libs-only-L talib | sed 's/-L//g')
+            fi
             uv run maturin build --release --out dist --find-interpreter
       - name: Upload wheels
         uses: actions/upload-artifact@v4
