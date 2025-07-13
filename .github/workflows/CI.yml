@@ -49,7 +49,7 @@ jobs:
           TA_LIBRARY_PATH: ${{ github.workspace }}/dependencies/lib
       - name: Test
         run: |
-          uv run pytest
+          uv run --extra test pytest
         env:
           DEPS_PATH: ${{ github.workspace }}/dependencies
           TA_INCLUDE_PATH: ${{ github.workspace }}/dependencies/include
