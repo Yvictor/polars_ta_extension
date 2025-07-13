@@ -39,6 +39,12 @@ dev = [
     "hypothesis",
     "pytest-memray==1.4.0; python_version >= '3.8'",
     "pytest-benchmark",
+]
+
+
+[project.optional-dependencies]
+test = [
+    "pytest>=7.4.4",
     "ta-lib==0.5.3",
 ]
 

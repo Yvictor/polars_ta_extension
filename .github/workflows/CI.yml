@@ -27,10 +27,8 @@ jobs:
     strategy:
       matrix:
         target: [x86_64]
-        #, aarch64-unknown-linux-gnu]
-        #, aarch64, armv7]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.10'
@@ -51,7 +49,7 @@ jobs:
           TA_LIBRARY_PATH: ${{ github.workspace }}/dependencies/lib
       - name: Test
         run: |
-          uv run pytest
+          uv run --extra test pytest
         env:
           DEPS_PATH: ${{ github.workspace }}/dependencies
           TA_INCLUDE_PATH: ${{ github.workspace }}/dependencies/include
@@ -111,52 +109,85 @@ jobs:
           TA_INCLUDE_PATH: ${{ github.workspace }}/dependencies/include
           TA_LIBRARY_PATH: ${{ github.workspace }}/dependencies/lib
       - name: Upload wheels
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: wheels
+          name: wheels-linux-${{ matrix.target }}
           path: dist
+      - name: Test wheel installation
+        run: |
+          pip install dist/*.whl
+          python -c "import polars_talib; print('Import successful')"
 
   linux-arm:
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         target: [aarch64]
-        # armv7l]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.10"
-      - name: install uv
-        uses: astral-sh/setup-uv@v5
-      - name: install tools
-        run: |
-          uv tool install maturin
-      - name: Install talib
-        run: |
-          wget https://github.com/ta-lib/ta-lib/releases/download/v0.6.4/ta-lib-0.6.4-src.tar.gz
-          tar -xzf ta-lib-0.6.4-src.tar.gz
-          cd ta-lib-0.6.4
-          ./configure
-          make
-          sudo make install
-          cd ..
-          rm -rf ta-lib-0.6.4
-        env:
-          TA_INCLUDE_PATH: ${{ github.workspace }}/dependencies/include
-          TA_LIBRARY_PATH: ${{ github.workspace }}/dependencies/lib
-      - name: Build wheels
-        run: |
-          maturin build --release --out dist --find-interpreter
-        env:
-          DEPS_PATH: ${{ github.workspace }}/dependencies
-          TA_INCLUDE_PATH: ${{ github.workspace }}/dependencies/include
-          TA_LIBRARY_PATH: ${{ github.workspace }}/dependencies/lib
-      - name: Upload wheels
-        uses: actions/upload-artifact@v3
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
-          name: wheels
+          toolchain: stable
+      - uses: uraimo/run-on-arch-action@v3
+        with:
+          arch: ${{ matrix.target }}
+          distro: ubuntu22.04
+          githubToken: ${{ github.token }}
+          install: |
+            apt update
+            apt install -y libclang-dev build-essential curl wget pkg-config
+            curl https://sh.rustup.rs -sSf | sh -s -- --default-toolchain stable -y
+            echo 'source $HOME/.cargo/env' >> $HOME/.bashrc
+            curl -LsSf https://astral.sh/uv/install.sh | sh
+            echo 'export PATH="$HOME/.local/bin:$PATH"' >> $HOME/.bashrc
+            export PATH="$HOME/.local/bin:$PATH"
+            uv python install 3.10
+            uv tool install maturin
+            # Download and build ta-lib
+            wget https://github.com/ta-lib/ta-lib/releases/download/v0.6.4/ta-lib-0.6.4-src.tar.gz
+            tar -xzf ta-lib-0.6.4-src.tar.gz
+            cd ta-lib-0.6.4
+            ./configure --prefix=/usr/local
+            make
+            make install
+            ldconfig
+            cd ..
+            rm -rf ta-lib-0.6.4
+          run: |
+            export DEPS_PATH=$PWD/dependencies
+            export TA_INCLUDE_PATH=$PWD/dependencies/include  
+            export TA_LIBRARY_PATH=$PWD/dependencies/lib
+            export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:/usr/lib/pkgconfig
+            export LIBRARY_PATH=/usr/local/lib:/usr/lib
+            source $HOME/.cargo/env
+            export PATH="$HOME/.local/bin:$PATH"
+            # Check if ta-lib is installed system-wide
+            if pkg-config --exists talib 2>/dev/null; then
+              echo "Using system ta-lib"
+              export TA_INCLUDE_PATH=$(pkg-config --cflags-only-I talib | sed 's/-I//g')
+              export TA_LIBRARY_PATH=$(pkg-config --libs-only-L talib | sed 's/-L//g')
+            fi
+            uv run maturin build --release --out dist --find-interpreter
+      - name: Upload wheels
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheels-linux-arm-${{ matrix.target }}
           path: dist
+      - name: Test wheel installation
+        uses: uraimo/run-on-arch-action@v3
+        with:
+          arch: ${{ matrix.target }}
+          distro: ubuntu22.04
+          githubToken: ${{ github.token }}
+          install: |
+            apt update
+            apt install -y python3 python3-pip
+          run: |
+            pip3 install dist/*.whl
+            python3 -c "import polars_talib; print('Import successful')"
 
 
   windows:
@@ -165,7 +196,7 @@ jobs:
       matrix:
         target: [x64, x86]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.10'
@@ -194,18 +225,24 @@ jobs:
           TA_INCLUDE_PATH: ${{ github.workspace }}\dependencies\include
           TA_LIBRARY_PATH: ${{ github.workspace }}\dependencies\lib
       - name: Upload wheels
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: wheels
+          name: wheels-windows-${{ matrix.target }}
           path: dist
+      - name: Test wheel installation (x64 only)
+        if: matrix.target == 'x64'
+        run: |
+          pip install dist/*.whl
+          python -c "import polars_talib; print('Import successful')"
+        shell: bash
 
   macos:
     runs-on: macos-latest
     strategy:
       matrix:
-        target: [x86_64, aarch64-apple-darwin]
+        target: [x86_64, aarch64]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.10'
@@ -225,20 +262,26 @@ jobs:
           TA_INCLUDE_PATH: ${{ github.workspace }}/dependencies/include
           TA_LIBRARY_PATH: ${{ github.workspace }}/dependencies/lib
       - name: Upload wheels
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: wheels
+          name: wheels-macos-${{ matrix.target }}
           path: dist
+      - name: Test wheel installation (aarch64 only)
+        if: matrix.target == 'aarch64'
+        run: |
+          pip install dist/*.whl
+          python -c "import polars_talib; print('Import successful')"
 
   release:
     name: Release
     runs-on: ubuntu-latest
-    if: "startsWith(github.ref, 'refs/tags/')"
-    needs: [linux, macos, windows]
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: [linux, macos, windows, linux-arm]
     steps:
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
-          name: wheels
+          pattern: wheels-*
+          merge-multiple: true
       - name: Publish to PyPI
         uses: PyO3/maturin-action@v1
         env:

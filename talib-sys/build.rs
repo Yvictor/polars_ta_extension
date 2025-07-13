@@ -170,9 +170,34 @@ fn main() {
         }
     }
 
-    println!("cargo:rustc-link-lib=static=ta_lib");
-    println!("cargo:rustc-link-search=native={ta_library_path}");
-    println!("cargo:rustc-link-search=native=../dependencies/lib");
+    // Try to use pkg-config first for system-installed ta-lib
+    let os = std::env::consts::OS;
+    if os != "windows" && Command::new("pkg-config")
+        .args(&["--exists", "talib"])
+        .output()
+        .map(|output| output.status.success())
+        .unwrap_or(false)
+    {
+        println!("cargo:rustc-link-lib=ta_lib");
+        if let Ok(output) = Command::new("pkg-config")
+            .args(&["--libs-only-L", "talib"])
+            .output()
+        {
+            let lib_dirs = String::from_utf8_lossy(&output.stdout);
+            for lib_dir in lib_dirs.split_whitespace() {
+                if let Some(path) = lib_dir.strip_prefix("-L") {
+                    println!("cargo:rustc-link-search=native={}", path);
+                }
+            }
+        }
+        // Add standard system paths as fallback
+        println!("cargo:rustc-link-search=native=/usr/local/lib");
+        println!("cargo:rustc-link-search=native=/usr/lib");
+    } else {
+        println!("cargo:rustc-link-lib=static=ta_lib");
+        println!("cargo:rustc-link-search=native={ta_library_path}");
+        println!("cargo:rustc-link-search=native=../dependencies/lib");
+    }
     // let cb = ParseCallbacks::add_derives();
     let bindings = bindgen::Builder::default()
         // The input header we would like to generate
