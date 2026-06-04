@@ -26,6 +26,17 @@ where
     (vec, ptr)
 }
 
+pub fn make_default_vec<T>(len: usize) -> Vec<T>
+where
+    T: Copy + CustomDefault,
+{
+    vec![T::default(); len]
+}
+
+pub fn cannot_produce_output(len: usize, lookback: i32) -> bool {
+    lookback >= 0 && (lookback as usize) >= len
+}
+
 pub fn check_begin_idx1(len: usize, arr_ptr: *const f64) -> usize {
     let mut begin_idx = 0;
     for i in 0..len {
