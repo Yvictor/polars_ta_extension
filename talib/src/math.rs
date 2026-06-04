@@ -1,5 +1,8 @@
-use crate::utils::{check_begin_idx2, check_begin_idx1};
-use crate::{common::TimePeriodKwargs, utils::make_vec};
+use crate::utils::{check_begin_idx1, check_begin_idx2};
+use crate::{
+    common::TimePeriodKwargs,
+    utils::{cannot_produce_output, make_default_vec, make_vec},
+};
 
 use talib_sys::{TA_ACOS_Lookback, TA_ACOS};
 use talib_sys::{TA_ADD_Lookback, TA_Integer, TA_RetCode, TA_ADD};
@@ -118,6 +121,12 @@ pub fn ta_max(
     let begin_idx = check_begin_idx1(len, real_ptr) as i32;
     let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_MAX_Lookback(kwargs.timeperiod) };
+    if lookback < 0 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if cannot_produce_output(len, lookback) {
+        return Ok(make_default_vec(len));
+    }
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_MAX(
@@ -158,6 +167,12 @@ pub fn ta_maxindex(
     let begin_idx = check_begin_idx1(len, real_ptr) as i32;
     let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_MAXINDEX_Lookback(kwargs.timeperiod) };
+    if lookback < 0 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if cannot_produce_output(len, lookback) {
+        return Ok(make_default_vec(len));
+    }
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_MAXINDEX(
@@ -198,6 +213,12 @@ pub fn ta_min(
     let begin_idx = check_begin_idx1(len, real_ptr) as i32;
     let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_MIN_Lookback(kwargs.timeperiod) };
+    if lookback < 0 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if cannot_produce_output(len, lookback) {
+        return Ok(make_default_vec(len));
+    }
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_MIN(
@@ -238,6 +259,12 @@ pub fn ta_minindex(
     let begin_idx = check_begin_idx1(len, real_ptr) as i32;
     let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_MININDEX_Lookback(kwargs.timeperiod) };
+    if lookback < 0 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if cannot_produce_output(len, lookback) {
+        return Ok(make_default_vec(len));
+    }
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_MININDEX(
@@ -278,6 +305,12 @@ pub fn ta_minmax(
     let begin_idx = check_begin_idx1(len, real_ptr) as i32;
     let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_MINMAX_Lookback(kwargs.timeperiod) };
+    if lookback < 0 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if cannot_produce_output(len, lookback) {
+        return Ok((make_default_vec(len), make_default_vec(len)));
+    }
     let (mut out_min, ptr_min) = make_vec(len, lookback);
     let (mut out_max, ptr_max) = make_vec(len, lookback);
     let ret_code = unsafe {
@@ -326,6 +359,12 @@ pub fn ta_minmaxindex(
     let begin_idx = check_begin_idx1(len, real_ptr) as i32;
     let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_MINMAXINDEX_Lookback(kwargs.timeperiod) };
+    if lookback < 0 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if cannot_produce_output(len, lookback) {
+        return Ok((make_default_vec(len), make_default_vec(len)));
+    }
     let (mut out_min, ptr_min) = make_vec(len, lookback);
     let (mut out_max, ptr_max) = make_vec(len, lookback);
     let ret_code = unsafe {
@@ -446,6 +485,12 @@ pub fn ta_sum(
     let begin_idx = check_begin_idx1(len, real_ptr) as i32;
     let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_SUM_Lookback(kwargs.timeperiod) };
+    if lookback < 0 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if cannot_produce_output(len, lookback) {
+        return Ok(make_default_vec(len));
+    }
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_SUM(

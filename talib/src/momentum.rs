@@ -1,5 +1,8 @@
 use crate::utils::{check_begin_idx1, check_begin_idx2, check_begin_idx3, check_begin_idx4};
-use crate::{common::TimePeriodKwargs, utils::make_vec};
+use crate::{
+    common::TimePeriodKwargs,
+    utils::{cannot_produce_output, make_default_vec, make_vec},
+};
 use derive_builder::Builder;
 use serde::Deserialize;
 use talib_sys::{TA_ADXR_Lookback, TA_ADXR};
@@ -452,6 +455,16 @@ pub fn ta_macd(
     let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx
         + unsafe { TA_MACD_Lookback(kwargs.fastperiod, kwargs.slowperiod, kwargs.signalperiod) };
+    if lookback < 0 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if cannot_produce_output(len, lookback) {
+        return Ok((
+            make_default_vec(len),
+            make_default_vec(len),
+            make_default_vec(len),
+        ));
+    }
     let (mut outmacd, ptr1) = make_vec(len, lookback);
     let (mut outmacdsignal, ptr2) = make_vec(len, lookback);
     let (mut outmacdhist, ptr3) = make_vec(len, lookback);
@@ -519,6 +532,16 @@ pub fn ta_macdext(
                 kwargs.signalmatype,
             )
         };
+    if lookback < 0 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if cannot_produce_output(len, lookback) {
+        return Ok((
+            make_default_vec(len),
+            make_default_vec(len),
+            make_default_vec(len),
+        ));
+    }
     let (mut outmacd, ptr1) = make_vec(len, lookback);
     let (mut outmacdsignal, ptr2) = make_vec(len, lookback);
     let (mut outmacdhist, ptr3) = make_vec(len, lookback);
@@ -571,6 +594,16 @@ pub fn ta_macdfix(
     let begin_idx = check_begin_idx1(len, input_ptr) as i32;
     let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_MACDFIX_Lookback(kwargs.signalperiod) };
+    if lookback < 0 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if cannot_produce_output(len, lookback) {
+        return Ok((
+            make_default_vec(len),
+            make_default_vec(len),
+            make_default_vec(len),
+        ));
+    }
     let (mut outmacd, ptr1) = make_vec(len, lookback);
     let (mut outmacdsignal, ptr2) = make_vec(len, lookback);
     let (mut outmacdhist, ptr3) = make_vec(len, lookback);
