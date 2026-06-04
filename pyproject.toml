@@ -1,6 +1,6 @@
 [project]
 name = "polars-talib"
-version = "0.1.5"
+version = "0.1.6"
 description = "Polars extension for Ta-Lib: Support Ta-Lib functions in Polars expressions"
 readme = "README.md"
 authors = [
