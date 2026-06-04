@@ -670,7 +670,7 @@ wheels = [
 
 [[package]]
 name = "polars-talib"
-version = "0.1.5"
+version = "0.1.6"
 source = { editable = "." }
 dependencies = [
     { name = "polars", version = "0.18.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.8'" },
