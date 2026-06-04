@@ -111,9 +111,9 @@ jobs:
           TA_INCLUDE_PATH: ${{ github.workspace }}/dependencies/include
           TA_LIBRARY_PATH: ${{ github.workspace }}/dependencies/lib
       - name: Upload wheels
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: wheels
+          name: wheels-linux-${{ matrix.target }}
           path: dist
 
   linux-arm:
@@ -153,9 +153,9 @@ jobs:
           TA_INCLUDE_PATH: ${{ github.workspace }}/dependencies/include
           TA_LIBRARY_PATH: ${{ github.workspace }}/dependencies/lib
       - name: Upload wheels
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: wheels
+          name: wheels-linux-arm-${{ matrix.target }}
           path: dist
 
 
@@ -194,9 +194,9 @@ jobs:
           TA_INCLUDE_PATH: ${{ github.workspace }}\dependencies\include
           TA_LIBRARY_PATH: ${{ github.workspace }}\dependencies\lib
       - name: Upload wheels
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: wheels
+          name: wheels-windows-${{ matrix.target }}
           path: dist
 
   macos:
@@ -225,9 +225,9 @@ jobs:
           TA_INCLUDE_PATH: ${{ github.workspace }}/dependencies/include
           TA_LIBRARY_PATH: ${{ github.workspace }}/dependencies/lib
       - name: Upload wheels
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: wheels
+          name: wheels-macos-${{ matrix.target }}
           path: dist
 
   release:
@@ -236,9 +236,10 @@ jobs:
     if: "startsWith(github.ref, 'refs/tags/')"
     needs: [linux, macos, windows]
     steps:
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
-          name: wheels
+          pattern: wheels-*
+          merge-multiple: true
       - name: Publish to PyPI
         uses: PyO3/maturin-action@v1
         env:
