@@ -12,7 +12,7 @@ def main():
     p.add_argument('--output',type=Path)
     args=p.parse_args()
     before=json.loads(args.baseline.read_text());after=json.loads(args.candidate.read_text())
-    for key in ('python','platform','polars','threads','affinity','repeats'):
+    for key in ('python','platform','cpu_model','numpy','polars','threads','affinity','repeats'):
         if before.get(key)!=after.get(key):p.error(f'incomparable {key}: {before.get(key)} != {after.get(key)}')
     rows=['| Query / rows | 0.1.6 median ms | 0.2.0 median ms | Speedup |', '| --- | ---: | ---: | ---: |']
     regressions=[]

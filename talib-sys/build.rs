@@ -32,6 +32,11 @@ fn main() {
             arch => panic!("unsupported Windows architecture: {arch}"),
         };
         config.env("Platform", platform);
+        if env::var("CARGO_CFG_TARGET_ENV").unwrap() == "msvc" {
+            // cmake-rs synthesizes CMAKE_C_FLAGS_RELEASE for MSVC and strips
+            // cc's optimization flags. Restore optimization explicitly.
+            config.cflag("/O2");
+        }
     }
     let dst = config
         .profile("Release")

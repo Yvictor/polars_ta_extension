@@ -56,7 +56,10 @@ def main():
                     samples.append(elapsed/1e6)
             finally: gc.enable()
             results[f'{name}/{size}']={'median_ms':statistics.median(samples),'min_ms':min(samples),'samples_ms':samples}
-    payload={'python':platform.python_version(), 'platform':platform.platform(), 'cpu':platform.processor(),
+    cpu_model=platform.processor()
+    if Path('/proc/cpuinfo').is_file():
+        cpu_model=next((line.split(':',1)[1].strip() for line in Path('/proc/cpuinfo').read_text().splitlines() if line.startswith('model name')),cpu_model)
+    payload={'cpu_model':cpu_model, 'numpy':np.__version__, 'python':platform.python_version(), 'platform':platform.platform(), 'cpu':platform.processor(),
              'polars':pl.__version__, 'talib':ta.__talib_version__, 'threads':pl.thread_pool_size(),
              'package':version('polars-talib'), 'affinity':sorted(os.sched_getaffinity(0)) if hasattr(os,'sched_getaffinity') else None, 'repeats':args.repeats, 'results':results}
     args.output.parent.mkdir(parents=True,exist_ok=True)

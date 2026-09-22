@@ -9,7 +9,8 @@ a claim of a globally optimal implementation or identical speedups on every CPU.
 Run `scripts/benchmark.py` in two isolated environments, one with the published
 `polars-talib==0.1.6` wheel and one with the candidate 0.2.0 release wheel. Install
 the same Polars and NumPy versions in both. The recorded runs use Python 3.12.7,
-Polars 1.44.2, NumPy 2.5.3, 4 Polars threads, CPU affinity 28–31, seed 26,
+AMD Ryzen 9 9950X 16-Core Processor, Polars 1.44.2, NumPy 2.5.3, 4 Polars threads,
+CPU affinity 28–31, seed 26,
 three warmups and 51 timed samples per query. Each measurement executes a lazy
 query through `collect()` and consumes its output. Times are medians in milliseconds.
 
@@ -65,7 +66,8 @@ because it slowed the null-heavy case. Chunked and cast inputs still need their
 required materialization. Outputs transfer Rust vectors into Polars without a
 Python per-row callback.
 
-The published wheels retain portable CPU settings. We do not enable unsafe
+The published wheels retain portable CPU settings. MSVC explicitly receives
+`/O2` because cmake-rs replaces the default Release flags for that generator. We do not enable unsafe
 floating-point fast-math, native-only instruction sets, or approximations to
 improve a benchmark. The 201-indicator correctness suite remains the first gate.
 

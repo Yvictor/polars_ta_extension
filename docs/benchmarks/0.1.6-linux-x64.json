@@ -1382,5 +1382,7 @@
         3.654414
       ]
     }
-  }
+  },
+  "cpu_model": "AMD Ryzen 9 9950X 16-Core Processor",
+  "numpy": "2.5.3"
 }

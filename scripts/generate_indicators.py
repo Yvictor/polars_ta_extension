@@ -90,6 +90,12 @@ def generate():
     py += [f'    namespace.{f["name"]} = _expr_{f["name"]}' for f in added]
     for path,lines in [('talib/src/generated.rs',rust),('src/generated.rs',plugin),('python/polars_talib/_generated.py',py)]:
         (ROOT/path).write_text('\n'.join(lines)+'\n')
+    catalog = ['# Indicator catalog', '', 'Generated from the pinned TA-Lib 0.8.1 API. All 201 functions are available as', '`polars_talib.<name>` and `pl.col(...).ta.<name>`. Use `inspect.signature`', 'for Python argument order and `get_functions_output_struct()` for Struct fields.', '']
+    for group in dict.fromkeys(f['group'] for f in api):
+        catalog += ['## '+group, '', '| Function | Description |', '| --- | --- |']
+        catalog += [f"| `{f['name']}` | {f['description']} |" for f in api if f['group']==group]
+        catalog.append('')
+    (ROOT/'docs/indicators.md').write_text('\n'.join(catalog)+'\n')
     import subprocess
     subprocess.run(['rustfmt', str(ROOT/'src/generated.rs'), str(ROOT/'talib/src/generated.rs')], check=True)
     print(f'Generated {len(added)} new indicators')

@@ -120,10 +120,12 @@ jobs:
           python-version: '3.12'
       - uses: astral-sh/setup-uv@v8.2.0
       - run: uv pip install --system maturin 'cmake>=4.2,<5' pytest numpy 'TA-Lib==0.8.1' 'polars==1.44.2' pytest-benchmark
+      - name: Check Python dependency lock
+        run: uv lock --check
       - name: Check generated wrappers are current
         run: |
           python scripts/generate_indicators.py
-          git diff --exit-code -- src/generated.rs talib/src/generated.rs python/polars_talib/_generated.py
+          git diff --exit-code -- src/generated.rs talib/src/generated.rs python/polars_talib/_generated.py docs/indicators.md
       - name: Rust crate tests
         run: cargo test --manifest-path talib/Cargo.toml
       - name: Build source distribution and install it without system TA-Lib
