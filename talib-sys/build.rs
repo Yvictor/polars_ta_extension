@@ -20,14 +20,26 @@ fn main() {
             .unpack(&out)
             .expect("extract vendored TA-Lib");
     }
-    let dst = cmake::Config::new(&source)
+    let windows = env::var("CARGO_CFG_TARGET_OS").unwrap() == "windows";
+    let mut config = cmake::Config::new(&source);
+    if windows {
+        // Cargo/CMake discover MSVC without vcvarsall, but upstream requires this
+        // variable even with an explicit Visual Studio generator architecture.
+        let platform = match env::var("CARGO_CFG_TARGET_ARCH").unwrap().as_str() {
+            "x86_64" => "x64",
+            "aarch64" => "ARM64",
+            "x86" => "Win32",
+            arch => panic!("unsupported Windows architecture: {arch}"),
+        };
+        config.env("Platform", platform);
+    }
+    let dst = config
         .profile("Release")
         .define("BUILD_SHARED_LIBS", "OFF")
         .define("BUILD_STATIC_LIBS", "ON")
         .define("BUILD_DEV_TOOLS", "OFF")
         .define("CMAKE_POSITION_INDEPENDENT_CODE", "ON")
         .build();
-    let windows = env::var("CARGO_CFG_TARGET_OS").unwrap() == "windows";
     println!(
         "cargo:rustc-link-search=native={}",
         dst.join("lib").display()
