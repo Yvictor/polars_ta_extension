@@ -119,7 +119,14 @@ Single expression on 50k rows, best of 7 runs (Linux x86_64, 4 cores), see
 | `macd().over("symbol")` (50 symbols) | 1.677 ms | 1.355 ms | 1.2x |
 | `kdj()` / `supertrend()` / `vwap()` | - | 0.85 / 0.67 / 0.26 ms | new |
 
-The remaining functions are within measurement noise of 0.1.6.
+Two functions got slower in upstream TA-Lib 0.8.1 itself (measured at the C
+level, independent of this wrapper): `ht_trendline` (3.2 → 4.3 ms, 0.73x) and
+`cdlengulfing` (0.30 → 0.32 ms, 0.93x). Everything else is within noise.
+
+The wrapper layer was not changed for existing functions; the per-call overhead
+on top of the C core (Polars expression evaluation plus the output allocation)
+is the same in 0.1.6 and 0.2.0: about 0.03 ms for single-input and 0.13 to
+0.2 ms for three-input functions on 50k rows.
 
 ## Supported Indicators and Functions
 
