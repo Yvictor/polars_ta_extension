@@ -173,6 +173,71 @@ def test_installed_wheel_contains_upstream_license():
     assert dist.locate_file(licenses[0]).read_bytes()==(Path(__file__).parents[1]/'talib-sys/vendor/TA-Lib-LICENSE').read_bytes()
 
 
+def test_installed_wheel_is_typed():
+    # Issue #28: static type checkers need the py.typed marker to read the annotations.
+    from importlib.metadata import distribution
+    dist = distribution('polars-talib')
+    direct_url = dist.read_text('direct_url.json')
+    editable = bool(direct_url) and json.loads(direct_url).get('dir_info', {}).get('editable', False)
+    if not editable:  # an editable install lists no package files
+        assert len([f for f in dist.files if f.name == 'py.typed']) == 1
+    assert (Path(ta.__file__).parent/'py.typed').exists()
+
+
+def test_extension_has_no_dynamic_talib_dependency():
+    # Issues #24 and #36: TA-Lib is linked statically, so importing the wheel never
+    # depends on a system libta_lib that the dynamic loader must locate.
+    from importlib.machinery import EXTENSION_SUFFIXES
+    binaries = [p for p in Path(ta.__file__).parent.iterdir()
+                if any(p.name.endswith(s) for s in EXTENSION_SUFFIXES)]
+    assert binaries
+    for binary in binaries:
+        data = binary.read_bytes()
+        for name in (b'libta_lib.so', b'libta-lib.so', b'libta_lib.dylib', b'libta-lib.dylib',
+                     b'ta_lib.dll', b'ta-lib.dll'):
+            assert name not in data, (binary.name, name)
+
+
+def test_namespace_methods_are_class_attributes():
+    # Issue #28: every namespace method is a class member, so type checkers resolve it.
+    for name in ta.get_functions():
+        assert inspect.isfunction(inspect.getattr_static(ta.TAExpr, name)), name
+
+
+def test_col_returns_the_namespace():
+    df = frame(64)
+    assert isinstance(ta.col('close'), ta.TAExpr)
+    assert df.select(ta.col('close').ema(5)).equals(df.select(pl.col('close').ta.ema(5)))
+    assert df.select(ta.col('close').hma(9)).equals(df.select(pl.col('close').ta.hma(9)))
+    shifted = pl.col('close') + 5
+    assert df.select(ta.col(shifted).rsi(7)).equals(df.select(shifted.ta.rsi(7)))
+    assert df.select(ta.col('open').cdl2crows(pl.col('high'), pl.col('low'), pl.col('close'))).equals(
+        df.select(pl.col('open').ta.cdl2crows(pl.col('high'), pl.col('low'), pl.col('close'))))
+
+
+def test_cci_over_groups_in_chunked_lazy_frames_is_deterministic():
+    # Issue #11: repeated runs of the same query must give identical, upstream-matching values,
+    # including multi-chunk inputs, groups shorter than the lookback and lazy filters.
+    rng = np.random.default_rng(11)
+    parts = []
+    for symbol, n in (('AAA', 40), ('BBB', 3), ('CCC', 40)):
+        parts.append(pl.DataFrame({'symbol': [symbol]*n, 'day': np.arange(n),
+                                   'high': rng.random(n)+10, 'low': rng.random(n)+9,
+                                   'close': rng.random(n)+9.5}))
+    df = pl.concat(parts, rechunk=False)
+    assert df['close'].n_chunks() == 3
+    query = df.lazy().filter(pl.col('day') >= 0).with_columns(
+        pl.col('close').ta.cci(pl.col('high'), pl.col('low'), timeperiod=7).over('symbol').alias('cci'))
+    first = query.collect()
+    for _ in range(10):
+        assert query.collect().equals(first)
+    for symbol, n in (('AAA', 40), ('BBB', 3), ('CCC', 40)):
+        group = first.filter(pl.col('symbol') == symbol)
+        expected = talib.CCI(group['high'].to_numpy(), group['low'].to_numpy(),
+                             group['close'].to_numpy(), timeperiod=7)
+        np.testing.assert_allclose(group['cci'].to_numpy(), expected, equal_nan=True)
+
+
 @pytest.mark.parametrize('spec', [f for f in API if len(f['inputs']) > 1], ids=lambda f: f['name'])
 @pytest.mark.parametrize('scalar_first', [False, True])
 def test_empty_columns_broadcast_scalars_in_either_position(spec, scalar_first):
@@ -190,10 +255,21 @@ def test_non_scalar_length_mismatch_in_either_position(fn, lengths):
 
 
 @pytest.mark.parametrize('fn', [ta.ema, ta.hma])
-@pytest.mark.parametrize('value', [14.0, '14', None, True])
+@pytest.mark.parametrize('value', ['14', None, True])
 def test_integer_parameters_report_clear_errors(fn, value):
     with pytest.raises(TypeError, match='timeperiod must be an integer'):
         fn(timeperiod=value)
+
+
+@pytest.mark.parametrize('fn', [ta.ema, ta.hma])
+def test_whole_number_float_parameters_are_accepted(fn):
+    # Issue #6: upstream TA-Lib accepts a float period, so whole-number floats convert.
+    expected = frame().select(fn(timeperiod=14))
+    assert frame().select(fn(timeperiod=14.0)).equals(expected)
+    assert frame().select(fn(timeperiod=np.float64(14))).equals(expected)
+    for value in (14.5, float('nan'), float('inf')):
+        with pytest.raises(ValueError, match='whole number'):
+            fn(timeperiod=value)
 
 
 @pytest.mark.parametrize('fn', [ta.ema, ta.hma])

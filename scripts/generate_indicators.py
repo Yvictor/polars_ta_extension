@@ -36,6 +36,7 @@ def generate():
         "lib = Path(__file__).parent",
         "",
     ]
+    methods = []
     groups = {}
     structs = {}
     for f in added:
@@ -179,15 +180,17 @@ def generate():
             + ", ".join(f'"{p["name"]}": {p["name"]}' for p in params)
             + "})",
             "",
-            f"_call_{n} = {n}",
+            f"_call_{n} = {n}",  # parameters such as percentile's `percentile` shadow the function
             "",
-            f"def _expr_{n}("
+        ]
+        methods += [
+            f"    def {n}("
             + ", ".join(
                 ["self"] + [f"{i}: pl.Expr = {default(i)}" for i in inputs if i != primary] + ps
             )
             + ") -> pl.Expr:",
-            f'    """{doc} The receiver is {primary}."""',
-            f"    return _call_{n}("
+            f'        """{doc} The receiver is {primary}."""',
+            f"        return _call_{n}("
             + ", ".join(f"{i}=" + ("self._expr" if i == primary else i) for i in inputs)
             + (", " if params else "")
             + ", ".join(f"{p['name']}={p['name']}" for p in params)
@@ -199,9 +202,13 @@ def generate():
         "GROUPS = " + repr(groups),
         "STRUCTS = " + repr(structs),
         "",
-        "def install(namespace):",
+        "class TAExprMixin:",
+        '    """Namespace methods for indicators added after TA-Lib 0.4.0."""',
+        "",
+        "    _expr: pl.Expr",
+        "",
     ]
-    py += [f"    namespace.{f['name']} = _expr_{f['name']}" for f in added]
+    py += methods
     for path, lines in [
         ("talib/src/generated.rs", rust),
         ("src/generated.rs", plugin),

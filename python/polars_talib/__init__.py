@@ -1,6 +1,7 @@
 import atexit
 import polars as pl
 from .utils import register_plugin, parse_version
+from ._generated import TAExprMixin
 from ._polars_talib import initialize, shutdown, version
 from pathlib import Path
 
@@ -219,7 +220,7 @@ def get_functions_output_struct():
 
 
 @pl.api.register_expr_namespace("ta")
-class TAExpr:
+class TAExpr(TAExprMixin):
     def __init__(self, expr: pl.Expr):
         self._expr = expr
 
@@ -6502,10 +6503,20 @@ def obv(
     return close.ta.obv(volume)
 
 
+def col(name: str | pl.Expr) -> TAExpr:
+    """Return the ``.ta`` namespace for a column name or expression.
+
+    ``polars_talib.col("close").ema(5)`` computes the same expression as
+    ``pl.col("close").ta.ema(5)``, but static type checkers and editors can
+    resolve the indicator methods because the return type is ``TAExpr``.
+    Any expression works as the receiver: ``polars_talib.col(pl.col("a") + 5).rsi()``.
+    """
+    return TAExpr(pl.col(name) if isinstance(name, str) else name)
+
+
 # Typed wrappers for indicators added after TA-Lib 0.4.0.
 from ._generated import *
-from ._generated import GROUPS as _NEW_GROUPS, STRUCTS as _NEW_STRUCTS, install as _install
-_install(TAExpr)
+from ._generated import GROUPS as _NEW_GROUPS, STRUCTS as _NEW_STRUCTS
 for _group, _names in _NEW_GROUPS.items():
     __function_groups__.setdefault(_group, []).extend(_names)
 _legacy_output_structs = get_functions_output_struct

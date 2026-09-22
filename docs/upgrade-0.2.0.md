@@ -23,9 +23,17 @@ use the official Python `TA-Lib==0.8.1` wheel as the independent reference.
 
 `MA_Type` exposes SMA, EMA, WMA, DEMA, TEMA, TRIMA, KAMA, MAMA, T3, HMA,
 DISABLED, DEFAULT, ZLEMA and RMA. Integer values remain accepted. Integer
-parameters such as `timeperiod` require integers (including NumPy integers), not
-`14.0` or strings. Invalid types now raise an explicit Python `TypeError` before
-plugin serialization; integer range violations raise `ValueError`.
+parameters such as `timeperiod` accept integers, NumPy integers and whole-number
+floats such as `14.0` (issue #6), matching the upstream Python wrapper. Strings,
+`None` and `bool` raise an explicit Python `TypeError` before plugin
+serialization; fractional or non-finite values such as `14.5` raise `ValueError`
+instead of being truncated silently, as do integer range violations.
+
+The package ships a `py.typed` marker and every `.ta` namespace method is a
+class attribute, so static type checkers and editors resolve all 201 methods.
+`polars_talib.col("close").ema(5)` is a typed alternative to
+`pl.col("close").ta.ema(5)` (issue #28); it accepts a column name or any
+expression and returns the same `TAExpr` namespace.
 
 Empty inputs return empty outputs. Inputs shorter than lookback and all-missing
 inputs retain their original length, with NaN for floating outputs and zero for
@@ -61,8 +69,12 @@ current Polars runtime and the test dependency matrix do not support that set.
 CI status on the PR is the authority for whether a target has actually passed.
 
 Wheels statically include TA-Lib and require no system TA-Lib, libclang or
-separate Python TA-Lib installation. By default the build compiles the pinned,
-checksum-verified source so headers and library can never mismatch (issue #26).
+separate Python TA-Lib installation. This replaces the dynamic linking behind the
+`_TA_ACOS` (macOS Intel, issue #24) and `TA_CDL3BLACKCROWS_Lookback` (Linux
+AArch64, issue #36) import failures of the 0.1.x wheels; a test checks that the
+extension module names no TA-Lib shared library. By default the build compiles
+the pinned, checksum-verified source so headers and library can never mismatch
+(issue #26).
 Packagers who must link a system TA-Lib 0.8.1 can set both `TA_LIBRARY_PATH`
 (directory with `libta-lib.a` / `ta-lib-static.lib`) and `TA_INCLUDE_PATH`
 (directory containing the five public headers under `ta-lib/`). Both variables

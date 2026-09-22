@@ -54,6 +54,16 @@ df.with_columns(
 )
 ```
 
+### typed namespace access
+`plta.col(...)` returns the same `.ta` namespace with a static return type, so
+editors and type checkers resolve every indicator method:
+``` python
+df.with_columns(
+    plta.col("close").ema(5).alias("ema5"),
+    plta.col(pl.col("close") * 2).rsi(14).alias("rsi_doubled"),
+)
+```
+
 ### multiple symbol usage using over syntax
 
 Sort by symbol and timestamp before computing history-dependent indicators.

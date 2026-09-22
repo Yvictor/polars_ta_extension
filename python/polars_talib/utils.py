@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from enum import IntEnum
-from numbers import Integral
+from numbers import Integral, Real
 from ._param_types import INTEGER_PARAMETERS
 from pathlib import Path
 import re
@@ -37,8 +37,14 @@ def register_plugin(*, symbol: str, is_elementwise: bool,
         for key in INTEGER_PARAMETERS.get(symbol, ()):
             if key in kwargs:
                 value = kwargs[key]
-                if isinstance(value, bool) or not isinstance(value, Integral):
+                if isinstance(value, bool) or not isinstance(value, Real):
                     raise TypeError(f"{symbol}: {key} must be an integer, got {type(value).__name__}")
+                if not isinstance(value, Integral):
+                    # Whole-number floats such as 14.0 are accepted like upstream TA-Lib;
+                    # fractional periods are rejected instead of silently truncated.
+                    if not float(value).is_integer():
+                        raise ValueError(f"{symbol}: {key} must be a whole number, got {value!r}")
+                    value = int(value)
                 if not -(2**31) <= value < 2**31:
                     raise ValueError(f"{symbol}: {key} must fit a signed 32-bit integer")
                 kwargs[key] = int(value)

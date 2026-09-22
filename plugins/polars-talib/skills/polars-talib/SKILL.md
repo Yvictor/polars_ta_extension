@@ -31,6 +31,7 @@ result = (
 - Compose native expressions in `select`/`with_columns`, including lazy pipelines. Avoid Python `map_elements` or per-row loops. History-dependent indicators must see a complete ordered group; a streaming query is not the TA-Lib incremental streaming API.
 - Use `pl.col(...)` for column arguments, especially legacy top-level functions. Namespace receiver conventions vary: RSI takes close, ATR's receiver is close with high/low arguments, and candlestick patterns use open. Inspect `inspect.signature(ta.<function>)` or the namespace method rather than guessing argument order.
 - Multi-output indicators return a Struct. Use `.struct.field("macdhist")`, or alias then `unnest`. Discover names through `ta.get_functions_output_struct()`; SuperTrend's `trend` and Fractal outputs are integers, while price outputs are Float64.
+- `ta.col("close").rsi(14)` is `pl.col("close").ta.rsi(14)` with a static `TAExpr` return type; prefer it in type-checked code. Integer parameters accept whole-number floats such as `14.0` but reject `14.5`.
 - Discover functions using `ta.get_functions()` and `ta.get_function_groups()`. All 14 moving-average types are in `ta.MA_Type`, including HMA, RMA, ZLEMA, DISABLED and DEFAULT.
 
 ## Missing data and compatibility
