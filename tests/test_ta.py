@@ -31,7 +31,7 @@ def df_ohlc(request, df_base: pl.DataFrame):
     )
 
 def test_version():
-    assert plta.__talib_version__[:5] == "0.4.0"
+    assert plta.__talib_version__[:5] == "0.8.1"
 
 
 def test_ta_has_impl():
@@ -282,6 +282,23 @@ def test_abstract_math_transform_eq(df_ohlc: pl.DataFrame, func: str):
         "trix",
         "ultosc",
         "willr",
+        "ac",
+        "ao",
+        "cmou",
+        "coppock",
+        "dpo",
+        "er",
+        "eri",
+        "fosc",
+        "fractal",
+        "imi",
+        "kdj",
+        "qstick",
+        "smi",
+        "tsi",
+        "vhf",
+        "vortex",
+        "wad",
     ],
 )
 def test_abstract_momentum_eq(df_ohlc: pl.DataFrame, func: str):
@@ -317,6 +334,14 @@ def test_abstract_momentum_eq(df_ohlc: pl.DataFrame, func: str):
         "tema",
         "trima",
         "wma",
+        "accbands",
+        "donchian",
+        "hma",
+        "kc",
+        "rma",
+        "supertrend",
+        "vwma",
+        "zlema",
     ],
 )
 def test_abstract_overlap_eq(df_ohlc: pl.DataFrame, func: str):
@@ -419,7 +444,14 @@ def test_abstract_pattern_eq(df_ohlc: pl.DataFrame, func: str):
         assert res.equals(expected)
 
 
-@pytest.mark.parametrize("func", ["avgprice", "medprice", "typprice", "wclprice"])
+@pytest.mark.parametrize("func", [
+        "avgprice",
+        "medprice",
+        "typprice",
+        "wclprice",
+        "avgdev",
+        "ha",
+    ])
 def test_abstract_price_transform_eq(df_ohlc: pl.DataFrame, func: str):
     expected = getattr(abstract, func.upper())(df_ohlc)
     expr = getattr(plta, func)()
@@ -446,6 +478,8 @@ def test_abstract_price_transform_eq(df_ohlc: pl.DataFrame, func: str):
         "stddev",
         "tsf",
         "var",
+        "percentile",
+        "percentrank",
     ],
 )
 def test_abstract_statistic_eq(df_ohlc: pl.DataFrame, func: str):
@@ -464,7 +498,15 @@ def test_abstract_statistic_eq(df_ohlc: pl.DataFrame, func: str):
 
 @pytest.mark.parametrize(
     "func",
-    ["atr", "natr", "trange"],
+    [
+        "atr",
+        "natr",
+        "trange",
+        "adr",
+        "cvi",
+        "massi",
+        "rvi",
+    ],
 )
 def test_abstract_volatility_eq(df_ohlc: pl.DataFrame, func: str):
     expected = getattr(abstract, func.upper())(df_ohlc)
@@ -482,7 +524,20 @@ def test_abstract_volatility_eq(df_ohlc: pl.DataFrame, func: str):
 
 @pytest.mark.parametrize(
     "func",
-    ["ad", "adosc", "obv"],
+    [
+        "ad",
+        "adosc",
+        "obv",
+        "cmf",
+        "efi",
+        "marketfi",
+        "nvi",
+        "pvi",
+        "pvo",
+        "pvt",
+        "rvol",
+        "vwap",
+    ],
 )
 def test_abstract_volume_eq(df_ohlc: pl.DataFrame, func: str):
     expected = getattr(abstract, func.upper())(df_ohlc)

@@ -21,3 +21,11 @@ def df_ohlc():
         ser,
     ]
     return pl.DataFrame(sers)
+
+
+@pytest.fixture
+def df_multi_symbol(df_ohlc: pl.DataFrame):
+    n_symbols = 50
+    return df_ohlc.with_columns(
+        pl.Series("symbol", np.repeat(np.arange(n_symbols), df_ohlc.height // n_symbols)).cast(pl.Utf8)
+    )

@@ -7,6 +7,12 @@
 pip install polars_talib
 ```
 
+Wheels bundle TA-Lib **0.8.1** statically (Linux x86_64/aarch64, macOS
+x86_64/arm64, Windows x86_64), so no system TA-Lib installation is required.
+All 201 TA-Lib functions are exposed, including the 0.8.x additions
+(KDJ, SuperTrend, VWAP, HMA, RMA, ZLEMA, Donchian/Keltner channels,
+Heikin-Ashi, Vortex, TSI, SMI, ...).
+
 and
 
 ```
@@ -111,75 +117,16 @@ plta.get_function_groups()
 
 ### Indicator Groups
 
-* Overlap Studies
-* Momentum Indicators
-* Volume Indicators
-* Volatility Indicators
-* Price Transform
 * Cycle Indicators
+* Math Operators
+* Math Transform
+* Momentum Indicators
+* Overlap Studies
 * Pattern Recognition
-
-##### Overlap Studies
-```
-bbands               Bollinger Bands
-dema                 Double Exponential Moving Average
-ema                  Exponential Moving Average
-ht_trendline         Hilbert Transform - Instantaneous Trendline
-kama                 Kaufman Adaptive Moving Average
-ma                   Moving average
-mama                 MESA Adaptive Moving Average
-mavp                 Moving average with variable period
-midpoint             MidPoint over period
-midprice             Midpoint Price over period
-sar                  Parabolic SAR
-sarext               Parabolic SAR - Extended
-sma                  Simple Moving Average
-t3                   Triple Exponential Moving Average (T3)
-tema                 Triple Exponential Moving Average
-trima                Triangular Moving Average
-wma                  Weighted Moving Average
-```
-
-##### Momentum Indicators
-```
-adx                  Average Directional Movement Index
-adxr                 Average Directional Movement Index Rating
-apo                  Absolute Price Oscillator
-aroon                Aroon
-aroonosc             Aroon Oscillator
-bop                  Balance Of Power
-cci                  Commodity Channel Index
-cmo                  Chande Momentum Oscillator
-dx                   Directional Movement Index
-macd                 Moving Average Convergence/Divergence
-macdext              MACD with controllable MA type
-macdfix              Moving Average Convergence/Divergence Fix 12/26
-mfi                  Money Flow Index
-minus_di             Minus Directional Indicator
-minus_dm             Minus Directional Movement
-mom                  Momentum
-plus_di              Plus Directional Indicator
-plus_dm              Plus Directional Movement
-ppo                  Percentage Price Oscillator
-roc                  Rate of change : ((price/prevPrice)-1)*100
-rocp                 Rate of change Percentage: (price-prevPrice)/prevPrice
-rocr                 Rate of change ratio: (price/prevPrice)
-rocr100              Rate of change ratio 100 scale: (price/prevPrice)*100
-rsi                  Relative Strength Index
-stoch                Stochastic
-stochf               Stochastic Fast
-stochrsi             Stochastic Relative Strength Index
-trix                 1-day Rate-Of-Change (ROC) of a Triple Smooth EMA
-ultosc               Ultimate Oscillator
-willr                Williams' %R
-```
-
-##### Volume Indicators
-```
-ad                   Chaikin A/D Line
-adosc                Chaikin A/D Oscillator
-obv                  On Balance Volume
-```
+* Price Transform
+* Statistic Functions
+* Volatility Indicators
+* Volume Indicators
 
 ##### Cycle Indicators
 ```
@@ -190,19 +137,119 @@ ht_sine              Hilbert Transform - SineWave
 ht_trendmode         Hilbert Transform - Trend vs Cycle Mode
 ```
 
-##### Price Transform
+##### Math Operators
 ```
-avgprice             Average Price
-medprice             Median Price
-typprice             Typical Price
-wclprice             Weighted Close Price
+add                  Vector Arithmetic Add
+cumsum               Cumulative Sum
+div                  Vector Arithmetic Div
+max                  Highest value over a specified period
+maxindex             Index of highest value over a specified period
+min                  Lowest value over a specified period
+minindex             Index of lowest value over a specified period
+minmax               Lowest and highest values over a specified period
+minmaxindex          Indexes of lowest and highest values over a specified period
+mult                 Vector Arithmetic Mult
+sub                  Vector Arithmetic Subtraction
+sum                  Summation
 ```
 
-##### Volatility Indicators
+##### Math Transform
 ```
-atr                  Average True Range
-natr                 Normalized Average True Range
-trange               True Range
+acos                 Vector Trigonometric ACos
+asin                 Vector Trigonometric ASin
+atan                 Vector Trigonometric ATan
+ceil                 Vector Ceil
+cos                  Vector Trigonometric Cos
+cosh                 Vector Trigonometric Cosh
+exp                  Vector Arithmetic Exp
+floor                Vector Floor
+ln                   Vector Log Natural
+log10                Vector Log10
+sin                  Vector Trigonometric Sin
+sinh                 Vector Trigonometric Sinh
+sqrt                 Vector Square Root
+tan                  Vector Trigonometric Tan
+tanh                 Vector Trigonometric Tanh
+```
+
+##### Momentum Indicators
+```
+ac                   Accelerator/Decelerator Oscillator
+adx                  Average Directional Movement Index
+adxr                 Average Directional Movement Index Rating
+ao                   Awesome Oscillator
+apo                  Absolute Price Oscillator
+aroon                Aroon
+aroonosc             Aroon Oscillator
+bop                  Balance Of Power
+cci                  Commodity Channel Index
+cmo                  Chande Momentum Oscillator
+cmou                 Chande Momentum Oscillator (Unsmoothed)
+coppock              Coppock Curve
+dpo                  Detrended Price Oscillator
+dx                   Directional Movement Index
+er                   Kaufman Efficiency Ratio
+eri                  Elder Ray Index (Bull Power / Bear Power)
+fosc                 Forecast Oscillator
+fractal              Williams Fractal
+imi                  Intraday Momentum Index
+kdj                  KDJ Stochastic
+macd                 Moving Average Convergence/Divergence
+macdext              MACD with controllable MA type
+macdfix              Moving Average Convergence/Divergence Fix 12/26
+mfi                  Money Flow Index
+minus_di             Minus Directional Indicator
+minus_dm             Minus Directional Movement
+mom                  Momentum
+plus_di              Plus Directional Indicator
+plus_dm              Plus Directional Movement
+ppo                  Percentage Price Oscillator
+qstick               Qstick
+roc                  Rate of change : ((price/prevPrice)-1)*100
+rocp                 Rate of change Percentage: (price-prevPrice)/prevPrice
+rocr                 Rate of change ratio: (price/prevPrice)
+rocr100              Rate of change ratio 100 scale: (price/prevPrice)*100
+rsi                  Relative Strength Index
+smi                  Stochastic Momentum Index
+stoch                Stochastic
+stochf               Stochastic Fast
+stochrsi             Stochastic Relative Strength Index
+trix                 1-day Rate-Of-Change (ROC) of a Triple Smooth EMA
+tsi                  True Strength Index
+ultosc               Ultimate Oscillator
+vhf                  Vertical Horizontal Filter
+vortex               Vortex Indicator
+wad                  Williams' Accumulation/Distribution
+willr                Williams' %R
+```
+
+##### Overlap Studies
+```
+accbands             Acceleration Bands
+bbands               Bollinger Bands
+dema                 Double Exponential Moving Average
+donchian             Donchian Channels
+ema                  Exponential Moving Average
+hma                  Hull Moving Average
+ht_trendline         Hilbert Transform - Instantaneous Trendline
+kama                 Kaufman Adaptive Moving Average
+kc                   Keltner Channels
+ma                   Moving average
+mama                 MESA Adaptive Moving Average
+mavp                 Moving average with variable period
+midpoint             MidPoint over period
+midprice             Midpoint Price over period
+rma                  Wilder's Smoothed Moving Average
+sar                  Parabolic SAR
+sarext               Parabolic SAR - Extended
+sma                  Simple Moving Average
+supertrend           SuperTrend
+t3                   Triple Exponential Moving Average (T3)
+tema                 Triple Exponential Moving Average
+trima                Triangular Moving Average
+vwma                 Volume Weighted Moving Average
+wma                  Weighted Moving Average
+zlema                Zero-Lag Exponential Moving Average
 ```
 
 ##### Pattern Recognition
@@ -212,24 +259,24 @@ cdl3blackcrows       Three Black Crows
 cdl3inside           Three Inside Up/Down
 cdl3linestrike       Three-Line Strike
 cdl3outside          Three Outside Up/Down
-cdl3starsinsoutH     Three Stars In The South
-cdl3whitesoldieRS    Three Advancing White Soldiers
-cdlabandonedbabY     Abandoned Baby
+cdl3starsinsouth     Three Stars In The South
+cdl3whitesoldiers    Three Advancing White Soldiers
+cdlabandonedbaby     Abandoned Baby
 cdladvanceblock      Advance Block
 cdlbelthold          Belt-hold
 cdlbreakaway         Breakaway
-cdlclosingmarubOZU   Closing Marubozu
-cdlconcealbabysWALL  Concealing Baby Swallow
-cdlcounterattacK     Counterattack
-cdldarkcloudcovER    Dark Cloud Cover
+cdlclosingmarubozu   Closing Marubozu
+cdlconcealbabyswall  Concealing Baby Swallow
+cdlcounterattack     Counterattack
+cdldarkcloudcover    Dark Cloud Cover
 cdldoji              Doji
 cdldojistar          Doji Star
-cdldragonflydojI     Dragonfly Doji
+cdldragonflydoji     Dragonfly Doji
 cdlengulfing         Engulfing Pattern
-cdleveningdojisTAR   Evening Doji Star
+cdleveningdojistar   Evening Doji Star
 cdleveningstar       Evening Star
-cdlgapsidesidewHITE  Up/Down-gap side-by-side white lines
-cdlgravestonedoJI    Gravestone Doji
+cdlgapsidesidewhite  Up/Down-gap side-by-side white lines
+cdlgravestonedoji    Gravestone Doji
 cdlhammer            Hammer
 cdlhangingman        Hanging Man
 cdlharami            Harami Pattern
@@ -238,36 +285,46 @@ cdlhighwave          High-Wave Candle
 cdlhikkake           Hikkake Pattern
 cdlhikkakemod        Modified Hikkake Pattern
 cdlhomingpigeon      Homing Pigeon
-cdlidentical3crOWS   Identical Three Crows
+cdlidentical3crows   Identical Three Crows
 cdlinneck            In-Neck Pattern
-cdlinvertedhammER    Inverted Hammer
+cdlinvertedhammer    Inverted Hammer
 cdlkicking           Kicking
-cdlkickingbylenGTH   Kicking - bull/bear determined by the longer marubozu
+cdlkickingbylength   Kicking - bull/bear determined by the longer marubozu
 cdlladderbottom      Ladder Bottom
-cdllongleggeddoJI    Long Legged Doji
+cdllongleggeddoji    Long Legged Doji
 cdllongline          Long Line Candle
 cdlmarubozu          Marubozu
 cdlmatchinglow       Matching Low
 cdlmathold           Mat Hold
-cdlmorningdojisTAR   Morning Doji Star
+cdlmorningdojistar   Morning Doji Star
 cdlmorningstar       Morning Star
 cdlonneck            On-Neck Pattern
 cdlpiercing          Piercing Pattern
 cdlrickshawman       Rickshaw Man
-cdlrisefall3metHODS  Rising/Falling Three Methods
-cdlseparatingliNES   Separating Lines
+cdlrisefall3methods  Rising/Falling Three Methods
+cdlseparatinglines   Separating Lines
 cdlshootingstar      Shooting Star
 cdlshortline         Short Line Candle
 cdlspinningtop       Spinning Top
-cdlstalledpatteRN    Stalled Pattern
-cdlsticksandwicH     Stick Sandwich
+cdlstalledpattern    Stalled Pattern
+cdlsticksandwich     Stick Sandwich
 cdltakuri            Takuri (Dragonfly Doji with very long lower shadow)
 cdltasukigap         Tasuki Gap
 cdlthrusting         Thrusting Pattern
 cdltristar           Tristar Pattern
 cdlunique3river      Unique 3 River
-cdlupsidegap2crOWS   Upside Gap Two Crows
-cdlxsidegap3metHODS  Upside/Downside Gap Three Methods
+cdlupsidegap2crows   Upside Gap Two Crows
+cdlxsidegap3methods  Upside/Downside Gap Three Methods
+```
+
+##### Price Transform
+```
+avgdev               Average Deviation
+avgprice             Average Price
+ha                   Heikin-Ashi Candles
+medprice             Median Price
+typprice             Typical Price
+wclprice             Weighted Close Price
 ```
 
 ##### Statistic Functions
@@ -278,7 +335,99 @@ linearreg            Linear Regression
 linearreg_angle      Linear Regression Angle
 linearreg_intercept  Linear Regression Intercept
 linearreg_slope      Linear Regression Slope
+percentile           Percentile (nearest rank)
+percentrank          Percent Rank
 stddev               Standard Deviation
 tsf                  Time Series Forecast
 var                  Variance
 ```
+
+##### Volatility Indicators
+```
+adr                  Average Day Range
+atr                  Average True Range
+cvi                  Chaikin's Volatility
+massi                Mass Index
+natr                 Normalized Average True Range
+rvi                  Relative Volatility Index
+trange               True Range
+```
+
+##### Volume Indicators
+```
+ad                   Chaikin A/D Line
+adosc                Chaikin A/D Oscillator
+cmf                  Chaikin Money Flow
+efi                  Elder's Force Index
+marketfi             Market Facilitation Index
+nvi                  Negative Volume Index
+obv                  On Balance Volume
+pvi                  Positive Volume Index
+pvo                  Percentage Volume Oscillator
+pvt                  Price Volume Trend
+rvol                 Relative Volume
+vwap                 Volume Weighted Average Price
+```
+
+## TA-Lib version
+
+`polars_talib` 0.2.0 bundles [TA-Lib 0.8.1](https://github.com/TA-Lib/ta-lib/releases/tag/v0.8.1).
+`polars_talib.__talib_version__` reports the linked version at runtime.
+Results are bit-for-bit identical to the Python `ta-lib` package built against the
+same TA-Lib version; the test-suite checks every function against it.
+
+Parameter defaults follow upstream 0.8.1, which changed a few of them compared
+to 0.1.x: `bbands(timeperiod=20)` (was 5), `apo`/`ppo` `matype=1` (EMA, was SMA)
+and `cdldarkcloudcover`/`cdlmathold` `penetration=0.5` (was 0.3). Pass the
+parameters explicitly if you relied on the old values. New MA types are
+available for every `matype` parameter: `9=HMA, 10=DISABLED, 11=DEFAULT,
+12=ZLEMA, 13=RMA`.
+
+## Building from source
+
+Requirements: Rust, Python >= 3.9, `make` + a C compiler (Linux/macOS) or
+CMake >= 3.30 + MSVC (Windows). `talib-sys/build.rs` downloads the TA-Lib
+source tarball from GitHub and builds a static library into
+`talib-sys/dependencies` on the first build.
+
+``` bash
+uv sync                       # build the extension in release mode and install dev deps
+uv run pytest                 # run the test-suite (compares against the Python ta-lib package)
+uv run pytest tests/test_bench.py --benchmark-only   # micro benchmarks
+```
+
+Environment variables understood by the build script:
+
+| variable | purpose |
+|---|---|
+| `DEPS_PATH` | install prefix for the bundled TA-Lib build (default `talib-sys/dependencies`) |
+| `TA_LIBRARY_PATH` / `TA_INCLUDE_PATH` | use an existing TA-Lib >= 0.6 static library / headers instead of building |
+| `TA_LIB_SRC_ARCHIVE` | local `ta-lib-<ver>-src.tar.gz` for offline builds |
+| `TA_LIB_SRC_URL` | alternative download URL |
+| `TA_LIB_BUILD_SYSTEM` | `autotools` (Unix default) or `cmake` (Windows default) |
+| `TA_LIB_CFLAGS` | extra C flags (default `-O3`) |
+
+To upgrade the bundled TA-Lib: bump `TA_LIB_VER` in `talib-sys/build.rs`, run
+`cargo build -p talib-sys --features bindgen` (needs libclang) to regenerate
+`talib-sys/src/bindings.rs`, then `python scripts/gen_talib_functions.py --apply`
+with the matching Python `ta-lib` installed to scaffold wrappers for new functions.
+
+## AI assistant skill
+
+[`skills/polars-talib`](./skills/polars-talib) is an
+[Agent Skill](https://agentskills.io) that teaches coding assistants how to use
+this package (call styles, `.over()` pipelines, struct outputs, NaN semantics and a
+full function reference). Install it with the universal installer:
+
+``` bash
+npx skills add Yvictor/polars_ta_extension        # Claude Code, Codex, Cursor, Gemini CLI, ...
+```
+
+or copy the folder manually:
+
+| tool | location |
+|---|---|
+| Claude Code | `~/.claude/skills/polars-talib/` (or `.claude/skills/` in a project) |
+| OpenAI Codex | `~/.codex/skills/polars-talib/` (or `.codex/skills/` in a project) |
+| Cursor | `.cursor/skills/polars-talib/` in a project |
+| other tools | any directory the tool scans for `SKILL.md` files |

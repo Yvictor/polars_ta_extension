@@ -1,0 +1,263 @@
+# polars_talib function reference (TA-Lib 0.8.1)
+
+Every function exists in two forms:
+
+* namespace method: `pl.col(<primary>).ta.<name>(<other inputs...>, <params...>)`
+* module function: `plta.<name>(<inputs in TA-Lib order...>, <params...>)` with column defaults
+  `open`, `high`, `low`, `close`, `volume` (and `close` for a generic `real` input).
+
+Multi-output functions return a `pl.Struct`; use `.struct.field("<output>")` or `.unnest()`.
+
+`matype` parameters accept: 0=SMA, 1=EMA, 2=WMA, 3=DEMA, 4=TEMA, 5=TRIMA, 6=KAMA, 7=MAMA, 8=T3,
+9=HMA, 10=DISABLED, 11=DEFAULT, 12=ZLEMA, 13=RMA.
+
+## Cycle Indicators
+
+| function | description | inputs (primary first) | parameters (defaults) | outputs |
+|---|---|---|---|---|
+| `ht_dcperiod` | Hilbert Transform - Dominant Cycle Period | close | - | real |
+| `ht_dcphase` | Hilbert Transform - Dominant Cycle Phase | close | - | real |
+| `ht_phasor` | Hilbert Transform - Phasor Components | close | - | inphase, quadrature |
+| `ht_sine` | Hilbert Transform - SineWave | close | - | sine, leadsine |
+| `ht_trendmode` | Hilbert Transform - Trend vs Cycle Mode | close | - | integer |
+
+## Math Operators
+
+| function | description | inputs (primary first) | parameters (defaults) | outputs |
+|---|---|---|---|---|
+| `add` | Vector Arithmetic Add | high, low | - | real |
+| `cumsum` | Cumulative Sum | close | - | real |
+| `div` | Vector Arithmetic Div | high, low | - | real |
+| `max` | Highest value over a specified period | close | timeperiod=30 | real |
+| `maxindex` | Index of highest value over a specified period | close | timeperiod=30 | integer |
+| `min` | Lowest value over a specified period | close | timeperiod=30 | real |
+| `minindex` | Index of lowest value over a specified period | close | timeperiod=30 | integer |
+| `minmax` | Lowest and highest values over a specified period | close | timeperiod=30 | min, max |
+| `minmaxindex` | Indexes of lowest and highest values over a specified period | close | timeperiod=30 | minidx, maxidx |
+| `mult` | Vector Arithmetic Mult | high, low | - | real |
+| `sub` | Vector Arithmetic Subtraction | high, low | - | real |
+| `sum` | Summation | close | timeperiod=30 | real |
+
+## Math Transform
+
+| function | description | inputs (primary first) | parameters (defaults) | outputs |
+|---|---|---|---|---|
+| `acos` | Vector Trigonometric ACos | close | - | real |
+| `asin` | Vector Trigonometric ASin | close | - | real |
+| `atan` | Vector Trigonometric ATan | close | - | real |
+| `ceil` | Vector Ceil | close | - | real |
+| `cos` | Vector Trigonometric Cos | close | - | real |
+| `cosh` | Vector Trigonometric Cosh | close | - | real |
+| `exp` | Vector Arithmetic Exp | close | - | real |
+| `floor` | Vector Floor | close | - | real |
+| `ln` | Vector Log Natural | close | - | real |
+| `log10` | Vector Log10 | close | - | real |
+| `sin` | Vector Trigonometric Sin | close | - | real |
+| `sinh` | Vector Trigonometric Sinh | close | - | real |
+| `sqrt` | Vector Square Root | close | - | real |
+| `tan` | Vector Trigonometric Tan | close | - | real |
+| `tanh` | Vector Trigonometric Tanh | close | - | real |
+
+## Momentum Indicators
+
+| function | description | inputs (primary first) | parameters (defaults) | outputs |
+|---|---|---|---|---|
+| `ac` | Accelerator/Decelerator Oscillator | high, low | fastperiod=5, slowperiod=34, signalperiod=5 | real |
+| `adx` | Average Directional Movement Index | close, high, low | timeperiod=14 | real |
+| `adxr` | Average Directional Movement Index Rating | close, high, low | timeperiod=14 | real |
+| `ao` | Awesome Oscillator | high, low | fastperiod=5, slowperiod=34 | real |
+| `apo` | Absolute Price Oscillator | close | fastperiod=12, slowperiod=26, matype=1 | real |
+| `aroon` | Aroon | high, low | timeperiod=14 | aroondown, aroonup |
+| `aroonosc` | Aroon Oscillator | high, low | timeperiod=14 | real |
+| `bop` | Balance Of Power | open, high, low, close | - | real |
+| `cci` | Commodity Channel Index | close, high, low | timeperiod=14 | real |
+| `cmo` | Chande Momentum Oscillator | close | timeperiod=14 | real |
+| `cmou` | Chande Momentum Oscillator (Unsmoothed) | close | timeperiod=14 | real |
+| `coppock` | Coppock Curve | close | wmaperiod=10, roc1period=11, roc2period=14 | real |
+| `dpo` | Detrended Price Oscillator | close | timeperiod=20 | real |
+| `dx` | Directional Movement Index | close, high, low | timeperiod=14 | real |
+| `er` | Kaufman Efficiency Ratio | close | timeperiod=10 | real |
+| `eri` | Elder Ray Index (Bull Power / Bear Power) | close, high, low | timeperiod=13 | bullpower, bearpower |
+| `fosc` | Forecast Oscillator | close | timeperiod=5 | real |
+| `fractal` | Williams Fractal | high, low | leftbars=2, rightbars=2 | swinghigh, swinglow |
+| `imi` | Intraday Momentum Index | open, close | timeperiod=14 | real |
+| `kdj` | KDJ Stochastic | close, high, low | fastk_period=9, slowk_period=3, slowk_matype=13, slowd_period=3, slowd_matype=13 | k, d, j |
+| `macd` | Moving Average Convergence/Divergence | close | fastperiod=12, slowperiod=26, signalperiod=9 | macd, macdsignal, macdhist |
+| `macdext` | MACD with controllable MA type | close | fastperiod=12, fastmatype=0, slowperiod=26, slowmatype=0, signalperiod=9, signalmatype=0 | macd, macdsignal, macdhist |
+| `macdfix` | Moving Average Convergence/Divergence Fix 12/26 | close | signalperiod=9 | macd, macdsignal, macdhist |
+| `mfi` | Money Flow Index | close, high, low, volume | timeperiod=14 | real |
+| `minus_di` | Minus Directional Indicator | close, high, low | timeperiod=14 | real |
+| `minus_dm` | Minus Directional Movement | high, low | timeperiod=14 | real |
+| `mom` | Momentum | close | timeperiod=10 | real |
+| `plus_di` | Plus Directional Indicator | close, high, low | timeperiod=14 | real |
+| `plus_dm` | Plus Directional Movement | high, low | timeperiod=14 | real |
+| `ppo` | Percentage Price Oscillator | close | fastperiod=12, slowperiod=26, matype=1 | real |
+| `qstick` | Qstick | open, close | timeperiod=10 | real |
+| `roc` | Rate of change : ((price/prevPrice)-1)*100 | close | timeperiod=10 | real |
+| `rocp` | Rate of change Percentage: (price-prevPrice)/prevPrice | close | timeperiod=10 | real |
+| `rocr` | Rate of change ratio: (price/prevPrice) | close | timeperiod=10 | real |
+| `rocr100` | Rate of change ratio 100 scale: (price/prevPrice)*100 | close | timeperiod=10 | real |
+| `rsi` | Relative Strength Index | close | timeperiod=14 | real |
+| `smi` | Stochastic Momentum Index | close, high, low | timeperiod=13, fastperiod=2, slowperiod=25, signalperiod=9 | smi, smisignal |
+| `stoch` | Stochastic | close, high, low | fastk_period=5, slowk_period=3, slowk_matype=0, slowd_period=3, slowd_matype=0 | slowk, slowd |
+| `stochf` | Stochastic Fast | close, high, low | fastk_period=5, fastd_period=3, fastd_matype=0 | fastk, fastd |
+| `stochrsi` | Stochastic Relative Strength Index | close | timeperiod=14, fastk_period=5, fastd_period=3, fastd_matype=0 | fastk, fastd |
+| `trix` | 1-day Rate-Of-Change (ROC) of a Triple Smooth EMA | close | timeperiod=30 | real |
+| `tsi` | True Strength Index | close | firstperiod=25, secondperiod=13 | real |
+| `ultosc` | Ultimate Oscillator | close, high, low | timeperiod1=7, timeperiod2=14, timeperiod3=28 | real |
+| `vhf` | Vertical Horizontal Filter | close | timeperiod=28 | real |
+| `vortex` | Vortex Indicator | close, high, low | timeperiod=14 | plusvi, minusvi |
+| `wad` | Williams' Accumulation/Distribution | close, high, low | - | real |
+| `willr` | Williams' %R | close, high, low | timeperiod=14 | real |
+
+## Overlap Studies
+
+| function | description | inputs (primary first) | parameters (defaults) | outputs |
+|---|---|---|---|---|
+| `accbands` | Acceleration Bands | close, high, low | timeperiod=20 | upperband, middleband, lowerband |
+| `bbands` | Bollinger Bands | close | timeperiod=20, nbdevup=2.0, nbdevdn=2.0, matype=0 | upperband, middleband, lowerband |
+| `dema` | Double Exponential Moving Average | close | timeperiod=30 | real |
+| `donchian` | Donchian Channels | high, low | timeperiod=20 | upperband, middleband, lowerband |
+| `ema` | Exponential Moving Average | close | timeperiod=30 | real |
+| `hma` | Hull Moving Average | close | timeperiod=20 | real |
+| `ht_trendline` | Hilbert Transform - Instantaneous Trendline | close | - | real |
+| `kama` | Kaufman Adaptive Moving Average | close | timeperiod=30 | real |
+| `kc` | Keltner Channels | close, high, low | timeperiod=20, atrperiod=10, nbdev=2.0 | upperband, middleband, lowerband |
+| `ma` | Moving average | close | timeperiod=30, matype=0 | real |
+| `mama` | MESA Adaptive Moving Average | close | fastlimit=0.5, slowlimit=0.05 | mama, fama |
+| `mavp` | Moving average with variable period | close, periods | minperiod=2, maxperiod=30, matype=0 | real |
+| `midpoint` | MidPoint over period | close | timeperiod=14 | real |
+| `midprice` | Midpoint Price over period | high, low | timeperiod=14 | real |
+| `rma` | Wilder's Smoothed Moving Average | close | timeperiod=30 | real |
+| `sar` | Parabolic SAR | high, low | acceleration=0.02, maximum=0.2 | real |
+| `sarext` | Parabolic SAR - Extended | high, low | startvalue=0.0, offsetonreverse=0.0, accelerationinitlong=0.02, accelerationlong=0.02, accelerationmaxlong=0.2, accelerationinitshort=0.02, accelerationshort=0.02, accelerationmaxshort=0.2 | real |
+| `sma` | Simple Moving Average | close | timeperiod=30 | real |
+| `supertrend` | SuperTrend | close, high, low | timeperiod=10, multiplier=3.0 | supertrend, trend |
+| `t3` | Triple Exponential Moving Average (T3) | close | timeperiod=5, vfactor=0.7 | real |
+| `tema` | Triple Exponential Moving Average | close | timeperiod=30 | real |
+| `trima` | Triangular Moving Average | close | timeperiod=30 | real |
+| `vwma` | Volume Weighted Moving Average | close, volume | timeperiod=30 | real |
+| `wma` | Weighted Moving Average | close | timeperiod=30 | real |
+| `zlema` | Zero-Lag Exponential Moving Average | close | timeperiod=30 | real |
+
+## Pattern Recognition
+
+| function | description | inputs (primary first) | parameters (defaults) | outputs |
+|---|---|---|---|---|
+| `cdl2crows` | Two Crows | open, high, low, close | - | integer |
+| `cdl3blackcrows` | Three Black Crows | open, high, low, close | - | integer |
+| `cdl3inside` | Three Inside Up/Down | open, high, low, close | - | integer |
+| `cdl3linestrike` | Three-Line Strike | open, high, low, close | - | integer |
+| `cdl3outside` | Three Outside Up/Down | open, high, low, close | - | integer |
+| `cdl3starsinsouth` | Three Stars In The South | open, high, low, close | - | integer |
+| `cdl3whitesoldiers` | Three Advancing White Soldiers | open, high, low, close | - | integer |
+| `cdlabandonedbaby` | Abandoned Baby | open, high, low, close | penetration=0.3 | integer |
+| `cdladvanceblock` | Advance Block | open, high, low, close | - | integer |
+| `cdlbelthold` | Belt-hold | open, high, low, close | - | integer |
+| `cdlbreakaway` | Breakaway | open, high, low, close | - | integer |
+| `cdlclosingmarubozu` | Closing Marubozu | open, high, low, close | - | integer |
+| `cdlconcealbabyswall` | Concealing Baby Swallow | open, high, low, close | - | integer |
+| `cdlcounterattack` | Counterattack | open, high, low, close | - | integer |
+| `cdldarkcloudcover` | Dark Cloud Cover | open, high, low, close | penetration=0.5 | integer |
+| `cdldoji` | Doji | open, high, low, close | - | integer |
+| `cdldojistar` | Doji Star | open, high, low, close | - | integer |
+| `cdldragonflydoji` | Dragonfly Doji | open, high, low, close | - | integer |
+| `cdlengulfing` | Engulfing Pattern | open, high, low, close | - | integer |
+| `cdleveningdojistar` | Evening Doji Star | open, high, low, close | penetration=0.3 | integer |
+| `cdleveningstar` | Evening Star | open, high, low, close | penetration=0.3 | integer |
+| `cdlgapsidesidewhite` | Up/Down-gap side-by-side white lines | open, high, low, close | - | integer |
+| `cdlgravestonedoji` | Gravestone Doji | open, high, low, close | - | integer |
+| `cdlhammer` | Hammer | open, high, low, close | - | integer |
+| `cdlhangingman` | Hanging Man | open, high, low, close | - | integer |
+| `cdlharami` | Harami Pattern | open, high, low, close | - | integer |
+| `cdlharamicross` | Harami Cross Pattern | open, high, low, close | - | integer |
+| `cdlhighwave` | High-Wave Candle | open, high, low, close | - | integer |
+| `cdlhikkake` | Hikkake Pattern | open, high, low, close | - | integer |
+| `cdlhikkakemod` | Modified Hikkake Pattern | open, high, low, close | - | integer |
+| `cdlhomingpigeon` | Homing Pigeon | open, high, low, close | - | integer |
+| `cdlidentical3crows` | Identical Three Crows | open, high, low, close | - | integer |
+| `cdlinneck` | In-Neck Pattern | open, high, low, close | - | integer |
+| `cdlinvertedhammer` | Inverted Hammer | open, high, low, close | - | integer |
+| `cdlkicking` | Kicking | open, high, low, close | - | integer |
+| `cdlkickingbylength` | Kicking - bull/bear determined by the longer marubozu | open, high, low, close | - | integer |
+| `cdlladderbottom` | Ladder Bottom | open, high, low, close | - | integer |
+| `cdllongleggeddoji` | Long Legged Doji | open, high, low, close | - | integer |
+| `cdllongline` | Long Line Candle | open, high, low, close | - | integer |
+| `cdlmarubozu` | Marubozu | open, high, low, close | - | integer |
+| `cdlmatchinglow` | Matching Low | open, high, low, close | - | integer |
+| `cdlmathold` | Mat Hold | open, high, low, close | penetration=0.5 | integer |
+| `cdlmorningdojistar` | Morning Doji Star | open, high, low, close | penetration=0.3 | integer |
+| `cdlmorningstar` | Morning Star | open, high, low, close | penetration=0.3 | integer |
+| `cdlonneck` | On-Neck Pattern | open, high, low, close | - | integer |
+| `cdlpiercing` | Piercing Pattern | open, high, low, close | - | integer |
+| `cdlrickshawman` | Rickshaw Man | open, high, low, close | - | integer |
+| `cdlrisefall3methods` | Rising/Falling Three Methods | open, high, low, close | - | integer |
+| `cdlseparatinglines` | Separating Lines | open, high, low, close | - | integer |
+| `cdlshootingstar` | Shooting Star | open, high, low, close | - | integer |
+| `cdlshortline` | Short Line Candle | open, high, low, close | - | integer |
+| `cdlspinningtop` | Spinning Top | open, high, low, close | - | integer |
+| `cdlstalledpattern` | Stalled Pattern | open, high, low, close | - | integer |
+| `cdlsticksandwich` | Stick Sandwich | open, high, low, close | - | integer |
+| `cdltakuri` | Takuri (Dragonfly Doji with very long lower shadow) | open, high, low, close | - | integer |
+| `cdltasukigap` | Tasuki Gap | open, high, low, close | - | integer |
+| `cdlthrusting` | Thrusting Pattern | open, high, low, close | - | integer |
+| `cdltristar` | Tristar Pattern | open, high, low, close | - | integer |
+| `cdlunique3river` | Unique 3 River | open, high, low, close | - | integer |
+| `cdlupsidegap2crows` | Upside Gap Two Crows | open, high, low, close | - | integer |
+| `cdlxsidegap3methods` | Upside/Downside Gap Three Methods | open, high, low, close | - | integer |
+
+## Price Transform
+
+| function | description | inputs (primary first) | parameters (defaults) | outputs |
+|---|---|---|---|---|
+| `avgdev` | Average Deviation | close | timeperiod=14 | real |
+| `avgprice` | Average Price | open, high, low, close | - | real |
+| `ha` | Heikin-Ashi Candles | open, high, low, close | - | haopen, hahigh, halow, haclose |
+| `medprice` | Median Price | high, low | - | real |
+| `typprice` | Typical Price | close, high, low | - | real |
+| `wclprice` | Weighted Close Price | close, high, low | - | real |
+
+## Statistic Functions
+
+| function | description | inputs (primary first) | parameters (defaults) | outputs |
+|---|---|---|---|---|
+| `beta` | Beta | high, low | timeperiod=5 | real |
+| `correl` | Pearson's Correlation Coefficient (r) | high, low | timeperiod=30 | real |
+| `linearreg` | Linear Regression | close | timeperiod=14 | real |
+| `linearreg_angle` | Linear Regression Angle | close | timeperiod=14 | real |
+| `linearreg_intercept` | Linear Regression Intercept | close | timeperiod=14 | real |
+| `linearreg_slope` | Linear Regression Slope | close | timeperiod=14 | real |
+| `percentile` | Percentile (nearest rank) | close | timeperiod=30, percentile=50.0 | real |
+| `percentrank` | Percent Rank | close | timeperiod=100 | real |
+| `stddev` | Standard Deviation | close | timeperiod=5, nbdev=1.0 | real |
+| `tsf` | Time Series Forecast | close | timeperiod=14 | real |
+| `var` | Variance | close | timeperiod=5, nbdev=1.0 | real |
+
+## Volatility Indicators
+
+| function | description | inputs (primary first) | parameters (defaults) | outputs |
+|---|---|---|---|---|
+| `adr` | Average Day Range | high, low | timeperiod=14 | real |
+| `atr` | Average True Range | close, high, low | timeperiod=14 | real |
+| `cvi` | Chaikin's Volatility | high, low | timeperiod=10, rocperiod=10 | real |
+| `massi` | Mass Index | high, low | fastperiod=9, slowperiod=25 | real |
+| `natr` | Normalized Average True Range | close, high, low | timeperiod=14 | real |
+| `rvi` | Relative Volatility Index | close | timeperiod=14, stddevperiod=10 | real |
+| `trange` | True Range | close, high, low | - | real |
+
+## Volume Indicators
+
+| function | description | inputs (primary first) | parameters (defaults) | outputs |
+|---|---|---|---|---|
+| `ad` | Chaikin A/D Line | close, high, low, volume | - | real |
+| `adosc` | Chaikin A/D Oscillator | close, high, low, volume | fastperiod=3, slowperiod=10 | real |
+| `cmf` | Chaikin Money Flow | close, high, low, volume | timeperiod=20 | real |
+| `efi` | Elder's Force Index | close, volume | timeperiod=13 | real |
+| `marketfi` | Market Facilitation Index | high, low, volume | - | real |
+| `nvi` | Negative Volume Index | close, volume | - | real |
+| `obv` | On Balance Volume | close, volume | - | real |
+| `pvi` | Positive Volume Index | close, volume | - | real |
+| `pvo` | Percentage Volume Oscillator | volume | fastperiod=12, slowperiod=26, matype=1 | real |
+| `pvt` | Price Volume Trend | close, volume | - | real |
+| `rvol` | Relative Volume | volume | timeperiod=20 | real |
+| `vwap` | Volume Weighted Average Price | close, high, low, volume | - | real |

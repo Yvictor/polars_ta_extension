@@ -1,6 +1,6 @@
 [package]
 name = "talib"
-version = "0.1.2"
+version = "0.2.0"
 edition = "2021"
 description = "Ta-Lib binding rust safe wrapper"
 keywords = ["Ta-Lib"]
@@ -14,4 +14,4 @@ repository = "https://github.com/Yvictor/polars_ta_extension"
 [dependencies]
 derive_builder = "0.20.2"
 serde = { version = "1.0", features = ["derive"] }
-talib-sys = { version = "0.1.0", path = "../talib-sys"}
+talib-sys = { version = "0.2.0", path = "../talib-sys" }

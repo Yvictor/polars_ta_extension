@@ -7,6 +7,9 @@ use talib::statistic::{
     LinearRegInterceptKwargs, LinearRegKwargs, LinearRegSlopeKwargs, StdDevKwargs, TsfKwargs,
     VarKwargs,
 };
+use talib::statistic::{ta_percentile, PercentileKwargs};
+use talib::statistic::{ta_percentrank};
+use talib::common::TimePeriodKwargs;
 
 #[polars_expr(output_type=Float64)]
 fn beta(inputs: &[Series], kwargs: BetaKwargs) -> PolarsResult<Series> {
@@ -128,6 +131,30 @@ fn var(inputs: &[Series], kwargs: VarKwargs) -> PolarsResult<Series> {
             let out_ser = Float64Chunked::from_vec("", out);
             Ok(out_ser.into_series())
         }
+        Err(ret_code) => ta_code2err(ret_code),
+    }
+}
+
+#[polars_expr(output_type=Float64)]
+fn percentile(inputs: &[Series], kwargs: PercentileKwargs) -> PolarsResult<Series> {
+    let real = &mut cast_series_to_f64(&inputs[0])?;
+    let (real_ptr, _real) = get_series_f64_ptr(real)?;
+    let len = real.len();
+    let res = ta_percentile(real_ptr, len, &kwargs);
+    match res {
+        Ok(out) => Ok(Float64Chunked::from_vec("", out).into_series()),
+        Err(ret_code) => ta_code2err(ret_code),
+    }
+}
+
+#[polars_expr(output_type=Float64)]
+fn percentrank(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
+    let real = &mut cast_series_to_f64(&inputs[0])?;
+    let (real_ptr, _real) = get_series_f64_ptr(real)?;
+    let len = real.len();
+    let res = ta_percentrank(real_ptr, len, &kwargs);
+    match res {
+        Ok(out) => Ok(Float64Chunked::from_vec("", out).into_series()),
         Err(ret_code) => ta_code2err(ret_code),
     }
 }

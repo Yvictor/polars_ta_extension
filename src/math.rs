@@ -11,6 +11,7 @@ use talib::math::{
     ta_acos, ta_asin, ta_atan, ta_ceil, ta_cos, ta_cosh, ta_exp, ta_floor, ta_ln, ta_log10, ta_sin,
     ta_sinh, ta_sqrt, ta_tan, ta_tanh,
 };
+use talib::math::{ta_cumsum};
 
 #[polars_expr(output_type=Float64)]
 fn add(inputs: &[Series]) -> PolarsResult<Series> {
@@ -386,6 +387,18 @@ fn tanh(inputs: &[Series]) -> PolarsResult<Series> {
 
     let len = input.len();
     let res = ta_tanh(input_ptr, len);
+    match res {
+        Ok(out) => Ok(Float64Chunked::from_vec("", out).into_series()),
+        Err(ret_code) => ta_code2err(ret_code),
+    }
+}
+
+#[polars_expr(output_type=Float64)]
+fn cumsum(inputs: &[Series]) -> PolarsResult<Series> {
+    let real = &mut cast_series_to_f64(&inputs[0])?;
+    let (real_ptr, _real) = get_series_f64_ptr(real)?;
+    let len = real.len();
+    let res = ta_cumsum(real_ptr, len);
     match res {
         Ok(out) => Ok(Float64Chunked::from_vec("", out).into_series()),
         Err(ret_code) => ta_code2err(ret_code),

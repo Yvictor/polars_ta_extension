@@ -36,6 +36,23 @@ use talib_sys::{TA_STOCH_Lookback, TA_STOCH};
 use talib_sys::{TA_TRIX_Lookback, TA_TRIX};
 use talib_sys::{TA_ULTOSC_Lookback, TA_ULTOSC};
 use talib_sys::{TA_WILLR_Lookback, TA_WILLR};
+use talib_sys::{TA_AC_Lookback, TA_AC};
+use talib_sys::{TA_AO_Lookback, TA_AO};
+use talib_sys::{TA_CMOU_Lookback, TA_CMOU};
+use talib_sys::{TA_COPPOCK_Lookback, TA_COPPOCK};
+use talib_sys::{TA_DPO_Lookback, TA_DPO};
+use talib_sys::{TA_ER_Lookback, TA_ER};
+use talib_sys::{TA_ERI_Lookback, TA_ERI};
+use talib_sys::{TA_FOSC_Lookback, TA_FOSC};
+use talib_sys::{TA_FRACTAL_Lookback, TA_FRACTAL};
+use talib_sys::{TA_IMI_Lookback, TA_IMI};
+use talib_sys::{TA_KDJ_Lookback, TA_KDJ};
+use talib_sys::{TA_QSTICK_Lookback, TA_QSTICK};
+use talib_sys::{TA_SMI_Lookback, TA_SMI};
+use talib_sys::{TA_TSI_Lookback, TA_TSI};
+use talib_sys::{TA_VHF_Lookback, TA_VHF};
+use talib_sys::{TA_VORTEX_Lookback, TA_VORTEX};
+use talib_sys::{TA_WAD_Lookback, TA_WAD};
 
 pub fn ta_adx(
     high_ptr: *const f64,
@@ -1439,6 +1456,922 @@ pub fn ta_willr(
                 unsafe { out.set_len(out_size_begin) }
             } else {
                 unsafe { out.set_len(len) }
+            }
+            Ok(out)
+        }
+        _ => Err(ret_code),
+    }
+}
+
+#[derive(Builder, Deserialize)]
+pub struct AcKwargs {
+    #[builder(default = "5")]
+    pub fastperiod: i32,
+    #[builder(default = "34")]
+    pub slowperiod: i32,
+    #[builder(default = "5")]
+    pub signalperiod: i32,
+}
+
+pub fn ta_ac(
+    high_ptr: *const f64,
+    low_ptr: *const f64,
+    len: usize,
+    kwargs: &AcKwargs,
+) -> Result<Vec<f64>, TA_RetCode> {
+    let mut out_begin: TA_Integer = 0;
+    let mut out_size: TA_Integer = 0;
+    let begin_idx = check_begin_idx2(len, high_ptr, low_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_AC_Lookback(kwargs.fastperiod, kwargs.slowperiod, kwargs.signalperiod) };
+    if lookback < 0 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if cannot_produce_output(len, lookback) {
+        return Ok(make_default_vec(len));
+    }
+    let (mut out, ptr) = make_vec(len, lookback);
+    let ret_code = unsafe {
+        TA_AC(
+            0,
+            end_idx,
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            kwargs.fastperiod,
+            kwargs.slowperiod,
+            kwargs.signalperiod,
+            &mut out_begin,
+            &mut out_size,
+            ptr,
+        )
+    };
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
+    match ret_code {
+        TA_RetCode::TA_SUCCESS => {
+            if out_size != 0 {
+                unsafe {
+                    out.set_len(out_size_begin);
+                }
+            } else {
+                unsafe {
+                    out.set_len(len);
+                }
+            }
+            Ok(out)
+        }
+        _ => Err(ret_code),
+    }
+}
+
+#[derive(Builder, Deserialize)]
+pub struct AoKwargs {
+    #[builder(default = "5")]
+    pub fastperiod: i32,
+    #[builder(default = "34")]
+    pub slowperiod: i32,
+}
+
+pub fn ta_ao(
+    high_ptr: *const f64,
+    low_ptr: *const f64,
+    len: usize,
+    kwargs: &AoKwargs,
+) -> Result<Vec<f64>, TA_RetCode> {
+    let mut out_begin: TA_Integer = 0;
+    let mut out_size: TA_Integer = 0;
+    let begin_idx = check_begin_idx2(len, high_ptr, low_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_AO_Lookback(kwargs.fastperiod, kwargs.slowperiod) };
+    if lookback < 0 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if cannot_produce_output(len, lookback) {
+        return Ok(make_default_vec(len));
+    }
+    let (mut out, ptr) = make_vec(len, lookback);
+    let ret_code = unsafe {
+        TA_AO(
+            0,
+            end_idx,
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            kwargs.fastperiod,
+            kwargs.slowperiod,
+            &mut out_begin,
+            &mut out_size,
+            ptr,
+        )
+    };
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
+    match ret_code {
+        TA_RetCode::TA_SUCCESS => {
+            if out_size != 0 {
+                unsafe {
+                    out.set_len(out_size_begin);
+                }
+            } else {
+                unsafe {
+                    out.set_len(len);
+                }
+            }
+            Ok(out)
+        }
+        _ => Err(ret_code),
+    }
+}
+
+pub fn ta_cmou(
+    real_ptr: *const f64,
+    len: usize,
+    kwargs: &TimePeriodKwargs,
+) -> Result<Vec<f64>, TA_RetCode> {
+    let mut out_begin: TA_Integer = 0;
+    let mut out_size: TA_Integer = 0;
+    let begin_idx = check_begin_idx1(len, real_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_CMOU_Lookback(kwargs.timeperiod) };
+    if lookback < 0 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if cannot_produce_output(len, lookback) {
+        return Ok(make_default_vec(len));
+    }
+    let (mut out, ptr) = make_vec(len, lookback);
+    let ret_code = unsafe {
+        TA_CMOU(
+            0,
+            end_idx,
+            real_ptr.offset(begin_idx as isize),
+            kwargs.timeperiod,
+            &mut out_begin,
+            &mut out_size,
+            ptr,
+        )
+    };
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
+    match ret_code {
+        TA_RetCode::TA_SUCCESS => {
+            if out_size != 0 {
+                unsafe {
+                    out.set_len(out_size_begin);
+                }
+            } else {
+                unsafe {
+                    out.set_len(len);
+                }
+            }
+            Ok(out)
+        }
+        _ => Err(ret_code),
+    }
+}
+
+#[derive(Builder, Deserialize)]
+pub struct CoppockKwargs {
+    #[builder(default = "10")]
+    pub wmaperiod: i32,
+    #[builder(default = "11")]
+    pub roc1period: i32,
+    #[builder(default = "14")]
+    pub roc2period: i32,
+}
+
+pub fn ta_coppock(
+    real_ptr: *const f64,
+    len: usize,
+    kwargs: &CoppockKwargs,
+) -> Result<Vec<f64>, TA_RetCode> {
+    let mut out_begin: TA_Integer = 0;
+    let mut out_size: TA_Integer = 0;
+    let begin_idx = check_begin_idx1(len, real_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_COPPOCK_Lookback(kwargs.wmaperiod, kwargs.roc1period, kwargs.roc2period) };
+    if lookback < 0 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if cannot_produce_output(len, lookback) {
+        return Ok(make_default_vec(len));
+    }
+    let (mut out, ptr) = make_vec(len, lookback);
+    let ret_code = unsafe {
+        TA_COPPOCK(
+            0,
+            end_idx,
+            real_ptr.offset(begin_idx as isize),
+            kwargs.wmaperiod,
+            kwargs.roc1period,
+            kwargs.roc2period,
+            &mut out_begin,
+            &mut out_size,
+            ptr,
+        )
+    };
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
+    match ret_code {
+        TA_RetCode::TA_SUCCESS => {
+            if out_size != 0 {
+                unsafe {
+                    out.set_len(out_size_begin);
+                }
+            } else {
+                unsafe {
+                    out.set_len(len);
+                }
+            }
+            Ok(out)
+        }
+        _ => Err(ret_code),
+    }
+}
+
+pub fn ta_dpo(
+    real_ptr: *const f64,
+    len: usize,
+    kwargs: &TimePeriodKwargs,
+) -> Result<Vec<f64>, TA_RetCode> {
+    let mut out_begin: TA_Integer = 0;
+    let mut out_size: TA_Integer = 0;
+    let begin_idx = check_begin_idx1(len, real_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_DPO_Lookback(kwargs.timeperiod) };
+    if lookback < 0 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if cannot_produce_output(len, lookback) {
+        return Ok(make_default_vec(len));
+    }
+    let (mut out, ptr) = make_vec(len, lookback);
+    let ret_code = unsafe {
+        TA_DPO(
+            0,
+            end_idx,
+            real_ptr.offset(begin_idx as isize),
+            kwargs.timeperiod,
+            &mut out_begin,
+            &mut out_size,
+            ptr,
+        )
+    };
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
+    match ret_code {
+        TA_RetCode::TA_SUCCESS => {
+            if out_size != 0 {
+                unsafe {
+                    out.set_len(out_size_begin);
+                }
+            } else {
+                unsafe {
+                    out.set_len(len);
+                }
+            }
+            Ok(out)
+        }
+        _ => Err(ret_code),
+    }
+}
+
+pub fn ta_er(
+    real_ptr: *const f64,
+    len: usize,
+    kwargs: &TimePeriodKwargs,
+) -> Result<Vec<f64>, TA_RetCode> {
+    let mut out_begin: TA_Integer = 0;
+    let mut out_size: TA_Integer = 0;
+    let begin_idx = check_begin_idx1(len, real_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_ER_Lookback(kwargs.timeperiod) };
+    if lookback < 0 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if cannot_produce_output(len, lookback) {
+        return Ok(make_default_vec(len));
+    }
+    let (mut out, ptr) = make_vec(len, lookback);
+    let ret_code = unsafe {
+        TA_ER(
+            0,
+            end_idx,
+            real_ptr.offset(begin_idx as isize),
+            kwargs.timeperiod,
+            &mut out_begin,
+            &mut out_size,
+            ptr,
+        )
+    };
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
+    match ret_code {
+        TA_RetCode::TA_SUCCESS => {
+            if out_size != 0 {
+                unsafe {
+                    out.set_len(out_size_begin);
+                }
+            } else {
+                unsafe {
+                    out.set_len(len);
+                }
+            }
+            Ok(out)
+        }
+        _ => Err(ret_code),
+    }
+}
+
+pub fn ta_eri(
+    high_ptr: *const f64,
+    low_ptr: *const f64,
+    close_ptr: *const f64,
+    len: usize,
+    kwargs: &TimePeriodKwargs,
+) -> Result<(Vec<f64>, Vec<f64>), TA_RetCode> {
+    let mut out_begin: TA_Integer = 0;
+    let mut out_size: TA_Integer = 0;
+    let begin_idx = check_begin_idx3(len, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_ERI_Lookback(kwargs.timeperiod) };
+    if lookback < 0 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if cannot_produce_output(len, lookback) {
+        return Ok((make_default_vec(len), make_default_vec(len)));
+    }
+    let (mut outbullpower, outbullpower_ptr) = make_vec(len, lookback);
+    let (mut outbearpower, outbearpower_ptr) = make_vec(len, lookback);
+    let ret_code = unsafe {
+        TA_ERI(
+            0,
+            end_idx,
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
+            kwargs.timeperiod,
+            &mut out_begin,
+            &mut out_size,
+            outbullpower_ptr,
+            outbearpower_ptr,
+        )
+    };
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
+    match ret_code {
+        TA_RetCode::TA_SUCCESS => {
+            if out_size != 0 {
+                unsafe {
+                    outbullpower.set_len(out_size_begin);
+                    outbearpower.set_len(out_size_begin);
+                }
+            } else {
+                unsafe {
+                    outbullpower.set_len(len);
+                    outbearpower.set_len(len);
+                }
+            }
+            Ok((outbullpower, outbearpower))
+        }
+        _ => Err(ret_code),
+    }
+}
+
+pub fn ta_fosc(
+    real_ptr: *const f64,
+    len: usize,
+    kwargs: &TimePeriodKwargs,
+) -> Result<Vec<f64>, TA_RetCode> {
+    let mut out_begin: TA_Integer = 0;
+    let mut out_size: TA_Integer = 0;
+    let begin_idx = check_begin_idx1(len, real_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_FOSC_Lookback(kwargs.timeperiod) };
+    if lookback < 0 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if cannot_produce_output(len, lookback) {
+        return Ok(make_default_vec(len));
+    }
+    let (mut out, ptr) = make_vec(len, lookback);
+    let ret_code = unsafe {
+        TA_FOSC(
+            0,
+            end_idx,
+            real_ptr.offset(begin_idx as isize),
+            kwargs.timeperiod,
+            &mut out_begin,
+            &mut out_size,
+            ptr,
+        )
+    };
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
+    match ret_code {
+        TA_RetCode::TA_SUCCESS => {
+            if out_size != 0 {
+                unsafe {
+                    out.set_len(out_size_begin);
+                }
+            } else {
+                unsafe {
+                    out.set_len(len);
+                }
+            }
+            Ok(out)
+        }
+        _ => Err(ret_code),
+    }
+}
+
+#[derive(Builder, Deserialize)]
+pub struct FractalKwargs {
+    #[builder(default = "2")]
+    pub leftbars: i32,
+    #[builder(default = "2")]
+    pub rightbars: i32,
+}
+
+pub fn ta_fractal(
+    high_ptr: *const f64,
+    low_ptr: *const f64,
+    len: usize,
+    kwargs: &FractalKwargs,
+) -> Result<(Vec<i32>, Vec<i32>), TA_RetCode> {
+    let mut out_begin: TA_Integer = 0;
+    let mut out_size: TA_Integer = 0;
+    let begin_idx = check_begin_idx2(len, high_ptr, low_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_FRACTAL_Lookback(kwargs.leftbars, kwargs.rightbars) };
+    if lookback < 0 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if cannot_produce_output(len, lookback) {
+        return Ok((make_default_vec(len), make_default_vec(len)));
+    }
+    let (mut outswinghigh, outswinghigh_ptr) = make_vec(len, lookback);
+    let (mut outswinglow, outswinglow_ptr) = make_vec(len, lookback);
+    let ret_code = unsafe {
+        TA_FRACTAL(
+            0,
+            end_idx,
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            kwargs.leftbars,
+            kwargs.rightbars,
+            &mut out_begin,
+            &mut out_size,
+            outswinghigh_ptr,
+            outswinglow_ptr,
+        )
+    };
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
+    match ret_code {
+        TA_RetCode::TA_SUCCESS => {
+            if out_size != 0 {
+                unsafe {
+                    outswinghigh.set_len(out_size_begin);
+                    outswinglow.set_len(out_size_begin);
+                }
+            } else {
+                unsafe {
+                    outswinghigh.set_len(len);
+                    outswinglow.set_len(len);
+                }
+            }
+            Ok((outswinghigh, outswinglow))
+        }
+        _ => Err(ret_code),
+    }
+}
+
+pub fn ta_imi(
+    open_ptr: *const f64,
+    close_ptr: *const f64,
+    len: usize,
+    kwargs: &TimePeriodKwargs,
+) -> Result<Vec<f64>, TA_RetCode> {
+    let mut out_begin: TA_Integer = 0;
+    let mut out_size: TA_Integer = 0;
+    let begin_idx = check_begin_idx2(len, open_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_IMI_Lookback(kwargs.timeperiod) };
+    if lookback < 0 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if cannot_produce_output(len, lookback) {
+        return Ok(make_default_vec(len));
+    }
+    let (mut out, ptr) = make_vec(len, lookback);
+    let ret_code = unsafe {
+        TA_IMI(
+            0,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
+            kwargs.timeperiod,
+            &mut out_begin,
+            &mut out_size,
+            ptr,
+        )
+    };
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
+    match ret_code {
+        TA_RetCode::TA_SUCCESS => {
+            if out_size != 0 {
+                unsafe {
+                    out.set_len(out_size_begin);
+                }
+            } else {
+                unsafe {
+                    out.set_len(len);
+                }
+            }
+            Ok(out)
+        }
+        _ => Err(ret_code),
+    }
+}
+
+#[derive(Builder, Deserialize)]
+pub struct KdjKwargs {
+    #[builder(default = "9")]
+    pub fastk_period: i32,
+    #[builder(default = "3")]
+    pub slowk_period: i32,
+    pub slowk_matype: TA_MAType,
+    #[builder(default = "3")]
+    pub slowd_period: i32,
+    pub slowd_matype: TA_MAType,
+}
+
+pub fn ta_kdj(
+    high_ptr: *const f64,
+    low_ptr: *const f64,
+    close_ptr: *const f64,
+    len: usize,
+    kwargs: &KdjKwargs,
+) -> Result<(Vec<f64>, Vec<f64>, Vec<f64>), TA_RetCode> {
+    let mut out_begin: TA_Integer = 0;
+    let mut out_size: TA_Integer = 0;
+    let begin_idx = check_begin_idx3(len, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_KDJ_Lookback(kwargs.fastk_period, kwargs.slowk_period, kwargs.slowk_matype, kwargs.slowd_period, kwargs.slowd_matype) };
+    if lookback < 0 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if cannot_produce_output(len, lookback) {
+        return Ok((make_default_vec(len), make_default_vec(len), make_default_vec(len)));
+    }
+    let (mut outk, outk_ptr) = make_vec(len, lookback);
+    let (mut outd, outd_ptr) = make_vec(len, lookback);
+    let (mut outj, outj_ptr) = make_vec(len, lookback);
+    let ret_code = unsafe {
+        TA_KDJ(
+            0,
+            end_idx,
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
+            kwargs.fastk_period,
+            kwargs.slowk_period,
+            kwargs.slowk_matype,
+            kwargs.slowd_period,
+            kwargs.slowd_matype,
+            &mut out_begin,
+            &mut out_size,
+            outk_ptr,
+            outd_ptr,
+            outj_ptr,
+        )
+    };
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
+    match ret_code {
+        TA_RetCode::TA_SUCCESS => {
+            if out_size != 0 {
+                unsafe {
+                    outk.set_len(out_size_begin);
+                    outd.set_len(out_size_begin);
+                    outj.set_len(out_size_begin);
+                }
+            } else {
+                unsafe {
+                    outk.set_len(len);
+                    outd.set_len(len);
+                    outj.set_len(len);
+                }
+            }
+            Ok((outk, outd, outj))
+        }
+        _ => Err(ret_code),
+    }
+}
+
+pub fn ta_qstick(
+    open_ptr: *const f64,
+    close_ptr: *const f64,
+    len: usize,
+    kwargs: &TimePeriodKwargs,
+) -> Result<Vec<f64>, TA_RetCode> {
+    let mut out_begin: TA_Integer = 0;
+    let mut out_size: TA_Integer = 0;
+    let begin_idx = check_begin_idx2(len, open_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_QSTICK_Lookback(kwargs.timeperiod) };
+    if lookback < 0 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if cannot_produce_output(len, lookback) {
+        return Ok(make_default_vec(len));
+    }
+    let (mut out, ptr) = make_vec(len, lookback);
+    let ret_code = unsafe {
+        TA_QSTICK(
+            0,
+            end_idx,
+            open_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
+            kwargs.timeperiod,
+            &mut out_begin,
+            &mut out_size,
+            ptr,
+        )
+    };
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
+    match ret_code {
+        TA_RetCode::TA_SUCCESS => {
+            if out_size != 0 {
+                unsafe {
+                    out.set_len(out_size_begin);
+                }
+            } else {
+                unsafe {
+                    out.set_len(len);
+                }
+            }
+            Ok(out)
+        }
+        _ => Err(ret_code),
+    }
+}
+
+#[derive(Builder, Deserialize)]
+pub struct SmiKwargs {
+    #[builder(default = "13")]
+    pub timeperiod: i32,
+    #[builder(default = "2")]
+    pub fastperiod: i32,
+    #[builder(default = "25")]
+    pub slowperiod: i32,
+    #[builder(default = "9")]
+    pub signalperiod: i32,
+}
+
+pub fn ta_smi(
+    high_ptr: *const f64,
+    low_ptr: *const f64,
+    close_ptr: *const f64,
+    len: usize,
+    kwargs: &SmiKwargs,
+) -> Result<(Vec<f64>, Vec<f64>), TA_RetCode> {
+    let mut out_begin: TA_Integer = 0;
+    let mut out_size: TA_Integer = 0;
+    let begin_idx = check_begin_idx3(len, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_SMI_Lookback(kwargs.timeperiod, kwargs.fastperiod, kwargs.slowperiod, kwargs.signalperiod) };
+    if lookback < 0 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if cannot_produce_output(len, lookback) {
+        return Ok((make_default_vec(len), make_default_vec(len)));
+    }
+    let (mut outsmi, outsmi_ptr) = make_vec(len, lookback);
+    let (mut outsmisignal, outsmisignal_ptr) = make_vec(len, lookback);
+    let ret_code = unsafe {
+        TA_SMI(
+            0,
+            end_idx,
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
+            kwargs.timeperiod,
+            kwargs.fastperiod,
+            kwargs.slowperiod,
+            kwargs.signalperiod,
+            &mut out_begin,
+            &mut out_size,
+            outsmi_ptr,
+            outsmisignal_ptr,
+        )
+    };
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
+    match ret_code {
+        TA_RetCode::TA_SUCCESS => {
+            if out_size != 0 {
+                unsafe {
+                    outsmi.set_len(out_size_begin);
+                    outsmisignal.set_len(out_size_begin);
+                }
+            } else {
+                unsafe {
+                    outsmi.set_len(len);
+                    outsmisignal.set_len(len);
+                }
+            }
+            Ok((outsmi, outsmisignal))
+        }
+        _ => Err(ret_code),
+    }
+}
+
+#[derive(Builder, Deserialize)]
+pub struct TsiKwargs {
+    #[builder(default = "25")]
+    pub firstperiod: i32,
+    #[builder(default = "13")]
+    pub secondperiod: i32,
+}
+
+pub fn ta_tsi(
+    real_ptr: *const f64,
+    len: usize,
+    kwargs: &TsiKwargs,
+) -> Result<Vec<f64>, TA_RetCode> {
+    let mut out_begin: TA_Integer = 0;
+    let mut out_size: TA_Integer = 0;
+    let begin_idx = check_begin_idx1(len, real_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_TSI_Lookback(kwargs.firstperiod, kwargs.secondperiod) };
+    if lookback < 0 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if cannot_produce_output(len, lookback) {
+        return Ok(make_default_vec(len));
+    }
+    let (mut out, ptr) = make_vec(len, lookback);
+    let ret_code = unsafe {
+        TA_TSI(
+            0,
+            end_idx,
+            real_ptr.offset(begin_idx as isize),
+            kwargs.firstperiod,
+            kwargs.secondperiod,
+            &mut out_begin,
+            &mut out_size,
+            ptr,
+        )
+    };
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
+    match ret_code {
+        TA_RetCode::TA_SUCCESS => {
+            if out_size != 0 {
+                unsafe {
+                    out.set_len(out_size_begin);
+                }
+            } else {
+                unsafe {
+                    out.set_len(len);
+                }
+            }
+            Ok(out)
+        }
+        _ => Err(ret_code),
+    }
+}
+
+pub fn ta_vhf(
+    real_ptr: *const f64,
+    len: usize,
+    kwargs: &TimePeriodKwargs,
+) -> Result<Vec<f64>, TA_RetCode> {
+    let mut out_begin: TA_Integer = 0;
+    let mut out_size: TA_Integer = 0;
+    let begin_idx = check_begin_idx1(len, real_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_VHF_Lookback(kwargs.timeperiod) };
+    if lookback < 0 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if cannot_produce_output(len, lookback) {
+        return Ok(make_default_vec(len));
+    }
+    let (mut out, ptr) = make_vec(len, lookback);
+    let ret_code = unsafe {
+        TA_VHF(
+            0,
+            end_idx,
+            real_ptr.offset(begin_idx as isize),
+            kwargs.timeperiod,
+            &mut out_begin,
+            &mut out_size,
+            ptr,
+        )
+    };
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
+    match ret_code {
+        TA_RetCode::TA_SUCCESS => {
+            if out_size != 0 {
+                unsafe {
+                    out.set_len(out_size_begin);
+                }
+            } else {
+                unsafe {
+                    out.set_len(len);
+                }
+            }
+            Ok(out)
+        }
+        _ => Err(ret_code),
+    }
+}
+
+pub fn ta_vortex(
+    high_ptr: *const f64,
+    low_ptr: *const f64,
+    close_ptr: *const f64,
+    len: usize,
+    kwargs: &TimePeriodKwargs,
+) -> Result<(Vec<f64>, Vec<f64>), TA_RetCode> {
+    let mut out_begin: TA_Integer = 0;
+    let mut out_size: TA_Integer = 0;
+    let begin_idx = check_begin_idx3(len, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_VORTEX_Lookback(kwargs.timeperiod) };
+    if lookback < 0 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if cannot_produce_output(len, lookback) {
+        return Ok((make_default_vec(len), make_default_vec(len)));
+    }
+    let (mut outplusvi, outplusvi_ptr) = make_vec(len, lookback);
+    let (mut outminusvi, outminusvi_ptr) = make_vec(len, lookback);
+    let ret_code = unsafe {
+        TA_VORTEX(
+            0,
+            end_idx,
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
+            kwargs.timeperiod,
+            &mut out_begin,
+            &mut out_size,
+            outplusvi_ptr,
+            outminusvi_ptr,
+        )
+    };
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
+    match ret_code {
+        TA_RetCode::TA_SUCCESS => {
+            if out_size != 0 {
+                unsafe {
+                    outplusvi.set_len(out_size_begin);
+                    outminusvi.set_len(out_size_begin);
+                }
+            } else {
+                unsafe {
+                    outplusvi.set_len(len);
+                    outminusvi.set_len(len);
+                }
+            }
+            Ok((outplusvi, outminusvi))
+        }
+        _ => Err(ret_code),
+    }
+}
+
+pub fn ta_wad(
+    high_ptr: *const f64,
+    low_ptr: *const f64,
+    close_ptr: *const f64,
+    len: usize,
+) -> Result<Vec<f64>, TA_RetCode> {
+    let mut out_begin: TA_Integer = 0;
+    let mut out_size: TA_Integer = 0;
+    let begin_idx = check_begin_idx3(len, high_ptr, low_ptr, close_ptr) as i32;
+    let end_idx = len as i32 - begin_idx - 1;
+    let lookback = begin_idx + unsafe { TA_WAD_Lookback() };
+    if lookback < 0 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if cannot_produce_output(len, lookback) {
+        return Ok(make_default_vec(len));
+    }
+    let (mut out, ptr) = make_vec(len, lookback);
+    let ret_code = unsafe {
+        TA_WAD(
+            0,
+            end_idx,
+            high_ptr.offset(begin_idx as isize),
+            low_ptr.offset(begin_idx as isize),
+            close_ptr.offset(begin_idx as isize),
+            &mut out_begin,
+            &mut out_size,
+            ptr,
+        )
+    };
+    let out_size_begin = (begin_idx + out_begin + out_size) as usize;
+    match ret_code {
+        TA_RetCode::TA_SUCCESS => {
+            if out_size != 0 {
+                unsafe {
+                    out.set_len(out_size_begin);
+                }
+            } else {
+                unsafe {
+                    out.set_len(len);
+                }
             }
             Ok(out)
         }

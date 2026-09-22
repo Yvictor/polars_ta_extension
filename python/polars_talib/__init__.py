@@ -20,9 +20,16 @@ initialize()
 atexit.register(shutdown)
 
 __function_groups__ = {
-    "Cycle Indicators": ["ht_dcperiod", "ht_dcphase", "ht_phasor", "ht_sine", "ht_trendmode"],
+    "Cycle Indicators": [
+        "ht_dcperiod",
+        "ht_dcphase",
+        "ht_phasor",
+        "ht_sine",
+        "ht_trendmode",
+    ],
     "Math Operators": [
         "add",
+        "cumsum",
         "div",
         "max",
         "maxindex",
@@ -52,15 +59,26 @@ __function_groups__ = {
         "tanh",
     ],
     "Momentum Indicators": [
+        "ac",
         "adx",
         "adxr",
+        "ao",
         "apo",
         "aroon",
         "aroonosc",
         "bop",
         "cci",
         "cmo",
+        "cmou",
+        "coppock",
+        "dpo",
         "dx",
+        "er",
+        "eri",
+        "fosc",
+        "fractal",
+        "imi",
+        "kdj",
         "macd",
         "macdext",
         "macdfix",
@@ -71,36 +89,50 @@ __function_groups__ = {
         "plus_di",
         "plus_dm",
         "ppo",
+        "qstick",
         "roc",
         "rocp",
         "rocr",
         "rocr100",
         "rsi",
+        "smi",
         "stoch",
         "stochf",
         "stochrsi",
         "trix",
+        "tsi",
         "ultosc",
+        "vhf",
+        "vortex",
+        "wad",
         "willr",
     ],
     "Overlap Studies": [
+        "accbands",
         "bbands",
         "dema",
+        "donchian",
         "ema",
+        "hma",
         "ht_trendline",
         "kama",
+        "kc",
         "ma",
         "mama",
         "mavp",
         "midpoint",
         "midprice",
+        "rma",
         "sar",
         "sarext",
         "sma",
+        "supertrend",
         "t3",
         "tema",
         "trima",
+        "vwma",
         "wma",
+        "zlema",
     ],
     "Pattern Recognition": [
         "cdl2crows",
@@ -165,7 +197,14 @@ __function_groups__ = {
         "cdlupsidegap2crows",
         "cdlxsidegap3methods",
     ],
-    "Price Transform": ["avgprice", "medprice", "typprice", "wclprice"],
+    "Price Transform": [
+        "avgdev",
+        "avgprice",
+        "ha",
+        "medprice",
+        "typprice",
+        "wclprice",
+    ],
     "Statistic Functions": [
         "beta",
         "correl",
@@ -173,12 +212,35 @@ __function_groups__ = {
         "linearreg_angle",
         "linearreg_intercept",
         "linearreg_slope",
+        "percentile",
+        "percentrank",
         "stddev",
         "tsf",
         "var",
     ],
-    "Volatility Indicators": ["atr", "natr", "trange"],
-    "Volume Indicators": ["ad", "adosc", "obv"],
+    "Volatility Indicators": [
+        "adr",
+        "atr",
+        "cvi",
+        "massi",
+        "natr",
+        "rvi",
+        "trange",
+    ],
+    "Volume Indicators": [
+        "ad",
+        "adosc",
+        "cmf",
+        "efi",
+        "marketfi",
+        "nvi",
+        "obv",
+        "pvi",
+        "pvo",
+        "pvt",
+        "rvol",
+        "vwap",
+    ],
 }
 
 
@@ -202,19 +264,29 @@ def get_functions_output_struct():
     Returns a dict with keys of function names and keys of the output struct
     """
     return {
-        "ht_phasor": ["inphase", "quadrature"],
-        "ht_sine": ["sine", "leadsine"],
-        "minmax": ["min", "max"],
-        "minmaxindex": ["minidx", "maxidx"],
-        "aroon": ["aroondown", "aroonup"],
-        "macd": ["macd", "macdsignal", "macdhist"],
-        "macdext": ["macd", "macdsignal", "macdhist"],
-        "macdfix": ["macd", "macdsignal", "macdhist"],
-        "stoch": ["slowk", "slowd"],
-        "stochf": ["fastk", "fastd"],
-        "stochrsi": ["fastk", "fastd"],
-        "bbands": ["upperband", "middleband", "lowerband"],
-        "mama": ["mama", "fama"],
+        "ht_phasor": ['inphase', 'quadrature'],
+        "ht_sine": ['sine', 'leadsine'],
+        "minmax": ['min', 'max'],
+        "minmaxindex": ['minidx', 'maxidx'],
+        "aroon": ['aroondown', 'aroonup'],
+        "eri": ['bullpower', 'bearpower'],
+        "fractal": ['swinghigh', 'swinglow'],
+        "kdj": ['k', 'd', 'j'],
+        "macd": ['macd', 'macdsignal', 'macdhist'],
+        "macdext": ['macd', 'macdsignal', 'macdhist'],
+        "macdfix": ['macd', 'macdsignal', 'macdhist'],
+        "smi": ['smi', 'smisignal'],
+        "stoch": ['slowk', 'slowd'],
+        "stochf": ['fastk', 'fastd'],
+        "stochrsi": ['fastk', 'fastd'],
+        "vortex": ['plusvi', 'minusvi'],
+        "accbands": ['upperband', 'middleband', 'lowerband'],
+        "bbands": ['upperband', 'middleband', 'lowerband'],
+        "donchian": ['upperband', 'middleband', 'lowerband'],
+        "kc": ['upperband', 'middleband', 'lowerband'],
+        "mama": ['mama', 'fama'],
+        "supertrend": ['supertrend', 'trend'],
+        "ha": ['haopen', 'hahigh', 'halow', 'haclose'],
     }
 
 
@@ -794,16 +866,16 @@ class TAExpr:
             is_elementwise=False,
         )
 
-    def apo(self, fastperiod: int = 12, slowperiod: int = 26, matype: int = 0) -> pl.Expr:
+    def apo(self, fastperiod: int = 12, slowperiod: int = 26, matype: int = 1) -> pl.Expr:
         """Absolute Price Oscillator (Momentum Indicators)
-        pl.col("close").ta.apo(fastperiod=12, slowperiod=26, matype=0)
+        pl.col("close").ta.apo(fastperiod=12, slowperiod=26, matype=1)
 
         Inputs:
             prices: ['close']
         Parameters:
             fastperiod: 12
             slowperiod: 26
-            matype: 0
+            matype: 1
         Outputs:
             real
         """
@@ -1176,16 +1248,16 @@ class TAExpr:
             is_elementwise=False,
         )
 
-    def ppo(self, fastperiod: int = 12, slowperiod: int = 26, matype: int = 0) -> pl.Expr:
+    def ppo(self, fastperiod: int = 12, slowperiod: int = 26, matype: int = 1) -> pl.Expr:
         """Percentage Price Oscillator (Momentum Indicators)
-        pl.col("close").ta.ppo(fastperiod=12, slowperiod=26, matype=0)
+        pl.col("close").ta.ppo(fastperiod=12, slowperiod=26, matype=1)
 
         Inputs:
             prices: ['close']
         Parameters:
             fastperiod: 12
             slowperiod: 26
-            matype: 0
+            matype: 1
         Outputs:
             real
         """
@@ -1489,15 +1561,15 @@ class TAExpr:
         )
 
     def bbands(
-        self, timeperiod: int = 5, nbdevup: float = 2.0, nbdevdn: float = 2.0, matype: int = 0
+        self, timeperiod: int = 20, nbdevup: float = 2.0, nbdevdn: float = 2.0, matype: int = 0
     ) -> pl.Expr:
         """Bollinger Bands (Overlap Studies)
-        ta.pol("close").ta.bbands(timeperiod=5, nbdevup=2.0, nbdevdn=2.0, matype=0)
+        ta.pol("close").ta.bbands(timeperiod=20, nbdevup=2.0, nbdevdn=2.0, matype=0)
 
         Inputs:
             real: (any ndarray)
         Parameters:
-            timeperiod: 5
+            timeperiod: 20
             nbdevup: 2.0
             nbdevdn: 2.0
             ma_type: 0
@@ -2241,10 +2313,10 @@ class TAExpr:
         high: IntoExpr = pl.col("high"),
         low: IntoExpr = pl.col("low"),
         close: IntoExpr = pl.col("close"),
-        penetration: float = 0.3,
+        penetration: float = 0.5,
     ):
         """Dark Cloud Cover (Pattern Recognition)
-            pl.col("open").ta.cdldarkcloudcover(pl.col("high"), pl.col("low"), pl.col("close"), penetration=0.3)
+            pl.col("open").ta.cdldarkcloudcover(pl.col("high"), pl.col("low"), pl.col("close"), penetration=0.5)
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
@@ -2853,10 +2925,10 @@ class TAExpr:
         high: IntoExpr = pl.col("high"),
         low: IntoExpr = pl.col("low"),
         close: IntoExpr = pl.col("close"),
-        penetration: float = 0.3,
+        penetration: float = 0.5,
     ):
         """Mat Hold (Pattern Recognition)
-            pl.col("open").ta.cdlmathold(pl.col("high"), pl.col("low"), pl.col("close"), penetration=0.3)
+            pl.col("open").ta.cdlmathold(pl.col("high"), pl.col("low"), pl.col("close"), penetration=0.5)
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
@@ -3663,6 +3735,1100 @@ class TAExpr:
             is_elementwise=False,
         )
 
+    def cumsum(
+        self,
+    ) -> pl.Expr:
+        """Cumulative Sum (Math Operators)
+        pl.col("close").ta.cumsum()
+
+        Inputs:
+            real
+        Outputs:
+            real
+        """
+        return register_plugin(
+            args=[self._expr],
+            lib=lib,
+            symbol="cumsum",
+            is_elementwise=False,
+        )
+
+    def ac(
+        self,
+        low: IntoExpr = pl.col("low"),
+        fastperiod: int = 5,
+        slowperiod: int = 34,
+        signalperiod: int = 5,
+    ) -> pl.Expr:
+        """Accelerator/Decelerator Oscillator (Momentum Indicators)
+        pl.col("high").ta.ac(pl.col("low"), fastperiod=5, slowperiod=34, signalperiod=5)
+
+        Inputs:
+            prices: ['high', 'low']
+        Parameters:
+            fastperiod: 5
+            slowperiod: 34
+            signalperiod: 5
+        Outputs:
+            real
+        """
+        return register_plugin(
+            args=[self._expr, low],
+            lib=lib,
+            kwargs={
+                "fastperiod": fastperiod,
+                "slowperiod": slowperiod,
+                "signalperiod": signalperiod,
+            },
+            symbol="ac",
+            is_elementwise=False,
+        )
+
+    def ao(
+        self,
+        low: IntoExpr = pl.col("low"),
+        fastperiod: int = 5,
+        slowperiod: int = 34,
+    ) -> pl.Expr:
+        """Awesome Oscillator (Momentum Indicators)
+        pl.col("high").ta.ao(pl.col("low"), fastperiod=5, slowperiod=34)
+
+        Inputs:
+            prices: ['high', 'low']
+        Parameters:
+            fastperiod: 5
+            slowperiod: 34
+        Outputs:
+            real
+        """
+        return register_plugin(
+            args=[self._expr, low],
+            lib=lib,
+            kwargs={
+                "fastperiod": fastperiod,
+                "slowperiod": slowperiod,
+            },
+            symbol="ao",
+            is_elementwise=False,
+        )
+
+    def cmou(
+        self,
+        timeperiod: int = 14,
+    ) -> pl.Expr:
+        """Chande Momentum Oscillator (Unsmoothed) (Momentum Indicators)
+        pl.col("close").ta.cmou(timeperiod=14)
+
+        Inputs:
+            real
+        Parameters:
+            timeperiod: 14
+        Outputs:
+            real
+        """
+        return register_plugin(
+            args=[self._expr],
+            lib=lib,
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="cmou",
+            is_elementwise=False,
+        )
+
+    def coppock(
+        self,
+        wmaperiod: int = 10,
+        roc1period: int = 11,
+        roc2period: int = 14,
+    ) -> pl.Expr:
+        """Coppock Curve (Momentum Indicators)
+        pl.col("close").ta.coppock(wmaperiod=10, roc1period=11, roc2period=14)
+
+        Inputs:
+            real
+        Parameters:
+            wmaperiod: 10
+            roc1period: 11
+            roc2period: 14
+        Outputs:
+            real
+        """
+        return register_plugin(
+            args=[self._expr],
+            lib=lib,
+            kwargs={
+                "wmaperiod": wmaperiod,
+                "roc1period": roc1period,
+                "roc2period": roc2period,
+            },
+            symbol="coppock",
+            is_elementwise=False,
+        )
+
+    def dpo(
+        self,
+        timeperiod: int = 20,
+    ) -> pl.Expr:
+        """Detrended Price Oscillator (Momentum Indicators)
+        pl.col("close").ta.dpo(timeperiod=20)
+
+        Inputs:
+            real
+        Parameters:
+            timeperiod: 20
+        Outputs:
+            real
+        """
+        return register_plugin(
+            args=[self._expr],
+            lib=lib,
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="dpo",
+            is_elementwise=False,
+        )
+
+    def er(
+        self,
+        timeperiod: int = 10,
+    ) -> pl.Expr:
+        """Kaufman Efficiency Ratio (Momentum Indicators)
+        pl.col("close").ta.er(timeperiod=10)
+
+        Inputs:
+            real
+        Parameters:
+            timeperiod: 10
+        Outputs:
+            real
+        """
+        return register_plugin(
+            args=[self._expr],
+            lib=lib,
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="er",
+            is_elementwise=False,
+        )
+
+    def eri(
+        self,
+        high: IntoExpr = pl.col("high"),
+        low: IntoExpr = pl.col("low"),
+        timeperiod: int = 13,
+    ) -> pl.Expr:
+        """Elder Ray Index (Bull Power / Bear Power) (Momentum Indicators)
+        pl.col("close").ta.eri(pl.col("high"), pl.col("low"), timeperiod=13)
+
+        Inputs:
+            prices: ['high', 'low', 'close']
+        Parameters:
+            timeperiod: 13
+        Outputs:
+            bullpower, bearpower
+        """
+        return register_plugin(
+            args=[self._expr, high, low],
+            lib=lib,
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="eri",
+            is_elementwise=False,
+        )
+
+    def fosc(
+        self,
+        timeperiod: int = 5,
+    ) -> pl.Expr:
+        """Forecast Oscillator (Momentum Indicators)
+        pl.col("close").ta.fosc(timeperiod=5)
+
+        Inputs:
+            real
+        Parameters:
+            timeperiod: 5
+        Outputs:
+            real
+        """
+        return register_plugin(
+            args=[self._expr],
+            lib=lib,
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="fosc",
+            is_elementwise=False,
+        )
+
+    def fractal(
+        self,
+        low: IntoExpr = pl.col("low"),
+        leftbars: int = 2,
+        rightbars: int = 2,
+    ) -> pl.Expr:
+        """Williams Fractal (Momentum Indicators)
+        pl.col("high").ta.fractal(pl.col("low"), leftbars=2, rightbars=2)
+
+        Inputs:
+            prices: ['high', 'low']
+        Parameters:
+            leftbars: 2
+            rightbars: 2
+        Outputs:
+            swinghigh, swinglow
+        """
+        return register_plugin(
+            args=[self._expr, low],
+            lib=lib,
+            kwargs={
+                "leftbars": leftbars,
+                "rightbars": rightbars,
+            },
+            symbol="fractal",
+            is_elementwise=False,
+        )
+
+    def imi(
+        self,
+        close: IntoExpr = pl.col("close"),
+        timeperiod: int = 14,
+    ) -> pl.Expr:
+        """Intraday Momentum Index (Momentum Indicators)
+        pl.col("open").ta.imi(pl.col("close"), timeperiod=14)
+
+        Inputs:
+            prices: ['open', 'close']
+        Parameters:
+            timeperiod: 14
+        Outputs:
+            real
+        """
+        return register_plugin(
+            args=[self._expr, close],
+            lib=lib,
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="imi",
+            is_elementwise=False,
+        )
+
+    def kdj(
+        self,
+        high: IntoExpr = pl.col("high"),
+        low: IntoExpr = pl.col("low"),
+        fastk_period: int = 9,
+        slowk_period: int = 3,
+        slowk_matype: int = 13,
+        slowd_period: int = 3,
+        slowd_matype: int = 13,
+    ) -> pl.Expr:
+        """KDJ Stochastic (Momentum Indicators)
+        pl.col("close").ta.kdj(pl.col("high"), pl.col("low"), fastk_period=9, slowk_period=3, slowk_matype=13, slowd_period=3, slowd_matype=13)
+
+        Inputs:
+            prices: ['high', 'low', 'close']
+        Parameters:
+            fastk_period: 9
+            slowk_period: 3
+            slowk_matype: 13
+            slowd_period: 3
+            slowd_matype: 13
+        Outputs:
+            k, d, j
+        """
+        return register_plugin(
+            args=[self._expr, high, low],
+            lib=lib,
+            kwargs={
+                "fastk_period": fastk_period,
+                "slowk_period": slowk_period,
+                "slowk_matype": slowk_matype,
+                "slowd_period": slowd_period,
+                "slowd_matype": slowd_matype,
+            },
+            symbol="kdj",
+            is_elementwise=False,
+        )
+
+    def qstick(
+        self,
+        close: IntoExpr = pl.col("close"),
+        timeperiod: int = 10,
+    ) -> pl.Expr:
+        """Qstick (Momentum Indicators)
+        pl.col("open").ta.qstick(pl.col("close"), timeperiod=10)
+
+        Inputs:
+            prices: ['open', 'close']
+        Parameters:
+            timeperiod: 10
+        Outputs:
+            real
+        """
+        return register_plugin(
+            args=[self._expr, close],
+            lib=lib,
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="qstick",
+            is_elementwise=False,
+        )
+
+    def smi(
+        self,
+        high: IntoExpr = pl.col("high"),
+        low: IntoExpr = pl.col("low"),
+        timeperiod: int = 13,
+        fastperiod: int = 2,
+        slowperiod: int = 25,
+        signalperiod: int = 9,
+    ) -> pl.Expr:
+        """Stochastic Momentum Index (Momentum Indicators)
+        pl.col("close").ta.smi(pl.col("high"), pl.col("low"), timeperiod=13, fastperiod=2, slowperiod=25, signalperiod=9)
+
+        Inputs:
+            prices: ['high', 'low', 'close']
+        Parameters:
+            timeperiod: 13
+            fastperiod: 2
+            slowperiod: 25
+            signalperiod: 9
+        Outputs:
+            smi, smisignal
+        """
+        return register_plugin(
+            args=[self._expr, high, low],
+            lib=lib,
+            kwargs={
+                "timeperiod": timeperiod,
+                "fastperiod": fastperiod,
+                "slowperiod": slowperiod,
+                "signalperiod": signalperiod,
+            },
+            symbol="smi",
+            is_elementwise=False,
+        )
+
+    def tsi(
+        self,
+        firstperiod: int = 25,
+        secondperiod: int = 13,
+    ) -> pl.Expr:
+        """True Strength Index (Momentum Indicators)
+        pl.col("close").ta.tsi(firstperiod=25, secondperiod=13)
+
+        Inputs:
+            real
+        Parameters:
+            firstperiod: 25
+            secondperiod: 13
+        Outputs:
+            real
+        """
+        return register_plugin(
+            args=[self._expr],
+            lib=lib,
+            kwargs={
+                "firstperiod": firstperiod,
+                "secondperiod": secondperiod,
+            },
+            symbol="tsi",
+            is_elementwise=False,
+        )
+
+    def vhf(
+        self,
+        timeperiod: int = 28,
+    ) -> pl.Expr:
+        """Vertical Horizontal Filter (Momentum Indicators)
+        pl.col("close").ta.vhf(timeperiod=28)
+
+        Inputs:
+            real
+        Parameters:
+            timeperiod: 28
+        Outputs:
+            real
+        """
+        return register_plugin(
+            args=[self._expr],
+            lib=lib,
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="vhf",
+            is_elementwise=False,
+        )
+
+    def vortex(
+        self,
+        high: IntoExpr = pl.col("high"),
+        low: IntoExpr = pl.col("low"),
+        timeperiod: int = 14,
+    ) -> pl.Expr:
+        """Vortex Indicator (Momentum Indicators)
+        pl.col("close").ta.vortex(pl.col("high"), pl.col("low"), timeperiod=14)
+
+        Inputs:
+            prices: ['high', 'low', 'close']
+        Parameters:
+            timeperiod: 14
+        Outputs:
+            plusvi, minusvi
+        """
+        return register_plugin(
+            args=[self._expr, high, low],
+            lib=lib,
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="vortex",
+            is_elementwise=False,
+        )
+
+    def wad(
+        self,
+        high: IntoExpr = pl.col("high"),
+        low: IntoExpr = pl.col("low"),
+    ) -> pl.Expr:
+        """Williams' Accumulation/Distribution (Momentum Indicators)
+        pl.col("close").ta.wad(pl.col("high"), pl.col("low"))
+
+        Inputs:
+            prices: ['high', 'low', 'close']
+        Outputs:
+            real
+        """
+        return register_plugin(
+            args=[self._expr, high, low],
+            lib=lib,
+            symbol="wad",
+            is_elementwise=False,
+        )
+
+    def accbands(
+        self,
+        high: IntoExpr = pl.col("high"),
+        low: IntoExpr = pl.col("low"),
+        timeperiod: int = 20,
+    ) -> pl.Expr:
+        """Acceleration Bands (Overlap Studies)
+        pl.col("close").ta.accbands(pl.col("high"), pl.col("low"), timeperiod=20)
+
+        Inputs:
+            prices: ['high', 'low', 'close']
+        Parameters:
+            timeperiod: 20
+        Outputs:
+            upperband, middleband, lowerband
+        """
+        return register_plugin(
+            args=[self._expr, high, low],
+            lib=lib,
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="accbands",
+            is_elementwise=False,
+        )
+
+    def donchian(
+        self,
+        low: IntoExpr = pl.col("low"),
+        timeperiod: int = 20,
+    ) -> pl.Expr:
+        """Donchian Channels (Overlap Studies)
+        pl.col("high").ta.donchian(pl.col("low"), timeperiod=20)
+
+        Inputs:
+            prices: ['high', 'low']
+        Parameters:
+            timeperiod: 20
+        Outputs:
+            upperband, middleband, lowerband
+        """
+        return register_plugin(
+            args=[self._expr, low],
+            lib=lib,
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="donchian",
+            is_elementwise=False,
+        )
+
+    def hma(
+        self,
+        timeperiod: int = 20,
+    ) -> pl.Expr:
+        """Hull Moving Average (Overlap Studies)
+        pl.col("close").ta.hma(timeperiod=20)
+
+        Inputs:
+            real
+        Parameters:
+            timeperiod: 20
+        Outputs:
+            real
+        """
+        return register_plugin(
+            args=[self._expr],
+            lib=lib,
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="hma",
+            is_elementwise=False,
+        )
+
+    def kc(
+        self,
+        high: IntoExpr = pl.col("high"),
+        low: IntoExpr = pl.col("low"),
+        timeperiod: int = 20,
+        atrperiod: int = 10,
+        nbdev: float = 2.0,
+    ) -> pl.Expr:
+        """Keltner Channels (Overlap Studies)
+        pl.col("close").ta.kc(pl.col("high"), pl.col("low"), timeperiod=20, atrperiod=10, nbdev=2.0)
+
+        Inputs:
+            prices: ['high', 'low', 'close']
+        Parameters:
+            timeperiod: 20
+            atrperiod: 10
+            nbdev: 2.0
+        Outputs:
+            upperband, middleband, lowerband
+        """
+        return register_plugin(
+            args=[self._expr, high, low],
+            lib=lib,
+            kwargs={
+                "timeperiod": timeperiod,
+                "atrperiod": atrperiod,
+                "nbdev": nbdev,
+            },
+            symbol="kc",
+            is_elementwise=False,
+        )
+
+    def rma(
+        self,
+        timeperiod: int = 30,
+    ) -> pl.Expr:
+        """Wilder's Smoothed Moving Average (Overlap Studies)
+        pl.col("close").ta.rma(timeperiod=30)
+
+        Inputs:
+            real
+        Parameters:
+            timeperiod: 30
+        Outputs:
+            real
+        """
+        return register_plugin(
+            args=[self._expr],
+            lib=lib,
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="rma",
+            is_elementwise=False,
+        )
+
+    def supertrend(
+        self,
+        high: IntoExpr = pl.col("high"),
+        low: IntoExpr = pl.col("low"),
+        timeperiod: int = 10,
+        multiplier: float = 3.0,
+    ) -> pl.Expr:
+        """SuperTrend (Overlap Studies)
+        pl.col("close").ta.supertrend(pl.col("high"), pl.col("low"), timeperiod=10, multiplier=3.0)
+
+        Inputs:
+            prices: ['high', 'low', 'close']
+        Parameters:
+            timeperiod: 10
+            multiplier: 3.0
+        Outputs:
+            supertrend, trend
+        """
+        return register_plugin(
+            args=[self._expr, high, low],
+            lib=lib,
+            kwargs={
+                "timeperiod": timeperiod,
+                "multiplier": multiplier,
+            },
+            symbol="supertrend",
+            is_elementwise=False,
+        )
+
+    def vwma(
+        self,
+        volume: IntoExpr = pl.col("volume"),
+        timeperiod: int = 30,
+    ) -> pl.Expr:
+        """Volume Weighted Moving Average (Overlap Studies)
+        pl.col("close").ta.vwma(pl.col("volume"), timeperiod=30)
+
+        Inputs:
+            prices: ['real', 'volume']
+        Parameters:
+            timeperiod: 30
+        Outputs:
+            real
+        """
+        return register_plugin(
+            args=[self._expr, volume],
+            lib=lib,
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="vwma",
+            is_elementwise=False,
+        )
+
+    def zlema(
+        self,
+        timeperiod: int = 30,
+    ) -> pl.Expr:
+        """Zero-Lag Exponential Moving Average (Overlap Studies)
+        pl.col("close").ta.zlema(timeperiod=30)
+
+        Inputs:
+            real
+        Parameters:
+            timeperiod: 30
+        Outputs:
+            real
+        """
+        return register_plugin(
+            args=[self._expr],
+            lib=lib,
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="zlema",
+            is_elementwise=False,
+        )
+
+    def avgdev(
+        self,
+        timeperiod: int = 14,
+    ) -> pl.Expr:
+        """Average Deviation (Price Transform)
+        pl.col("close").ta.avgdev(timeperiod=14)
+
+        Inputs:
+            real
+        Parameters:
+            timeperiod: 14
+        Outputs:
+            real
+        """
+        return register_plugin(
+            args=[self._expr],
+            lib=lib,
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="avgdev",
+            is_elementwise=False,
+        )
+
+    def ha(
+        self,
+        high: IntoExpr = pl.col("high"),
+        low: IntoExpr = pl.col("low"),
+        close: IntoExpr = pl.col("close"),
+    ) -> pl.Expr:
+        """Heikin-Ashi Candles (Price Transform)
+        pl.col("open").ta.ha(pl.col("high"), pl.col("low"), pl.col("close"))
+
+        Inputs:
+            prices: ['open', 'high', 'low', 'close']
+        Outputs:
+            haopen, hahigh, halow, haclose
+        """
+        return register_plugin(
+            args=[self._expr, high, low, close],
+            lib=lib,
+            symbol="ha",
+            is_elementwise=False,
+        )
+
+    def percentile(
+        self,
+        timeperiod: int = 30,
+        percentile: float = 50.0,
+    ) -> pl.Expr:
+        """Percentile (nearest rank) (Statistic Functions)
+        pl.col("close").ta.percentile(timeperiod=30, percentile=50.0)
+
+        Inputs:
+            real
+        Parameters:
+            timeperiod: 30
+            percentile: 50.0
+        Outputs:
+            real
+        """
+        return register_plugin(
+            args=[self._expr],
+            lib=lib,
+            kwargs={
+                "timeperiod": timeperiod,
+                "percentile": percentile,
+            },
+            symbol="percentile",
+            is_elementwise=False,
+        )
+
+    def percentrank(
+        self,
+        timeperiod: int = 100,
+    ) -> pl.Expr:
+        """Percent Rank (Statistic Functions)
+        pl.col("close").ta.percentrank(timeperiod=100)
+
+        Inputs:
+            real
+        Parameters:
+            timeperiod: 100
+        Outputs:
+            real
+        """
+        return register_plugin(
+            args=[self._expr],
+            lib=lib,
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="percentrank",
+            is_elementwise=False,
+        )
+
+    def adr(
+        self,
+        low: IntoExpr = pl.col("low"),
+        timeperiod: int = 14,
+    ) -> pl.Expr:
+        """Average Day Range (Volatility Indicators)
+        pl.col("high").ta.adr(pl.col("low"), timeperiod=14)
+
+        Inputs:
+            prices: ['high', 'low']
+        Parameters:
+            timeperiod: 14
+        Outputs:
+            real
+        """
+        return register_plugin(
+            args=[self._expr, low],
+            lib=lib,
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="adr",
+            is_elementwise=False,
+        )
+
+    def cvi(
+        self,
+        low: IntoExpr = pl.col("low"),
+        timeperiod: int = 10,
+        rocperiod: int = 10,
+    ) -> pl.Expr:
+        """Chaikin's Volatility (Volatility Indicators)
+        pl.col("high").ta.cvi(pl.col("low"), timeperiod=10, rocperiod=10)
+
+        Inputs:
+            prices: ['high', 'low']
+        Parameters:
+            timeperiod: 10
+            rocperiod: 10
+        Outputs:
+            real
+        """
+        return register_plugin(
+            args=[self._expr, low],
+            lib=lib,
+            kwargs={
+                "timeperiod": timeperiod,
+                "rocperiod": rocperiod,
+            },
+            symbol="cvi",
+            is_elementwise=False,
+        )
+
+    def massi(
+        self,
+        low: IntoExpr = pl.col("low"),
+        fastperiod: int = 9,
+        slowperiod: int = 25,
+    ) -> pl.Expr:
+        """Mass Index (Volatility Indicators)
+        pl.col("high").ta.massi(pl.col("low"), fastperiod=9, slowperiod=25)
+
+        Inputs:
+            prices: ['high', 'low']
+        Parameters:
+            fastperiod: 9
+            slowperiod: 25
+        Outputs:
+            real
+        """
+        return register_plugin(
+            args=[self._expr, low],
+            lib=lib,
+            kwargs={
+                "fastperiod": fastperiod,
+                "slowperiod": slowperiod,
+            },
+            symbol="massi",
+            is_elementwise=False,
+        )
+
+    def rvi(
+        self,
+        timeperiod: int = 14,
+        stddevperiod: int = 10,
+    ) -> pl.Expr:
+        """Relative Volatility Index (Volatility Indicators)
+        pl.col("close").ta.rvi(timeperiod=14, stddevperiod=10)
+
+        Inputs:
+            real
+        Parameters:
+            timeperiod: 14
+            stddevperiod: 10
+        Outputs:
+            real
+        """
+        return register_plugin(
+            args=[self._expr],
+            lib=lib,
+            kwargs={
+                "timeperiod": timeperiod,
+                "stddevperiod": stddevperiod,
+            },
+            symbol="rvi",
+            is_elementwise=False,
+        )
+
+    def cmf(
+        self,
+        high: IntoExpr = pl.col("high"),
+        low: IntoExpr = pl.col("low"),
+        volume: IntoExpr = pl.col("volume"),
+        timeperiod: int = 20,
+    ) -> pl.Expr:
+        """Chaikin Money Flow (Volume Indicators)
+        pl.col("close").ta.cmf(pl.col("high"), pl.col("low"), pl.col("volume"), timeperiod=20)
+
+        Inputs:
+            prices: ['high', 'low', 'close', 'volume']
+        Parameters:
+            timeperiod: 20
+        Outputs:
+            real
+        """
+        return register_plugin(
+            args=[self._expr, high, low, volume],
+            lib=lib,
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="cmf",
+            is_elementwise=False,
+        )
+
+    def efi(
+        self,
+        volume: IntoExpr = pl.col("volume"),
+        timeperiod: int = 13,
+    ) -> pl.Expr:
+        """Elder's Force Index (Volume Indicators)
+        pl.col("close").ta.efi(pl.col("volume"), timeperiod=13)
+
+        Inputs:
+            prices: ['close', 'volume']
+        Parameters:
+            timeperiod: 13
+        Outputs:
+            real
+        """
+        return register_plugin(
+            args=[self._expr, volume],
+            lib=lib,
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="efi",
+            is_elementwise=False,
+        )
+
+    def marketfi(
+        self,
+        low: IntoExpr = pl.col("low"),
+        volume: IntoExpr = pl.col("volume"),
+    ) -> pl.Expr:
+        """Market Facilitation Index (Volume Indicators)
+        pl.col("high").ta.marketfi(pl.col("low"), pl.col("volume"))
+
+        Inputs:
+            prices: ['high', 'low', 'volume']
+        Outputs:
+            real
+        """
+        return register_plugin(
+            args=[self._expr, low, volume],
+            lib=lib,
+            symbol="marketfi",
+            is_elementwise=False,
+        )
+
+    def nvi(
+        self,
+        volume: IntoExpr = pl.col("volume"),
+    ) -> pl.Expr:
+        """Negative Volume Index (Volume Indicators)
+        pl.col("close").ta.nvi(pl.col("volume"))
+
+        Inputs:
+            prices: ['close', 'volume']
+        Outputs:
+            real
+        """
+        return register_plugin(
+            args=[self._expr, volume],
+            lib=lib,
+            symbol="nvi",
+            is_elementwise=False,
+        )
+
+    def pvi(
+        self,
+        volume: IntoExpr = pl.col("volume"),
+    ) -> pl.Expr:
+        """Positive Volume Index (Volume Indicators)
+        pl.col("close").ta.pvi(pl.col("volume"))
+
+        Inputs:
+            prices: ['close', 'volume']
+        Outputs:
+            real
+        """
+        return register_plugin(
+            args=[self._expr, volume],
+            lib=lib,
+            symbol="pvi",
+            is_elementwise=False,
+        )
+
+    def pvo(
+        self,
+        fastperiod: int = 12,
+        slowperiod: int = 26,
+        matype: int = 1,
+    ) -> pl.Expr:
+        """Percentage Volume Oscillator (Volume Indicators)
+        pl.col("volume").ta.pvo(fastperiod=12, slowperiod=26, matype=1)
+
+        Inputs:
+            prices: ['volume']
+        Parameters:
+            fastperiod: 12
+            slowperiod: 26
+            matype: 1
+        Outputs:
+            real
+        """
+        return register_plugin(
+            args=[self._expr],
+            lib=lib,
+            kwargs={
+                "fastperiod": fastperiod,
+                "slowperiod": slowperiod,
+                "matype": matype,
+            },
+            symbol="pvo",
+            is_elementwise=False,
+        )
+
+    def pvt(
+        self,
+        volume: IntoExpr = pl.col("volume"),
+    ) -> pl.Expr:
+        """Price Volume Trend (Volume Indicators)
+        pl.col("close").ta.pvt(pl.col("volume"))
+
+        Inputs:
+            prices: ['close', 'volume']
+        Outputs:
+            real
+        """
+        return register_plugin(
+            args=[self._expr, volume],
+            lib=lib,
+            symbol="pvt",
+            is_elementwise=False,
+        )
+
+    def rvol(
+        self,
+        timeperiod: int = 20,
+    ) -> pl.Expr:
+        """Relative Volume (Volume Indicators)
+        pl.col("volume").ta.rvol(timeperiod=20)
+
+        Inputs:
+            prices: ['volume']
+        Parameters:
+            timeperiod: 20
+        Outputs:
+            real
+        """
+        return register_plugin(
+            args=[self._expr],
+            lib=lib,
+            kwargs={
+                "timeperiod": timeperiod,
+            },
+            symbol="rvol",
+            is_elementwise=False,
+        )
+
+    def vwap(
+        self,
+        high: IntoExpr = pl.col("high"),
+        low: IntoExpr = pl.col("low"),
+        volume: IntoExpr = pl.col("volume"),
+    ) -> pl.Expr:
+        """Volume Weighted Average Price (Volume Indicators)
+        pl.col("close").ta.vwap(pl.col("high"), pl.col("low"), pl.col("volume"))
+
+        Inputs:
+            prices: ['high', 'low', 'close', 'volume']
+        Outputs:
+            real
+        """
+        return register_plugin(
+            args=[self._expr, high, low, volume],
+            lib=lib,
+            symbol="vwap",
+            is_elementwise=False,
+        )
+
 
 def ht_dcperiod(real: IntoExpr = pl.col("close")) -> pl.Expr:
     """Hilbert Transform - Dominant Cycle Period (Cycle Indicators)
@@ -4159,17 +5325,17 @@ def apo(
     real: IntoExpr = pl.col("close"),
     fastperiod: int = 12,
     slowperiod: int = 26,
-    matype: int = 0,
+    matype: int = 1,
 ) -> pl.Expr:
     """Absolute Price Oscillator (Momentum Indicators)
-    pl.col("close").ta.apo(timeperiod=12, matype=0)
+    pl.col("close").ta.apo(fastperiod=12, slowperiod=26, matype=1)
 
     Inputs:
         real
     Parameters:
         fastperiod: 12
         slowperiod: 26
-        matype: 0
+        matype: 1
     Outputs:
         real
     """
@@ -4469,17 +5635,17 @@ def ppo(
     real: IntoExpr = pl.col("close"),
     fastperiod: int = 12,
     slowperiod: int = 26,
-    matype: int = 0,
+    matype: int = 1,
 ) -> pl.Expr:
     """Percentage Price Oscillator (Momentum Indicators)
-    pl.col("close").ta.ppo(timeperiod=12, matype=0)
+    pl.col("close").ta.ppo(fastperiod=12, slowperiod=26, matype=1)
 
     Inputs:
         real
     Parameters:
         fastperiod: 12
         slowperiod: 26
-        matype: 0
+        matype: 1
     Outputs:
         real
     """
@@ -4720,18 +5886,18 @@ def willr(
 
 def bbands(
     real: IntoExpr = pl.col("close"),
-    timeperiod: int = 5,
+    timeperiod: int = 20,
     nbdevup: float = 2.0,
     nbdevdn: float = 2.0,
     matype: int = 0,
 ) -> pl.Expr:
     """Bollinger Bands (Overlap Studies)
-    pl.col("close").ta.bbands(timeperiod=5, nbdevup=2.0, nbdevdn=2.0, matype=0)
+    pl.col("close").ta.bbands(timeperiod=20, nbdevup=2.0, nbdevdn=2.0, matype=0)
 
     Inputs:
         real
     Parameters:
-        timeperiod: 5
+        timeperiod: 20
         nbdevup: 2.0
         nbdevdn: 2.0
         matype: 0
@@ -5308,10 +6474,10 @@ def cdldarkcloudcover(
     high: IntoExpr = pl.col("high"),
     low: IntoExpr = pl.col("low"),
     close: IntoExpr = pl.col("close"),
-    penetration: float = 0.3,
+    penetration: float = 0.5,
 ):
     """Dark Cloud Cover (Pattern Recognition)
-    pl.col("open").ta.cdldarkcloudcover(pl.col("high"), pl.col("low"), pl.col("close"), penetration=0.3)
+    pl.col("open").ta.cdldarkcloudcover(pl.col("high"), pl.col("low"), pl.col("close"), penetration=0.5)
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
@@ -5803,10 +6969,10 @@ def cdlmathold(
     high: IntoExpr = pl.col("high"),
     low: IntoExpr = pl.col("low"),
     close: IntoExpr = pl.col("close"),
-    penetration: float = 0.3,
+    penetration: float = 0.5,
 ):
     """Mat Hold (Pattern Recognition)
-    pl.col("open").ta.cdlmathold(pl.col("high"), pl.col("low"), pl.col("close"), penetration=0.3)
+    pl.col("open").ta.cdlmathold(pl.col("high"), pl.col("low"), pl.col("close"), penetration=0.5)
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
@@ -6500,3 +7666,797 @@ def obv(
         obv
     """
     return close.ta.obv(volume)
+
+
+def cumsum(
+    real: IntoExpr = pl.col("close"),
+) -> pl.Expr:
+    """Cumulative Sum (Math Operators)
+    pl.col("close").ta.cumsum()
+
+    Inputs:
+        real
+    Outputs:
+        real
+    """
+    return real.ta.cumsum()
+
+
+def ac(
+    high: IntoExpr = pl.col("high"),
+    low: IntoExpr = pl.col("low"),
+    fastperiod: int = 5,
+    slowperiod: int = 34,
+    signalperiod: int = 5,
+) -> pl.Expr:
+    """Accelerator/Decelerator Oscillator (Momentum Indicators)
+    pl.col("high").ta.ac(pl.col("low"), fastperiod=5, slowperiod=34, signalperiod=5)
+
+    Inputs:
+        prices: ['high', 'low']
+    Parameters:
+        fastperiod: 5
+        slowperiod: 34
+        signalperiod: 5
+    Outputs:
+        real
+    """
+    return high.ta.ac(low, fastperiod=fastperiod, slowperiod=slowperiod, signalperiod=signalperiod)
+
+
+def ao(
+    high: IntoExpr = pl.col("high"),
+    low: IntoExpr = pl.col("low"),
+    fastperiod: int = 5,
+    slowperiod: int = 34,
+) -> pl.Expr:
+    """Awesome Oscillator (Momentum Indicators)
+    pl.col("high").ta.ao(pl.col("low"), fastperiod=5, slowperiod=34)
+
+    Inputs:
+        prices: ['high', 'low']
+    Parameters:
+        fastperiod: 5
+        slowperiod: 34
+    Outputs:
+        real
+    """
+    return high.ta.ao(low, fastperiod=fastperiod, slowperiod=slowperiod)
+
+
+def cmou(
+    real: IntoExpr = pl.col("close"),
+    timeperiod: int = 14,
+) -> pl.Expr:
+    """Chande Momentum Oscillator (Unsmoothed) (Momentum Indicators)
+    pl.col("close").ta.cmou(timeperiod=14)
+
+    Inputs:
+        real
+    Parameters:
+        timeperiod: 14
+    Outputs:
+        real
+    """
+    return real.ta.cmou(timeperiod=timeperiod)
+
+
+def coppock(
+    real: IntoExpr = pl.col("close"),
+    wmaperiod: int = 10,
+    roc1period: int = 11,
+    roc2period: int = 14,
+) -> pl.Expr:
+    """Coppock Curve (Momentum Indicators)
+    pl.col("close").ta.coppock(wmaperiod=10, roc1period=11, roc2period=14)
+
+    Inputs:
+        real
+    Parameters:
+        wmaperiod: 10
+        roc1period: 11
+        roc2period: 14
+    Outputs:
+        real
+    """
+    return real.ta.coppock(wmaperiod=wmaperiod, roc1period=roc1period, roc2period=roc2period)
+
+
+def dpo(
+    real: IntoExpr = pl.col("close"),
+    timeperiod: int = 20,
+) -> pl.Expr:
+    """Detrended Price Oscillator (Momentum Indicators)
+    pl.col("close").ta.dpo(timeperiod=20)
+
+    Inputs:
+        real
+    Parameters:
+        timeperiod: 20
+    Outputs:
+        real
+    """
+    return real.ta.dpo(timeperiod=timeperiod)
+
+
+def er(
+    real: IntoExpr = pl.col("close"),
+    timeperiod: int = 10,
+) -> pl.Expr:
+    """Kaufman Efficiency Ratio (Momentum Indicators)
+    pl.col("close").ta.er(timeperiod=10)
+
+    Inputs:
+        real
+    Parameters:
+        timeperiod: 10
+    Outputs:
+        real
+    """
+    return real.ta.er(timeperiod=timeperiod)
+
+
+def eri(
+    high: IntoExpr = pl.col("high"),
+    low: IntoExpr = pl.col("low"),
+    close: IntoExpr = pl.col("close"),
+    timeperiod: int = 13,
+) -> pl.Expr:
+    """Elder Ray Index (Bull Power / Bear Power) (Momentum Indicators)
+    pl.col("close").ta.eri(pl.col("high"), pl.col("low"), timeperiod=13)
+
+    Inputs:
+        prices: ['high', 'low', 'close']
+    Parameters:
+        timeperiod: 13
+    Outputs:
+        bullpower, bearpower
+    """
+    return close.ta.eri(high, low, timeperiod=timeperiod)
+
+
+def fosc(
+    real: IntoExpr = pl.col("close"),
+    timeperiod: int = 5,
+) -> pl.Expr:
+    """Forecast Oscillator (Momentum Indicators)
+    pl.col("close").ta.fosc(timeperiod=5)
+
+    Inputs:
+        real
+    Parameters:
+        timeperiod: 5
+    Outputs:
+        real
+    """
+    return real.ta.fosc(timeperiod=timeperiod)
+
+
+def fractal(
+    high: IntoExpr = pl.col("high"),
+    low: IntoExpr = pl.col("low"),
+    leftbars: int = 2,
+    rightbars: int = 2,
+) -> pl.Expr:
+    """Williams Fractal (Momentum Indicators)
+    pl.col("high").ta.fractal(pl.col("low"), leftbars=2, rightbars=2)
+
+    Inputs:
+        prices: ['high', 'low']
+    Parameters:
+        leftbars: 2
+        rightbars: 2
+    Outputs:
+        swinghigh, swinglow
+    """
+    return high.ta.fractal(low, leftbars=leftbars, rightbars=rightbars)
+
+
+def imi(
+    open: IntoExpr = pl.col("open"),
+    close: IntoExpr = pl.col("close"),
+    timeperiod: int = 14,
+) -> pl.Expr:
+    """Intraday Momentum Index (Momentum Indicators)
+    pl.col("open").ta.imi(pl.col("close"), timeperiod=14)
+
+    Inputs:
+        prices: ['open', 'close']
+    Parameters:
+        timeperiod: 14
+    Outputs:
+        real
+    """
+    return open.ta.imi(close, timeperiod=timeperiod)
+
+
+def kdj(
+    high: IntoExpr = pl.col("high"),
+    low: IntoExpr = pl.col("low"),
+    close: IntoExpr = pl.col("close"),
+    fastk_period: int = 9,
+    slowk_period: int = 3,
+    slowk_matype: int = 13,
+    slowd_period: int = 3,
+    slowd_matype: int = 13,
+) -> pl.Expr:
+    """KDJ Stochastic (Momentum Indicators)
+    pl.col("close").ta.kdj(pl.col("high"), pl.col("low"), fastk_period=9, slowk_period=3, slowk_matype=13, slowd_period=3, slowd_matype=13)
+
+    Inputs:
+        prices: ['high', 'low', 'close']
+    Parameters:
+        fastk_period: 9
+        slowk_period: 3
+        slowk_matype: 13
+        slowd_period: 3
+        slowd_matype: 13
+    Outputs:
+        k, d, j
+    """
+    return close.ta.kdj(high, low, fastk_period=fastk_period, slowk_period=slowk_period, slowk_matype=slowk_matype, slowd_period=slowd_period, slowd_matype=slowd_matype)
+
+
+def qstick(
+    open: IntoExpr = pl.col("open"),
+    close: IntoExpr = pl.col("close"),
+    timeperiod: int = 10,
+) -> pl.Expr:
+    """Qstick (Momentum Indicators)
+    pl.col("open").ta.qstick(pl.col("close"), timeperiod=10)
+
+    Inputs:
+        prices: ['open', 'close']
+    Parameters:
+        timeperiod: 10
+    Outputs:
+        real
+    """
+    return open.ta.qstick(close, timeperiod=timeperiod)
+
+
+def smi(
+    high: IntoExpr = pl.col("high"),
+    low: IntoExpr = pl.col("low"),
+    close: IntoExpr = pl.col("close"),
+    timeperiod: int = 13,
+    fastperiod: int = 2,
+    slowperiod: int = 25,
+    signalperiod: int = 9,
+) -> pl.Expr:
+    """Stochastic Momentum Index (Momentum Indicators)
+    pl.col("close").ta.smi(pl.col("high"), pl.col("low"), timeperiod=13, fastperiod=2, slowperiod=25, signalperiod=9)
+
+    Inputs:
+        prices: ['high', 'low', 'close']
+    Parameters:
+        timeperiod: 13
+        fastperiod: 2
+        slowperiod: 25
+        signalperiod: 9
+    Outputs:
+        smi, smisignal
+    """
+    return close.ta.smi(high, low, timeperiod=timeperiod, fastperiod=fastperiod, slowperiod=slowperiod, signalperiod=signalperiod)
+
+
+def tsi(
+    real: IntoExpr = pl.col("close"),
+    firstperiod: int = 25,
+    secondperiod: int = 13,
+) -> pl.Expr:
+    """True Strength Index (Momentum Indicators)
+    pl.col("close").ta.tsi(firstperiod=25, secondperiod=13)
+
+    Inputs:
+        real
+    Parameters:
+        firstperiod: 25
+        secondperiod: 13
+    Outputs:
+        real
+    """
+    return real.ta.tsi(firstperiod=firstperiod, secondperiod=secondperiod)
+
+
+def vhf(
+    real: IntoExpr = pl.col("close"),
+    timeperiod: int = 28,
+) -> pl.Expr:
+    """Vertical Horizontal Filter (Momentum Indicators)
+    pl.col("close").ta.vhf(timeperiod=28)
+
+    Inputs:
+        real
+    Parameters:
+        timeperiod: 28
+    Outputs:
+        real
+    """
+    return real.ta.vhf(timeperiod=timeperiod)
+
+
+def vortex(
+    high: IntoExpr = pl.col("high"),
+    low: IntoExpr = pl.col("low"),
+    close: IntoExpr = pl.col("close"),
+    timeperiod: int = 14,
+) -> pl.Expr:
+    """Vortex Indicator (Momentum Indicators)
+    pl.col("close").ta.vortex(pl.col("high"), pl.col("low"), timeperiod=14)
+
+    Inputs:
+        prices: ['high', 'low', 'close']
+    Parameters:
+        timeperiod: 14
+    Outputs:
+        plusvi, minusvi
+    """
+    return close.ta.vortex(high, low, timeperiod=timeperiod)
+
+
+def wad(
+    high: IntoExpr = pl.col("high"),
+    low: IntoExpr = pl.col("low"),
+    close: IntoExpr = pl.col("close"),
+) -> pl.Expr:
+    """Williams' Accumulation/Distribution (Momentum Indicators)
+    pl.col("close").ta.wad(pl.col("high"), pl.col("low"))
+
+    Inputs:
+        prices: ['high', 'low', 'close']
+    Outputs:
+        real
+    """
+    return close.ta.wad(high, low)
+
+
+def accbands(
+    high: IntoExpr = pl.col("high"),
+    low: IntoExpr = pl.col("low"),
+    close: IntoExpr = pl.col("close"),
+    timeperiod: int = 20,
+) -> pl.Expr:
+    """Acceleration Bands (Overlap Studies)
+    pl.col("close").ta.accbands(pl.col("high"), pl.col("low"), timeperiod=20)
+
+    Inputs:
+        prices: ['high', 'low', 'close']
+    Parameters:
+        timeperiod: 20
+    Outputs:
+        upperband, middleband, lowerband
+    """
+    return close.ta.accbands(high, low, timeperiod=timeperiod)
+
+
+def donchian(
+    high: IntoExpr = pl.col("high"),
+    low: IntoExpr = pl.col("low"),
+    timeperiod: int = 20,
+) -> pl.Expr:
+    """Donchian Channels (Overlap Studies)
+    pl.col("high").ta.donchian(pl.col("low"), timeperiod=20)
+
+    Inputs:
+        prices: ['high', 'low']
+    Parameters:
+        timeperiod: 20
+    Outputs:
+        upperband, middleband, lowerband
+    """
+    return high.ta.donchian(low, timeperiod=timeperiod)
+
+
+def hma(
+    real: IntoExpr = pl.col("close"),
+    timeperiod: int = 20,
+) -> pl.Expr:
+    """Hull Moving Average (Overlap Studies)
+    pl.col("close").ta.hma(timeperiod=20)
+
+    Inputs:
+        real
+    Parameters:
+        timeperiod: 20
+    Outputs:
+        real
+    """
+    return real.ta.hma(timeperiod=timeperiod)
+
+
+def kc(
+    high: IntoExpr = pl.col("high"),
+    low: IntoExpr = pl.col("low"),
+    close: IntoExpr = pl.col("close"),
+    timeperiod: int = 20,
+    atrperiod: int = 10,
+    nbdev: float = 2.0,
+) -> pl.Expr:
+    """Keltner Channels (Overlap Studies)
+    pl.col("close").ta.kc(pl.col("high"), pl.col("low"), timeperiod=20, atrperiod=10, nbdev=2.0)
+
+    Inputs:
+        prices: ['high', 'low', 'close']
+    Parameters:
+        timeperiod: 20
+        atrperiod: 10
+        nbdev: 2.0
+    Outputs:
+        upperband, middleband, lowerband
+    """
+    return close.ta.kc(high, low, timeperiod=timeperiod, atrperiod=atrperiod, nbdev=nbdev)
+
+
+def rma(
+    real: IntoExpr = pl.col("close"),
+    timeperiod: int = 30,
+) -> pl.Expr:
+    """Wilder's Smoothed Moving Average (Overlap Studies)
+    pl.col("close").ta.rma(timeperiod=30)
+
+    Inputs:
+        real
+    Parameters:
+        timeperiod: 30
+    Outputs:
+        real
+    """
+    return real.ta.rma(timeperiod=timeperiod)
+
+
+def supertrend(
+    high: IntoExpr = pl.col("high"),
+    low: IntoExpr = pl.col("low"),
+    close: IntoExpr = pl.col("close"),
+    timeperiod: int = 10,
+    multiplier: float = 3.0,
+) -> pl.Expr:
+    """SuperTrend (Overlap Studies)
+    pl.col("close").ta.supertrend(pl.col("high"), pl.col("low"), timeperiod=10, multiplier=3.0)
+
+    Inputs:
+        prices: ['high', 'low', 'close']
+    Parameters:
+        timeperiod: 10
+        multiplier: 3.0
+    Outputs:
+        supertrend, trend
+    """
+    return close.ta.supertrend(high, low, timeperiod=timeperiod, multiplier=multiplier)
+
+
+def vwma(
+    real: IntoExpr = pl.col("close"),
+    volume: IntoExpr = pl.col("volume"),
+    timeperiod: int = 30,
+) -> pl.Expr:
+    """Volume Weighted Moving Average (Overlap Studies)
+    pl.col("close").ta.vwma(pl.col("volume"), timeperiod=30)
+
+    Inputs:
+        prices: ['real', 'volume']
+    Parameters:
+        timeperiod: 30
+    Outputs:
+        real
+    """
+    return real.ta.vwma(volume, timeperiod=timeperiod)
+
+
+def zlema(
+    real: IntoExpr = pl.col("close"),
+    timeperiod: int = 30,
+) -> pl.Expr:
+    """Zero-Lag Exponential Moving Average (Overlap Studies)
+    pl.col("close").ta.zlema(timeperiod=30)
+
+    Inputs:
+        real
+    Parameters:
+        timeperiod: 30
+    Outputs:
+        real
+    """
+    return real.ta.zlema(timeperiod=timeperiod)
+
+
+def avgdev(
+    real: IntoExpr = pl.col("close"),
+    timeperiod: int = 14,
+) -> pl.Expr:
+    """Average Deviation (Price Transform)
+    pl.col("close").ta.avgdev(timeperiod=14)
+
+    Inputs:
+        real
+    Parameters:
+        timeperiod: 14
+    Outputs:
+        real
+    """
+    return real.ta.avgdev(timeperiod=timeperiod)
+
+
+def ha(
+    open: IntoExpr = pl.col("open"),
+    high: IntoExpr = pl.col("high"),
+    low: IntoExpr = pl.col("low"),
+    close: IntoExpr = pl.col("close"),
+) -> pl.Expr:
+    """Heikin-Ashi Candles (Price Transform)
+    pl.col("open").ta.ha(pl.col("high"), pl.col("low"), pl.col("close"))
+
+    Inputs:
+        prices: ['open', 'high', 'low', 'close']
+    Outputs:
+        haopen, hahigh, halow, haclose
+    """
+    return open.ta.ha(high, low, close)
+
+
+def percentile(
+    real: IntoExpr = pl.col("close"),
+    timeperiod: int = 30,
+    percentile: float = 50.0,
+) -> pl.Expr:
+    """Percentile (nearest rank) (Statistic Functions)
+    pl.col("close").ta.percentile(timeperiod=30, percentile=50.0)
+
+    Inputs:
+        real
+    Parameters:
+        timeperiod: 30
+        percentile: 50.0
+    Outputs:
+        real
+    """
+    return real.ta.percentile(timeperiod=timeperiod, percentile=percentile)
+
+
+def percentrank(
+    real: IntoExpr = pl.col("close"),
+    timeperiod: int = 100,
+) -> pl.Expr:
+    """Percent Rank (Statistic Functions)
+    pl.col("close").ta.percentrank(timeperiod=100)
+
+    Inputs:
+        real
+    Parameters:
+        timeperiod: 100
+    Outputs:
+        real
+    """
+    return real.ta.percentrank(timeperiod=timeperiod)
+
+
+def adr(
+    high: IntoExpr = pl.col("high"),
+    low: IntoExpr = pl.col("low"),
+    timeperiod: int = 14,
+) -> pl.Expr:
+    """Average Day Range (Volatility Indicators)
+    pl.col("high").ta.adr(pl.col("low"), timeperiod=14)
+
+    Inputs:
+        prices: ['high', 'low']
+    Parameters:
+        timeperiod: 14
+    Outputs:
+        real
+    """
+    return high.ta.adr(low, timeperiod=timeperiod)
+
+
+def cvi(
+    high: IntoExpr = pl.col("high"),
+    low: IntoExpr = pl.col("low"),
+    timeperiod: int = 10,
+    rocperiod: int = 10,
+) -> pl.Expr:
+    """Chaikin's Volatility (Volatility Indicators)
+    pl.col("high").ta.cvi(pl.col("low"), timeperiod=10, rocperiod=10)
+
+    Inputs:
+        prices: ['high', 'low']
+    Parameters:
+        timeperiod: 10
+        rocperiod: 10
+    Outputs:
+        real
+    """
+    return high.ta.cvi(low, timeperiod=timeperiod, rocperiod=rocperiod)
+
+
+def massi(
+    high: IntoExpr = pl.col("high"),
+    low: IntoExpr = pl.col("low"),
+    fastperiod: int = 9,
+    slowperiod: int = 25,
+) -> pl.Expr:
+    """Mass Index (Volatility Indicators)
+    pl.col("high").ta.massi(pl.col("low"), fastperiod=9, slowperiod=25)
+
+    Inputs:
+        prices: ['high', 'low']
+    Parameters:
+        fastperiod: 9
+        slowperiod: 25
+    Outputs:
+        real
+    """
+    return high.ta.massi(low, fastperiod=fastperiod, slowperiod=slowperiod)
+
+
+def rvi(
+    real: IntoExpr = pl.col("close"),
+    timeperiod: int = 14,
+    stddevperiod: int = 10,
+) -> pl.Expr:
+    """Relative Volatility Index (Volatility Indicators)
+    pl.col("close").ta.rvi(timeperiod=14, stddevperiod=10)
+
+    Inputs:
+        real
+    Parameters:
+        timeperiod: 14
+        stddevperiod: 10
+    Outputs:
+        real
+    """
+    return real.ta.rvi(timeperiod=timeperiod, stddevperiod=stddevperiod)
+
+
+def cmf(
+    high: IntoExpr = pl.col("high"),
+    low: IntoExpr = pl.col("low"),
+    close: IntoExpr = pl.col("close"),
+    volume: IntoExpr = pl.col("volume"),
+    timeperiod: int = 20,
+) -> pl.Expr:
+    """Chaikin Money Flow (Volume Indicators)
+    pl.col("close").ta.cmf(pl.col("high"), pl.col("low"), pl.col("volume"), timeperiod=20)
+
+    Inputs:
+        prices: ['high', 'low', 'close', 'volume']
+    Parameters:
+        timeperiod: 20
+    Outputs:
+        real
+    """
+    return close.ta.cmf(high, low, volume, timeperiod=timeperiod)
+
+
+def efi(
+    close: IntoExpr = pl.col("close"),
+    volume: IntoExpr = pl.col("volume"),
+    timeperiod: int = 13,
+) -> pl.Expr:
+    """Elder's Force Index (Volume Indicators)
+    pl.col("close").ta.efi(pl.col("volume"), timeperiod=13)
+
+    Inputs:
+        prices: ['close', 'volume']
+    Parameters:
+        timeperiod: 13
+    Outputs:
+        real
+    """
+    return close.ta.efi(volume, timeperiod=timeperiod)
+
+
+def marketfi(
+    high: IntoExpr = pl.col("high"),
+    low: IntoExpr = pl.col("low"),
+    volume: IntoExpr = pl.col("volume"),
+) -> pl.Expr:
+    """Market Facilitation Index (Volume Indicators)
+    pl.col("high").ta.marketfi(pl.col("low"), pl.col("volume"))
+
+    Inputs:
+        prices: ['high', 'low', 'volume']
+    Outputs:
+        real
+    """
+    return high.ta.marketfi(low, volume)
+
+
+def nvi(
+    close: IntoExpr = pl.col("close"),
+    volume: IntoExpr = pl.col("volume"),
+) -> pl.Expr:
+    """Negative Volume Index (Volume Indicators)
+    pl.col("close").ta.nvi(pl.col("volume"))
+
+    Inputs:
+        prices: ['close', 'volume']
+    Outputs:
+        real
+    """
+    return close.ta.nvi(volume)
+
+
+def pvi(
+    close: IntoExpr = pl.col("close"),
+    volume: IntoExpr = pl.col("volume"),
+) -> pl.Expr:
+    """Positive Volume Index (Volume Indicators)
+    pl.col("close").ta.pvi(pl.col("volume"))
+
+    Inputs:
+        prices: ['close', 'volume']
+    Outputs:
+        real
+    """
+    return close.ta.pvi(volume)
+
+
+def pvo(
+    volume: IntoExpr = pl.col("volume"),
+    fastperiod: int = 12,
+    slowperiod: int = 26,
+    matype: int = 1,
+) -> pl.Expr:
+    """Percentage Volume Oscillator (Volume Indicators)
+    pl.col("volume").ta.pvo(fastperiod=12, slowperiod=26, matype=1)
+
+    Inputs:
+        prices: ['volume']
+    Parameters:
+        fastperiod: 12
+        slowperiod: 26
+        matype: 1
+    Outputs:
+        real
+    """
+    return volume.ta.pvo(fastperiod=fastperiod, slowperiod=slowperiod, matype=matype)
+
+
+def pvt(
+    close: IntoExpr = pl.col("close"),
+    volume: IntoExpr = pl.col("volume"),
+) -> pl.Expr:
+    """Price Volume Trend (Volume Indicators)
+    pl.col("close").ta.pvt(pl.col("volume"))
+
+    Inputs:
+        prices: ['close', 'volume']
+    Outputs:
+        real
+    """
+    return close.ta.pvt(volume)
+
+
+def rvol(
+    volume: IntoExpr = pl.col("volume"),
+    timeperiod: int = 20,
+) -> pl.Expr:
+    """Relative Volume (Volume Indicators)
+    pl.col("volume").ta.rvol(timeperiod=20)
+
+    Inputs:
+        prices: ['volume']
+    Parameters:
+        timeperiod: 20
+    Outputs:
+        real
+    """
+    return volume.ta.rvol(timeperiod=timeperiod)
+
+
+def vwap(
+    high: IntoExpr = pl.col("high"),
+    low: IntoExpr = pl.col("low"),
+    close: IntoExpr = pl.col("close"),
+    volume: IntoExpr = pl.col("volume"),
+) -> pl.Expr:
+    """Volume Weighted Average Price (Volume Indicators)
+    pl.col("close").ta.vwap(pl.col("high"), pl.col("low"), pl.col("volume"))
+
+    Inputs:
+        prices: ['high', 'low', 'close', 'volume']
+    Outputs:
+        real
+    """
+    return close.ta.vwap(high, low, volume)

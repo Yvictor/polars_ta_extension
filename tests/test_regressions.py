@@ -94,3 +94,49 @@ def test_macd_over_groups_shorter_than_lookback_preserves_length(expr: pl.Expr):
 
     assert result.height == df.height
     assert result.select(pl.all().is_nan().all()).row(0) == (True, True, True)
+
+
+@pytest.mark.parametrize(
+    "func",
+    ["kdj", "supertrend", "eri", "fractal", "smi", "vortex", "accbands", "donchian", "kc", "ha"],
+)
+def test_new_struct_functions_over_short_groups_preserve_length(func: str):
+    df = pl.DataFrame(
+        {
+            "g": ["a", "a", "b", "b", "b"],
+            "open": [1.0, 2.0, 3.0, 4.0, 5.0],
+            "high": [1.5, 2.5, 3.5, 4.5, 5.5],
+            "low": [0.5, 1.5, 2.5, 3.5, 4.5],
+            "close": [1.2, 2.2, 3.2, 4.2, 5.2],
+        }
+    )
+
+    result = df.select(getattr(plta, func)().over("g").alias("out")).unnest("out")
+
+    assert result.height == df.height
+    assert result.columns == plta.get_functions_output_struct()[func]
+
+
+@pytest.mark.parametrize("func", ["vwap", "cmf", "efi", "rvol", "pvo", "vwma"])
+def test_new_volume_functions_accept_int_volume(func: str):
+    n = 60
+    df = pl.DataFrame(
+        {
+            "high": [float(i) + 1.0 for i in range(n)],
+            "low": [float(i) - 1.0 for i in range(n)],
+            "close": [float(i) for i in range(n)],
+            "volume": list(range(1000, 1000 + n)),
+        }
+    )
+
+    result = df.select(getattr(plta, func)().alias("out"))
+
+    assert result.height == n
+    assert result["out"].dtype == pl.Float64
+    assert result["out"].tail(1).is_nan().sum() == 0
+
+
+def test_talib_version_and_function_count():
+    assert plta.__talib_version__.startswith("0.8.1")
+    assert len(plta.get_functions()) == 201
+    assert "kdj" in plta.get_function_groups()["Momentum Indicators"]
