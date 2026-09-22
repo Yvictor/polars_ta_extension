@@ -354,7 +354,7 @@ requires-dist = [{ name = "polars", specifier = ">=1.20,<2" }]
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "maturin", specifier = ">=1.8,<2" },
+    { name = "maturin", specifier = ">=1.15,<2" },
     { name = "numpy", specifier = ">=1.26" },
     { name = "pytest", specifier = ">=8" },
     { name = "pytest-benchmark", specifier = ">=5" },

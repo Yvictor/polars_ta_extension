@@ -3,6 +3,7 @@ name = "polars-talib"
 version = "0.2.0"
 description = "Polars extension for Ta-Lib: Support Ta-Lib functions in Polars expressions"
 readme = "README.md"
+license-files = ["LICENSE", "talib-sys/vendor/TA-Lib-LICENSE"]
 authors = [
     {name = "yvictor", email = "yvictor3141@gmail.com"}
 ]
@@ -22,12 +23,12 @@ python-source = "python"
 features = ["pyo3/extension-module"]
 
 [build-system]
-requires = ["maturin>=1.0,<2.0"]
+requires = ["maturin>=1.15,<2.0"]
 build-backend = "maturin"
 
 [dependency-groups]
 dev = [
-    "maturin>=1.8,<2",
+    "maturin>=1.15,<2",
     "pytest>=8",
     "numpy>=1.26",
     "pytest-benchmark>=5",

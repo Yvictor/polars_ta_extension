@@ -156,3 +156,11 @@ def test_skill_example_pipeline():
     ).unnest('macd'))
     assert result.height==64
     assert {'rsi','macd','macdsignal','macdhist','atr'}<=set(result.columns)
+
+
+def test_installed_wheel_contains_upstream_license():
+    from importlib.metadata import distribution
+    dist=distribution('polars-talib')
+    licenses=[f for f in dist.files if f.name=='TA-Lib-LICENSE']
+    assert len(licenses)==1
+    assert dist.locate_file(licenses[0]).read_bytes()==(Path(__file__).parents[1]/'talib-sys/vendor/TA-Lib-LICENSE').read_bytes()
