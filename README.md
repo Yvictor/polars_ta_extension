@@ -101,6 +101,26 @@ df.loc["AAPL"]
 
 It's about 150x faster, see more detail in [basic.ipynb](./examples/basic.ipynb)
 
+### 0.2.0 (TA-Lib 0.8.1) vs 0.1.6 (TA-Lib 0.4.0)
+
+Single expression on 50k rows, best of 7 runs (Linux x86_64, 4 cores), see
+`tests/test_bench.py` for the CI benchmarks:
+
+| expression | 0.1.6 | 0.2.0 | speedup |
+|---|---|---|---|
+| `macd()` | 0.541 ms | 0.156 ms | 3.5x |
+| `tema(30)` | 0.487 ms | 0.137 ms | 3.6x |
+| `trix(30)` | 0.514 ms | 0.152 ms | 3.4x |
+| `atr(14)` | 0.584 ms | 0.174 ms | 3.4x |
+| `natr(14)` | 0.559 ms | 0.186 ms | 3.0x |
+| `dema(30)` | 0.354 ms | 0.149 ms | 2.4x |
+| `rsi(14)` | 0.386 ms | 0.189 ms | 2.0x |
+| `ema(30)` | 0.155 ms | 0.123 ms | 1.3x |
+| `macd().over("symbol")` (50 symbols) | 1.677 ms | 1.355 ms | 1.2x |
+| `kdj()` / `supertrend()` / `vwap()` | - | 0.85 / 0.67 / 0.26 ms | new |
+
+The remaining functions are within measurement noise of 0.1.6.
+
 ## Supported Indicators and Functions
 
 ``` python
