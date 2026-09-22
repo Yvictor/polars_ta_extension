@@ -8,345 +8,431 @@ def ac(high: pl.Expr = pl.col("high"), low: pl.Expr = pl.col("low"), fastperiod:
     """Accelerator/Decelerator Oscillator (Momentum Indicators). Outputs: real."""
     return register_plugin(args=[high, low], symbol="ac", is_elementwise=False, lib=lib, kwargs={"fastperiod": fastperiod, "slowperiod": slowperiod, "signalperiod": signalperiod})
 
+_call_ac = ac
+
 def _expr_ac(self, low: pl.Expr = pl.col("low"), fastperiod: int = 5, slowperiod: int = 34, signalperiod: int = 5) -> pl.Expr:
     """Accelerator/Decelerator Oscillator (Momentum Indicators). Outputs: real. The receiver is high."""
-    return ac(high=self._expr, low=low, fastperiod=fastperiod, slowperiod=slowperiod, signalperiod=signalperiod)
+    return _call_ac(high=self._expr, low=low, fastperiod=fastperiod, slowperiod=slowperiod, signalperiod=signalperiod)
 
 def accbands(high: pl.Expr = pl.col("high"), low: pl.Expr = pl.col("low"), close: pl.Expr = pl.col("close"), timeperiod: int = 20) -> pl.Expr:
     """Acceleration Bands (Overlap Studies). Outputs: upperband, middleband, lowerband."""
     return register_plugin(args=[high, low, close], symbol="accbands", is_elementwise=False, lib=lib, kwargs={"timeperiod": timeperiod})
 
+_call_accbands = accbands
+
 def _expr_accbands(self, high: pl.Expr = pl.col("high"), low: pl.Expr = pl.col("low"), timeperiod: int = 20) -> pl.Expr:
     """Acceleration Bands (Overlap Studies). Outputs: upperband, middleband, lowerband. The receiver is close."""
-    return accbands(high=high, low=low, close=self._expr, timeperiod=timeperiod)
+    return _call_accbands(high=high, low=low, close=self._expr, timeperiod=timeperiod)
 
 def adr(high: pl.Expr = pl.col("high"), low: pl.Expr = pl.col("low"), timeperiod: int = 14) -> pl.Expr:
     """Average Day Range (Volatility Indicators). Outputs: real."""
     return register_plugin(args=[high, low], symbol="adr", is_elementwise=False, lib=lib, kwargs={"timeperiod": timeperiod})
 
+_call_adr = adr
+
 def _expr_adr(self, low: pl.Expr = pl.col("low"), timeperiod: int = 14) -> pl.Expr:
     """Average Day Range (Volatility Indicators). Outputs: real. The receiver is high."""
-    return adr(high=self._expr, low=low, timeperiod=timeperiod)
+    return _call_adr(high=self._expr, low=low, timeperiod=timeperiod)
 
 def ao(high: pl.Expr = pl.col("high"), low: pl.Expr = pl.col("low"), fastperiod: int = 5, slowperiod: int = 34) -> pl.Expr:
     """Awesome Oscillator (Momentum Indicators). Outputs: real."""
     return register_plugin(args=[high, low], symbol="ao", is_elementwise=False, lib=lib, kwargs={"fastperiod": fastperiod, "slowperiod": slowperiod})
 
+_call_ao = ao
+
 def _expr_ao(self, low: pl.Expr = pl.col("low"), fastperiod: int = 5, slowperiod: int = 34) -> pl.Expr:
     """Awesome Oscillator (Momentum Indicators). Outputs: real. The receiver is high."""
-    return ao(high=self._expr, low=low, fastperiod=fastperiod, slowperiod=slowperiod)
+    return _call_ao(high=self._expr, low=low, fastperiod=fastperiod, slowperiod=slowperiod)
 
 def avgdev(real: pl.Expr = pl.col("close"), timeperiod: int = 14) -> pl.Expr:
     """Average Deviation (Price Transform). Outputs: real."""
     return register_plugin(args=[real], symbol="avgdev", is_elementwise=False, lib=lib, kwargs={"timeperiod": timeperiod})
 
+_call_avgdev = avgdev
+
 def _expr_avgdev(self, timeperiod: int = 14) -> pl.Expr:
     """Average Deviation (Price Transform). Outputs: real. The receiver is real."""
-    return avgdev(real=self._expr, timeperiod=timeperiod)
+    return _call_avgdev(real=self._expr, timeperiod=timeperiod)
 
 def cmf(high: pl.Expr = pl.col("high"), low: pl.Expr = pl.col("low"), close: pl.Expr = pl.col("close"), volume: pl.Expr = pl.col("volume"), timeperiod: int = 20) -> pl.Expr:
     """Chaikin Money Flow (Volume Indicators). Outputs: real."""
     return register_plugin(args=[high, low, close, volume], symbol="cmf", is_elementwise=False, lib=lib, kwargs={"timeperiod": timeperiod})
 
+_call_cmf = cmf
+
 def _expr_cmf(self, high: pl.Expr = pl.col("high"), low: pl.Expr = pl.col("low"), volume: pl.Expr = pl.col("volume"), timeperiod: int = 20) -> pl.Expr:
     """Chaikin Money Flow (Volume Indicators). Outputs: real. The receiver is close."""
-    return cmf(high=high, low=low, close=self._expr, volume=volume, timeperiod=timeperiod)
+    return _call_cmf(high=high, low=low, close=self._expr, volume=volume, timeperiod=timeperiod)
 
 def cmou(real: pl.Expr = pl.col("close"), timeperiod: int = 14) -> pl.Expr:
     """Chande Momentum Oscillator (Unsmoothed) (Momentum Indicators). Outputs: real."""
     return register_plugin(args=[real], symbol="cmou", is_elementwise=False, lib=lib, kwargs={"timeperiod": timeperiod})
 
+_call_cmou = cmou
+
 def _expr_cmou(self, timeperiod: int = 14) -> pl.Expr:
     """Chande Momentum Oscillator (Unsmoothed) (Momentum Indicators). Outputs: real. The receiver is real."""
-    return cmou(real=self._expr, timeperiod=timeperiod)
+    return _call_cmou(real=self._expr, timeperiod=timeperiod)
 
 def coppock(real: pl.Expr = pl.col("close"), wmaperiod: int = 10, roc1period: int = 11, roc2period: int = 14) -> pl.Expr:
     """Coppock Curve (Momentum Indicators). Outputs: real."""
     return register_plugin(args=[real], symbol="coppock", is_elementwise=False, lib=lib, kwargs={"wmaperiod": wmaperiod, "roc1period": roc1period, "roc2period": roc2period})
 
+_call_coppock = coppock
+
 def _expr_coppock(self, wmaperiod: int = 10, roc1period: int = 11, roc2period: int = 14) -> pl.Expr:
     """Coppock Curve (Momentum Indicators). Outputs: real. The receiver is real."""
-    return coppock(real=self._expr, wmaperiod=wmaperiod, roc1period=roc1period, roc2period=roc2period)
+    return _call_coppock(real=self._expr, wmaperiod=wmaperiod, roc1period=roc1period, roc2period=roc2period)
 
 def cumsum(real: pl.Expr = pl.col("close")) -> pl.Expr:
     """Cumulative Sum (Math Operators). Outputs: real."""
     return register_plugin(args=[real], symbol="cumsum", is_elementwise=False, lib=lib, kwargs={})
 
+_call_cumsum = cumsum
+
 def _expr_cumsum(self) -> pl.Expr:
     """Cumulative Sum (Math Operators). Outputs: real. The receiver is real."""
-    return cumsum(real=self._expr)
+    return _call_cumsum(real=self._expr)
 
 def cvi(high: pl.Expr = pl.col("high"), low: pl.Expr = pl.col("low"), timeperiod: int = 10, rocperiod: int = 10) -> pl.Expr:
     """Chaikin's Volatility (Volatility Indicators). Outputs: real."""
     return register_plugin(args=[high, low], symbol="cvi", is_elementwise=False, lib=lib, kwargs={"timeperiod": timeperiod, "rocperiod": rocperiod})
 
+_call_cvi = cvi
+
 def _expr_cvi(self, low: pl.Expr = pl.col("low"), timeperiod: int = 10, rocperiod: int = 10) -> pl.Expr:
     """Chaikin's Volatility (Volatility Indicators). Outputs: real. The receiver is high."""
-    return cvi(high=self._expr, low=low, timeperiod=timeperiod, rocperiod=rocperiod)
+    return _call_cvi(high=self._expr, low=low, timeperiod=timeperiod, rocperiod=rocperiod)
 
 def donchian(high: pl.Expr = pl.col("high"), low: pl.Expr = pl.col("low"), timeperiod: int = 20) -> pl.Expr:
     """Donchian Channels (Overlap Studies). Outputs: upperband, middleband, lowerband."""
     return register_plugin(args=[high, low], symbol="donchian", is_elementwise=False, lib=lib, kwargs={"timeperiod": timeperiod})
 
+_call_donchian = donchian
+
 def _expr_donchian(self, low: pl.Expr = pl.col("low"), timeperiod: int = 20) -> pl.Expr:
     """Donchian Channels (Overlap Studies). Outputs: upperband, middleband, lowerband. The receiver is high."""
-    return donchian(high=self._expr, low=low, timeperiod=timeperiod)
+    return _call_donchian(high=self._expr, low=low, timeperiod=timeperiod)
 
 def dpo(real: pl.Expr = pl.col("close"), timeperiod: int = 20) -> pl.Expr:
     """Detrended Price Oscillator (Momentum Indicators). Outputs: real."""
     return register_plugin(args=[real], symbol="dpo", is_elementwise=False, lib=lib, kwargs={"timeperiod": timeperiod})
 
+_call_dpo = dpo
+
 def _expr_dpo(self, timeperiod: int = 20) -> pl.Expr:
     """Detrended Price Oscillator (Momentum Indicators). Outputs: real. The receiver is real."""
-    return dpo(real=self._expr, timeperiod=timeperiod)
+    return _call_dpo(real=self._expr, timeperiod=timeperiod)
 
 def efi(close: pl.Expr = pl.col("close"), volume: pl.Expr = pl.col("volume"), timeperiod: int = 13) -> pl.Expr:
     """Elder's Force Index (Volume Indicators). Outputs: real."""
     return register_plugin(args=[close, volume], symbol="efi", is_elementwise=False, lib=lib, kwargs={"timeperiod": timeperiod})
 
+_call_efi = efi
+
 def _expr_efi(self, volume: pl.Expr = pl.col("volume"), timeperiod: int = 13) -> pl.Expr:
     """Elder's Force Index (Volume Indicators). Outputs: real. The receiver is close."""
-    return efi(close=self._expr, volume=volume, timeperiod=timeperiod)
+    return _call_efi(close=self._expr, volume=volume, timeperiod=timeperiod)
 
 def er(real: pl.Expr = pl.col("close"), timeperiod: int = 10) -> pl.Expr:
     """Kaufman Efficiency Ratio (Momentum Indicators). Outputs: real."""
     return register_plugin(args=[real], symbol="er", is_elementwise=False, lib=lib, kwargs={"timeperiod": timeperiod})
 
+_call_er = er
+
 def _expr_er(self, timeperiod: int = 10) -> pl.Expr:
     """Kaufman Efficiency Ratio (Momentum Indicators). Outputs: real. The receiver is real."""
-    return er(real=self._expr, timeperiod=timeperiod)
+    return _call_er(real=self._expr, timeperiod=timeperiod)
 
 def eri(high: pl.Expr = pl.col("high"), low: pl.Expr = pl.col("low"), close: pl.Expr = pl.col("close"), timeperiod: int = 13) -> pl.Expr:
     """Elder Ray Index (Bull Power / Bear Power) (Momentum Indicators). Outputs: bullpower, bearpower."""
     return register_plugin(args=[high, low, close], symbol="eri", is_elementwise=False, lib=lib, kwargs={"timeperiod": timeperiod})
 
+_call_eri = eri
+
 def _expr_eri(self, high: pl.Expr = pl.col("high"), low: pl.Expr = pl.col("low"), timeperiod: int = 13) -> pl.Expr:
     """Elder Ray Index (Bull Power / Bear Power) (Momentum Indicators). Outputs: bullpower, bearpower. The receiver is close."""
-    return eri(high=high, low=low, close=self._expr, timeperiod=timeperiod)
+    return _call_eri(high=high, low=low, close=self._expr, timeperiod=timeperiod)
 
 def fosc(real: pl.Expr = pl.col("close"), timeperiod: int = 5) -> pl.Expr:
     """Forecast Oscillator (Momentum Indicators). Outputs: real."""
     return register_plugin(args=[real], symbol="fosc", is_elementwise=False, lib=lib, kwargs={"timeperiod": timeperiod})
 
+_call_fosc = fosc
+
 def _expr_fosc(self, timeperiod: int = 5) -> pl.Expr:
     """Forecast Oscillator (Momentum Indicators). Outputs: real. The receiver is real."""
-    return fosc(real=self._expr, timeperiod=timeperiod)
+    return _call_fosc(real=self._expr, timeperiod=timeperiod)
 
 def fractal(high: pl.Expr = pl.col("high"), low: pl.Expr = pl.col("low"), leftbars: int = 2, rightbars: int = 2) -> pl.Expr:
     """Williams Fractal (Momentum Indicators). Outputs: swinghigh, swinglow."""
     return register_plugin(args=[high, low], symbol="fractal", is_elementwise=False, lib=lib, kwargs={"leftbars": leftbars, "rightbars": rightbars})
 
+_call_fractal = fractal
+
 def _expr_fractal(self, low: pl.Expr = pl.col("low"), leftbars: int = 2, rightbars: int = 2) -> pl.Expr:
     """Williams Fractal (Momentum Indicators). Outputs: swinghigh, swinglow. The receiver is high."""
-    return fractal(high=self._expr, low=low, leftbars=leftbars, rightbars=rightbars)
+    return _call_fractal(high=self._expr, low=low, leftbars=leftbars, rightbars=rightbars)
 
 def ha(open: pl.Expr = pl.col("open"), high: pl.Expr = pl.col("high"), low: pl.Expr = pl.col("low"), close: pl.Expr = pl.col("close")) -> pl.Expr:
     """Heikin-Ashi Candles (Price Transform). Outputs: haopen, hahigh, halow, haclose."""
     return register_plugin(args=[open, high, low, close], symbol="ha", is_elementwise=False, lib=lib, kwargs={})
 
+_call_ha = ha
+
 def _expr_ha(self, open: pl.Expr = pl.col("open"), high: pl.Expr = pl.col("high"), low: pl.Expr = pl.col("low")) -> pl.Expr:
     """Heikin-Ashi Candles (Price Transform). Outputs: haopen, hahigh, halow, haclose. The receiver is close."""
-    return ha(open=open, high=high, low=low, close=self._expr)
+    return _call_ha(open=open, high=high, low=low, close=self._expr)
 
 def hma(real: pl.Expr = pl.col("close"), timeperiod: int = 20) -> pl.Expr:
     """Hull Moving Average (Overlap Studies). Outputs: real."""
     return register_plugin(args=[real], symbol="hma", is_elementwise=False, lib=lib, kwargs={"timeperiod": timeperiod})
 
+_call_hma = hma
+
 def _expr_hma(self, timeperiod: int = 20) -> pl.Expr:
     """Hull Moving Average (Overlap Studies). Outputs: real. The receiver is real."""
-    return hma(real=self._expr, timeperiod=timeperiod)
+    return _call_hma(real=self._expr, timeperiod=timeperiod)
 
 def imi(open: pl.Expr = pl.col("open"), close: pl.Expr = pl.col("close"), timeperiod: int = 14) -> pl.Expr:
     """Intraday Momentum Index (Momentum Indicators). Outputs: real."""
     return register_plugin(args=[open, close], symbol="imi", is_elementwise=False, lib=lib, kwargs={"timeperiod": timeperiod})
 
+_call_imi = imi
+
 def _expr_imi(self, open: pl.Expr = pl.col("open"), timeperiod: int = 14) -> pl.Expr:
     """Intraday Momentum Index (Momentum Indicators). Outputs: real. The receiver is close."""
-    return imi(open=open, close=self._expr, timeperiod=timeperiod)
+    return _call_imi(open=open, close=self._expr, timeperiod=timeperiod)
 
 def kc(high: pl.Expr = pl.col("high"), low: pl.Expr = pl.col("low"), close: pl.Expr = pl.col("close"), timeperiod: int = 20, atrperiod: int = 10, nbdev: float = 2.0) -> pl.Expr:
     """Keltner Channels (Overlap Studies). Outputs: upperband, middleband, lowerband."""
     return register_plugin(args=[high, low, close], symbol="kc", is_elementwise=False, lib=lib, kwargs={"timeperiod": timeperiod, "atrperiod": atrperiod, "nbdev": nbdev})
 
+_call_kc = kc
+
 def _expr_kc(self, high: pl.Expr = pl.col("high"), low: pl.Expr = pl.col("low"), timeperiod: int = 20, atrperiod: int = 10, nbdev: float = 2.0) -> pl.Expr:
     """Keltner Channels (Overlap Studies). Outputs: upperband, middleband, lowerband. The receiver is close."""
-    return kc(high=high, low=low, close=self._expr, timeperiod=timeperiod, atrperiod=atrperiod, nbdev=nbdev)
+    return _call_kc(high=high, low=low, close=self._expr, timeperiod=timeperiod, atrperiod=atrperiod, nbdev=nbdev)
 
 def kdj(high: pl.Expr = pl.col("high"), low: pl.Expr = pl.col("low"), close: pl.Expr = pl.col("close"), fastk_period: int = 9, slowk_period: int = 3, slowk_matype: int = 13, slowd_period: int = 3, slowd_matype: int = 13) -> pl.Expr:
     """KDJ Stochastic (Momentum Indicators). Outputs: k, d, j."""
     return register_plugin(args=[high, low, close], symbol="kdj", is_elementwise=False, lib=lib, kwargs={"fastk_period": fastk_period, "slowk_period": slowk_period, "slowk_matype": slowk_matype, "slowd_period": slowd_period, "slowd_matype": slowd_matype})
 
+_call_kdj = kdj
+
 def _expr_kdj(self, high: pl.Expr = pl.col("high"), low: pl.Expr = pl.col("low"), fastk_period: int = 9, slowk_period: int = 3, slowk_matype: int = 13, slowd_period: int = 3, slowd_matype: int = 13) -> pl.Expr:
     """KDJ Stochastic (Momentum Indicators). Outputs: k, d, j. The receiver is close."""
-    return kdj(high=high, low=low, close=self._expr, fastk_period=fastk_period, slowk_period=slowk_period, slowk_matype=slowk_matype, slowd_period=slowd_period, slowd_matype=slowd_matype)
+    return _call_kdj(high=high, low=low, close=self._expr, fastk_period=fastk_period, slowk_period=slowk_period, slowk_matype=slowk_matype, slowd_period=slowd_period, slowd_matype=slowd_matype)
 
 def marketfi(high: pl.Expr = pl.col("high"), low: pl.Expr = pl.col("low"), volume: pl.Expr = pl.col("volume")) -> pl.Expr:
     """Market Facilitation Index (Volume Indicators). Outputs: real."""
     return register_plugin(args=[high, low, volume], symbol="marketfi", is_elementwise=False, lib=lib, kwargs={})
 
+_call_marketfi = marketfi
+
 def _expr_marketfi(self, low: pl.Expr = pl.col("low"), volume: pl.Expr = pl.col("volume")) -> pl.Expr:
     """Market Facilitation Index (Volume Indicators). Outputs: real. The receiver is high."""
-    return marketfi(high=self._expr, low=low, volume=volume)
+    return _call_marketfi(high=self._expr, low=low, volume=volume)
 
 def massi(high: pl.Expr = pl.col("high"), low: pl.Expr = pl.col("low"), fastperiod: int = 9, slowperiod: int = 25) -> pl.Expr:
     """Mass Index (Volatility Indicators). Outputs: real."""
     return register_plugin(args=[high, low], symbol="massi", is_elementwise=False, lib=lib, kwargs={"fastperiod": fastperiod, "slowperiod": slowperiod})
 
+_call_massi = massi
+
 def _expr_massi(self, low: pl.Expr = pl.col("low"), fastperiod: int = 9, slowperiod: int = 25) -> pl.Expr:
     """Mass Index (Volatility Indicators). Outputs: real. The receiver is high."""
-    return massi(high=self._expr, low=low, fastperiod=fastperiod, slowperiod=slowperiod)
+    return _call_massi(high=self._expr, low=low, fastperiod=fastperiod, slowperiod=slowperiod)
 
 def nvi(close: pl.Expr = pl.col("close"), volume: pl.Expr = pl.col("volume")) -> pl.Expr:
     """Negative Volume Index (Volume Indicators). Outputs: real."""
     return register_plugin(args=[close, volume], symbol="nvi", is_elementwise=False, lib=lib, kwargs={})
 
+_call_nvi = nvi
+
 def _expr_nvi(self, volume: pl.Expr = pl.col("volume")) -> pl.Expr:
     """Negative Volume Index (Volume Indicators). Outputs: real. The receiver is close."""
-    return nvi(close=self._expr, volume=volume)
+    return _call_nvi(close=self._expr, volume=volume)
 
 def percentile(real: pl.Expr = pl.col("close"), timeperiod: int = 30, percentile: float = 50.0) -> pl.Expr:
     """Percentile (nearest rank) (Statistic Functions). Outputs: real."""
     return register_plugin(args=[real], symbol="percentile", is_elementwise=False, lib=lib, kwargs={"timeperiod": timeperiod, "percentile": percentile})
 
+_call_percentile = percentile
+
 def _expr_percentile(self, timeperiod: int = 30, percentile: float = 50.0) -> pl.Expr:
     """Percentile (nearest rank) (Statistic Functions). Outputs: real. The receiver is real."""
-    return percentile(real=self._expr, timeperiod=timeperiod, percentile=percentile)
+    return _call_percentile(real=self._expr, timeperiod=timeperiod, percentile=percentile)
 
 def percentrank(real: pl.Expr = pl.col("close"), timeperiod: int = 100) -> pl.Expr:
     """Percent Rank (Statistic Functions). Outputs: real."""
     return register_plugin(args=[real], symbol="percentrank", is_elementwise=False, lib=lib, kwargs={"timeperiod": timeperiod})
 
+_call_percentrank = percentrank
+
 def _expr_percentrank(self, timeperiod: int = 100) -> pl.Expr:
     """Percent Rank (Statistic Functions). Outputs: real. The receiver is real."""
-    return percentrank(real=self._expr, timeperiod=timeperiod)
+    return _call_percentrank(real=self._expr, timeperiod=timeperiod)
 
 def pvi(close: pl.Expr = pl.col("close"), volume: pl.Expr = pl.col("volume")) -> pl.Expr:
     """Positive Volume Index (Volume Indicators). Outputs: real."""
     return register_plugin(args=[close, volume], symbol="pvi", is_elementwise=False, lib=lib, kwargs={})
 
+_call_pvi = pvi
+
 def _expr_pvi(self, volume: pl.Expr = pl.col("volume")) -> pl.Expr:
     """Positive Volume Index (Volume Indicators). Outputs: real. The receiver is close."""
-    return pvi(close=self._expr, volume=volume)
+    return _call_pvi(close=self._expr, volume=volume)
 
 def pvo(volume: pl.Expr = pl.col("volume"), fastperiod: int = 12, slowperiod: int = 26, matype: int = 1) -> pl.Expr:
     """Percentage Volume Oscillator (Volume Indicators). Outputs: real."""
     return register_plugin(args=[volume], symbol="pvo", is_elementwise=False, lib=lib, kwargs={"fastperiod": fastperiod, "slowperiod": slowperiod, "matype": matype})
 
+_call_pvo = pvo
+
 def _expr_pvo(self, fastperiod: int = 12, slowperiod: int = 26, matype: int = 1) -> pl.Expr:
     """Percentage Volume Oscillator (Volume Indicators). Outputs: real. The receiver is volume."""
-    return pvo(volume=self._expr, fastperiod=fastperiod, slowperiod=slowperiod, matype=matype)
+    return _call_pvo(volume=self._expr, fastperiod=fastperiod, slowperiod=slowperiod, matype=matype)
 
 def pvt(close: pl.Expr = pl.col("close"), volume: pl.Expr = pl.col("volume")) -> pl.Expr:
     """Price Volume Trend (Volume Indicators). Outputs: real."""
     return register_plugin(args=[close, volume], symbol="pvt", is_elementwise=False, lib=lib, kwargs={})
 
+_call_pvt = pvt
+
 def _expr_pvt(self, volume: pl.Expr = pl.col("volume")) -> pl.Expr:
     """Price Volume Trend (Volume Indicators). Outputs: real. The receiver is close."""
-    return pvt(close=self._expr, volume=volume)
+    return _call_pvt(close=self._expr, volume=volume)
 
 def qstick(open: pl.Expr = pl.col("open"), close: pl.Expr = pl.col("close"), timeperiod: int = 10) -> pl.Expr:
     """Qstick (Momentum Indicators). Outputs: real."""
     return register_plugin(args=[open, close], symbol="qstick", is_elementwise=False, lib=lib, kwargs={"timeperiod": timeperiod})
 
+_call_qstick = qstick
+
 def _expr_qstick(self, open: pl.Expr = pl.col("open"), timeperiod: int = 10) -> pl.Expr:
     """Qstick (Momentum Indicators). Outputs: real. The receiver is close."""
-    return qstick(open=open, close=self._expr, timeperiod=timeperiod)
+    return _call_qstick(open=open, close=self._expr, timeperiod=timeperiod)
 
 def rma(real: pl.Expr = pl.col("close"), timeperiod: int = 30) -> pl.Expr:
     """Wilder's Smoothed Moving Average (Overlap Studies). Outputs: real."""
     return register_plugin(args=[real], symbol="rma", is_elementwise=False, lib=lib, kwargs={"timeperiod": timeperiod})
 
+_call_rma = rma
+
 def _expr_rma(self, timeperiod: int = 30) -> pl.Expr:
     """Wilder's Smoothed Moving Average (Overlap Studies). Outputs: real. The receiver is real."""
-    return rma(real=self._expr, timeperiod=timeperiod)
+    return _call_rma(real=self._expr, timeperiod=timeperiod)
 
 def rvi(real: pl.Expr = pl.col("close"), timeperiod: int = 14, stddevperiod: int = 10) -> pl.Expr:
     """Relative Volatility Index (Volatility Indicators). Outputs: real."""
     return register_plugin(args=[real], symbol="rvi", is_elementwise=False, lib=lib, kwargs={"timeperiod": timeperiod, "stddevperiod": stddevperiod})
 
+_call_rvi = rvi
+
 def _expr_rvi(self, timeperiod: int = 14, stddevperiod: int = 10) -> pl.Expr:
     """Relative Volatility Index (Volatility Indicators). Outputs: real. The receiver is real."""
-    return rvi(real=self._expr, timeperiod=timeperiod, stddevperiod=stddevperiod)
+    return _call_rvi(real=self._expr, timeperiod=timeperiod, stddevperiod=stddevperiod)
 
 def rvol(volume: pl.Expr = pl.col("volume"), timeperiod: int = 20) -> pl.Expr:
     """Relative Volume (Volume Indicators). Outputs: real."""
     return register_plugin(args=[volume], symbol="rvol", is_elementwise=False, lib=lib, kwargs={"timeperiod": timeperiod})
 
+_call_rvol = rvol
+
 def _expr_rvol(self, timeperiod: int = 20) -> pl.Expr:
     """Relative Volume (Volume Indicators). Outputs: real. The receiver is volume."""
-    return rvol(volume=self._expr, timeperiod=timeperiod)
+    return _call_rvol(volume=self._expr, timeperiod=timeperiod)
 
 def smi(high: pl.Expr = pl.col("high"), low: pl.Expr = pl.col("low"), close: pl.Expr = pl.col("close"), timeperiod: int = 13, fastperiod: int = 2, slowperiod: int = 25, signalperiod: int = 9) -> pl.Expr:
     """Stochastic Momentum Index (Momentum Indicators). Outputs: smi, smisignal."""
     return register_plugin(args=[high, low, close], symbol="smi", is_elementwise=False, lib=lib, kwargs={"timeperiod": timeperiod, "fastperiod": fastperiod, "slowperiod": slowperiod, "signalperiod": signalperiod})
 
+_call_smi = smi
+
 def _expr_smi(self, high: pl.Expr = pl.col("high"), low: pl.Expr = pl.col("low"), timeperiod: int = 13, fastperiod: int = 2, slowperiod: int = 25, signalperiod: int = 9) -> pl.Expr:
     """Stochastic Momentum Index (Momentum Indicators). Outputs: smi, smisignal. The receiver is close."""
-    return smi(high=high, low=low, close=self._expr, timeperiod=timeperiod, fastperiod=fastperiod, slowperiod=slowperiod, signalperiod=signalperiod)
+    return _call_smi(high=high, low=low, close=self._expr, timeperiod=timeperiod, fastperiod=fastperiod, slowperiod=slowperiod, signalperiod=signalperiod)
 
 def supertrend(high: pl.Expr = pl.col("high"), low: pl.Expr = pl.col("low"), close: pl.Expr = pl.col("close"), timeperiod: int = 10, multiplier: float = 3.0) -> pl.Expr:
     """SuperTrend (Overlap Studies). Outputs: supertrend, trend."""
     return register_plugin(args=[high, low, close], symbol="supertrend", is_elementwise=False, lib=lib, kwargs={"timeperiod": timeperiod, "multiplier": multiplier})
 
+_call_supertrend = supertrend
+
 def _expr_supertrend(self, high: pl.Expr = pl.col("high"), low: pl.Expr = pl.col("low"), timeperiod: int = 10, multiplier: float = 3.0) -> pl.Expr:
     """SuperTrend (Overlap Studies). Outputs: supertrend, trend. The receiver is close."""
-    return supertrend(high=high, low=low, close=self._expr, timeperiod=timeperiod, multiplier=multiplier)
+    return _call_supertrend(high=high, low=low, close=self._expr, timeperiod=timeperiod, multiplier=multiplier)
 
 def tsi(real: pl.Expr = pl.col("close"), firstperiod: int = 25, secondperiod: int = 13) -> pl.Expr:
     """True Strength Index (Momentum Indicators). Outputs: real."""
     return register_plugin(args=[real], symbol="tsi", is_elementwise=False, lib=lib, kwargs={"firstperiod": firstperiod, "secondperiod": secondperiod})
 
+_call_tsi = tsi
+
 def _expr_tsi(self, firstperiod: int = 25, secondperiod: int = 13) -> pl.Expr:
     """True Strength Index (Momentum Indicators). Outputs: real. The receiver is real."""
-    return tsi(real=self._expr, firstperiod=firstperiod, secondperiod=secondperiod)
+    return _call_tsi(real=self._expr, firstperiod=firstperiod, secondperiod=secondperiod)
 
 def vhf(real: pl.Expr = pl.col("close"), timeperiod: int = 28) -> pl.Expr:
     """Vertical Horizontal Filter (Momentum Indicators). Outputs: real."""
     return register_plugin(args=[real], symbol="vhf", is_elementwise=False, lib=lib, kwargs={"timeperiod": timeperiod})
 
+_call_vhf = vhf
+
 def _expr_vhf(self, timeperiod: int = 28) -> pl.Expr:
     """Vertical Horizontal Filter (Momentum Indicators). Outputs: real. The receiver is real."""
-    return vhf(real=self._expr, timeperiod=timeperiod)
+    return _call_vhf(real=self._expr, timeperiod=timeperiod)
 
 def vortex(high: pl.Expr = pl.col("high"), low: pl.Expr = pl.col("low"), close: pl.Expr = pl.col("close"), timeperiod: int = 14) -> pl.Expr:
     """Vortex Indicator (Momentum Indicators). Outputs: plusvi, minusvi."""
     return register_plugin(args=[high, low, close], symbol="vortex", is_elementwise=False, lib=lib, kwargs={"timeperiod": timeperiod})
 
+_call_vortex = vortex
+
 def _expr_vortex(self, high: pl.Expr = pl.col("high"), low: pl.Expr = pl.col("low"), timeperiod: int = 14) -> pl.Expr:
     """Vortex Indicator (Momentum Indicators). Outputs: plusvi, minusvi. The receiver is close."""
-    return vortex(high=high, low=low, close=self._expr, timeperiod=timeperiod)
+    return _call_vortex(high=high, low=low, close=self._expr, timeperiod=timeperiod)
 
 def vwap(high: pl.Expr = pl.col("high"), low: pl.Expr = pl.col("low"), close: pl.Expr = pl.col("close"), volume: pl.Expr = pl.col("volume")) -> pl.Expr:
     """Volume Weighted Average Price (Volume Indicators). Outputs: real."""
     return register_plugin(args=[high, low, close, volume], symbol="vwap", is_elementwise=False, lib=lib, kwargs={})
 
+_call_vwap = vwap
+
 def _expr_vwap(self, high: pl.Expr = pl.col("high"), low: pl.Expr = pl.col("low"), volume: pl.Expr = pl.col("volume")) -> pl.Expr:
     """Volume Weighted Average Price (Volume Indicators). Outputs: real. The receiver is close."""
-    return vwap(high=high, low=low, close=self._expr, volume=volume)
+    return _call_vwap(high=high, low=low, close=self._expr, volume=volume)
 
 def vwma(real: pl.Expr = pl.col("close"), volume: pl.Expr = pl.col("volume"), timeperiod: int = 30) -> pl.Expr:
     """Volume Weighted Moving Average (Overlap Studies). Outputs: real."""
     return register_plugin(args=[real, volume], symbol="vwma", is_elementwise=False, lib=lib, kwargs={"timeperiod": timeperiod})
 
+_call_vwma = vwma
+
 def _expr_vwma(self, volume: pl.Expr = pl.col("volume"), timeperiod: int = 30) -> pl.Expr:
     """Volume Weighted Moving Average (Overlap Studies). Outputs: real. The receiver is real."""
-    return vwma(real=self._expr, volume=volume, timeperiod=timeperiod)
+    return _call_vwma(real=self._expr, volume=volume, timeperiod=timeperiod)
 
 def wad(high: pl.Expr = pl.col("high"), low: pl.Expr = pl.col("low"), close: pl.Expr = pl.col("close")) -> pl.Expr:
     """Williams' Accumulation/Distribution (Momentum Indicators). Outputs: real."""
     return register_plugin(args=[high, low, close], symbol="wad", is_elementwise=False, lib=lib, kwargs={})
 
+_call_wad = wad
+
 def _expr_wad(self, high: pl.Expr = pl.col("high"), low: pl.Expr = pl.col("low")) -> pl.Expr:
     """Williams' Accumulation/Distribution (Momentum Indicators). Outputs: real. The receiver is close."""
-    return wad(high=high, low=low, close=self._expr)
+    return _call_wad(high=high, low=low, close=self._expr)
 
 def zlema(real: pl.Expr = pl.col("close"), timeperiod: int = 30) -> pl.Expr:
     """Zero-Lag Exponential Moving Average (Overlap Studies). Outputs: real."""
     return register_plugin(args=[real], symbol="zlema", is_elementwise=False, lib=lib, kwargs={"timeperiod": timeperiod})
 
+_call_zlema = zlema
+
 def _expr_zlema(self, timeperiod: int = 30) -> pl.Expr:
     """Zero-Lag Exponential Moving Average (Overlap Studies). Outputs: real. The receiver is real."""
-    return zlema(real=self._expr, timeperiod=timeperiod)
+    return _call_zlema(real=self._expr, timeperiod=timeperiod)
 
 __all__ = ['ac', 'accbands', 'adr', 'ao', 'avgdev', 'cmf', 'cmou', 'coppock', 'cumsum', 'cvi', 'donchian', 'dpo', 'efi', 'er', 'eri', 'fosc', 'fractal', 'ha', 'hma', 'imi', 'kc', 'kdj', 'marketfi', 'massi', 'nvi', 'percentile', 'percentrank', 'pvi', 'pvo', 'pvt', 'qstick', 'rma', 'rvi', 'rvol', 'smi', 'supertrend', 'tsi', 'vhf', 'vortex', 'vwap', 'vwma', 'wad', 'zlema']
 GROUPS = {'Momentum Indicators': ['ac', 'ao', 'cmou', 'coppock', 'dpo', 'er', 'eri', 'fosc', 'fractal', 'imi', 'kdj', 'qstick', 'smi', 'tsi', 'vhf', 'vortex', 'wad'], 'Overlap Studies': ['accbands', 'donchian', 'hma', 'kc', 'rma', 'supertrend', 'vwma', 'zlema'], 'Volatility Indicators': ['adr', 'cvi', 'massi', 'rvi'], 'Price Transform': ['avgdev', 'ha'], 'Volume Indicators': ['cmf', 'efi', 'marketfi', 'nvi', 'pvi', 'pvo', 'pvt', 'rvol', 'vwap'], 'Math Operators': ['cumsum'], 'Statistic Functions': ['percentile', 'percentrank']}

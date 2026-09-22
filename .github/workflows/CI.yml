@@ -47,7 +47,7 @@ jobs:
       - uses: astral-sh/setup-uv@v8.2.0
       - name: CMake (native hosts)
         if: runner.os != 'Linux'
-        run: uv pip install --system 'cmake>=3.30,<4'
+        run: uv pip install --system 'cmake>=4.2,<5'
       - name: Build self-contained release wheel
         uses: PyO3/maturin-action@v1.46.0
         with:
@@ -57,10 +57,13 @@ jobs:
           sccache: 'true'
           rust-toolchain: '1.90.0'
           before-script-linux: |
+            if test -x /opt/python/cp312-cp312/bin/python; then
+              export PATH=/opt/python/cp312-cp312/bin:$PATH
+            fi
             if command -v apk >/dev/null; then
               apk add --no-cache cmake make
             else
-              /opt/python/cp312-cp312/bin/python -m pip install 'cmake>=3.30,<4'
+              python3 -m pip install 'cmake>=4.2,<5'
             fi
       - name: Test installed wheel (native)
         if: ${{ !startsWith(matrix.name, 'musl-') }}
@@ -116,7 +119,7 @@ jobs:
         with:
           python-version: '3.12'
       - uses: astral-sh/setup-uv@v8.2.0
-      - run: uv pip install --system maturin 'cmake>=3.30,<4' pytest numpy 'TA-Lib==0.8.1' 'polars==1.44.2' pytest-benchmark
+      - run: uv pip install --system maturin 'cmake>=4.2,<5' pytest numpy 'TA-Lib==0.8.1' 'polars==1.44.2' pytest-benchmark
       - name: Check generated wrappers are current
         run: |
           python scripts/generate_indicators.py
@@ -146,12 +149,25 @@ jobs:
         with:
           name: wheels-linux-x64
           path: dist
-      - run: python -m pip install dist/*.whl 'polars==1.44.2' numpy
-      - run: python scripts/benchmark.py --output benchmark.json --repeats 25
+      - uses: astral-sh/setup-uv@v8.2.0
+      - name: Compare release wheels on the same runner
+        run: |
+          uv venv .benchmark-base
+          uv venv .benchmark-candidate
+          uv pip install --python .benchmark-base 'polars-talib==0.1.6' 'polars==1.44.2' 'numpy==2.5.3'
+          uv pip install --python .benchmark-candidate dist/*.whl 'polars==1.44.2' 'numpy==2.5.3'
+          .benchmark-base/bin/python scripts/benchmark.py --output baseline.json --repeats 51 --pin-cpus 4
+          .benchmark-candidate/bin/python scripts/benchmark.py --output candidate.json --repeats 51 --pin-cpus 4
+          python scripts/compare_benchmarks.py baseline.json candidate.json --output comparison.md
+          cat comparison.md >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v7
+        if: always()
         with:
           name: benchmark
-          path: benchmark.json
+          path: |
+            baseline.json
+            candidate.json
+            comparison.md
 
   release:
     name: Publish tested wheels

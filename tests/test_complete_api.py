@@ -111,3 +111,48 @@ def test_all_ma_types(matype):
 def test_invalid_period_reports_error(spec):
     with pytest.raises(pl.exceptions.ComputeError):
         frame(10).select(getattr(ta,spec['name'])(*[pl.col(column(i)) for i in spec['inputs']],timeperiod=-1))
+
+
+@pytest.mark.parametrize('spec',[f for f in API if any(p['name']=='timeperiod' for p in f['params'])],ids=lambda f:f['name'])
+@pytest.mark.parametrize('period',[2,5,31])
+def test_nondefault_period_and_internal_nan(spec,period):
+    df=frame(300).with_columns(pl.when(pl.int_range(pl.len())==200).then(float('nan')).otherwise(pl.col('close')).alias('close'))
+    args=[pl.col(column(i)) for i in spec['inputs']]
+    actual=arrays(df.select(getattr(ta,spec['name'])(*args,timeperiod=period)))
+    expected=getattr(talib,spec['name'].upper())(*[df[column(i)].to_numpy() for i in spec['inputs']],timeperiod=period)
+    expected=list(expected) if isinstance(expected,tuple) else [expected]
+    for got,want in zip(actual,expected):
+        np.testing.assert_allclose(got,want,rtol=1e-10,atol=1e-10,equal_nan=True)
+
+
+@pytest.mark.parametrize('spec',[f for f in API if getattr(ta,f['name']).__module__.endswith('._generated')],ids=lambda f:f['name'])
+def test_new_namespace_and_struct_metadata(spec):
+    inputs=spec['inputs']
+    primary='close' if 'close' in inputs else inputs[0]
+    expression=getattr(pl.col(column(primary)).ta,spec['name'])(**{i:pl.col(column(i)) for i in inputs if i!=primary})
+    df=frame()
+    expected=df.select(expr(spec))
+    actual=df.select(expression.alias('result'))
+    assert actual.equals(expected)
+    if len(spec['outputs'])>1:
+        assert actual.to_series().struct.fields==ta.get_functions_output_struct()[spec['name']]
+
+
+def test_new_scalar_broadcast_and_legacy_mismatch():
+    df=frame(32)
+    out=df.select(ta.ao(pl.col('high'),pl.lit(99.)))
+    want=talib.AO(df['high'].to_numpy(),np.full(32,99.))
+    np.testing.assert_allclose(out.to_series().to_numpy(),want,equal_nan=True)
+    with pytest.raises(pl.exceptions.ComputeError, match="equal lengths"):
+        df.select(ta.add(pl.col('close'),pl.lit(1.)))
+
+
+def test_skill_example_pipeline():
+    bars=frame(64).with_columns(pl.lit('A').alias('symbol'),pl.int_range(pl.len()).alias('timestamp'))
+    result=(bars.sort(['symbol','timestamp']).with_columns(
+        ta.rsi(pl.col('close'),timeperiod=14).over('symbol').alias('rsi'),
+        ta.macd(pl.col('close')).over('symbol').alias('macd'),
+        ta.atr(pl.col('high'),pl.col('low'),pl.col('close')).over('symbol').alias('atr'),
+    ).unnest('macd'))
+    assert result.height==64
+    assert {'rsi','macd','macdsignal','macdhist','atr'}<=set(result.columns)

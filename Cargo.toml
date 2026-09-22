@@ -2,6 +2,9 @@
 name = "polars_talib"
 version = "0.2.0"
 edition = "2021"
+description = "Native Polars expressions for all TA-Lib technical indicators"
+license = "MIT"
+repository = "https://github.com/Yvictor/polars_ta_extension"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [lib]

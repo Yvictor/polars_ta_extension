@@ -83,9 +83,9 @@ def generate():
         py += [f'def {n}('+', '.join([f'{i}: pl.Expr = {default(i)}' for i in inputs]+ps)+') -> pl.Expr:',
                f'    """{doc}"""',
                '    return register_plugin('+f'args=[{", ".join(inputs)}], symbol="{n}", is_elementwise=False, lib=lib, kwargs={{'+', '.join(f'"{p["name"]}": {p["name"]}' for p in params)+'})','',
-               f'def _expr_{n}('+', '.join(['self']+[f'{i}: pl.Expr = {default(i)}' for i in inputs if i!=primary]+ps)+') -> pl.Expr:',
+               f'_call_{n} = {n}', '', f'def _expr_{n}('+', '.join(['self']+[f'{i}: pl.Expr = {default(i)}' for i in inputs if i!=primary]+ps)+') -> pl.Expr:',
                f'    """{doc} The receiver is {primary}."""',
-               f'    return {n}('+', '.join(f'{i}='+('self._expr' if i==primary else i) for i in inputs)+ (', ' if params else '')+', '.join(f'{p["name"]}={p["name"]}' for p in params)+')','']
+               f'    return _call_{n}('+', '.join(f'{i}='+('self._expr' if i==primary else i) for i in inputs)+ (', ' if params else '')+', '.join(f'{p["name"]}={p["name"]}' for p in params)+')','']
     py += ['__all__ = '+repr([f['name'] for f in added]), 'GROUPS = '+repr(groups), 'STRUCTS = '+repr(structs), '', 'def install(namespace):']
     py += [f'    namespace.{f["name"]} = _expr_{f["name"]}' for f in added]
     for path,lines in [('talib/src/generated.rs',rust),('src/generated.rs',plugin),('python/polars_talib/_generated.py',py)]:

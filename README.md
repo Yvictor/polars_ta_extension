@@ -1,10 +1,18 @@
 # Polars Extension for Ta-Lib
 
+Version **0.2.0** bundles **TA-Lib 0.8.1**: all **201 batch indicators**,
+including SuperTrend, VWAP, HMA, KDJ and Heikin-Ashi. Python 3.10+; Polars 1.20+.
+Binary wheels include the C library.
+
+- [Upgrade notes, platform matrix and source builds](docs/upgrade-0.2.0.md)
+- [Install the skill for Codex, Claude Code or Cursor](docs/skills.md)
+- [Reproducible performance results](docs/performance.md)
+
 
 ## Getting Started
 
 ``` bash
-pip install polars_talib
+pip install 'polars-talib==0.2.0'
 ```
 
 and
@@ -28,6 +36,8 @@ df.with_columns(
 ```
 
 ### multiple symbol usage using over syntax
+
+Sort by symbol and timestamp before computing history-dependent indicators.
 ``` python
 df.with_columns(
     pl.col("close").ta.ema(5).over("symbol").alias("ema5"),
