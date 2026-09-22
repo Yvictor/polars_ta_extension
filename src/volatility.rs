@@ -5,6 +5,7 @@ use talib::volatility::{ta_atr, ta_natr, ta_trange, ATRKwargs, NATRKwargs};
 
 #[polars_expr(output_type=Float64)]
 fn atr(inputs: &[Series], kwargs: ATRKwargs) -> PolarsResult<Series> {
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let close = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -21,6 +22,7 @@ fn atr(inputs: &[Series], kwargs: ATRKwargs) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Float64)]
 fn trange(inputs: &[Series]) -> PolarsResult<Series> {
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let close = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -37,6 +39,7 @@ fn trange(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Float64)]
 fn natr(inputs: &[Series], kwargs: NATRKwargs) -> PolarsResult<Series> {
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let close = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;

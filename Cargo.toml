@@ -1,7 +1,10 @@
 [package]
 name = "polars_talib"
-version = "0.1.6"
+version = "0.2.0"
 edition = "2021"
+description = "Native Polars expressions for all TA-Lib technical indicators"
+license = "MIT"
+repository = "https://github.com/Yvictor/polars_ta_extension"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [lib]
@@ -10,7 +13,7 @@ crate-type = ["cdylib"]
 
 
 [dependencies]
-pyo3 = { version = "0.20", features = ["extension-module", "abi3-py37"] }
+pyo3 = { version = "0.20", features = ["extension-module", "abi3-py310"] }
 pyo3-polars = { version = "0.10.0", features = ["derive"] }
 polars = {version = "0.36.2", features = ["dtype-struct"]}
 # "performant", "lazy", "dtype-array"

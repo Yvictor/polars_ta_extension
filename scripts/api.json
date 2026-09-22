@@ -1,0 +1,4560 @@
+[
+  {
+    "name": "ac",
+    "group": "Momentum Indicators",
+    "description": "Accelerator/Decelerator Oscillator",
+    "inputs": [
+      "high",
+      "low"
+    ],
+    "params": [
+      {
+        "name": "fastperiod",
+        "c_name": "optInFastPeriod",
+        "type": "int",
+        "default": 5
+      },
+      {
+        "name": "slowperiod",
+        "c_name": "optInSlowPeriod",
+        "type": "int",
+        "default": 34
+      },
+      {
+        "name": "signalperiod",
+        "c_name": "optInSignalPeriod",
+        "type": "int",
+        "default": 5
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "accbands",
+    "group": "Overlap Studies",
+    "description": "Acceleration Bands",
+    "inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 20
+      }
+    ],
+    "outputs": [
+      {
+        "name": "realupperband",
+        "type": "double"
+      },
+      {
+        "name": "realmiddleband",
+        "type": "double"
+      },
+      {
+        "name": "reallowerband",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "acos",
+    "group": "Math Transform",
+    "description": "Vector Trigonometric ACos",
+    "inputs": [
+      "real"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "ad",
+    "group": "Volume Indicators",
+    "description": "Chaikin A/D Line",
+    "inputs": [
+      "high",
+      "low",
+      "close",
+      "volume"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "add",
+    "group": "Math Operators",
+    "description": "Vector Arithmetic Add",
+    "inputs": [
+      "real0",
+      "real1"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "adosc",
+    "group": "Volume Indicators",
+    "description": "Chaikin A/D Oscillator",
+    "inputs": [
+      "high",
+      "low",
+      "close",
+      "volume"
+    ],
+    "params": [
+      {
+        "name": "fastperiod",
+        "c_name": "optInFastPeriod",
+        "type": "int",
+        "default": 3
+      },
+      {
+        "name": "slowperiod",
+        "c_name": "optInSlowPeriod",
+        "type": "int",
+        "default": 10
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "adr",
+    "group": "Volatility Indicators",
+    "description": "Average Day Range",
+    "inputs": [
+      "high",
+      "low"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 14
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "adx",
+    "group": "Momentum Indicators",
+    "description": "Average Directional Movement Index",
+    "inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 14
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "adxr",
+    "group": "Momentum Indicators",
+    "description": "Average Directional Movement Index Rating",
+    "inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 14
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "ao",
+    "group": "Momentum Indicators",
+    "description": "Awesome Oscillator",
+    "inputs": [
+      "high",
+      "low"
+    ],
+    "params": [
+      {
+        "name": "fastperiod",
+        "c_name": "optInFastPeriod",
+        "type": "int",
+        "default": 5
+      },
+      {
+        "name": "slowperiod",
+        "c_name": "optInSlowPeriod",
+        "type": "int",
+        "default": 34
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "apo",
+    "group": "Momentum Indicators",
+    "description": "Absolute Price Oscillator",
+    "inputs": [
+      "real"
+    ],
+    "params": [
+      {
+        "name": "fastperiod",
+        "c_name": "optInFastPeriod",
+        "type": "int",
+        "default": 12
+      },
+      {
+        "name": "slowperiod",
+        "c_name": "optInSlowPeriod",
+        "type": "int",
+        "default": 26
+      },
+      {
+        "name": "matype",
+        "c_name": "optInMAType",
+        "type": "TA_MAType",
+        "default": 1
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "aroon",
+    "group": "Momentum Indicators",
+    "description": "Aroon",
+    "inputs": [
+      "high",
+      "low"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 14
+      }
+    ],
+    "outputs": [
+      {
+        "name": "aroondown",
+        "type": "double"
+      },
+      {
+        "name": "aroonup",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "aroonosc",
+    "group": "Momentum Indicators",
+    "description": "Aroon Oscillator",
+    "inputs": [
+      "high",
+      "low"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 14
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "asin",
+    "group": "Math Transform",
+    "description": "Vector Trigonometric ASin",
+    "inputs": [
+      "real"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "atan",
+    "group": "Math Transform",
+    "description": "Vector Trigonometric ATan",
+    "inputs": [
+      "real"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "atr",
+    "group": "Volatility Indicators",
+    "description": "Average True Range",
+    "inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 14
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "avgdev",
+    "group": "Price Transform",
+    "description": "Average Deviation",
+    "inputs": [
+      "real"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 14
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "avgprice",
+    "group": "Price Transform",
+    "description": "Average Price",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "bbands",
+    "group": "Overlap Studies",
+    "description": "Bollinger Bands",
+    "inputs": [
+      "real"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 20
+      },
+      {
+        "name": "nbdevup",
+        "c_name": "optInNbDevUp",
+        "type": "double",
+        "default": 2.0
+      },
+      {
+        "name": "nbdevdn",
+        "c_name": "optInNbDevDn",
+        "type": "double",
+        "default": 2.0
+      },
+      {
+        "name": "matype",
+        "c_name": "optInMAType",
+        "type": "TA_MAType",
+        "default": 0
+      }
+    ],
+    "outputs": [
+      {
+        "name": "realupperband",
+        "type": "double"
+      },
+      {
+        "name": "realmiddleband",
+        "type": "double"
+      },
+      {
+        "name": "reallowerband",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "beta",
+    "group": "Statistic Functions",
+    "description": "Beta",
+    "inputs": [
+      "real0",
+      "real1"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 5
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "bop",
+    "group": "Momentum Indicators",
+    "description": "Balance Of Power",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "cci",
+    "group": "Momentum Indicators",
+    "description": "Commodity Channel Index",
+    "inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 14
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "cdl2crows",
+    "group": "Pattern Recognition",
+    "description": "Two Crows",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdl3blackcrows",
+    "group": "Pattern Recognition",
+    "description": "Three Black Crows",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdl3inside",
+    "group": "Pattern Recognition",
+    "description": "Three Inside Up/Down",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdl3linestrike",
+    "group": "Pattern Recognition",
+    "description": "Three-Line Strike",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdl3outside",
+    "group": "Pattern Recognition",
+    "description": "Three Outside Up/Down",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdl3starsinsouth",
+    "group": "Pattern Recognition",
+    "description": "Three Stars In The South",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdl3whitesoldiers",
+    "group": "Pattern Recognition",
+    "description": "Three Advancing White Soldiers",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdlabandonedbaby",
+    "group": "Pattern Recognition",
+    "description": "Abandoned Baby",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [
+      {
+        "name": "penetration",
+        "c_name": "optInPenetration",
+        "type": "double",
+        "default": 0.3
+      }
+    ],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdladvanceblock",
+    "group": "Pattern Recognition",
+    "description": "Advance Block",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdlbelthold",
+    "group": "Pattern Recognition",
+    "description": "Belt-hold",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdlbreakaway",
+    "group": "Pattern Recognition",
+    "description": "Breakaway",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdlclosingmarubozu",
+    "group": "Pattern Recognition",
+    "description": "Closing Marubozu",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdlconcealbabyswall",
+    "group": "Pattern Recognition",
+    "description": "Concealing Baby Swallow",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdlcounterattack",
+    "group": "Pattern Recognition",
+    "description": "Counterattack",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdldarkcloudcover",
+    "group": "Pattern Recognition",
+    "description": "Dark Cloud Cover",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [
+      {
+        "name": "penetration",
+        "c_name": "optInPenetration",
+        "type": "double",
+        "default": 0.5
+      }
+    ],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdldoji",
+    "group": "Pattern Recognition",
+    "description": "Doji",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdldojistar",
+    "group": "Pattern Recognition",
+    "description": "Doji Star",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdldragonflydoji",
+    "group": "Pattern Recognition",
+    "description": "Dragonfly Doji",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdlengulfing",
+    "group": "Pattern Recognition",
+    "description": "Engulfing Pattern",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdleveningdojistar",
+    "group": "Pattern Recognition",
+    "description": "Evening Doji Star",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [
+      {
+        "name": "penetration",
+        "c_name": "optInPenetration",
+        "type": "double",
+        "default": 0.3
+      }
+    ],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdleveningstar",
+    "group": "Pattern Recognition",
+    "description": "Evening Star",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [
+      {
+        "name": "penetration",
+        "c_name": "optInPenetration",
+        "type": "double",
+        "default": 0.3
+      }
+    ],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdlgapsidesidewhite",
+    "group": "Pattern Recognition",
+    "description": "Up/Down-gap side-by-side white lines",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdlgravestonedoji",
+    "group": "Pattern Recognition",
+    "description": "Gravestone Doji",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdlhammer",
+    "group": "Pattern Recognition",
+    "description": "Hammer",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdlhangingman",
+    "group": "Pattern Recognition",
+    "description": "Hanging Man",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdlharami",
+    "group": "Pattern Recognition",
+    "description": "Harami Pattern",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdlharamicross",
+    "group": "Pattern Recognition",
+    "description": "Harami Cross Pattern",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdlhighwave",
+    "group": "Pattern Recognition",
+    "description": "High-Wave Candle",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdlhikkake",
+    "group": "Pattern Recognition",
+    "description": "Hikkake Pattern",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdlhikkakemod",
+    "group": "Pattern Recognition",
+    "description": "Modified Hikkake Pattern",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdlhomingpigeon",
+    "group": "Pattern Recognition",
+    "description": "Homing Pigeon",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdlidentical3crows",
+    "group": "Pattern Recognition",
+    "description": "Identical Three Crows",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdlinneck",
+    "group": "Pattern Recognition",
+    "description": "In-Neck Pattern",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdlinvertedhammer",
+    "group": "Pattern Recognition",
+    "description": "Inverted Hammer",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdlkicking",
+    "group": "Pattern Recognition",
+    "description": "Kicking",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdlkickingbylength",
+    "group": "Pattern Recognition",
+    "description": "Kicking - bull/bear determined by the longer marubozu",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdlladderbottom",
+    "group": "Pattern Recognition",
+    "description": "Ladder Bottom",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdllongleggeddoji",
+    "group": "Pattern Recognition",
+    "description": "Long Legged Doji",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdllongline",
+    "group": "Pattern Recognition",
+    "description": "Long Line Candle",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdlmarubozu",
+    "group": "Pattern Recognition",
+    "description": "Marubozu",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdlmatchinglow",
+    "group": "Pattern Recognition",
+    "description": "Matching Low",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdlmathold",
+    "group": "Pattern Recognition",
+    "description": "Mat Hold",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [
+      {
+        "name": "penetration",
+        "c_name": "optInPenetration",
+        "type": "double",
+        "default": 0.5
+      }
+    ],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdlmorningdojistar",
+    "group": "Pattern Recognition",
+    "description": "Morning Doji Star",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [
+      {
+        "name": "penetration",
+        "c_name": "optInPenetration",
+        "type": "double",
+        "default": 0.3
+      }
+    ],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdlmorningstar",
+    "group": "Pattern Recognition",
+    "description": "Morning Star",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [
+      {
+        "name": "penetration",
+        "c_name": "optInPenetration",
+        "type": "double",
+        "default": 0.3
+      }
+    ],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdlonneck",
+    "group": "Pattern Recognition",
+    "description": "On-Neck Pattern",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdlpiercing",
+    "group": "Pattern Recognition",
+    "description": "Piercing Pattern",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdlrickshawman",
+    "group": "Pattern Recognition",
+    "description": "Rickshaw Man",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdlrisefall3methods",
+    "group": "Pattern Recognition",
+    "description": "Rising/Falling Three Methods",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdlseparatinglines",
+    "group": "Pattern Recognition",
+    "description": "Separating Lines",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdlshootingstar",
+    "group": "Pattern Recognition",
+    "description": "Shooting Star",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdlshortline",
+    "group": "Pattern Recognition",
+    "description": "Short Line Candle",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdlspinningtop",
+    "group": "Pattern Recognition",
+    "description": "Spinning Top",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdlstalledpattern",
+    "group": "Pattern Recognition",
+    "description": "Stalled Pattern",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdlsticksandwich",
+    "group": "Pattern Recognition",
+    "description": "Stick Sandwich",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdltakuri",
+    "group": "Pattern Recognition",
+    "description": "Takuri (Dragonfly Doji with very long lower shadow)",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdltasukigap",
+    "group": "Pattern Recognition",
+    "description": "Tasuki Gap",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdlthrusting",
+    "group": "Pattern Recognition",
+    "description": "Thrusting Pattern",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdltristar",
+    "group": "Pattern Recognition",
+    "description": "Tristar Pattern",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdlunique3river",
+    "group": "Pattern Recognition",
+    "description": "Unique 3 River",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdlupsidegap2crows",
+    "group": "Pattern Recognition",
+    "description": "Upside Gap Two Crows",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "cdlxsidegap3methods",
+    "group": "Pattern Recognition",
+    "description": "Upside/Downside Gap Three Methods",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "ceil",
+    "group": "Math Transform",
+    "description": "Vector Ceil",
+    "inputs": [
+      "real"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "cmf",
+    "group": "Volume Indicators",
+    "description": "Chaikin Money Flow",
+    "inputs": [
+      "high",
+      "low",
+      "close",
+      "volume"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 20
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "cmo",
+    "group": "Momentum Indicators",
+    "description": "Chande Momentum Oscillator",
+    "inputs": [
+      "real"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 14
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "cmou",
+    "group": "Momentum Indicators",
+    "description": "Chande Momentum Oscillator (Unsmoothed)",
+    "inputs": [
+      "real"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 14
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "coppock",
+    "group": "Momentum Indicators",
+    "description": "Coppock Curve",
+    "inputs": [
+      "real"
+    ],
+    "params": [
+      {
+        "name": "wmaperiod",
+        "c_name": "optInWMAPeriod",
+        "type": "int",
+        "default": 10
+      },
+      {
+        "name": "roc1period",
+        "c_name": "optInROC1Period",
+        "type": "int",
+        "default": 11
+      },
+      {
+        "name": "roc2period",
+        "c_name": "optInROC2Period",
+        "type": "int",
+        "default": 14
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "correl",
+    "group": "Statistic Functions",
+    "description": "Pearson's Correlation Coefficient (r)",
+    "inputs": [
+      "real0",
+      "real1"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 30
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "cos",
+    "group": "Math Transform",
+    "description": "Vector Trigonometric Cos",
+    "inputs": [
+      "real"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "cosh",
+    "group": "Math Transform",
+    "description": "Vector Trigonometric Cosh",
+    "inputs": [
+      "real"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "cumsum",
+    "group": "Math Operators",
+    "description": "Cumulative Sum",
+    "inputs": [
+      "real"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "cvi",
+    "group": "Volatility Indicators",
+    "description": "Chaikin's Volatility",
+    "inputs": [
+      "high",
+      "low"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 10
+      },
+      {
+        "name": "rocperiod",
+        "c_name": "optInROCPeriod",
+        "type": "int",
+        "default": 10
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "dema",
+    "group": "Overlap Studies",
+    "description": "Double Exponential Moving Average",
+    "inputs": [
+      "real"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 30
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "div",
+    "group": "Math Operators",
+    "description": "Vector Arithmetic Div",
+    "inputs": [
+      "real0",
+      "real1"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "donchian",
+    "group": "Overlap Studies",
+    "description": "Donchian Channels",
+    "inputs": [
+      "high",
+      "low"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 20
+      }
+    ],
+    "outputs": [
+      {
+        "name": "realupperband",
+        "type": "double"
+      },
+      {
+        "name": "realmiddleband",
+        "type": "double"
+      },
+      {
+        "name": "reallowerband",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "dpo",
+    "group": "Momentum Indicators",
+    "description": "Detrended Price Oscillator",
+    "inputs": [
+      "real"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 20
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "dx",
+    "group": "Momentum Indicators",
+    "description": "Directional Movement Index",
+    "inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 14
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "efi",
+    "group": "Volume Indicators",
+    "description": "Elder's Force Index",
+    "inputs": [
+      "close",
+      "volume"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 13
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "ema",
+    "group": "Overlap Studies",
+    "description": "Exponential Moving Average",
+    "inputs": [
+      "real"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 30
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "er",
+    "group": "Momentum Indicators",
+    "description": "Kaufman Efficiency Ratio",
+    "inputs": [
+      "real"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 10
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "eri",
+    "group": "Momentum Indicators",
+    "description": "Elder Ray Index (Bull Power / Bear Power)",
+    "inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 13
+      }
+    ],
+    "outputs": [
+      {
+        "name": "bullpower",
+        "type": "double"
+      },
+      {
+        "name": "bearpower",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "exp",
+    "group": "Math Transform",
+    "description": "Vector Arithmetic Exp",
+    "inputs": [
+      "real"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "floor",
+    "group": "Math Transform",
+    "description": "Vector Floor",
+    "inputs": [
+      "real"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "fosc",
+    "group": "Momentum Indicators",
+    "description": "Forecast Oscillator",
+    "inputs": [
+      "real"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 5
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "fractal",
+    "group": "Momentum Indicators",
+    "description": "Williams Fractal",
+    "inputs": [
+      "high",
+      "low"
+    ],
+    "params": [
+      {
+        "name": "leftbars",
+        "c_name": "optInLeftBars",
+        "type": "int",
+        "default": 2
+      },
+      {
+        "name": "rightbars",
+        "c_name": "optInRightBars",
+        "type": "int",
+        "default": 2
+      }
+    ],
+    "outputs": [
+      {
+        "name": "swinghigh",
+        "type": "int"
+      },
+      {
+        "name": "swinglow",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "ha",
+    "group": "Price Transform",
+    "description": "Heikin-Ashi Candles",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "haopen",
+        "type": "double"
+      },
+      {
+        "name": "hahigh",
+        "type": "double"
+      },
+      {
+        "name": "halow",
+        "type": "double"
+      },
+      {
+        "name": "haclose",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "hma",
+    "group": "Overlap Studies",
+    "description": "Hull Moving Average",
+    "inputs": [
+      "real"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 20
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "ht_dcperiod",
+    "group": "Cycle Indicators",
+    "description": "Hilbert Transform - Dominant Cycle Period",
+    "inputs": [
+      "real"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "ht_dcphase",
+    "group": "Cycle Indicators",
+    "description": "Hilbert Transform - Dominant Cycle Phase",
+    "inputs": [
+      "real"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "ht_phasor",
+    "group": "Cycle Indicators",
+    "description": "Hilbert Transform - Phasor Components",
+    "inputs": [
+      "real"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "inphase",
+        "type": "double"
+      },
+      {
+        "name": "quadrature",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "ht_sine",
+    "group": "Cycle Indicators",
+    "description": "Hilbert Transform - SineWave",
+    "inputs": [
+      "real"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "sine",
+        "type": "double"
+      },
+      {
+        "name": "leadsine",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "ht_trendline",
+    "group": "Overlap Studies",
+    "description": "Hilbert Transform - Instantaneous Trendline",
+    "inputs": [
+      "real"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "ht_trendmode",
+    "group": "Cycle Indicators",
+    "description": "Hilbert Transform - Trend vs Cycle Mode",
+    "inputs": [
+      "real"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "imi",
+    "group": "Momentum Indicators",
+    "description": "Intraday Momentum Index",
+    "inputs": [
+      "open",
+      "close"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 14
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "kama",
+    "group": "Overlap Studies",
+    "description": "Kaufman Adaptive Moving Average",
+    "inputs": [
+      "real"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 30
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "kc",
+    "group": "Overlap Studies",
+    "description": "Keltner Channels",
+    "inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 20
+      },
+      {
+        "name": "atrperiod",
+        "c_name": "optInATRPeriod",
+        "type": "int",
+        "default": 10
+      },
+      {
+        "name": "nbdev",
+        "c_name": "optInNbDev",
+        "type": "double",
+        "default": 2.0
+      }
+    ],
+    "outputs": [
+      {
+        "name": "realupperband",
+        "type": "double"
+      },
+      {
+        "name": "realmiddleband",
+        "type": "double"
+      },
+      {
+        "name": "reallowerband",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "kdj",
+    "group": "Momentum Indicators",
+    "description": "KDJ Stochastic",
+    "inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [
+      {
+        "name": "fastk_period",
+        "c_name": "optInFastK_Period",
+        "type": "int",
+        "default": 9
+      },
+      {
+        "name": "slowk_period",
+        "c_name": "optInSlowK_Period",
+        "type": "int",
+        "default": 3
+      },
+      {
+        "name": "slowk_matype",
+        "c_name": "optInSlowK_MAType",
+        "type": "TA_MAType",
+        "default": 13
+      },
+      {
+        "name": "slowd_period",
+        "c_name": "optInSlowD_Period",
+        "type": "int",
+        "default": 3
+      },
+      {
+        "name": "slowd_matype",
+        "c_name": "optInSlowD_MAType",
+        "type": "TA_MAType",
+        "default": 13
+      }
+    ],
+    "outputs": [
+      {
+        "name": "k",
+        "type": "double"
+      },
+      {
+        "name": "d",
+        "type": "double"
+      },
+      {
+        "name": "j",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "linearreg",
+    "group": "Statistic Functions",
+    "description": "Linear Regression",
+    "inputs": [
+      "real"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 14
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "linearreg_angle",
+    "group": "Statistic Functions",
+    "description": "Linear Regression Angle",
+    "inputs": [
+      "real"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 14
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "linearreg_intercept",
+    "group": "Statistic Functions",
+    "description": "Linear Regression Intercept",
+    "inputs": [
+      "real"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 14
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "linearreg_slope",
+    "group": "Statistic Functions",
+    "description": "Linear Regression Slope",
+    "inputs": [
+      "real"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 14
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "ln",
+    "group": "Math Transform",
+    "description": "Vector Log Natural",
+    "inputs": [
+      "real"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "log10",
+    "group": "Math Transform",
+    "description": "Vector Log10",
+    "inputs": [
+      "real"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "ma",
+    "group": "Overlap Studies",
+    "description": "Moving average",
+    "inputs": [
+      "real"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 30
+      },
+      {
+        "name": "matype",
+        "c_name": "optInMAType",
+        "type": "TA_MAType",
+        "default": 0
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "macd",
+    "group": "Momentum Indicators",
+    "description": "Moving Average Convergence/Divergence",
+    "inputs": [
+      "real"
+    ],
+    "params": [
+      {
+        "name": "fastperiod",
+        "c_name": "optInFastPeriod",
+        "type": "int",
+        "default": 12
+      },
+      {
+        "name": "slowperiod",
+        "c_name": "optInSlowPeriod",
+        "type": "int",
+        "default": 26
+      },
+      {
+        "name": "signalperiod",
+        "c_name": "optInSignalPeriod",
+        "type": "int",
+        "default": 9
+      }
+    ],
+    "outputs": [
+      {
+        "name": "macd",
+        "type": "double"
+      },
+      {
+        "name": "macdsignal",
+        "type": "double"
+      },
+      {
+        "name": "macdhist",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "macdext",
+    "group": "Momentum Indicators",
+    "description": "MACD with controllable MA type",
+    "inputs": [
+      "real"
+    ],
+    "params": [
+      {
+        "name": "fastperiod",
+        "c_name": "optInFastPeriod",
+        "type": "int",
+        "default": 12
+      },
+      {
+        "name": "fastmatype",
+        "c_name": "optInFastMAType",
+        "type": "TA_MAType",
+        "default": 0
+      },
+      {
+        "name": "slowperiod",
+        "c_name": "optInSlowPeriod",
+        "type": "int",
+        "default": 26
+      },
+      {
+        "name": "slowmatype",
+        "c_name": "optInSlowMAType",
+        "type": "TA_MAType",
+        "default": 0
+      },
+      {
+        "name": "signalperiod",
+        "c_name": "optInSignalPeriod",
+        "type": "int",
+        "default": 9
+      },
+      {
+        "name": "signalmatype",
+        "c_name": "optInSignalMAType",
+        "type": "TA_MAType",
+        "default": 0
+      }
+    ],
+    "outputs": [
+      {
+        "name": "macd",
+        "type": "double"
+      },
+      {
+        "name": "macdsignal",
+        "type": "double"
+      },
+      {
+        "name": "macdhist",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "macdfix",
+    "group": "Momentum Indicators",
+    "description": "Moving Average Convergence/Divergence Fix 12/26",
+    "inputs": [
+      "real"
+    ],
+    "params": [
+      {
+        "name": "signalperiod",
+        "c_name": "optInSignalPeriod",
+        "type": "int",
+        "default": 9
+      }
+    ],
+    "outputs": [
+      {
+        "name": "macd",
+        "type": "double"
+      },
+      {
+        "name": "macdsignal",
+        "type": "double"
+      },
+      {
+        "name": "macdhist",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "mama",
+    "group": "Overlap Studies",
+    "description": "MESA Adaptive Moving Average",
+    "inputs": [
+      "real"
+    ],
+    "params": [
+      {
+        "name": "fastlimit",
+        "c_name": "optInFastLimit",
+        "type": "double",
+        "default": 0.5
+      },
+      {
+        "name": "slowlimit",
+        "c_name": "optInSlowLimit",
+        "type": "double",
+        "default": 0.05
+      }
+    ],
+    "outputs": [
+      {
+        "name": "mama",
+        "type": "double"
+      },
+      {
+        "name": "fama",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "marketfi",
+    "group": "Volume Indicators",
+    "description": "Market Facilitation Index",
+    "inputs": [
+      "high",
+      "low",
+      "volume"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "massi",
+    "group": "Volatility Indicators",
+    "description": "Mass Index",
+    "inputs": [
+      "high",
+      "low"
+    ],
+    "params": [
+      {
+        "name": "fastperiod",
+        "c_name": "optInFastPeriod",
+        "type": "int",
+        "default": 9
+      },
+      {
+        "name": "slowperiod",
+        "c_name": "optInSlowPeriod",
+        "type": "int",
+        "default": 25
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "mavp",
+    "group": "Overlap Studies",
+    "description": "Moving average with variable period",
+    "inputs": [
+      "real",
+      "periods"
+    ],
+    "params": [
+      {
+        "name": "minperiod",
+        "c_name": "optInMinPeriod",
+        "type": "int",
+        "default": 2
+      },
+      {
+        "name": "maxperiod",
+        "c_name": "optInMaxPeriod",
+        "type": "int",
+        "default": 30
+      },
+      {
+        "name": "matype",
+        "c_name": "optInMAType",
+        "type": "TA_MAType",
+        "default": 0
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "max",
+    "group": "Math Operators",
+    "description": "Highest value over a specified period",
+    "inputs": [
+      "real"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 30
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "maxindex",
+    "group": "Math Operators",
+    "description": "Index of highest value over a specified period",
+    "inputs": [
+      "real"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 30
+      }
+    ],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "medprice",
+    "group": "Price Transform",
+    "description": "Median Price",
+    "inputs": [
+      "high",
+      "low"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "mfi",
+    "group": "Momentum Indicators",
+    "description": "Money Flow Index",
+    "inputs": [
+      "high",
+      "low",
+      "close",
+      "volume"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 14
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "midpoint",
+    "group": "Overlap Studies",
+    "description": "MidPoint over period",
+    "inputs": [
+      "real"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 14
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "midprice",
+    "group": "Overlap Studies",
+    "description": "Midpoint Price over period",
+    "inputs": [
+      "high",
+      "low"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 14
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "min",
+    "group": "Math Operators",
+    "description": "Lowest value over a specified period",
+    "inputs": [
+      "real"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 30
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "minindex",
+    "group": "Math Operators",
+    "description": "Index of lowest value over a specified period",
+    "inputs": [
+      "real"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 30
+      }
+    ],
+    "outputs": [
+      {
+        "name": "integer",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "minmax",
+    "group": "Math Operators",
+    "description": "Lowest and highest values over a specified period",
+    "inputs": [
+      "real"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 30
+      }
+    ],
+    "outputs": [
+      {
+        "name": "min",
+        "type": "double"
+      },
+      {
+        "name": "max",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "minmaxindex",
+    "group": "Math Operators",
+    "description": "Indexes of lowest and highest values over a specified period",
+    "inputs": [
+      "real"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 30
+      }
+    ],
+    "outputs": [
+      {
+        "name": "minidx",
+        "type": "int"
+      },
+      {
+        "name": "maxidx",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "minus_di",
+    "group": "Momentum Indicators",
+    "description": "Minus Directional Indicator",
+    "inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 14
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "minus_dm",
+    "group": "Momentum Indicators",
+    "description": "Minus Directional Movement",
+    "inputs": [
+      "high",
+      "low"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 14
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "mom",
+    "group": "Momentum Indicators",
+    "description": "Momentum",
+    "inputs": [
+      "real"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 10
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "mult",
+    "group": "Math Operators",
+    "description": "Vector Arithmetic Mult",
+    "inputs": [
+      "real0",
+      "real1"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "natr",
+    "group": "Volatility Indicators",
+    "description": "Normalized Average True Range",
+    "inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 14
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "nvi",
+    "group": "Volume Indicators",
+    "description": "Negative Volume Index",
+    "inputs": [
+      "close",
+      "volume"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "obv",
+    "group": "Volume Indicators",
+    "description": "On Balance Volume",
+    "inputs": [
+      "real",
+      "volume"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "percentile",
+    "group": "Statistic Functions",
+    "description": "Percentile (nearest rank)",
+    "inputs": [
+      "real"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 30
+      },
+      {
+        "name": "percentile",
+        "c_name": "optInPercentile",
+        "type": "double",
+        "default": 50.0
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "percentrank",
+    "group": "Statistic Functions",
+    "description": "Percent Rank",
+    "inputs": [
+      "real"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 100
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "plus_di",
+    "group": "Momentum Indicators",
+    "description": "Plus Directional Indicator",
+    "inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 14
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "plus_dm",
+    "group": "Momentum Indicators",
+    "description": "Plus Directional Movement",
+    "inputs": [
+      "high",
+      "low"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 14
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "ppo",
+    "group": "Momentum Indicators",
+    "description": "Percentage Price Oscillator",
+    "inputs": [
+      "real"
+    ],
+    "params": [
+      {
+        "name": "fastperiod",
+        "c_name": "optInFastPeriod",
+        "type": "int",
+        "default": 12
+      },
+      {
+        "name": "slowperiod",
+        "c_name": "optInSlowPeriod",
+        "type": "int",
+        "default": 26
+      },
+      {
+        "name": "matype",
+        "c_name": "optInMAType",
+        "type": "TA_MAType",
+        "default": 1
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "pvi",
+    "group": "Volume Indicators",
+    "description": "Positive Volume Index",
+    "inputs": [
+      "close",
+      "volume"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "pvo",
+    "group": "Volume Indicators",
+    "description": "Percentage Volume Oscillator",
+    "inputs": [
+      "volume"
+    ],
+    "params": [
+      {
+        "name": "fastperiod",
+        "c_name": "optInFastPeriod",
+        "type": "int",
+        "default": 12
+      },
+      {
+        "name": "slowperiod",
+        "c_name": "optInSlowPeriod",
+        "type": "int",
+        "default": 26
+      },
+      {
+        "name": "matype",
+        "c_name": "optInMAType",
+        "type": "TA_MAType",
+        "default": 1
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "pvt",
+    "group": "Volume Indicators",
+    "description": "Price Volume Trend",
+    "inputs": [
+      "close",
+      "volume"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "qstick",
+    "group": "Momentum Indicators",
+    "description": "Qstick",
+    "inputs": [
+      "open",
+      "close"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 10
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "rma",
+    "group": "Overlap Studies",
+    "description": "Wilder's Smoothed Moving Average",
+    "inputs": [
+      "real"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 30
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "roc",
+    "group": "Momentum Indicators",
+    "description": "Rate of change : ((price/prevPrice)-1)*100",
+    "inputs": [
+      "real"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 10
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "rocp",
+    "group": "Momentum Indicators",
+    "description": "Rate of change Percentage: (price-prevPrice)/prevPrice",
+    "inputs": [
+      "real"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 10
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "rocr",
+    "group": "Momentum Indicators",
+    "description": "Rate of change ratio: (price/prevPrice)",
+    "inputs": [
+      "real"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 10
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "rocr100",
+    "group": "Momentum Indicators",
+    "description": "Rate of change ratio 100 scale: (price/prevPrice)*100",
+    "inputs": [
+      "real"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 10
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "rsi",
+    "group": "Momentum Indicators",
+    "description": "Relative Strength Index",
+    "inputs": [
+      "real"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 14
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "rvi",
+    "group": "Volatility Indicators",
+    "description": "Relative Volatility Index",
+    "inputs": [
+      "real"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 14
+      },
+      {
+        "name": "stddevperiod",
+        "c_name": "optInStdDevPeriod",
+        "type": "int",
+        "default": 10
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "rvol",
+    "group": "Volume Indicators",
+    "description": "Relative Volume",
+    "inputs": [
+      "volume"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 20
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "sar",
+    "group": "Overlap Studies",
+    "description": "Parabolic SAR",
+    "inputs": [
+      "high",
+      "low"
+    ],
+    "params": [
+      {
+        "name": "acceleration",
+        "c_name": "optInAcceleration",
+        "type": "double",
+        "default": 0.02
+      },
+      {
+        "name": "maximum",
+        "c_name": "optInMaximum",
+        "type": "double",
+        "default": 0.2
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "sarext",
+    "group": "Overlap Studies",
+    "description": "Parabolic SAR - Extended",
+    "inputs": [
+      "high",
+      "low"
+    ],
+    "params": [
+      {
+        "name": "startvalue",
+        "c_name": "optInStartValue",
+        "type": "double",
+        "default": 0.0
+      },
+      {
+        "name": "offsetonreverse",
+        "c_name": "optInOffsetOnReverse",
+        "type": "double",
+        "default": 0.0
+      },
+      {
+        "name": "accelerationinitlong",
+        "c_name": "optInAccelerationInitLong",
+        "type": "double",
+        "default": 0.02
+      },
+      {
+        "name": "accelerationlong",
+        "c_name": "optInAccelerationLong",
+        "type": "double",
+        "default": 0.02
+      },
+      {
+        "name": "accelerationmaxlong",
+        "c_name": "optInAccelerationMaxLong",
+        "type": "double",
+        "default": 0.2
+      },
+      {
+        "name": "accelerationinitshort",
+        "c_name": "optInAccelerationInitShort",
+        "type": "double",
+        "default": 0.02
+      },
+      {
+        "name": "accelerationshort",
+        "c_name": "optInAccelerationShort",
+        "type": "double",
+        "default": 0.02
+      },
+      {
+        "name": "accelerationmaxshort",
+        "c_name": "optInAccelerationMaxShort",
+        "type": "double",
+        "default": 0.2
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "sin",
+    "group": "Math Transform",
+    "description": "Vector Trigonometric Sin",
+    "inputs": [
+      "real"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "sinh",
+    "group": "Math Transform",
+    "description": "Vector Trigonometric Sinh",
+    "inputs": [
+      "real"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "sma",
+    "group": "Overlap Studies",
+    "description": "Simple Moving Average",
+    "inputs": [
+      "real"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 30
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "smi",
+    "group": "Momentum Indicators",
+    "description": "Stochastic Momentum Index",
+    "inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 13
+      },
+      {
+        "name": "fastperiod",
+        "c_name": "optInFastPeriod",
+        "type": "int",
+        "default": 2
+      },
+      {
+        "name": "slowperiod",
+        "c_name": "optInSlowPeriod",
+        "type": "int",
+        "default": 25
+      },
+      {
+        "name": "signalperiod",
+        "c_name": "optInSignalPeriod",
+        "type": "int",
+        "default": 9
+      }
+    ],
+    "outputs": [
+      {
+        "name": "smi",
+        "type": "double"
+      },
+      {
+        "name": "smisignal",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "sqrt",
+    "group": "Math Transform",
+    "description": "Vector Square Root",
+    "inputs": [
+      "real"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "stddev",
+    "group": "Statistic Functions",
+    "description": "Standard Deviation",
+    "inputs": [
+      "real"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 5
+      },
+      {
+        "name": "nbdev",
+        "c_name": "optInNbDev",
+        "type": "double",
+        "default": 1.0
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "stoch",
+    "group": "Momentum Indicators",
+    "description": "Stochastic",
+    "inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [
+      {
+        "name": "fastk_period",
+        "c_name": "optInFastK_Period",
+        "type": "int",
+        "default": 5
+      },
+      {
+        "name": "slowk_period",
+        "c_name": "optInSlowK_Period",
+        "type": "int",
+        "default": 3
+      },
+      {
+        "name": "slowk_matype",
+        "c_name": "optInSlowK_MAType",
+        "type": "TA_MAType",
+        "default": 0
+      },
+      {
+        "name": "slowd_period",
+        "c_name": "optInSlowD_Period",
+        "type": "int",
+        "default": 3
+      },
+      {
+        "name": "slowd_matype",
+        "c_name": "optInSlowD_MAType",
+        "type": "TA_MAType",
+        "default": 0
+      }
+    ],
+    "outputs": [
+      {
+        "name": "slowk",
+        "type": "double"
+      },
+      {
+        "name": "slowd",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "stochf",
+    "group": "Momentum Indicators",
+    "description": "Stochastic Fast",
+    "inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [
+      {
+        "name": "fastk_period",
+        "c_name": "optInFastK_Period",
+        "type": "int",
+        "default": 5
+      },
+      {
+        "name": "fastd_period",
+        "c_name": "optInFastD_Period",
+        "type": "int",
+        "default": 3
+      },
+      {
+        "name": "fastd_matype",
+        "c_name": "optInFastD_MAType",
+        "type": "TA_MAType",
+        "default": 0
+      }
+    ],
+    "outputs": [
+      {
+        "name": "fastk",
+        "type": "double"
+      },
+      {
+        "name": "fastd",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "stochrsi",
+    "group": "Momentum Indicators",
+    "description": "Stochastic Relative Strength Index",
+    "inputs": [
+      "real"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 14
+      },
+      {
+        "name": "fastk_period",
+        "c_name": "optInFastK_Period",
+        "type": "int",
+        "default": 5
+      },
+      {
+        "name": "fastd_period",
+        "c_name": "optInFastD_Period",
+        "type": "int",
+        "default": 3
+      },
+      {
+        "name": "fastd_matype",
+        "c_name": "optInFastD_MAType",
+        "type": "TA_MAType",
+        "default": 0
+      }
+    ],
+    "outputs": [
+      {
+        "name": "fastk",
+        "type": "double"
+      },
+      {
+        "name": "fastd",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "sub",
+    "group": "Math Operators",
+    "description": "Vector Arithmetic Subtraction",
+    "inputs": [
+      "real0",
+      "real1"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "sum",
+    "group": "Math Operators",
+    "description": "Summation",
+    "inputs": [
+      "real"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 30
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "supertrend",
+    "group": "Overlap Studies",
+    "description": "SuperTrend",
+    "inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 10
+      },
+      {
+        "name": "multiplier",
+        "c_name": "optInMultiplier",
+        "type": "double",
+        "default": 3.0
+      }
+    ],
+    "outputs": [
+      {
+        "name": "supertrend",
+        "type": "double"
+      },
+      {
+        "name": "trend",
+        "type": "int"
+      }
+    ]
+  },
+  {
+    "name": "t3",
+    "group": "Overlap Studies",
+    "description": "Triple Exponential Moving Average (T3)",
+    "inputs": [
+      "real"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 5
+      },
+      {
+        "name": "vfactor",
+        "c_name": "optInVFactor",
+        "type": "double",
+        "default": 0.7
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "tan",
+    "group": "Math Transform",
+    "description": "Vector Trigonometric Tan",
+    "inputs": [
+      "real"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "tanh",
+    "group": "Math Transform",
+    "description": "Vector Trigonometric Tanh",
+    "inputs": [
+      "real"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "tema",
+    "group": "Overlap Studies",
+    "description": "Triple Exponential Moving Average",
+    "inputs": [
+      "real"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 30
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "trange",
+    "group": "Volatility Indicators",
+    "description": "True Range",
+    "inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "trima",
+    "group": "Overlap Studies",
+    "description": "Triangular Moving Average",
+    "inputs": [
+      "real"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 30
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "trix",
+    "group": "Momentum Indicators",
+    "description": "1-day Rate-Of-Change (ROC) of a Triple Smooth EMA",
+    "inputs": [
+      "real"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 30
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "tsf",
+    "group": "Statistic Functions",
+    "description": "Time Series Forecast",
+    "inputs": [
+      "real"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 14
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "tsi",
+    "group": "Momentum Indicators",
+    "description": "True Strength Index",
+    "inputs": [
+      "real"
+    ],
+    "params": [
+      {
+        "name": "firstperiod",
+        "c_name": "optInFirstPeriod",
+        "type": "int",
+        "default": 25
+      },
+      {
+        "name": "secondperiod",
+        "c_name": "optInSecondPeriod",
+        "type": "int",
+        "default": 13
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "typprice",
+    "group": "Price Transform",
+    "description": "Typical Price",
+    "inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "ultosc",
+    "group": "Momentum Indicators",
+    "description": "Ultimate Oscillator",
+    "inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [
+      {
+        "name": "timeperiod1",
+        "c_name": "optInTimePeriod1",
+        "type": "int",
+        "default": 7
+      },
+      {
+        "name": "timeperiod2",
+        "c_name": "optInTimePeriod2",
+        "type": "int",
+        "default": 14
+      },
+      {
+        "name": "timeperiod3",
+        "c_name": "optInTimePeriod3",
+        "type": "int",
+        "default": 28
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "var",
+    "group": "Statistic Functions",
+    "description": "Variance",
+    "inputs": [
+      "real"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 5
+      },
+      {
+        "name": "nbdev",
+        "c_name": "optInNbDev",
+        "type": "double",
+        "default": 1.0
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "vhf",
+    "group": "Momentum Indicators",
+    "description": "Vertical Horizontal Filter",
+    "inputs": [
+      "real"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 28
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "vortex",
+    "group": "Momentum Indicators",
+    "description": "Vortex Indicator",
+    "inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 14
+      }
+    ],
+    "outputs": [
+      {
+        "name": "plusvi",
+        "type": "double"
+      },
+      {
+        "name": "minusvi",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "vwap",
+    "group": "Volume Indicators",
+    "description": "Volume Weighted Average Price",
+    "inputs": [
+      "high",
+      "low",
+      "close",
+      "volume"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "vwma",
+    "group": "Overlap Studies",
+    "description": "Volume Weighted Moving Average",
+    "inputs": [
+      "real",
+      "volume"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 30
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "wad",
+    "group": "Momentum Indicators",
+    "description": "Williams' Accumulation/Distribution",
+    "inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "wclprice",
+    "group": "Price Transform",
+    "description": "Weighted Close Price",
+    "inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "willr",
+    "group": "Momentum Indicators",
+    "description": "Williams' %R",
+    "inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 14
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "wma",
+    "group": "Overlap Studies",
+    "description": "Weighted Moving Average",
+    "inputs": [
+      "real"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 30
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  },
+  {
+    "name": "zlema",
+    "group": "Overlap Studies",
+    "description": "Zero-Lag Exponential Moving Average",
+    "inputs": [
+      "real"
+    ],
+    "params": [
+      {
+        "name": "timeperiod",
+        "c_name": "optInTimePeriod",
+        "type": "int",
+        "default": 30
+      }
+    ],
+    "outputs": [
+      {
+        "name": "real",
+        "type": "double"
+      }
+    ]
+  }
+]

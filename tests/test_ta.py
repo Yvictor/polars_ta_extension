@@ -31,7 +31,7 @@ def df_ohlc(request, df_base: pl.DataFrame):
     )
 
 def test_version():
-    assert plta.__talib_version__[:5] == "0.4.0"
+    assert plta.__talib_version__[:5] == "0.8.1"
 
 
 def test_ta_has_impl():
@@ -40,8 +40,7 @@ def test_ta_has_impl():
 
 
 def test_get_functions():
-    for plfn, fn in zip(plta.get_functions(), talib.get_functions()):
-        assert plfn == fn.lower()
+    assert plta.get_functions() == [fn.lower() for fn in talib.get_functions()]
 
 
 def test_get_function_groups():

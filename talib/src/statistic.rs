@@ -1,4 +1,5 @@
-use crate::utils::{make_vec, check_begin_idx2, check_begin_idx1};
+use crate::utils::{check_begin_idx1, check_begin_idx2, make_vec};
+use derive_builder::Builder;
 use serde::Deserialize;
 use talib_sys::{
     TA_BETA_Lookback, TA_CORREL_Lookback, TA_Integer, TA_LINEARREG_ANGLE_Lookback,
@@ -7,7 +8,6 @@ use talib_sys::{
     TA_LINEARREG, TA_LINEARREG_ANGLE, TA_LINEARREG_INTERCEPT, TA_LINEARREG_SLOPE, TA_STDDEV,
     TA_TSF, TA_VAR,
 };
-use derive_builder::Builder;
 
 #[derive(Builder, Deserialize)]
 pub struct BetaKwargs {
@@ -21,11 +21,20 @@ pub fn ta_beta(
     len: usize,
     kwargs: &BetaKwargs,
 ) -> Result<Vec<f64>, TA_RetCode> {
+    if len > 100_000_001 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
     let begin_idx = check_begin_idx2(len, real0_ptr, real1_ptr) as i32;
     let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_BETA_Lookback(kwargs.timeperiod) };
+    if lookback < begin_idx {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if len == 0 || lookback as usize >= len {
+        return Ok(crate::utils::make_default_vec(len));
+    }
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_BETA(
@@ -47,9 +56,7 @@ pub fn ta_beta(
                     out.set_len(out_size_begin);
                 }
             } else {
-                unsafe {
-                    out.set_len(len);
-                }
+                out.resize(len, crate::utils::CustomDefault::default());
             }
             Ok(out)
         }
@@ -69,11 +76,20 @@ pub fn ta_correl(
     len: usize,
     kwargs: &CorrelKwargs,
 ) -> Result<Vec<f64>, TA_RetCode> {
+    if len > 100_000_001 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
     let begin_idx = check_begin_idx2(len, real0_ptr, real1_ptr) as i32;
     let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_CORREL_Lookback(kwargs.timeperiod) };
+    if lookback < begin_idx {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if len == 0 || lookback as usize >= len {
+        return Ok(crate::utils::make_default_vec(len));
+    }
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_CORREL(
@@ -95,9 +111,7 @@ pub fn ta_correl(
                     out.set_len(out_size_begin);
                 }
             } else {
-                unsafe {
-                    out.set_len(len);
-                }
+                out.resize(len, crate::utils::CustomDefault::default());
             }
             Ok(out)
         }
@@ -116,11 +130,20 @@ pub fn ta_linearreg(
     len: usize,
     kwargs: &LinearRegKwargs,
 ) -> Result<Vec<f64>, TA_RetCode> {
+    if len > 100_000_001 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
     let begin_idx = check_begin_idx1(len, real_ptr) as i32;
     let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_LINEARREG_Lookback(kwargs.timeperiod) };
+    if lookback < begin_idx {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if len == 0 || lookback as usize >= len {
+        return Ok(crate::utils::make_default_vec(len));
+    }
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_LINEARREG(
@@ -141,9 +164,7 @@ pub fn ta_linearreg(
                     out.set_len(out_size_begin);
                 }
             } else {
-                unsafe {
-                    out.set_len(len);
-                }
+                out.resize(len, crate::utils::CustomDefault::default());
             }
             Ok(out)
         }
@@ -162,11 +183,20 @@ pub fn ta_linearreg_angle(
     len: usize,
     kwargs: &LinearRegAngleKwargs,
 ) -> Result<Vec<f64>, TA_RetCode> {
+    if len > 100_000_001 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
     let begin_idx = check_begin_idx1(len, real_ptr) as i32;
     let end_idx = len as i32 - begin_idx - 1;
-    let lookback = begin_idx + unsafe{ TA_LINEARREG_ANGLE_Lookback(kwargs.timeperiod) };
+    let lookback = begin_idx + unsafe { TA_LINEARREG_ANGLE_Lookback(kwargs.timeperiod) };
+    if lookback < begin_idx {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if len == 0 || lookback as usize >= len {
+        return Ok(crate::utils::make_default_vec(len));
+    }
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_LINEARREG_ANGLE(
@@ -187,9 +217,7 @@ pub fn ta_linearreg_angle(
                     out.set_len(out_size_begin);
                 }
             } else {
-                unsafe {
-                    out.set_len(len);
-                }
+                out.resize(len, crate::utils::CustomDefault::default());
             }
             Ok(out)
         }
@@ -208,11 +236,20 @@ pub fn ta_linearreg_intercept(
     len: usize,
     kwargs: &LinearRegInterceptKwargs,
 ) -> Result<Vec<f64>, TA_RetCode> {
+    if len > 100_000_001 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
     let begin_idx = check_begin_idx1(len, real_ptr) as i32;
     let end_idx = len as i32 - begin_idx - 1;
-    let lookback = begin_idx + unsafe{ TA_LINEARREG_INTERCEPT_Lookback(kwargs.timeperiod) };
+    let lookback = begin_idx + unsafe { TA_LINEARREG_INTERCEPT_Lookback(kwargs.timeperiod) };
+    if lookback < begin_idx {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if len == 0 || lookback as usize >= len {
+        return Ok(crate::utils::make_default_vec(len));
+    }
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_LINEARREG_INTERCEPT(
@@ -233,9 +270,7 @@ pub fn ta_linearreg_intercept(
                     out.set_len(out_size_begin);
                 }
             } else {
-                unsafe {
-                    out.set_len(len);
-                }
+                out.resize(len, crate::utils::CustomDefault::default());
             }
             Ok(out)
         }
@@ -254,11 +289,20 @@ pub fn ta_linearreg_slope(
     len: usize,
     kwargs: &LinearRegSlopeKwargs,
 ) -> Result<Vec<f64>, TA_RetCode> {
+    if len > 100_000_001 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
     let begin_idx = check_begin_idx1(len, real_ptr) as i32;
     let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_LINEARREG_SLOPE_Lookback(kwargs.timeperiod) };
+    if lookback < begin_idx {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if len == 0 || lookback as usize >= len {
+        return Ok(crate::utils::make_default_vec(len));
+    }
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_LINEARREG_SLOPE(
@@ -279,9 +323,7 @@ pub fn ta_linearreg_slope(
                     out.set_len(out_size_begin);
                 }
             } else {
-                unsafe {
-                    out.set_len(len);
-                }
+                out.resize(len, crate::utils::CustomDefault::default());
             }
             Ok(out)
         }
@@ -302,11 +344,20 @@ pub fn ta_stddev(
     len: usize,
     kwargs: &StdDevKwargs,
 ) -> Result<Vec<f64>, TA_RetCode> {
+    if len > 100_000_001 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
     let begin_idx = check_begin_idx1(len, real_ptr) as i32;
     let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_STDDEV_Lookback(kwargs.timeperiod, kwargs.nbdev) };
+    if lookback < begin_idx {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if len == 0 || lookback as usize >= len {
+        return Ok(crate::utils::make_default_vec(len));
+    }
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_STDDEV(
@@ -348,11 +399,20 @@ pub fn ta_tsf(
     len: usize,
     kwargs: &TsfKwargs,
 ) -> Result<Vec<f64>, TA_RetCode> {
+    if len > 100_000_001 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
     let begin_idx = check_begin_idx1(len, real_ptr) as i32;
     let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_TSF_Lookback(kwargs.timeperiod) };
+    if lookback < begin_idx {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if len == 0 || lookback as usize >= len {
+        return Ok(crate::utils::make_default_vec(len));
+    }
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_TSF(
@@ -395,11 +455,20 @@ pub fn ta_var(
     len: usize,
     kwargs: &VarKwargs,
 ) -> Result<Vec<f64>, TA_RetCode> {
+    if len > 100_000_001 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
     let begin_idx = check_begin_idx1(len, real_ptr) as i32;
     let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_VAR_Lookback(kwargs.timeperiod, kwargs.nbdev) };
+    if lookback < begin_idx {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if len == 0 || lookback as usize >= len {
+        return Ok(crate::utils::make_default_vec(len));
+    }
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_VAR(

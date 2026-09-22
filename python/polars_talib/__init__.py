@@ -1,6 +1,7 @@
 import atexit
 import polars as pl
 from .utils import register_plugin, parse_version
+from ._generated import TAExprMixin
 from ._polars_talib import initialize, shutdown, version
 from pathlib import Path
 
@@ -219,7 +220,7 @@ def get_functions_output_struct():
 
 
 @pl.api.register_expr_namespace("ta")
-class TAExpr:
+class TAExpr(TAExprMixin):
     def __init__(self, expr: pl.Expr):
         self._expr = expr
 
@@ -794,16 +795,16 @@ class TAExpr:
             is_elementwise=False,
         )
 
-    def apo(self, fastperiod: int = 12, slowperiod: int = 26, matype: int = 0) -> pl.Expr:
+    def apo(self, fastperiod: int = 12, slowperiod: int = 26, matype: int = 1) -> pl.Expr:
         """Absolute Price Oscillator (Momentum Indicators)
-        pl.col("close").ta.apo(fastperiod=12, slowperiod=26, matype=0)
+        pl.col("close").ta.apo(fastperiod=12, slowperiod=26, matype=1)
 
         Inputs:
             prices: ['close']
         Parameters:
             fastperiod: 12
             slowperiod: 26
-            matype: 0
+            matype: 1
         Outputs:
             real
         """
@@ -1176,16 +1177,16 @@ class TAExpr:
             is_elementwise=False,
         )
 
-    def ppo(self, fastperiod: int = 12, slowperiod: int = 26, matype: int = 0) -> pl.Expr:
+    def ppo(self, fastperiod: int = 12, slowperiod: int = 26, matype: int = 1) -> pl.Expr:
         """Percentage Price Oscillator (Momentum Indicators)
-        pl.col("close").ta.ppo(fastperiod=12, slowperiod=26, matype=0)
+        pl.col("close").ta.ppo(fastperiod=12, slowperiod=26, matype=1)
 
         Inputs:
             prices: ['close']
         Parameters:
             fastperiod: 12
             slowperiod: 26
-            matype: 0
+            matype: 1
         Outputs:
             real
         """
@@ -1489,15 +1490,15 @@ class TAExpr:
         )
 
     def bbands(
-        self, timeperiod: int = 5, nbdevup: float = 2.0, nbdevdn: float = 2.0, matype: int = 0
+        self, timeperiod: int = 20, nbdevup: float = 2.0, nbdevdn: float = 2.0, matype: int = 0
     ) -> pl.Expr:
         """Bollinger Bands (Overlap Studies)
-        ta.pol("close").ta.bbands(timeperiod=5, nbdevup=2.0, nbdevdn=2.0, matype=0)
+        ta.pol("close").ta.bbands(timeperiod=20, nbdevup=2.0, nbdevdn=2.0, matype=0)
 
         Inputs:
             real: (any ndarray)
         Parameters:
-            timeperiod: 5
+            timeperiod: 20
             nbdevup: 2.0
             nbdevdn: 2.0
             ma_type: 0
@@ -2241,7 +2242,7 @@ class TAExpr:
         high: IntoExpr = pl.col("high"),
         low: IntoExpr = pl.col("low"),
         close: IntoExpr = pl.col("close"),
-        penetration: float = 0.3,
+        penetration: float = 0.5,
     ):
         """Dark Cloud Cover (Pattern Recognition)
             pl.col("open").ta.cdldarkcloudcover(pl.col("high"), pl.col("low"), pl.col("close"), penetration=0.3)
@@ -2853,7 +2854,7 @@ class TAExpr:
         high: IntoExpr = pl.col("high"),
         low: IntoExpr = pl.col("low"),
         close: IntoExpr = pl.col("close"),
-        penetration: float = 0.3,
+        penetration: float = 0.5,
     ):
         """Mat Hold (Pattern Recognition)
             pl.col("open").ta.cdlmathold(pl.col("high"), pl.col("low"), pl.col("close"), penetration=0.3)
@@ -4159,17 +4160,17 @@ def apo(
     real: IntoExpr = pl.col("close"),
     fastperiod: int = 12,
     slowperiod: int = 26,
-    matype: int = 0,
+    matype: int = 1,
 ) -> pl.Expr:
     """Absolute Price Oscillator (Momentum Indicators)
-    pl.col("close").ta.apo(timeperiod=12, matype=0)
+    pl.col("close").ta.apo(timeperiod=12, matype=1)
 
     Inputs:
         real
     Parameters:
         fastperiod: 12
         slowperiod: 26
-        matype: 0
+        matype: 1
     Outputs:
         real
     """
@@ -4469,17 +4470,17 @@ def ppo(
     real: IntoExpr = pl.col("close"),
     fastperiod: int = 12,
     slowperiod: int = 26,
-    matype: int = 0,
+    matype: int = 1,
 ) -> pl.Expr:
     """Percentage Price Oscillator (Momentum Indicators)
-    pl.col("close").ta.ppo(timeperiod=12, matype=0)
+    pl.col("close").ta.ppo(timeperiod=12, matype=1)
 
     Inputs:
         real
     Parameters:
         fastperiod: 12
         slowperiod: 26
-        matype: 0
+        matype: 1
     Outputs:
         real
     """
@@ -4720,18 +4721,18 @@ def willr(
 
 def bbands(
     real: IntoExpr = pl.col("close"),
-    timeperiod: int = 5,
+    timeperiod: int = 20,
     nbdevup: float = 2.0,
     nbdevdn: float = 2.0,
     matype: int = 0,
 ) -> pl.Expr:
     """Bollinger Bands (Overlap Studies)
-    pl.col("close").ta.bbands(timeperiod=5, nbdevup=2.0, nbdevdn=2.0, matype=0)
+    pl.col("close").ta.bbands(timeperiod=20, nbdevup=2.0, nbdevdn=2.0, matype=0)
 
     Inputs:
         real
     Parameters:
-        timeperiod: 5
+        timeperiod: 20
         nbdevup: 2.0
         nbdevdn: 2.0
         matype: 0
@@ -5308,7 +5309,7 @@ def cdldarkcloudcover(
     high: IntoExpr = pl.col("high"),
     low: IntoExpr = pl.col("low"),
     close: IntoExpr = pl.col("close"),
-    penetration: float = 0.3,
+    penetration: float = 0.5,
 ):
     """Dark Cloud Cover (Pattern Recognition)
     pl.col("open").ta.cdldarkcloudcover(pl.col("high"), pl.col("low"), pl.col("close"), penetration=0.3)
@@ -5803,7 +5804,7 @@ def cdlmathold(
     high: IntoExpr = pl.col("high"),
     low: IntoExpr = pl.col("low"),
     close: IntoExpr = pl.col("close"),
-    penetration: float = 0.3,
+    penetration: float = 0.5,
 ):
     """Mat Hold (Pattern Recognition)
     pl.col("open").ta.cdlmathold(pl.col("high"), pl.col("low"), pl.col("close"), penetration=0.3)
@@ -6500,3 +6501,49 @@ def obv(
         obv
     """
     return close.ta.obv(volume)
+
+
+def col(name: str | pl.Expr) -> TAExpr:
+    """Return the ``.ta`` namespace for a column name or expression.
+
+    ``polars_talib.col("close").ema(5)`` computes the same expression as
+    ``pl.col("close").ta.ema(5)``, but static type checkers and editors can
+    resolve the indicator methods because the return type is ``TAExpr``.
+    Any expression works as the receiver: ``polars_talib.col(pl.col("a") + 5).rsi()``.
+    """
+    return TAExpr(pl.col(name) if isinstance(name, str) else name)
+
+
+# Typed wrappers for indicators added after TA-Lib 0.4.0.
+from ._generated import *
+from ._generated import GROUPS as _NEW_GROUPS, STRUCTS as _NEW_STRUCTS
+for _group, _names in _NEW_GROUPS.items():
+    __function_groups__.setdefault(_group, []).extend(_names)
+_legacy_output_structs = get_functions_output_struct
+
+def get_functions_output_struct():
+    return {**_legacy_output_structs(), **_NEW_STRUCTS}
+
+__version__ = "0.2.0"
+
+for _names in __function_groups__.values():
+    _names.sort()
+
+from enum import IntEnum
+
+class MA_Type(IntEnum):
+    """TA-Lib 0.8.1 moving-average modes, accepted by every matype parameter."""
+    SMA = 0
+    EMA = 1
+    WMA = 2
+    DEMA = 3
+    TEMA = 4
+    TRIMA = 5
+    KAMA = 6
+    MAMA = 7
+    T3 = 8
+    HMA = 9
+    DISABLED = 10
+    DEFAULT = 11
+    ZLEMA = 12
+    RMA = 13
