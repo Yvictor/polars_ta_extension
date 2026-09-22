@@ -126,9 +126,11 @@ jobs:
         run: |
           python scripts/generate_indicators.py
           python scripts/generate_skill_reference.py
-          git diff --exit-code -- src/generated.rs talib/src/generated.rs python/polars_talib/_generated.py docs/indicators.md skills/polars-talib/reference/functions.md
+          git diff --exit-code -- src/generated.rs talib/src/generated.rs python/polars_talib/_generated.py python/polars_talib/_param_types.py docs/indicators.md skills/polars-talib/reference/functions.md
       - name: Rust crate tests
         run: cargo test --manifest-path talib/Cargo.toml
+      - name: Validate system-library overrides
+        run: python scripts/check_build_overrides.py
       - name: Build source distribution and install it without system TA-Lib
         run: |
           maturin sdist --out dist
@@ -157,7 +159,6 @@ jobs:
       # fixed regression threshold. The comparison and raw samples are kept as
       # a job summary and artifact for humans to judge.
       - name: Compare release wheels on the same runner
-        continue-on-error: true
         run: |
           uv venv .benchmark-base
           uv venv .benchmark-candidate
@@ -165,7 +166,7 @@ jobs:
           uv pip install --python .benchmark-candidate dist/*.whl 'polars==1.44.2' 'numpy==2.5.3'
           .benchmark-base/bin/python scripts/benchmark.py --output baseline.json --repeats 51 --pin-cpus 4
           .benchmark-candidate/bin/python scripts/benchmark.py --output candidate.json --repeats 51 --pin-cpus 4
-          python scripts/compare_benchmarks.py baseline.json candidate.json --output comparison.md
+          python scripts/compare_benchmarks.py baseline.json candidate.json --output comparison.md --report-only
           cat comparison.md >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v7
         if: always()

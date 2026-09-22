@@ -11,7 +11,8 @@ Every function exists in two forms:
 
 Multi-output functions return a `pl.Struct`; use `.struct.field("<output>")` or `.unnest()`.
 Outputs named `integer` (and `trend`, `swinghigh`, `swinglow`, candlestick patterns) are Int32,
-everything else Float64.
+everything else Float64. The receiver column uses the default column name; other inputs
+are listed in positional order, not necessarily Python keyword names.
 
 `matype` parameters accept `polars_talib.MA_Type` or the integers 0=SMA, 1=EMA, 2=WMA,
 3=DEMA, 4=TEMA, 5=TRIMA, 6=KAMA, 7=MAMA, 8=T3, 9=HMA, 10=DISABLED, 11=DEFAULT, 12=ZLEMA, 13=RMA.
@@ -24,46 +25,46 @@ everything else Float64.
 | `adx` | Average Directional Movement Index | close | high, low | timeperiod=14 | real |
 | `adxr` | Average Directional Movement Index Rating | close | high, low | timeperiod=14 | real |
 | `ao` | Awesome Oscillator | high | low | fastperiod=5, slowperiod=34 | real |
-| `apo` | Absolute Price Oscillator | real | - | fastperiod=12, slowperiod=26, matype=1 | real |
+| `apo` | Absolute Price Oscillator | close | - | fastperiod=12, slowperiod=26, matype=1 | real |
 | `aroon` | Aroon | high | low | timeperiod=14 | aroondown, aroonup |
 | `aroonosc` | Aroon Oscillator | high | low | timeperiod=14 | real |
 | `bop` | Balance Of Power | open | high, low, close | - | real |
 | `cci` | Commodity Channel Index | close | high, low | timeperiod=14 | real |
-| `cmo` | Chande Momentum Oscillator | real | - | timeperiod=14 | real |
-| `cmou` | Chande Momentum Oscillator (Unsmoothed) | real | - | timeperiod=14 | real |
-| `coppock` | Coppock Curve | real | - | wmaperiod=10, roc1period=11, roc2period=14 | real |
-| `dpo` | Detrended Price Oscillator | real | - | timeperiod=20 | real |
+| `cmo` | Chande Momentum Oscillator | close | - | timeperiod=14 | real |
+| `cmou` | Chande Momentum Oscillator (Unsmoothed) | close | - | timeperiod=14 | real |
+| `coppock` | Coppock Curve | close | - | wmaperiod=10, roc1period=11, roc2period=14 | real |
+| `dpo` | Detrended Price Oscillator | close | - | timeperiod=20 | real |
 | `dx` | Directional Movement Index | close | high, low | timeperiod=14 | real |
-| `er` | Kaufman Efficiency Ratio | real | - | timeperiod=10 | real |
+| `er` | Kaufman Efficiency Ratio | close | - | timeperiod=10 | real |
 | `eri` | Elder Ray Index (Bull Power / Bear Power) | close | high, low | timeperiod=13 | bullpower, bearpower |
-| `fosc` | Forecast Oscillator | real | - | timeperiod=5 | real |
+| `fosc` | Forecast Oscillator | close | - | timeperiod=5 | real |
 | `fractal` | Williams Fractal | high | low | leftbars=2, rightbars=2 | swinghigh, swinglow |
 | `imi` | Intraday Momentum Index | close | open | timeperiod=14 | real |
 | `kdj` | KDJ Stochastic | close | high, low | fastk_period=9, slowk_period=3, slowk_matype=13, slowd_period=3, slowd_matype=13 | k, d, j |
-| `macd` | Moving Average Convergence/Divergence | real | - | fastperiod=12, slowperiod=26, signalperiod=9 | macd, macdsignal, macdhist |
-| `macdext` | MACD with controllable MA type | real | - | fastperiod=12, fastmatype=0, slowperiod=26, slowmatype=0, signalperiod=9, signalmatype=0 | macd, macdsignal, macdhist |
-| `macdfix` | Moving Average Convergence/Divergence Fix 12/26 | real | - | signalperiod=9 | macd, macdsignal, macdhist |
+| `macd` | Moving Average Convergence/Divergence | close | - | fastperiod=12, slowperiod=26, signalperiod=9 | macd, macdsignal, macdhist |
+| `macdext` | MACD with controllable MA type | close | - | fastperiod=12, fastmatype=0, slowperiod=26, slowmatype=0, signalperiod=9, signalmatype=0 | macd, macdsignal, macdhist |
+| `macdfix` | Moving Average Convergence/Divergence Fix 12/26 | close | - | signalperiod=9 | macd, macdsignal, macdhist |
 | `mfi` | Money Flow Index | close | high, low, volume | timeperiod=14 | real |
 | `minus_di` | Minus Directional Indicator | close | high, low | timeperiod=14 | real |
 | `minus_dm` | Minus Directional Movement | high | low | timeperiod=14 | real |
-| `mom` | Momentum | real | - | timeperiod=10 | real |
+| `mom` | Momentum | close | - | timeperiod=10 | real |
 | `plus_di` | Plus Directional Indicator | close | high, low | timeperiod=14 | real |
 | `plus_dm` | Plus Directional Movement | high | low | timeperiod=14 | real |
-| `ppo` | Percentage Price Oscillator | real | - | fastperiod=12, slowperiod=26, matype=1 | real |
+| `ppo` | Percentage Price Oscillator | close | - | fastperiod=12, slowperiod=26, matype=1 | real |
 | `qstick` | Qstick | close | open | timeperiod=10 | real |
-| `roc` | Rate of change : ((price/prevPrice)-1)*100 | real | - | timeperiod=10 | real |
-| `rocp` | Rate of change Percentage: (price-prevPrice)/prevPrice | real | - | timeperiod=10 | real |
-| `rocr` | Rate of change ratio: (price/prevPrice) | real | - | timeperiod=10 | real |
-| `rocr100` | Rate of change ratio 100 scale: (price/prevPrice)*100 | real | - | timeperiod=10 | real |
-| `rsi` | Relative Strength Index | real | - | timeperiod=14 | real |
+| `roc` | Rate of change : ((price/prevPrice)-1)*100 | close | - | timeperiod=10 | real |
+| `rocp` | Rate of change Percentage: (price-prevPrice)/prevPrice | close | - | timeperiod=10 | real |
+| `rocr` | Rate of change ratio: (price/prevPrice) | close | - | timeperiod=10 | real |
+| `rocr100` | Rate of change ratio 100 scale: (price/prevPrice)*100 | close | - | timeperiod=10 | real |
+| `rsi` | Relative Strength Index | close | - | timeperiod=14 | real |
 | `smi` | Stochastic Momentum Index | close | high, low | timeperiod=13, fastperiod=2, slowperiod=25, signalperiod=9 | smi, smisignal |
 | `stoch` | Stochastic | close | high, low | fastk_period=5, slowk_period=3, slowk_matype=0, slowd_period=3, slowd_matype=0 | slowk, slowd |
 | `stochf` | Stochastic Fast | close | high, low | fastk_period=5, fastd_period=3, fastd_matype=0 | fastk, fastd |
-| `stochrsi` | Stochastic Relative Strength Index | real | - | timeperiod=14, fastk_period=5, fastd_period=3, fastd_matype=0 | fastk, fastd |
-| `trix` | 1-day Rate-Of-Change (ROC) of a Triple Smooth EMA | real | - | timeperiod=30 | real |
-| `tsi` | True Strength Index | real | - | firstperiod=25, secondperiod=13 | real |
+| `stochrsi` | Stochastic Relative Strength Index | close | - | timeperiod=14, fastk_period=5, fastd_period=3, fastd_matype=0 | fastk, fastd |
+| `trix` | 1-day Rate-Of-Change (ROC) of a Triple Smooth EMA | close | - | timeperiod=30 | real |
+| `tsi` | True Strength Index | close | - | firstperiod=25, secondperiod=13 | real |
 | `ultosc` | Ultimate Oscillator | close | high, low | timeperiod1=7, timeperiod2=14, timeperiod3=28 | real |
-| `vhf` | Vertical Horizontal Filter | real | - | timeperiod=28 | real |
+| `vhf` | Vertical Horizontal Filter | close | - | timeperiod=28 | real |
 | `vortex` | Vortex Indicator | close | high, low | timeperiod=14 | plusvi, minusvi |
 | `wad` | Williams' Accumulation/Distribution | close | high, low | - | real |
 | `willr` | Williams' %R | close | high, low | timeperiod=14 | real |
@@ -73,50 +74,50 @@ everything else Float64.
 | function | description | receiver | other inputs | parameters (defaults) | outputs |
 |---|---|---|---|---|---|
 | `accbands` | Acceleration Bands | close | high, low | timeperiod=20 | upperband, middleband, lowerband |
-| `bbands` | Bollinger Bands | real | - | timeperiod=20, nbdevup=2.0, nbdevdn=2.0, matype=0 | upperband, middleband, lowerband |
-| `dema` | Double Exponential Moving Average | real | - | timeperiod=30 | real |
+| `bbands` | Bollinger Bands | close | - | timeperiod=20, nbdevup=2.0, nbdevdn=2.0, matype=0 | upperband, middleband, lowerband |
+| `dema` | Double Exponential Moving Average | close | - | timeperiod=30 | real |
 | `donchian` | Donchian Channels | high | low | timeperiod=20 | upperband, middleband, lowerband |
-| `ema` | Exponential Moving Average | real | - | timeperiod=30 | real |
-| `hma` | Hull Moving Average | real | - | timeperiod=20 | real |
-| `ht_trendline` | Hilbert Transform - Instantaneous Trendline | real | - | - | real |
-| `kama` | Kaufman Adaptive Moving Average | real | - | timeperiod=30 | real |
+| `ema` | Exponential Moving Average | close | - | timeperiod=30 | real |
+| `hma` | Hull Moving Average | close | - | timeperiod=20 | real |
+| `ht_trendline` | Hilbert Transform - Instantaneous Trendline | close | - | - | real |
+| `kama` | Kaufman Adaptive Moving Average | close | - | timeperiod=30 | real |
 | `kc` | Keltner Channels | close | high, low | timeperiod=20, atrperiod=10, nbdev=2.0 | upperband, middleband, lowerband |
-| `ma` | Moving average | real | - | timeperiod=30, matype=0 | real |
-| `mama` | MESA Adaptive Moving Average | real | - | fastlimit=0.5, slowlimit=0.05 | mama, fama |
-| `mavp` | Moving average with variable period | real | periods | minperiod=2, maxperiod=30, matype=0 | real |
-| `midpoint` | MidPoint over period | real | - | timeperiod=14 | real |
+| `ma` | Moving average | close | - | timeperiod=30, matype=0 | real |
+| `mama` | MESA Adaptive Moving Average | close | - | fastlimit=0.5, slowlimit=0.05 | mama, fama |
+| `mavp` | Moving average with variable period | close | periods | minperiod=2, maxperiod=30, matype=0 | real |
+| `midpoint` | MidPoint over period | close | - | timeperiod=14 | real |
 | `midprice` | Midpoint Price over period | high | low | timeperiod=14 | real |
-| `rma` | Wilder's Smoothed Moving Average | real | - | timeperiod=30 | real |
+| `rma` | Wilder's Smoothed Moving Average | close | - | timeperiod=30 | real |
 | `sar` | Parabolic SAR | high | low | acceleration=0.02, maximum=0.2 | real |
 | `sarext` | Parabolic SAR - Extended | high | low | startvalue=0.0, offsetonreverse=0.0, accelerationinitlong=0.02, accelerationlong=0.02, accelerationmaxlong=0.2, accelerationinitshort=0.02, accelerationshort=0.02, accelerationmaxshort=0.2 | real |
-| `sma` | Simple Moving Average | real | - | timeperiod=30 | real |
+| `sma` | Simple Moving Average | close | - | timeperiod=30 | real |
 | `supertrend` | SuperTrend | close | high, low | timeperiod=10, multiplier=3.0 | supertrend, trend |
-| `t3` | Triple Exponential Moving Average (T3) | real | - | timeperiod=5, vfactor=0.7 | real |
-| `tema` | Triple Exponential Moving Average | real | - | timeperiod=30 | real |
-| `trima` | Triangular Moving Average | real | - | timeperiod=30 | real |
-| `vwma` | Volume Weighted Moving Average | real | volume | timeperiod=30 | real |
-| `wma` | Weighted Moving Average | real | - | timeperiod=30 | real |
-| `zlema` | Zero-Lag Exponential Moving Average | real | - | timeperiod=30 | real |
+| `t3` | Triple Exponential Moving Average (T3) | close | - | timeperiod=5, vfactor=0.7 | real |
+| `tema` | Triple Exponential Moving Average | close | - | timeperiod=30 | real |
+| `trima` | Triangular Moving Average | close | - | timeperiod=30 | real |
+| `vwma` | Volume Weighted Moving Average | close | volume | timeperiod=30 | real |
+| `wma` | Weighted Moving Average | close | - | timeperiod=30 | real |
+| `zlema` | Zero-Lag Exponential Moving Average | close | - | timeperiod=30 | real |
 
 ## Math Transform
 
 | function | description | receiver | other inputs | parameters (defaults) | outputs |
 |---|---|---|---|---|---|
-| `acos` | Vector Trigonometric ACos | real | - | - | real |
-| `asin` | Vector Trigonometric ASin | real | - | - | real |
-| `atan` | Vector Trigonometric ATan | real | - | - | real |
-| `ceil` | Vector Ceil | real | - | - | real |
-| `cos` | Vector Trigonometric Cos | real | - | - | real |
-| `cosh` | Vector Trigonometric Cosh | real | - | - | real |
-| `exp` | Vector Arithmetic Exp | real | - | - | real |
-| `floor` | Vector Floor | real | - | - | real |
-| `ln` | Vector Log Natural | real | - | - | real |
-| `log10` | Vector Log10 | real | - | - | real |
-| `sin` | Vector Trigonometric Sin | real | - | - | real |
-| `sinh` | Vector Trigonometric Sinh | real | - | - | real |
-| `sqrt` | Vector Square Root | real | - | - | real |
-| `tan` | Vector Trigonometric Tan | real | - | - | real |
-| `tanh` | Vector Trigonometric Tanh | real | - | - | real |
+| `acos` | Vector Trigonometric ACos | close | - | - | real |
+| `asin` | Vector Trigonometric ASin | close | - | - | real |
+| `atan` | Vector Trigonometric ATan | close | - | - | real |
+| `ceil` | Vector Ceil | close | - | - | real |
+| `cos` | Vector Trigonometric Cos | close | - | - | real |
+| `cosh` | Vector Trigonometric Cosh | close | - | - | real |
+| `exp` | Vector Arithmetic Exp | close | - | - | real |
+| `floor` | Vector Floor | close | - | - | real |
+| `ln` | Vector Log Natural | close | - | - | real |
+| `log10` | Vector Log10 | close | - | - | real |
+| `sin` | Vector Trigonometric Sin | close | - | - | real |
+| `sinh` | Vector Trigonometric Sinh | close | - | - | real |
+| `sqrt` | Vector Square Root | close | - | - | real |
+| `tan` | Vector Trigonometric Tan | close | - | - | real |
+| `tanh` | Vector Trigonometric Tanh | close | - | - | real |
 
 ## Volume Indicators
 
@@ -128,7 +129,7 @@ everything else Float64.
 | `efi` | Elder's Force Index | close | volume | timeperiod=13 | real |
 | `marketfi` | Market Facilitation Index | high | low, volume | - | real |
 | `nvi` | Negative Volume Index | close | volume | - | real |
-| `obv` | On Balance Volume | real | volume | - | real |
+| `obv` | On Balance Volume | close | volume | - | real |
 | `pvi` | Positive Volume Index | close | volume | - | real |
 | `pvo` | Percentage Volume Oscillator | volume | - | fastperiod=12, slowperiod=26, matype=1 | real |
 | `pvt` | Price Volume Trend | close | volume | - | real |
@@ -139,18 +140,18 @@ everything else Float64.
 
 | function | description | receiver | other inputs | parameters (defaults) | outputs |
 |---|---|---|---|---|---|
-| `add` | Vector Arithmetic Add | real0 | real1 | - | real |
-| `cumsum` | Cumulative Sum | real | - | - | real |
-| `div` | Vector Arithmetic Div | real0 | real1 | - | real |
-| `max` | Highest value over a specified period | real | - | timeperiod=30 | real |
-| `maxindex` | Index of highest value over a specified period | real | - | timeperiod=30 | integer |
-| `min` | Lowest value over a specified period | real | - | timeperiod=30 | real |
-| `minindex` | Index of lowest value over a specified period | real | - | timeperiod=30 | integer |
-| `minmax` | Lowest and highest values over a specified period | real | - | timeperiod=30 | min, max |
-| `minmaxindex` | Indexes of lowest and highest values over a specified period | real | - | timeperiod=30 | minidx, maxidx |
-| `mult` | Vector Arithmetic Mult | real0 | real1 | - | real |
-| `sub` | Vector Arithmetic Subtraction | real0 | real1 | - | real |
-| `sum` | Summation | real | - | timeperiod=30 | real |
+| `add` | Vector Arithmetic Add | high | real1 | - | real |
+| `cumsum` | Cumulative Sum | close | - | - | real |
+| `div` | Vector Arithmetic Div | high | real1 | - | real |
+| `max` | Highest value over a specified period | close | - | timeperiod=30 | real |
+| `maxindex` | Index of highest value over a specified period | close | - | timeperiod=30 | integer |
+| `min` | Lowest value over a specified period | close | - | timeperiod=30 | real |
+| `minindex` | Index of lowest value over a specified period | close | - | timeperiod=30 | integer |
+| `minmax` | Lowest and highest values over a specified period | close | - | timeperiod=30 | min, max |
+| `minmaxindex` | Indexes of lowest and highest values over a specified period | close | - | timeperiod=30 | minidx, maxidx |
+| `mult` | Vector Arithmetic Mult | high | real1 | - | real |
+| `sub` | Vector Arithmetic Subtraction | high | real1 | - | real |
+| `sum` | Summation | close | - | timeperiod=30 | real |
 
 ## Volatility Indicators
 
@@ -161,14 +162,14 @@ everything else Float64.
 | `cvi` | Chaikin's Volatility | high | low | timeperiod=10, rocperiod=10 | real |
 | `massi` | Mass Index | high | low | fastperiod=9, slowperiod=25 | real |
 | `natr` | Normalized Average True Range | close | high, low | timeperiod=14 | real |
-| `rvi` | Relative Volatility Index | real | - | timeperiod=14, stddevperiod=10 | real |
+| `rvi` | Relative Volatility Index | close | - | timeperiod=14, stddevperiod=10 | real |
 | `trange` | True Range | close | high, low | - | real |
 
 ## Price Transform
 
 | function | description | receiver | other inputs | parameters (defaults) | outputs |
 |---|---|---|---|---|---|
-| `avgdev` | Average Deviation | real | - | timeperiod=14 | real |
+| `avgdev` | Average Deviation | close | - | timeperiod=14 | real |
 | `avgprice` | Average Price | open | high, low, close | - | real |
 | `ha` | Heikin-Ashi Candles | close | open, high, low | - | haopen, hahigh, halow, haclose |
 | `medprice` | Median Price | high | low | - | real |
@@ -179,17 +180,17 @@ everything else Float64.
 
 | function | description | receiver | other inputs | parameters (defaults) | outputs |
 |---|---|---|---|---|---|
-| `beta` | Beta | real0 | real1 | timeperiod=5 | real |
-| `correl` | Pearson's Correlation Coefficient (r) | real0 | real1 | timeperiod=30 | real |
-| `linearreg` | Linear Regression | real | - | timeperiod=14 | real |
-| `linearreg_angle` | Linear Regression Angle | real | - | timeperiod=14 | real |
-| `linearreg_intercept` | Linear Regression Intercept | real | - | timeperiod=14 | real |
-| `linearreg_slope` | Linear Regression Slope | real | - | timeperiod=14 | real |
-| `percentile` | Percentile (nearest rank) | real | - | timeperiod=30, percentile=50.0 | real |
-| `percentrank` | Percent Rank | real | - | timeperiod=100 | real |
-| `stddev` | Standard Deviation | real | - | timeperiod=5, nbdev=1.0 | real |
-| `tsf` | Time Series Forecast | real | - | timeperiod=14 | real |
-| `var` | Variance | real | - | timeperiod=5, nbdev=1.0 | real |
+| `beta` | Beta | high | real1 | timeperiod=5 | real |
+| `correl` | Pearson's Correlation Coefficient (r) | high | real1 | timeperiod=30 | real |
+| `linearreg` | Linear Regression | close | - | timeperiod=14 | real |
+| `linearreg_angle` | Linear Regression Angle | close | - | timeperiod=14 | real |
+| `linearreg_intercept` | Linear Regression Intercept | close | - | timeperiod=14 | real |
+| `linearreg_slope` | Linear Regression Slope | close | - | timeperiod=14 | real |
+| `percentile` | Percentile (nearest rank) | close | - | timeperiod=30, percentile=50.0 | real |
+| `percentrank` | Percent Rank | close | - | timeperiod=100 | real |
+| `stddev` | Standard Deviation | close | - | timeperiod=5, nbdev=1.0 | real |
+| `tsf` | Time Series Forecast | close | - | timeperiod=14 | real |
+| `var` | Variance | close | - | timeperiod=5, nbdev=1.0 | real |
 
 ## Pattern Recognition
 
@@ -261,9 +262,9 @@ everything else Float64.
 
 | function | description | receiver | other inputs | parameters (defaults) | outputs |
 |---|---|---|---|---|---|
-| `ht_dcperiod` | Hilbert Transform - Dominant Cycle Period | real | - | - | real |
-| `ht_dcphase` | Hilbert Transform - Dominant Cycle Phase | real | - | - | real |
-| `ht_phasor` | Hilbert Transform - Phasor Components | real | - | - | inphase, quadrature |
-| `ht_sine` | Hilbert Transform - SineWave | real | - | - | sine, leadsine |
-| `ht_trendmode` | Hilbert Transform - Trend vs Cycle Mode | real | - | - | integer |
+| `ht_dcperiod` | Hilbert Transform - Dominant Cycle Period | close | - | - | real |
+| `ht_dcphase` | Hilbert Transform - Dominant Cycle Phase | close | - | - | real |
+| `ht_phasor` | Hilbert Transform - Phasor Components | close | - | - | inphase, quadrature |
+| `ht_sine` | Hilbert Transform - SineWave | close | - | - | sine, leadsine |
+| `ht_trendmode` | Hilbert Transform - Trend vs Cycle Mode | close | - | - | integer |
 

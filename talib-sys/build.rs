@@ -29,34 +29,6 @@ fn main() {
     let out = PathBuf::from(env::var_os("OUT_DIR").unwrap());
     let windows = env::var("CARGO_CFG_TARGET_OS").unwrap() == "windows";
 
-    // Optional override for packagers: link an existing TA-Lib 0.8.1 static
-    // library instead of compiling the vendored sources. Both variables must
-    // point at a `lib` directory holding the static library and an `include`
-    // directory holding `ta-lib/ta_func.h`.
-    if let (Some(lib_dir), Some(include_dir)) = (
-        env::var_os("TA_LIBRARY_PATH").map(PathBuf::from),
-        env::var_os("TA_INCLUDE_PATH").map(PathBuf::from),
-    ) {
-        let lib_file = static_lib_file(&lib_dir, windows);
-        assert!(
-            lib_file.exists(),
-            "TA_LIBRARY_PATH is set but {} does not exist",
-            lib_file.display()
-        );
-        assert!(
-            include_dir.join("ta-lib").join("ta_func.h").exists(),
-            "TA_INCLUDE_PATH is set but {}/ta-lib/ta_func.h does not exist",
-            include_dir.display()
-        );
-        println!(
-            "cargo:warning=linking system TA-Lib from {}",
-            lib_dir.display()
-        );
-        emit_link(&lib_dir, windows);
-        finish_bindings(&include_dir, &out);
-        return;
-    }
-
     let archive = fs::read(format!("vendor/ta-lib-{VERSION}-src.tar.gz")).unwrap();
     assert_eq!(
         format!("{:x}", Sha256::digest(&archive)),
@@ -67,7 +39,7 @@ fn main() {
     // A stamp file marks a complete extraction so an interrupted build never
     // reuses a partially unpacked tree.
     let stamp = source.join(".extracted");
-    if !stamp.exists() {
+    if fs::read_to_string(&stamp).ok().as_deref() != Some(SHA256) {
         if source.exists() {
             fs::remove_dir_all(&source).expect("remove partial TA-Lib extraction");
         }
@@ -76,6 +48,48 @@ fn main() {
             .expect("extract vendored TA-Lib");
         fs::write(&stamp, SHA256).expect("write extraction stamp");
     }
+    // Overrides must be paired, and their headers must match the checked-in ABI.
+    let library = env::var_os("TA_LIBRARY_PATH").map(PathBuf::from);
+    let headers = env::var_os("TA_INCLUDE_PATH").map(PathBuf::from);
+    assert_eq!(
+        library.is_some(),
+        headers.is_some(),
+        "set both TA_LIBRARY_PATH and TA_INCLUDE_PATH, or neither"
+    );
+    if let (Some(lib_dir), Some(include_dir)) = (library, headers) {
+        let lib_file = static_lib_file(&lib_dir, windows);
+        assert!(
+            lib_file.is_file(),
+            "TA_LIBRARY_PATH: missing {}",
+            lib_file.display()
+        );
+        println!("cargo:rerun-if-changed={}", lib_file.display());
+        for header in [
+            "ta_libc.h",
+            "ta_common.h",
+            "ta_defs.h",
+            "ta_func.h",
+            "ta_abstract.h",
+        ] {
+            let supplied = include_dir.join("ta-lib").join(header);
+            let bytes =
+                fs::read(&supplied).unwrap_or_else(|e| panic!("{}: {e}", supplied.display()));
+            assert!(
+                bytes == fs::read(source.join("include").join(header)).unwrap(),
+                "TA_INCLUDE_PATH: {} does not match the pinned TA-Lib {VERSION} headers",
+                supplied.display()
+            );
+            println!("cargo:rerun-if-changed={}", supplied.display());
+        }
+        println!(
+            "cargo:warning=linking external TA-Lib {VERSION} from {}",
+            lib_dir.display()
+        );
+        emit_link(&lib_dir, windows);
+        finish_bindings(&include_dir, &out);
+        return;
+    }
+
     let mut config = cmake::Config::new(&source);
     if windows {
         // Cargo/CMake discover MSVC without vcvarsall, but upstream requires this

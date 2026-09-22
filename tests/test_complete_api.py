@@ -171,3 +171,33 @@ def test_installed_wheel_contains_upstream_license():
     licenses=[f for f in dist.files if f.name=='TA-Lib-LICENSE']
     assert len(licenses)==1
     assert dist.locate_file(licenses[0]).read_bytes()==(Path(__file__).parents[1]/'talib-sys/vendor/TA-Lib-LICENSE').read_bytes()
+
+
+@pytest.mark.parametrize('spec', [f for f in API if len(f['inputs']) > 1], ids=lambda f: f['name'])
+@pytest.mark.parametrize('scalar_first', [False, True])
+def test_empty_columns_broadcast_scalars_in_either_position(spec, scalar_first):
+    args = [pl.col(column(i)) for i in spec['inputs']]
+    args[0 if scalar_first else -1] = pl.lit(1.)
+    query = frame(8).lazy().filter(pl.lit(False)).select(getattr(ta, spec['name'])(*args))
+    assert query.collect().height == 0
+
+
+@pytest.mark.parametrize('fn', [ta.ao, ta.add])
+@pytest.mark.parametrize('lengths', [(0, 2), (2, 0), (2, 3), (3, 2)])
+def test_non_scalar_length_mismatch_in_either_position(fn, lengths):
+    with pytest.raises(pl.exceptions.ComputeError, match='lengths differ'):
+        frame(8).select(fn(pl.col('high').head(lengths[0]), pl.col('low').head(lengths[1])))
+
+
+@pytest.mark.parametrize('fn', [ta.ema, ta.hma])
+@pytest.mark.parametrize('value', [14.0, '14', None])
+def test_integer_parameters_report_clear_errors(fn, value):
+    with pytest.raises(TypeError, match='timeperiod must be an integer'):
+        fn(timeperiod=value)
+
+
+@pytest.mark.parametrize('fn', [ta.ema, ta.hma])
+def test_numpy_integer_parameters_are_supported(fn):
+    assert frame().select(fn(timeperiod=np.int64(14))).equals(frame().select(fn(timeperiod=14)))
+    with pytest.raises(ValueError, match='signed 32-bit integer'):
+        fn(timeperiod=2**40)

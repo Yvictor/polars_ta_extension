@@ -31,7 +31,13 @@ pub fn ta_code2err(ret_code: TA_RetCode) -> PolarsResult<Series> {
 /// Align plugin inputs before handing raw buffers to C: length-1 inputs
 /// (Polars literals) broadcast to the common length, anything else must match.
 pub fn broadcast_inputs(inputs: &[Series]) -> PolarsResult<Vec<Series>> {
-    let len = inputs.iter().map(|s| s.len()).max().unwrap_or(0);
+    // A scalar also broadcasts to zero rows. Taking max(0, 1) would reject
+    // a valid filtered-to-empty column paired with a literal.
+    let len = inputs
+        .iter()
+        .map(|s| s.len())
+        .find(|&len| len != 1)
+        .unwrap_or(1);
     inputs
         .iter()
         .map(|s| {

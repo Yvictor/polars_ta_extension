@@ -59,12 +59,13 @@ not exist in 0.1.6. There is no fabricated old-version ratio for these functions
 
 ## Where the speedups come from: TA-Lib core versus the wrapper
 
-The wrapper layer around the C calls is a fixed per-call cost (Polars expression
-evaluation, casting/rechunking inputs, one output allocation); it does not scale
-with the algorithm. To attribute the deltas, the same functions were timed on
-50k-row data both through Polars (`df.select(...)`, best of 3×25 runs) and by
-calling `TA_*` directly from a C program linked against the 0.4.0 library shipped
-in 0.1.6 and the 0.8.1 library shipped here (Linux x86_64, one machine).
+The following table was contributed in [PR #37's review](https://github.com/Yvictor/polars_ta_extension/pull/37)
+using its implementation, not the current #38 wrapper. That author reported
+50k-row Linux x86_64 measurements, best of 3×25 runs, comparing direct C calls
+against Polars expressions. The C harness and raw samples for this table were
+not committed, so these are attributed supporting observations rather than a
+reproducible benchmark of this PR. The raw 51-sample reports above and current
+CI artifacts are the reproducible evidence for this implementation.
 
 | function | C core 0.4.0 ms | C core 0.8.1 ms | core speedup | Polars 0.1.6 ms | Polars 0.2.0 ms | e2e speedup |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -83,19 +84,14 @@ in 0.1.6 and the 0.8.1 library shipped here (Linux x86_64, one machine).
 | cdlengulfing() | 0.296 | 0.318 | 0.93x | 0.442 | 0.478 | 0.92x |
 | ht_trendline() | 3.177 | 4.326 | 0.73x | 3.664 | 4.482 | 0.82x |
 
-Readings:
-
-* Every large speedup (MACD, DEMA/TEMA/TRIX, ATR/NATR, RSI) is in the TA-Lib core:
-  upstream 0.8.x rewrote those algorithms. The end-to-end gain is smaller than the
-  core gain where the fixed wrapper cost now dominates the much shorter core time.
-* Two functions are slower in upstream 0.8.1 itself: `ht_trendline` (0.73x) and
-  `cdlengulfing` (0.93x). This is not a build-flag effect: `-O2`, `-O3` and forcing
-  `-mfma` give the same numbers, and the `target_clones("default","fma")` runtime
-  dispatch is active in the static library. Absolute cost stays below 5 ms per 50k rows.
-* The wrapper cost itself is 0.02–0.05 ms for one input and 0.13–0.2 ms for three
-  or four inputs on 50k rows, of the same order as Polars' own multi-column
-  expression evaluation (`pl.col("high") + pl.col("low")` costs about 0.09 ms on the
-  same frame). It does not copy inputs: single-chunk Float64 columns are borrowed.
+The measurements support upstream C changes as a major source of the MACD,
+DEMA/TEMA/TRIX, ATR/NATR and RSI gains. They also report slower HT_TRENDLINE and
+CDLENGULFING on that configuration; those ratios are not platform-wide promises.
+The accompanying compiler/FMA investigation has not been independently reproduced
+here. Wrapper work is not a constant independent of input size: null filling,
+casting, rechunking, scalar expansion and output initialization can scale with rows.
+Do not attribute every end-to-end change to C or subtract measurements from
+different runs to claim an exact wrapper cost.
 
 ## Implementation choices and regression checks
 
@@ -112,8 +108,44 @@ floating-point fast-math, native-only instruction sets, or approximations to
 improve a benchmark. The 201-indicator correctness suite remains the first gate.
 
 CI compares the published 0.1.6 and candidate wheels on the same runner and retains
-both JSON reports. It fails on >25% regressions in EMA, RSI, MACD, ATR, null RSI or
-chunked EMA at 100k and 1M rows. All other cases are reported, including smaller
-and grouped queries; those are not hard-gated because scheduler noise is large
-relative to their execution time. This threshold detects substantial regressions,
-not a proof that smaller regressions never occur.
+both JSON reports and a job summary. Timing regressions above 25% in the selected
+long-series cases produce warnings with `--report-only`, not release failures:
+shared runners are noisy. Installation, execution, malformed data and incomparable
+metadata still fail the benchmark job. The release depends on all correctness,
+compatibility and source-build jobs, while benchmark results remain informational.
+Without `--report-only`, the comparison script still enforces the threshold for
+controlled local measurements. New indicators need direct before/after comparisons
+because they do not exist in the 0.1.6 baseline.
+
+
+## Follow-up: output allocation after review
+
+The direct comparison of PRs #37/#38 found that #38's new SuperTrend wrapper was
+slower despite passing numerical tests. The original generated wrappers filled
+the entire output with padding before C overwrote the valid rows. The shared
+`OutputBuffer` now initializes only warm-up rows, lets C write into spare capacity,
+and exposes only the successful, validated output range. Any unwritten tail is
+padded before returning; failed calls never expose uninitialized values.
+
+We compared the local release wheel at `97b66f4` against the reviewed follow-up
+implementation on the same Ryzen 9950X / Python 3.12.7 / Polars 1.44.2 / NumPy
+2.5.3, with four threads pinned to CPUs 28–31. Each case uses three warmups and
+51 samples. Round 1 ran before→after; round 2 ran after→before. The retained
+reports include all measured cases, not only the improvements:
+[before 1](benchmarks/review-followup/before-first.json),
+[after 1](benchmarks/review-followup/after-first.json),
+[before 2](benchmarks/review-followup/before-second.json),
+[after 2](benchmarks/review-followup/after-second.json).
+
+| 1M rows | Before / after, round 1 (ms) | Before / after, round 2 (ms) | Observation |
+| --- | ---: | ---: | --- |
+| SuperTrend | 4.0444 / 3.3861 | 4.0969 / 3.4031 | 1.19–1.20x speedup |
+| KDJ | 12.6232 / 12.0319 | 12.6955 / 11.6715 | 1.05–1.09x speedup |
+| HMA | 3.1996 / 3.1296 | 3.2115 / 3.1078 | 1.02–1.03x speedup |
+| null RSI | 4.3842 / 4.4215 | 4.3761 / 4.3602 | Within 1% |
+| multi | 6.7141 / 7.2854 | 6.8650 / 6.7024 | Variable; no stable gain |
+
+These runs include the shared input-broadcasting changes as well as allocation
+changes; they are not a controlled C-only attribution experiment. They address
+the measured new-indicator overhead, not a proof of optimal performance for all
+201 indicators or platforms. Correctness and bounds checks remain required.

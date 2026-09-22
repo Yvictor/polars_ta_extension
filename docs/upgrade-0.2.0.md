@@ -22,14 +22,17 @@ to the indicator, not byte equality against a 0.4.0 library. Tests in this proje
 use the official Python `TA-Lib==0.8.1` wheel as the independent reference.
 
 `MA_Type` exposes SMA, EMA, WMA, DEMA, TEMA, TRIMA, KAMA, MAMA, T3, HMA,
-DISABLED, DEFAULT, ZLEMA and RMA. Integer values remain accepted.
+DISABLED, DEFAULT, ZLEMA and RMA. Integer values remain accepted. Integer
+parameters such as `timeperiod` require integers (including NumPy integers), not
+`14.0` or strings. Invalid types now raise an explicit Python `TypeError` before
+plugin serialization; integer range violations raise `ValueError`.
 
 Empty inputs return empty outputs. Inputs shorter than lookback and all-missing
 inputs retain their original length, with NaN for floating outputs and zero for
 integer outputs. Nulls convert to NaN. Internal NaNs follow upstream behavior;
-there is no implicit imputation or session reset. Inputs to legacy multi-input
-plugins must have equal lengths; mismatches raise a Polars error before C sees
-any pointers. New indicators additionally support broadcasting scalar inputs.
+there is no implicit imputation or session reset. All multi-input plugins
+broadcast length-one inputs to the other inputs' length, including zero rows.
+Other length mismatches raise a Polars error before C sees any pointers.
 
 New functions include AC, ACCBANDS, ADR, AO, AVGDEV, CMF, CMOU, COPPOCK,
 CUMSUM, CVI, DONCHIAN, DPO, EFI, ER, ERI, FOSC, FRACTAL, HA, HMA, IMI, KC,
@@ -52,6 +55,7 @@ current Polars release against Python 3.10, 3.11, 3.12, 3.13 and 3.14.
 | Windows | x64, ARM64 | Native Windows runners |
 
 These are the tested wheel targets, not a claim about every operating system.
+Windows wheels use MSVC; MinGW builds are not covered by the support matrix.
 32-bit Windows, PyPy and Python <3.10 are no longer claimed as supported: the
 current Polars runtime and the test dependency matrix do not support that set.
 CI status on the PR is the authority for whether a target has actually passed.
@@ -61,8 +65,11 @@ separate Python TA-Lib installation. By default the build compiles the pinned,
 checksum-verified source so headers and library can never mismatch (issue #26).
 Packagers who must link a system TA-Lib 0.8.1 can set both `TA_LIBRARY_PATH`
 (directory with `libta-lib.a` / `ta-lib-static.lib`) and `TA_INCLUDE_PATH`
-(directory with `ta-lib/ta_func.h`); older TA-Lib versions fail at link time
-because the bindings reference the 0.8.x functions. `DEPS_PATH` is no longer used.
+(directory containing the five public headers under `ta-lib/`). Both variables
+are required together. The build checks those headers against the pinned archive;
+the extension also checks the linked library's version when imported. Use the
+matching static library, compiled with PIC on Unix. Official wheels always use
+the vendored build. `DEPS_PATH` is no longer used.
 
 For a source build install Rust (CI uses 1.90.0), a C/C++ build toolchain, CMake
 and Python. Upstream's CMake project needs CMake 3.18+ on Linux/macOS and 3.30+
@@ -70,7 +77,7 @@ on Windows (Visual Studio 2026 requires CMake 4.2+). Then:
 
 ```sh
 python -m pip install maturin
-maturin build --release --locked
+maturin build --release --locked --out dist
 python -m pip install dist/*.whl
 ```
 
@@ -90,9 +97,14 @@ outputs. To regenerate it, compile upstream 0.8.1 as a shared library and run:
 ```sh
 python scripts/extract_api.py /path/to/ta-lib-0.8.1 /path/to/libta-lib.so
 python scripts/generate_indicators.py
+python scripts/generate_skill_reference.py
 ```
 
-The second command needs `rustfmt`. CI checks generated wrappers are unchanged.
+The wrapper generator needs `rustfmt`. CI checks wrappers and the skill reference
+for drift. It generates the 43 added APIs; the 158 legacy APIs retain their
+existing Python signatures and Rust builder types. Migrating those public APIs
+to generation needs a separate compatibility review. Both paths share input
+broadcasting; the 201-function parity suite covers their behavior.
 For FFI bindings, install libclang and build
 `cargo build --manifest-path talib-sys/Cargo.toml --features regenerate-bindings`.
 Review and copy the resulting `OUT_DIR/bindings.rs` into

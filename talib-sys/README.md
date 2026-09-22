@@ -6,7 +6,10 @@ TA-Lib or libclang installation is needed for ordinary builds.
 
 Building requires a C/C++ toolchain and CMake 3.18+ (3.30+ on Windows, which
 upstream's CMakeLists enforces). Set `TA_LIBRARY_PATH` and `TA_INCLUDE_PATH` to
-link an existing TA-Lib 0.8.1 static library instead of the vendored sources. The optional
+link an existing TA-Lib 0.8.1 static library instead of compiling the vendored
+sources. Both paths must be set together; all five public headers must match
+the pinned archive. The Python extension verifies the library version on import.
+Raw Rust consumers must likewise use the matching library. The optional
 `regenerate-bindings` feature requires libclang and writes regenerated bindings
 to Cargo's `OUT_DIR`; it never modifies checked-in source files.
 

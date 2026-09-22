@@ -17,13 +17,20 @@ signals = (
         ta.vwap().over("symbol").alias("vwap"),   # cumulative per group; reset sessions yourself
     )
     .with_columns(
-        golden_cross=(pl.col("ema20") > pl.col("ema50"))
+        golden_cross=pl.col("ema20").is_finite()
+        & pl.col("ema50").is_finite()
+        & pl.col("ema20").shift(1).over("symbol").is_finite()
+        & pl.col("ema50").shift(1).over("symbol").is_finite()
+        & (pl.col("ema20") > pl.col("ema50"))
         & (pl.col("ema20").shift(1).over("symbol") <= pl.col("ema50").shift(1).over("symbol"))
     )
     .filter(pl.col("golden_cross") & (pl.col("rsi") < 70))
     .collect()
 )
 ```
+
+Polars NaNs are not nulls and have ordering semantics. Require finite current
+and previous values before testing a crossover so warm-up does not create a signal.
 
 ## Struct outputs
 
@@ -58,8 +65,9 @@ ta.add(pl.col("close"), pl.lit(1.0))
 
 ## Candlestick patterns
 
-Every `cdl*` function returns Int32 (`100` bullish, `-100` bearish, `0` none); the
-namespace receiver is `open`.
+Every `cdl*` function returns Int32 (positive bullish, negative bearish, zero none).
+Magnitudes depend on the pattern and can include values such as 80 or 200; do not
+assume every signal is exactly ±100. The namespace receiver is `open`.
 
 ```python
 patterns = ta.get_function_groups()["Pattern Recognition"]

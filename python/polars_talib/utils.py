@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from enum import IntEnum
+from numbers import Integral
+from ._param_types import INTEGER_PARAMETERS
 from pathlib import Path
 import re
 from typing import Any, Sequence
@@ -31,6 +33,15 @@ def register_plugin(*, symbol: str, is_elementwise: bool,
                     kwargs: dict[str, Any] | None = None, args: list[IntoExpr],
                     lib: str | Path, returns_scalar: bool = False) -> pl.Expr:
     if kwargs:
+        kwargs = dict(kwargs)
+        for key in INTEGER_PARAMETERS.get(symbol, ()):
+            if key in kwargs:
+                value = kwargs[key]
+                if not isinstance(value, Integral):
+                    raise TypeError(f"{symbol}: {key} must be an integer, got {type(value).__name__}")
+                if not -(2**31) <= value < 2**31:
+                    raise ValueError(f"{symbol}: {key} must fit a signed 32-bit integer")
+                kwargs[key] = int(value)
         kwargs = {key: int(value) if isinstance(value, IntEnum) else value
                   for key, value in kwargs.items()}
     return register_plugin_function(
