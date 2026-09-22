@@ -1,22 +1,18 @@
 [project]
 name = "polars-talib"
-version = "0.1.6"
+version = "0.2.0"
 description = "Polars extension for Ta-Lib: Support Ta-Lib functions in Polars expressions"
 readme = "README.md"
 authors = [
     {name = "yvictor", email = "yvictor3141@gmail.com"}
 ]
-requires-python = ">=3.7"
+requires-python = ">=3.10"
 classifiers = [
     "Programming Language :: Rust",
     "Programming Language :: Python :: Implementation :: CPython",
-    "Programming Language :: Python :: Implementation :: PyPy",
 ]
 keywords = ["polars-extension", "talib", "technical-analysis", "TA-Lib", "polars", "rust", "polars-expr"]
-dependencies = [
-    "polars >= 0.18.0,<0.18.5; python_version < '3.8'",
-    "polars >= 0.19; python_version >= '3.8'",
-]
+dependencies = ["polars>=1.20,<2"]
 
 
 [tool.maturin]
@@ -31,16 +27,13 @@ build-backend = "maturin"
 
 [dependency-groups]
 dev = [
-    "maturin>=1.8.1",
-    "pytest>=7.4.1",
-    "numpy==1.20.0; python_version < '3.9'",
-    "numpy==1.26.4; python_version >= '3.9'",
-    "memray",
-    "hypothesis",
-    "pytest-memray==1.4.0; python_version >= '3.8'",
-    "pytest-benchmark",
-    "ta-lib==0.5.3",
+    "maturin>=1.8,<2",
+    "pytest>=8",
+    "numpy>=1.26",
+    "pytest-benchmark>=5",
+    "ta-lib==0.8.1",
 ]
+
 
 
 [tool.ruff]

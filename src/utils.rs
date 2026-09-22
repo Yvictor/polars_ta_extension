@@ -58,3 +58,13 @@ pub fn ta_code2err(ret_code: TA_RetCode) -> PolarsResult<Series> {
 //     let out_ser = ChunkedArray::<T>::from_vec("", out);
 //     out_ser.into_series()
 // }
+
+/// A plugin must validate lengths before handing raw buffers to C.
+pub fn validate_input_lengths(inputs: &[Series]) -> PolarsResult<()> {
+    if let Some(first) = inputs.first() {
+        if inputs.iter().any(|s| s.len() != first.len()) {
+            return Err(PolarsError::ShapeMismatch("TA-Lib inputs must have equal lengths".into()));
+        }
+    }
+    Ok(())
+}

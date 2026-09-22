@@ -36,11 +36,20 @@ pub fn ta_add(
     real1_ptr: *const f64,
     len: usize,
 ) -> Result<Vec<f64>, TA_RetCode> {
+    if len > 100_000_001 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
     let begin_idx = check_begin_idx2(len, real0_ptr, real1_ptr) as i32;
     let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_ADD_Lookback() };
+    if lookback < begin_idx {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if len == 0 || lookback as usize >= len {
+        return Ok(crate::utils::make_default_vec(len));
+    }
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_ADD(
@@ -61,9 +70,8 @@ pub fn ta_add(
                     out.set_len(out_size_begin);
                 }
             } else {
-                unsafe {
-                    out.set_len(len);
-                }
+                out.resize(len, crate::utils::CustomDefault::default());
+                
             }
             Ok(out)
         }
@@ -76,11 +84,20 @@ pub fn ta_div(
     real1_ptr: *const f64,
     len: usize,
 ) -> Result<Vec<f64>, TA_RetCode> {
+    if len > 100_000_001 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
     let begin_idx = check_begin_idx2(len, real0_ptr, real1_ptr) as i32;
     let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_DIV_Lookback() };
+    if lookback < begin_idx {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if len == 0 || lookback as usize >= len {
+        return Ok(crate::utils::make_default_vec(len));
+    }
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_DIV(
@@ -101,9 +118,8 @@ pub fn ta_div(
                     out.set_len(out_size_begin);
                 }
             } else {
-                unsafe {
-                    out.set_len(len);
-                }
+                out.resize(len, crate::utils::CustomDefault::default());
+                
             }
             Ok(out)
         }
@@ -116,6 +132,9 @@ pub fn ta_max(
     len: usize,
     kwargs: &TimePeriodKwargs,
 ) -> Result<Vec<f64>, TA_RetCode> {
+    if len > 100_000_001 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
     let begin_idx = check_begin_idx1(len, real_ptr) as i32;
@@ -126,6 +145,12 @@ pub fn ta_max(
     }
     if cannot_produce_output(len, lookback) {
         return Ok(make_default_vec(len));
+    }
+    if lookback < begin_idx {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if len == 0 || lookback as usize >= len {
+        return Ok(crate::utils::make_default_vec(len));
     }
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
@@ -147,9 +172,8 @@ pub fn ta_max(
                     out.set_len(out_size_begin);
                 }
             } else {
-                unsafe {
-                    out.set_len(len);
-                }
+                out.resize(len, crate::utils::CustomDefault::default());
+                
             }
             Ok(out)
         }
@@ -162,6 +186,9 @@ pub fn ta_maxindex(
     len: usize,
     kwargs: &TimePeriodKwargs,
 ) -> Result<Vec<i32>, TA_RetCode> {
+    if len > 100_000_001 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
     let begin_idx = check_begin_idx1(len, real_ptr) as i32;
@@ -172,6 +199,12 @@ pub fn ta_maxindex(
     }
     if cannot_produce_output(len, lookback) {
         return Ok(make_default_vec(len));
+    }
+    if lookback < begin_idx {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if len == 0 || lookback as usize >= len {
+        return Ok(crate::utils::make_default_vec(len));
     }
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
@@ -193,9 +226,8 @@ pub fn ta_maxindex(
                     out.set_len(out_size_begin);
                 }
             } else {
-                unsafe {
-                    out.set_len(len);
-                }
+                out.resize(len, crate::utils::CustomDefault::default());
+                
             }
             Ok(out)
         }
@@ -208,6 +240,9 @@ pub fn ta_min(
     len: usize,
     kwargs: &TimePeriodKwargs,
 ) -> Result<Vec<f64>, TA_RetCode> {
+    if len > 100_000_001 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
     let begin_idx = check_begin_idx1(len, real_ptr) as i32;
@@ -218,6 +253,12 @@ pub fn ta_min(
     }
     if cannot_produce_output(len, lookback) {
         return Ok(make_default_vec(len));
+    }
+    if lookback < begin_idx {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if len == 0 || lookback as usize >= len {
+        return Ok(crate::utils::make_default_vec(len));
     }
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
@@ -239,9 +280,8 @@ pub fn ta_min(
                     out.set_len(out_size_begin);
                 }
             } else {
-                unsafe {
-                    out.set_len(len);
-                }
+                out.resize(len, crate::utils::CustomDefault::default());
+                
             }
             Ok(out)
         }
@@ -254,6 +294,9 @@ pub fn ta_minindex(
     len: usize,
     kwargs: &TimePeriodKwargs,
 ) -> Result<Vec<i32>, TA_RetCode> {
+    if len > 100_000_001 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
     let begin_idx = check_begin_idx1(len, real_ptr) as i32;
@@ -264,6 +307,12 @@ pub fn ta_minindex(
     }
     if cannot_produce_output(len, lookback) {
         return Ok(make_default_vec(len));
+    }
+    if lookback < begin_idx {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if len == 0 || lookback as usize >= len {
+        return Ok(crate::utils::make_default_vec(len));
     }
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
@@ -285,9 +334,8 @@ pub fn ta_minindex(
                     out.set_len(out_size_begin);
                 }
             } else {
-                unsafe {
-                    out.set_len(len);
-                }
+                out.resize(len, crate::utils::CustomDefault::default());
+                
             }
             Ok(out)
         }
@@ -300,6 +348,9 @@ pub fn ta_minmax(
     len: usize,
     kwargs: &TimePeriodKwargs,
 ) -> Result<(Vec<f64>, Vec<f64>), TA_RetCode> {
+    if len > 100_000_001 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
     let begin_idx = check_begin_idx1(len, real_ptr) as i32;
@@ -310,6 +361,15 @@ pub fn ta_minmax(
     }
     if cannot_produce_output(len, lookback) {
         return Ok((make_default_vec(len), make_default_vec(len)));
+    }
+    if lookback < begin_idx {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if len == 0 || lookback as usize >= len {
+        return Ok((
+            crate::utils::make_default_vec(len),
+            crate::utils::make_default_vec(len),
+        ));
     }
     let (mut out_min, ptr_min) = make_vec(len, lookback);
     let (mut out_max, ptr_max) = make_vec(len, lookback);
@@ -336,12 +396,10 @@ pub fn ta_minmax(
                     out_max.set_len(out_size_begin);
                 }
             } else {
-                unsafe {
-                    out_min.set_len(len);
-                }
-                unsafe {
-                    out_max.set_len(len);
-                }
+                out_min.resize(len, crate::utils::CustomDefault::default());
+                
+                out_max.resize(len, crate::utils::CustomDefault::default());
+                
             }
             Ok((out_min, out_max))
         }
@@ -354,6 +412,9 @@ pub fn ta_minmaxindex(
     len: usize,
     kwargs: &TimePeriodKwargs,
 ) -> Result<(Vec<i32>, Vec<i32>), TA_RetCode> {
+    if len > 100_000_001 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
     let begin_idx = check_begin_idx1(len, real_ptr) as i32;
@@ -364,6 +425,15 @@ pub fn ta_minmaxindex(
     }
     if cannot_produce_output(len, lookback) {
         return Ok((make_default_vec(len), make_default_vec(len)));
+    }
+    if lookback < begin_idx {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if len == 0 || lookback as usize >= len {
+        return Ok((
+            crate::utils::make_default_vec(len),
+            crate::utils::make_default_vec(len),
+        ));
     }
     let (mut out_min, ptr_min) = make_vec(len, lookback);
     let (mut out_max, ptr_max) = make_vec(len, lookback);
@@ -390,12 +460,10 @@ pub fn ta_minmaxindex(
                     out_max.set_len(out_size_begin);
                 }
             } else {
-                unsafe {
-                    out_min.set_len(len);
-                }
-                unsafe {
-                    out_max.set_len(len);
-                }
+                out_min.resize(len, crate::utils::CustomDefault::default());
+                
+                out_max.resize(len, crate::utils::CustomDefault::default());
+                
             }
             Ok((out_min, out_max))
         }
@@ -408,11 +476,20 @@ pub fn ta_mult(
     real1_ptr: *const f64,
     len: usize,
 ) -> Result<Vec<f64>, TA_RetCode> {
+    if len > 100_000_001 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
     let begin_idx = check_begin_idx2(len, real0_ptr, real1_ptr) as i32;
     let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_MULT_Lookback() };
+    if lookback < begin_idx {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if len == 0 || lookback as usize >= len {
+        return Ok(crate::utils::make_default_vec(len));
+    }
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_MULT(
@@ -444,11 +521,20 @@ pub fn ta_sub(
     real1_ptr: *const f64,
     len: usize,
 ) -> Result<Vec<f64>, TA_RetCode> {
+    if len > 100_000_001 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
     let begin_idx = check_begin_idx2(len, real0_ptr, real1_ptr) as i32;
     let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_SUB_Lookback() };
+    if lookback < begin_idx {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if len == 0 || lookback as usize >= len {
+        return Ok(crate::utils::make_default_vec(len));
+    }
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_SUB(
@@ -480,6 +566,9 @@ pub fn ta_sum(
     len: usize,
     kwargs: &TimePeriodKwargs,
 ) -> Result<Vec<f64>, TA_RetCode> {
+    if len > 100_000_001 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
     let begin_idx = check_begin_idx1(len, real_ptr) as i32;
@@ -490,6 +579,12 @@ pub fn ta_sum(
     }
     if cannot_produce_output(len, lookback) {
         return Ok(make_default_vec(len));
+    }
+    if lookback < begin_idx {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if len == 0 || lookback as usize >= len {
+        return Ok(crate::utils::make_default_vec(len));
     }
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
@@ -518,11 +613,20 @@ pub fn ta_sum(
 }
 
 pub fn ta_acos(real_ptr: *const f64, len: usize) -> Result<Vec<f64>, TA_RetCode> {
+    if len > 100_000_001 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
     let begin_idx = check_begin_idx1(len, real_ptr) as i32;
     let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_ACOS_Lookback() };
+    if lookback < begin_idx {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if len == 0 || lookback as usize >= len {
+        return Ok(crate::utils::make_default_vec(len));
+    }
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_ACOS(
@@ -549,11 +653,20 @@ pub fn ta_acos(real_ptr: *const f64, len: usize) -> Result<Vec<f64>, TA_RetCode>
 }
 
 pub fn ta_asin(real_ptr: *const f64, len: usize) -> Result<Vec<f64>, TA_RetCode> {
+    if len > 100_000_001 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
     let begin_idx = check_begin_idx1(len, real_ptr) as i32;
     let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_ASIN_Lookback() };
+    if lookback < begin_idx {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if len == 0 || lookback as usize >= len {
+        return Ok(crate::utils::make_default_vec(len));
+    }
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_ASIN(
@@ -583,7 +696,16 @@ pub fn ta_atan(real_ptr: *const f64, len: usize) -> Result<Vec<f64>, TA_RetCode>
     let begin_idx = check_begin_idx1(len, real_ptr) as i32;
     let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_ATAN_Lookback() };
+    if lookback < begin_idx {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if len == 0 || lookback as usize >= len {
+        return Ok(crate::utils::make_default_vec(len));
+    }
     let (mut out, ptr) = make_vec(len, lookback);
+    if len > 100_000_001 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
     let ret_code = unsafe {
@@ -614,7 +736,16 @@ pub fn ta_ceil(real_ptr: *const f64, len: usize) -> Result<Vec<f64>, TA_RetCode>
     let begin_idx = check_begin_idx1(len, real_ptr) as i32;
     let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_CEIL_Lookback() };
+    if lookback < begin_idx {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if len == 0 || lookback as usize >= len {
+        return Ok(crate::utils::make_default_vec(len));
+    }
     let (mut out, ptr) = make_vec(len, lookback);
+    if len > 100_000_001 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
     let ret_code = unsafe {
@@ -645,7 +776,16 @@ pub fn ta_cos(real_ptr: *const f64, len: usize) -> Result<Vec<f64>, TA_RetCode> 
     let begin_idx = check_begin_idx1(len, real_ptr) as i32;
     let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_COS_Lookback() };
+    if lookback < begin_idx {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if len == 0 || lookback as usize >= len {
+        return Ok(crate::utils::make_default_vec(len));
+    }
     let (mut out, ptr) = make_vec(len, lookback);
+    if len > 100_000_001 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
     let ret_code = unsafe {
@@ -676,7 +816,16 @@ pub fn ta_cosh(real_ptr: *const f64, len: usize) -> Result<Vec<f64>, TA_RetCode>
     let begin_idx = check_begin_idx1(len, real_ptr) as i32;
     let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_COSH_Lookback() };
+    if lookback < begin_idx {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if len == 0 || lookback as usize >= len {
+        return Ok(crate::utils::make_default_vec(len));
+    }
     let (mut out, ptr) = make_vec(len, lookback);
+    if len > 100_000_001 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
     let ret_code = unsafe {
@@ -708,7 +857,16 @@ pub fn ta_exp(real_ptr: *const f64, len: usize) -> Result<Vec<f64>, TA_RetCode> 
     let begin_idx = check_begin_idx1(len, real_ptr) as i32;
     let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_EXP_Lookback() };
+    if lookback < begin_idx {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if len == 0 || lookback as usize >= len {
+        return Ok(crate::utils::make_default_vec(len));
+    }
     let (mut out, ptr) = make_vec(len, lookback);
+    if len > 100_000_001 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
 
@@ -741,7 +899,16 @@ pub fn ta_floor(real_ptr: *const f64, len: usize) -> Result<Vec<f64>, TA_RetCode
     let begin_idx = check_begin_idx1(len, real_ptr) as i32;
     let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_FLOOR_Lookback() };
+    if lookback < begin_idx {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if len == 0 || lookback as usize >= len {
+        return Ok(crate::utils::make_default_vec(len));
+    }
     let (mut out, ptr) = make_vec(len, lookback);
+    if len > 100_000_001 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
 
@@ -774,7 +941,16 @@ pub fn ta_ln(real_ptr: *const f64, len: usize) -> Result<Vec<f64>, TA_RetCode> {
     let begin_idx = check_begin_idx1(len, real_ptr) as i32;
     let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_LN_Lookback() };
+    if lookback < begin_idx {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if len == 0 || lookback as usize >= len {
+        return Ok(crate::utils::make_default_vec(len));
+    }
     let (mut out, ptr) = make_vec(len, lookback);
+    if len > 100_000_001 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
 
@@ -807,7 +983,16 @@ pub fn ta_log10(real_ptr: *const f64, len: usize) -> Result<Vec<f64>, TA_RetCode
     let begin_idx = check_begin_idx1(len, real_ptr) as i32;
     let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_LOG10_Lookback() };
+    if lookback < begin_idx {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if len == 0 || lookback as usize >= len {
+        return Ok(crate::utils::make_default_vec(len));
+    }
     let (mut out, ptr) = make_vec(len, lookback);
+    if len > 100_000_001 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
 
@@ -840,7 +1025,16 @@ pub fn ta_sin(real_ptr: *const f64, len: usize) -> Result<Vec<f64>, TA_RetCode> 
     let begin_idx = check_begin_idx1(len, real_ptr) as i32;
     let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_SIN_Lookback() };
+    if lookback < begin_idx {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if len == 0 || lookback as usize >= len {
+        return Ok(crate::utils::make_default_vec(len));
+    }
     let (mut out, ptr) = make_vec(len, lookback);
+    if len > 100_000_001 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
 
@@ -873,7 +1067,16 @@ pub fn ta_sinh(real_ptr: *const f64, len: usize) -> Result<Vec<f64>, TA_RetCode>
     let begin_idx = check_begin_idx1(len, real_ptr) as i32;
     let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_SINH_Lookback() };
+    if lookback < begin_idx {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if len == 0 || lookback as usize >= len {
+        return Ok(crate::utils::make_default_vec(len));
+    }
     let (mut out, ptr) = make_vec(len, lookback);
+    if len > 100_000_001 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
 
@@ -906,7 +1109,16 @@ pub fn ta_sqrt(real_ptr: *const f64, len: usize) -> Result<Vec<f64>, TA_RetCode>
     let begin_idx = check_begin_idx1(len, real_ptr) as i32;
     let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_SQRT_Lookback() };
+    if lookback < begin_idx {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if len == 0 || lookback as usize >= len {
+        return Ok(crate::utils::make_default_vec(len));
+    }
     let (mut out, ptr) = make_vec(len, lookback);
+    if len > 100_000_001 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
 
@@ -939,7 +1151,16 @@ pub fn ta_tan(real_ptr: *const f64, len: usize) -> Result<Vec<f64>, TA_RetCode> 
     let begin_idx = check_begin_idx1(len, real_ptr) as i32;
     let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_TAN_Lookback() };
+    if lookback < begin_idx {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if len == 0 || lookback as usize >= len {
+        return Ok(crate::utils::make_default_vec(len));
+    }
     let (mut out, ptr) = make_vec(len, lookback);
+    if len > 100_000_001 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
 
@@ -972,7 +1193,16 @@ pub fn ta_tanh(real_ptr: *const f64, len: usize) -> Result<Vec<f64>, TA_RetCode>
     let begin_idx = check_begin_idx1(len, real_ptr) as i32;
     let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_TANH_Lookback() };
+    if lookback < begin_idx {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if len == 0 || lookback as usize >= len {
+        return Ok(crate::utils::make_default_vec(len));
+    }
     let (mut out, ptr) = make_vec(len, lookback);
+    if len > 100_000_001 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
 

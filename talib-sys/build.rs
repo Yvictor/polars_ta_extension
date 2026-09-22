@@ -1,207 +1,67 @@
-extern crate bindgen;
+use sha2::{Digest, Sha256};
+use std::{env, fs, path::PathBuf};
 
-use bindgen::callbacks::{DeriveInfo, ParseCallbacks, TypeKind};
-use std::env;
-use std::io::{Cursor, Read};
-use std::process::Command;
-use std::{io::Write, path::PathBuf};
-
-const TA_LIB_VER: &str = "0.4.0";
-// const TA_LIB_TGZ: &str = "ta-lib-0.4.0-src.tar.gz";
-
-#[derive(Debug)]
-struct DerivesCallback;
-
-impl ParseCallbacks for DerivesCallback {
-    // Test the "custom derives" capability by adding `PartialEq` to the `Test` struct.
-    fn add_derives(&self, info: &DeriveInfo<'_>) -> Vec<String> {
-        if info.name.starts_with("_") {
-            vec![]
-        } else if info.kind == TypeKind::Struct {
-            vec![]
-        } else if info.name == "TA_RangeType"
-            || info.name == "TA_CandleSettingType"
-            || info.name == "TA_InputParameterType"
-            || info.name == "TA_OptInputParameterType"
-            || info.name == "TA_OutputParameterType"
-            || info.name == "TA_Compatibility"
-            || info.name == "TA_MAType"
-            || info.name == "TA_FuncUnstId"
-            || info.name == "TA_RetCode"
-            || info.name == "TA_FuncUnstId"
-        {
-            vec!["Deserialize".into()]
-        } else {
-            vec!["Deserialize".into(), "Deserialize_repr".into()]
-        }
-    }
-}
+const VERSION: &str = "0.8.1";
+const SHA256: &str = "ec59ccd88c0c77f618587d858787c8f9d06c40460a09d66751926f6fd670f985";
 
 fn main() {
-    #[cfg(target_os = "windows")]
-    let ta_lib_gz = format!("ta-lib-{TA_LIB_VER}-msvc.zip");
-    #[cfg(target_os = "windows")]
-    let ta_lib_url = format!("https://github.com/Yvictor/polars_ta_extension/releases/download/0.1.0/{ta_lib_gz}");
-    #[cfg(target_family = "unix")]
-    let ta_lib_gz = format!("ta-lib-{TA_LIB_VER}-src.tar.gz");
-    #[cfg(target_family = "unix")]
-    let ta_lib_url = format!(
-        "https://github.com/Yvictor/polars_ta_extension/releases/download/0.1.0/{ta_lib_gz}"
+    println!("cargo:rerun-if-changed=wrapper.h");
+    println!("cargo:rerun-if-changed=vendor/ta-lib-0.8.1-src.tar.gz");
+    let out = PathBuf::from(env::var_os("OUT_DIR").unwrap());
+    let archive = fs::read(format!("vendor/ta-lib-{VERSION}-src.tar.gz")).unwrap();
+    assert_eq!(
+        format!("{:x}", Sha256::digest(&archive)),
+        SHA256,
+        "TA-Lib source checksum mismatch"
     );
-
-    let cwd = env::current_dir().unwrap();
-    let deps_dir = PathBuf::from(
-        &env::var("DEPS_PATH").unwrap_or(cwd.join("dependencies").display().to_string()),
+    let source = out.join(format!("ta-lib-{VERSION}"));
+    if !source.exists() {
+        tar::Archive::new(flate2::read::GzDecoder::new(&archive[..]))
+            .unpack(&out)
+            .expect("extract vendored TA-Lib");
+    }
+    let dst = cmake::Config::new(&source)
+        .profile("Release")
+        .define("BUILD_SHARED_LIBS", "OFF")
+        .define("BUILD_STATIC_LIBS", "ON")
+        .define("BUILD_DEV_TOOLS", "OFF")
+        .define("CMAKE_POSITION_INDEPENDENT_CODE", "ON")
+        .build();
+    let windows = env::var("CARGO_CFG_TARGET_OS").unwrap() == "windows";
+    println!(
+        "cargo:rustc-link-search=native={}",
+        dst.join("lib").display()
     );
-    let tmp_dir = deps_dir.join("tmp");
-    let file_gz_path = tmp_dir.join(ta_lib_gz);
-    let ta_library_path =
-        env::var("TA_LIBRARY_PATH").unwrap_or(cwd.join("dependencies/lib").display().to_string());
-    let ta_include_path = env::var("TA_INCLUDE_PATH")
-        .unwrap_or(cwd.join("dependencies/include").display().to_string());
-    if !file_gz_path.exists() {
-        let resp = reqwest::blocking::get(ta_lib_url).unwrap();
-        let content = resp.bytes().unwrap();
-        std::fs::create_dir_all(tmp_dir.clone()).unwrap();
-        let mut file_gz = std::fs::File::create(file_gz_path.clone()).unwrap();
-        file_gz.write_all(&content).unwrap();
-        file_gz.sync_data().unwrap();
+    println!(
+        "cargo:rustc-link-lib=static={}",
+        if windows { "ta-lib-static" } else { "ta-lib" }
+    );
+    if !windows {
+        println!("cargo:rustc-link-lib=m");
     }
-    let lib_path = PathBuf::from(ta_library_path.clone());
-    let os = std::env::consts::OS;
-    if !lib_path.exists() {
-        let mut file_gz = std::fs::File::open(file_gz_path).unwrap();
-        if os == "windows" {
-            if !lib_path.join("ta_lib.lib").exists() {
-                let metadata = std::fs::File::metadata(&file_gz).expect("unable to read metadata");
-                let mut buf = vec![0; metadata.len() as usize];
-                file_gz.read(&mut buf).expect("buffer overflow");
-                zip_extract::extract(Cursor::new(buf), &tmp_dir, false).unwrap();
-                Command::new("nmake")
-                    .current_dir(
-                        &tmp_dir
-                            .join("ta-lib")
-                            .join("c")
-                            .join("make")
-                            .join("cdr")
-                            .join("win32")
-                            .join("msvc"),
-                    )
-                    .status()
-                    .expect("Failed to run make command");
-                // nmake and clang
-                // set LIBCLANG_PATH=bin
-                fs_extra::dir::copy(
-                    &tmp_dir.join("ta-lib").join("c").join("lib"),
-                    deps_dir.clone(),
-                    &fs_extra::dir::CopyOptions::new().overwrite(true).skip_exist(true),
-                )
-                .unwrap();
-                let dir_content = fs_extra::dir::get_dir_content(deps_dir.clone()).unwrap();
-                println!("deps_dir: {:?}", deps_dir);
-                for f in dir_content.directories {
-                    println!("{}", f);
-                }
-                for f in dir_content.files {
-                    println!("{}", f);
-                }
-                fs_extra::dir::copy(
-                    &tmp_dir.join("ta-lib").join("c").join("include"),
-                    deps_dir.clone(),
-                    &fs_extra::dir::CopyOptions::new().skip_exist(true),
-                )
-                .unwrap();
-                let _ = std::fs::create_dir_all(PathBuf::from(&ta_include_path).join("ta-lib"));
-                fs_extra::dir::copy(
-                    &PathBuf::from(&ta_include_path),
-                    PathBuf::from(&ta_include_path).join("ta-lib"),
-                    &fs_extra::dir::CopyOptions::new()
-                        .skip_exist(true)
-                        .content_only(true),
-                )
-                .unwrap();
-                let ta_lib_path = PathBuf::from(&ta_library_path);
-                // let dir_content = fs_extra::dir::get_dir_content(ta_lib_path.clone()).unwrap();
-                // println!("ta_lib_path: {:?}", ta_lib_path);
-                // for f in dir_content.directories {
-                //     println!("{}", f);
-                // }
-                // for f in dir_content.files {
-                //     println!("{}", f);
-                // }
-                std::fs::copy(
-                    ta_lib_path.join("ta_libc_cdr.lib"),
-                    ta_lib_path.join("ta_lib.lib"),
-                )
-                .unwrap();
-            }
-        } else {
-            let mut archive = tar::Archive::new(flate2::read::GzDecoder::new(file_gz));
-            archive
-                .entries()
-                .unwrap()
-                .filter_map(|r| r.ok())
-                .map(|mut entry| -> std::io::Result<PathBuf> {
-                    let strip_path = entry.path()?.iter().skip(1).collect::<std::path::PathBuf>();
-                    let path = tmp_dir.join("ta-lib").join(strip_path);
-                    // println!("unpack: {:?}", path);
-                    entry.unpack(&path)?;
-                    Ok(path)
-                })
-                .filter_map(|e| e.ok())
-                .for_each(|x| println!("> {}", x.display()));
+    println!("cargo:rerun-if-changed=src/bindings.rs");
+    #[cfg(not(feature = "regenerate-bindings"))]
+    fs::copy("src/bindings.rs", out.join("bindings.rs")).expect("copy portable bindings");
+    #[cfg(feature = "regenerate-bindings")]
+    generate_bindings(&dst, &out);
+}
 
-            Command::new("./configure")
-                .arg(format!("--prefix={}", deps_dir.display()))
-                .current_dir(&tmp_dir.join("ta-lib"))
-                .status()
-                .expect("Failed to run configure command");
-
-            Command::new("make")
-                .current_dir(&tmp_dir.join("ta-lib"))
-                .status()
-                .expect("Failed to run make command");
-
-            Command::new("make")
-                .arg("install")
-                .current_dir(&tmp_dir.join("ta-lib"))
-                .status()
-                .expect("Failed to run make install command");
-        }
-    }
-
-    println!("cargo:rustc-link-lib=static=ta_lib");
-    println!("cargo:rustc-link-search=native={ta_library_path}");
-    println!("cargo:rustc-link-search=native=../dependencies/lib");
-    // let cb = ParseCallbacks::add_derives();
-    let bindings = bindgen::Builder::default()
-        // The input header we would like to generate
-        // bindings for.
+#[cfg(feature = "regenerate-bindings")]
+fn generate_bindings(dst: &std::path::Path, out: &std::path::Path) {
+    // The umbrella header includes ta_defs.h before headers using TA_LIB_API.
+    // Always use the headers that belong to the archive being linked (#26).
+    bindgen::Builder::default()
         .header("wrapper.h")
-        .clang_arg(format!("-I{}", ta_include_path))
-        .clang_arg("-I../dependencies/include")
-        .clang_arg("-v")
-        // Generate rustified enums
-        // .newtype_enum("*")
-        // .bitfield_enum("*")
-        // .constified_enum_module(".*")
-        // .rustified_enum(".*")
+        .clang_arg(format!("-I{}", dst.join("include").display()))
+        .allowlist_function("TA_.*")
+        .allowlist_type("TA_.*")
+        .allowlist_var("TA_.*")
         .constified_enum(".*")
         .rustified_enum("TA_RetCode")
-        // .rustified_non_exhaustive_enum(".*")
-        // .raw_line("use serde::Deserialize;")
-        // .raw_line("use serde_repr::Deserialize_repr;")
-        // .parse_callbacks(bindgen::callbacks::ParseCallbacks::add_derives(vec!["Deserialize"]))
-        // .parse_callbacks(Box::new(DerivesCallback {}))
-        // Finish the builder and generate the bindings.
+        .layout_tests(false)
+        .parse_callbacks(Box::new(bindgen::CargoCallbacks::new()))
         .generate()
-        // Unwrap the Result and panic on failure.
-        .expect("Unable to generate bindings");
-
-    // Write the bindings to the $OUT_DIR/bindings.rs file.
-    // let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
-    let out_path = PathBuf::from("src");
-    bindings
-        .write_to_file(out_path.join("bindings.rs"))
-        .expect("Couldn't write bindings!");
+        .expect("generate TA-Lib bindings")
+        .write_to_file(out.join("bindings.rs"))
+        .expect("write TA-Lib bindings");
 }

@@ -6,11 +6,20 @@ use talib_sys::{TA_HT_SINE_Lookback, TA_HT_SINE};
 use talib_sys::{TA_HT_TRENDMODE_Lookback, TA_HT_TRENDMODE};
 
 pub fn ta_ht_dcperiod(real_ptr: *const f64, len: usize) -> Result<Vec<f64>, TA_RetCode> {
+    if len > 100_000_001 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
     let begin_idx = check_begin_idx1(len, real_ptr) as i32;
     let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_HT_DCPERIOD_Lookback() };
+    if lookback < begin_idx {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if len == 0 || lookback as usize >= len {
+        return Ok(crate::utils::make_default_vec(len));
+    }
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_HT_DCPERIOD(
@@ -30,9 +39,8 @@ pub fn ta_ht_dcperiod(real_ptr: *const f64, len: usize) -> Result<Vec<f64>, TA_R
                     out.set_len(out_size_begin);
                 }
             } else {
-                unsafe {
-                    out.set_len(len);
-                }
+                out.resize(len, crate::utils::CustomDefault::default());
+                
             }
             Ok(out)
         }
@@ -41,11 +49,20 @@ pub fn ta_ht_dcperiod(real_ptr: *const f64, len: usize) -> Result<Vec<f64>, TA_R
 }
 
 pub fn ta_ht_dcphase(real_ptr: *const f64, len: usize) -> Result<Vec<f64>, TA_RetCode> {
+    if len > 100_000_001 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
     let begin_idx = check_begin_idx1(len, real_ptr) as i32;
     let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_HT_DCPHASE_Lookback() };
+    if lookback < begin_idx {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if len == 0 || lookback as usize >= len {
+        return Ok(crate::utils::make_default_vec(len));
+    }
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_HT_DCPHASE(
@@ -65,9 +82,8 @@ pub fn ta_ht_dcphase(real_ptr: *const f64, len: usize) -> Result<Vec<f64>, TA_Re
                     out.set_len(out_size_begin);
                 }
             } else {
-                unsafe {
-                    out.set_len(len);
-                }
+                out.resize(len, crate::utils::CustomDefault::default());
+                
             }
             Ok(out)
         }
@@ -76,11 +92,23 @@ pub fn ta_ht_dcphase(real_ptr: *const f64, len: usize) -> Result<Vec<f64>, TA_Re
 }
 
 pub fn ta_ht_phasor(real_ptr: *const f64, len: usize) -> Result<(Vec<f64>, Vec<f64>), TA_RetCode> {
+    if len > 100_000_001 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
     let begin_idx = check_begin_idx1(len, real_ptr) as i32;
     let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_HT_PHASOR_Lookback() };
+    if lookback < begin_idx {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if len == 0 || lookback as usize >= len {
+        return Ok((
+            crate::utils::make_default_vec(len),
+            crate::utils::make_default_vec(len),
+        ));
+    }
     let (mut out_in_phase, ptr_in_phase) = make_vec(len, lookback);
     let (mut out_quadrature, ptr_quadrature) = make_vec(len, lookback);
     let ret_code = unsafe {
@@ -103,10 +131,9 @@ pub fn ta_ht_phasor(real_ptr: *const f64, len: usize) -> Result<(Vec<f64>, Vec<f
                     out_quadrature.set_len(out_size_begin);
                 }
             } else {
-                unsafe {
-                    out_in_phase.set_len(len);
-                    out_quadrature.set_len(len);
-                }
+                out_in_phase.resize(len, crate::utils::CustomDefault::default());
+                    out_quadrature.resize(len, crate::utils::CustomDefault::default());
+                
             }
             Ok((out_in_phase, out_quadrature))
         }
@@ -115,11 +142,23 @@ pub fn ta_ht_phasor(real_ptr: *const f64, len: usize) -> Result<(Vec<f64>, Vec<f
 }
 
 pub fn ta_ht_sine(real_ptr: *const f64, len: usize) -> Result<(Vec<f64>, Vec<f64>), TA_RetCode> {
+    if len > 100_000_001 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
     let begin_idx = check_begin_idx1(len, real_ptr) as i32;
     let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_HT_SINE_Lookback() };
+    if lookback < begin_idx {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if len == 0 || lookback as usize >= len {
+        return Ok((
+            crate::utils::make_default_vec(len),
+            crate::utils::make_default_vec(len),
+        ));
+    }
     let (mut out_sine, ptr_sine) = make_vec(len, lookback);
     let (mut out_leadsine, ptr_leadsine) = make_vec(len, lookback);
     let ret_code = unsafe {
@@ -142,10 +181,9 @@ pub fn ta_ht_sine(real_ptr: *const f64, len: usize) -> Result<(Vec<f64>, Vec<f64
                     out_leadsine.set_len(out_size_begin);
                 }
             } else {
-                unsafe {
-                    out_sine.set_len(len);
-                    out_leadsine.set_len(len);
-                }
+                out_sine.resize(len, crate::utils::CustomDefault::default());
+                    out_leadsine.resize(len, crate::utils::CustomDefault::default());
+                
             }
             Ok((out_sine, out_leadsine))
         }
@@ -154,11 +192,20 @@ pub fn ta_ht_sine(real_ptr: *const f64, len: usize) -> Result<(Vec<f64>, Vec<f64
 }
 
 pub fn ta_ht_trendmode(real_ptr: *const f64, len: usize) -> Result<Vec<i32>, TA_RetCode> {
+    if len > 100_000_001 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
     let begin_idx = check_begin_idx1(len, real_ptr) as i32;
     let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_HT_TRENDMODE_Lookback() };
+    if lookback < begin_idx {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if len == 0 || lookback as usize >= len {
+        return Ok(crate::utils::make_default_vec(len));
+    }
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_HT_TRENDMODE(
@@ -178,9 +225,8 @@ pub fn ta_ht_trendmode(real_ptr: *const f64, len: usize) -> Result<Vec<i32>, TA_
                     out.set_len(out_size_begin);
                 }
             } else {
-                unsafe {
-                    out.set_len(len);
-                }
+                out.resize(len, crate::utils::CustomDefault::default());
+                
             }
             Ok(out)
         }

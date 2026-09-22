@@ -1,10 +1,10 @@
 use crate::utils::{check_begin_idx3, make_vec};
+use derive_builder::Builder;
 use serde::Deserialize;
 use talib_sys::{
     TA_ATR_Lookback, TA_Integer, TA_NATR_Lookback, TA_RetCode, TA_TRANGE_Lookback, TA_ATR, TA_NATR,
     TA_TRANGE,
 };
-use derive_builder::Builder;
 
 #[derive(Builder, Deserialize)]
 pub struct ATRKwargs {
@@ -19,11 +19,20 @@ pub fn ta_atr(
     len: usize,
     kwargs: &ATRKwargs,
 ) -> Result<Vec<f64>, TA_RetCode> {
+    if len > 100_000_001 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
     let begin_idx = check_begin_idx3(len, high_ptr, low_ptr, close_ptr) as i32;
     let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_ATR_Lookback(kwargs.timeperiod) };
+    if lookback < begin_idx {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if len == 0 || lookback as usize >= len {
+        return Ok(crate::utils::make_default_vec(len));
+    }
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_ATR(
@@ -46,9 +55,8 @@ pub fn ta_atr(
                     out.set_len(out_size_begin);
                 }
             } else {
-                unsafe {
-                    out.set_len(len);
-                }
+                out.resize(len, crate::utils::CustomDefault::default());
+                
             }
             Ok(out)
         }
@@ -62,11 +70,20 @@ pub fn ta_trange(
     close_ptr: *const f64,
     len: usize,
 ) -> Result<Vec<f64>, TA_RetCode> {
+    if len > 100_000_001 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
     let begin_idx = check_begin_idx3(len, high_ptr, low_ptr, close_ptr) as i32;
     let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_TRANGE_Lookback() };
+    if lookback < begin_idx {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if len == 0 || lookback as usize >= len {
+        return Ok(crate::utils::make_default_vec(len));
+    }
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_TRANGE(
@@ -88,9 +105,8 @@ pub fn ta_trange(
                     out.set_len(out_size_begin);
                 }
             } else {
-                unsafe {
-                    out.set_len(len);
-                }
+                out.resize(len, crate::utils::CustomDefault::default());
+                
             }
             Ok(out)
         }
@@ -111,11 +127,20 @@ pub fn ta_natr(
     len: usize,
     kwargs: &NATRKwargs,
 ) -> Result<Vec<f64>, TA_RetCode> {
+    if len > 100_000_001 {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
     let mut out_begin: TA_Integer = 0;
     let mut out_size: TA_Integer = 0;
     let begin_idx = check_begin_idx3(len, high_ptr, low_ptr, close_ptr) as i32;
     let end_idx = len as i32 - begin_idx - 1;
     let lookback = begin_idx + unsafe { TA_NATR_Lookback(kwargs.timeperiod) };
+    if lookback < begin_idx {
+        return Err(TA_RetCode::TA_BAD_PARAM);
+    }
+    if len == 0 || lookback as usize >= len {
+        return Ok(crate::utils::make_default_vec(len));
+    }
     let (mut out, ptr) = make_vec(len, lookback);
     let ret_code = unsafe {
         TA_NATR(
@@ -138,9 +163,8 @@ pub fn ta_natr(
                     out.set_len(out_size_begin);
                 }
             } else {
-                unsafe {
-                    out.set_len(len);
-                }
+                out.resize(len, crate::utils::CustomDefault::default());
+                
             }
             Ok(out)
         }
