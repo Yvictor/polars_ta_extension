@@ -1,0 +1,32 @@
+{
+  "name": "polars-talib",
+  "version": "0.2.0",
+  "description": "Use all 201 TA-Lib indicators in native Polars expressions, grouped time series and lazy pipelines.",
+  "author": {
+    "name": "Yvictor",
+    "url": "https://github.com/Yvictor"
+  },
+  "homepage": "https://github.com/Yvictor/polars_ta_extension",
+  "repository": "https://github.com/Yvictor/polars_ta_extension",
+  "license": "MIT",
+  "keywords": [
+    "polars",
+    "ta-lib",
+    "technical-indicators",
+    "python"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Polars TA-Lib",
+    "shortDescription": "201 TA-Lib indicators as native Polars expressions",
+    "longDescription": "Use all 201 TA-Lib indicators in native Polars expressions, grouped time series and lazy pipelines.",
+    "developerName": "Yvictor",
+    "category": "Productivity",
+    "capabilities": [],
+    "websiteURL": "https://github.com/Yvictor/polars_ta_extension",
+    "defaultPrompt": [
+      "Build a grouped Polars indicator pipeline.",
+      "Help me migrate TA-Lib code to Polars."
+    ]
+  }
+}

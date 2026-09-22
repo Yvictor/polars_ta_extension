@@ -1,4 +1,4 @@
-"""Generate skills/polars-talib/reference/functions.md from scripts/api.json.
+"""Generate plugins/polars-talib/skills/polars-talib/reference/functions.md from scripts/api.json.
 
 The table lists, for every TA-Lib function, the namespace receiver (the column
 that carries the `.ta` call), the remaining inputs, parameters with defaults and
@@ -73,7 +73,7 @@ def generate():
                 f"| `{f['name']}` | {f['description']} | {receiver_column} | {others} | {params} | {', '.join(outputs)} |"
             )
         lines.append("")
-    out = ROOT / "skills/polars-talib/reference/functions.md"
+    out = ROOT / "plugins/polars-talib/skills/polars-talib/reference/functions.md"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text("\n".join(lines) + "\n")
     print(f"wrote {out.relative_to(ROOT)} ({len(api)} functions)")

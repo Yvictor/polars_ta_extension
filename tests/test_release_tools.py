@@ -29,7 +29,7 @@ def test_skill_reference_examples_execute(tmp_path, monkeypatch):
     df.write_parquet(tmp_path / "prices.parquet")
     monkeypatch.chdir(tmp_path)
     namespace = {"df": df, "pl": pl, "ta": ta}
-    text = (ROOT / "skills/polars-talib/reference/patterns.md").read_text()
+    text = (ROOT / "plugins/polars-talib/skills/polars-talib/reference/patterns.md").read_text()
     for block in re.findall(r"```python\n(.*?)```", text, re.S):
         for node in ast.parse(block).body:
             if isinstance(node, ast.Expr):
@@ -90,7 +90,7 @@ def test_skill_function_reference_matches_the_installed_api():
     api = {f["name"]: f for f in json.loads((ROOT / "scripts/api.json").read_text())}
     df = frame(128)
     seen = set()
-    for row in (ROOT / "skills/polars-talib/reference/functions.md").read_text().splitlines():
+    for row in (ROOT / "plugins/polars-talib/skills/polars-talib/reference/functions.md").read_text().splitlines():
         if not row.startswith("| `"):
             continue
         name, _, receiver, others, _, outputs = [cell.strip() for cell in row.strip("|").split("|")]

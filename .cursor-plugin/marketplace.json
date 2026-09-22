@@ -1,0 +1,16 @@
+{
+  "name": "polars-ta-extension",
+  "owner": {
+    "name": "Yvictor"
+  },
+  "metadata": {
+    "description": "Polars TA-Lib coding skills."
+  },
+  "plugins": [
+    {
+      "name": "polars-talib",
+      "source": "plugins/polars-talib",
+      "description": "Use all 201 TA-Lib indicators in native Polars expressions, grouped time series and lazy pipelines."
+    }
+  ]
+}

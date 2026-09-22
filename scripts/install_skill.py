@@ -12,7 +12,7 @@ def main():
     folders={'codex':'.agents','claude':'.claude','cursor':'.cursor','agents':'.agents'}
     base=(args.project or Path.home()).expanduser().resolve()
     destination=base/folders[args.agent]/'skills'/'polars-talib'
-    source=Path(__file__).resolve().parents[1]/'skills'/'polars-talib'
+    source=Path(__file__).resolve().parents[1]/'plugins'/'polars-talib'/'skills'/'polars-talib'
     if destination.exists():
         parser.error(f'{destination} already exists; review or remove it before reinstalling')
     destination.parent.mkdir(parents=True,exist_ok=True)

@@ -9,6 +9,27 @@ Binary wheels include the C library.
 - [Reproducible performance results](docs/performance.md)
 
 
+## Native AI plugin installation
+
+The repository supports the same native marketplace/install flow as
+[Shioaji](https://github.com/Sinotrade/Shioaji#ai-coding-agent-skills).
+**Until PR #38 is merged, use the [review-branch commands](docs/skills.md#try-the-review-branch).**
+After merge, install from the default branch:
+
+```sh
+# Claude Code
+claude plugin marketplace add Yvictor/polars_ta_extension
+claude plugin install polars-talib@polars-ta-extension
+
+# Codex
+codex plugin marketplace add Yvictor/polars_ta_extension
+codex plugin add polars-talib@polars-ta-extension
+```
+
+See [skill installation](docs/skills.md) for invocation, updates, local checkouts,
+standalone installation, and Cursor support. The plugin supplies coding guidance;
+install the Python library separately.
+
 ## Getting Started
 
 ``` bash

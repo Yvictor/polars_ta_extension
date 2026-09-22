@@ -86,6 +86,22 @@ jobs:
           path: dist/*.whl
           if-no-files-found: error
 
+  native-plugins:
+    name: Native Claude Code and Codex plugins
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Install tested native CLIs
+        run: npm install --global @openai/codex@0.155.1 @anthropic-ai/claude-code@2.1.278
+      - name: Install and discover plugin skills with native CLIs
+        run: python scripts/check_native_plugins.py
+
   compatibility:
     name: Python ${{ matrix.python }} / Polars ${{ matrix.polars }}
     needs: wheels
@@ -126,7 +142,7 @@ jobs:
         run: |
           python scripts/generate_indicators.py
           python scripts/generate_skill_reference.py
-          git diff --exit-code -- src/generated.rs talib/src/generated.rs python/polars_talib/_generated.py python/polars_talib/_param_types.py docs/indicators.md skills/polars-talib/reference/functions.md
+          git diff --exit-code -- src/generated.rs talib/src/generated.rs python/polars_talib/_generated.py python/polars_talib/_param_types.py docs/indicators.md plugins/polars-talib/skills/polars-talib/reference/functions.md
       - name: Rust crate tests
         run: cargo test --manifest-path talib/Cargo.toml
       - name: Validate system-library overrides
@@ -180,7 +196,7 @@ jobs:
   release:
     name: Publish tested wheels
     if: startsWith(github.ref, 'refs/tags/')
-    needs: [wheels, compatibility, source]
+    needs: [wheels, compatibility, source, native-plugins]
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/download-artifact@v7
