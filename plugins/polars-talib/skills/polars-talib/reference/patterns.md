@@ -86,7 +86,9 @@ ta.linearreg_slope(timeperiod=14)
 ## Errors
 
 * Inputs of different lengths (other than length-1 literals) raise
-  `ComputeError: indicator input lengths differ`.
+  `ComputeError: indicator input lengths differ`. A length-1 literal broadcasts to
+  the length of the column inputs, including zero rows; an expression whose inputs
+  are all literals has no column to follow and evaluates to a single row.
 * Invalid parameters (`timeperiod=0`, unknown `matype`) raise `ComputeError`
   mentioning `TA_BAD_PARAM`.
 

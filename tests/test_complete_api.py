@@ -190,7 +190,7 @@ def test_non_scalar_length_mismatch_in_either_position(fn, lengths):
 
 
 @pytest.mark.parametrize('fn', [ta.ema, ta.hma])
-@pytest.mark.parametrize('value', [14.0, '14', None])
+@pytest.mark.parametrize('value', [14.0, '14', None, True])
 def test_integer_parameters_report_clear_errors(fn, value):
     with pytest.raises(TypeError, match='timeperiod must be an integer'):
         fn(timeperiod=value)

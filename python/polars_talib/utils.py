@@ -37,7 +37,7 @@ def register_plugin(*, symbol: str, is_elementwise: bool,
         for key in INTEGER_PARAMETERS.get(symbol, ()):
             if key in kwargs:
                 value = kwargs[key]
-                if not isinstance(value, Integral):
+                if isinstance(value, bool) or not isinstance(value, Integral):
                     raise TypeError(f"{symbol}: {key} must be an integer, got {type(value).__name__}")
                 if not -(2**31) <= value < 2**31:
                     raise ValueError(f"{symbol}: {key} must fit a signed 32-bit integer")

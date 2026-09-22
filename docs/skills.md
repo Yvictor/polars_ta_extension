@@ -8,8 +8,9 @@ coding guidance; it does not install Python packages or run trading software.
 
 ## Native installation
 
-The commands below use the repository's default branch. **Until PR #38 is merged,
-use the [review-branch commands](#try-the-review-branch) instead.**
+The commands below use the repository's default branch; see
+[installing from a branch or checkout](#install-from-a-branch-or-checkout) for
+unreleased versions.
 
 Claude Code, from a terminal:
 
@@ -43,31 +44,31 @@ Native installation and discovery are tested with Codex CLI 0.155.1 and Claude
 Code 2.1.278. These are tested versions, not inferred minimum versions. If your
 CLI lacks these subcommands, update it or use the standalone installer below.
 
-## Try the review branch
+## Install from a branch or checkout
 
-These commands install the PR's files before they are available on the default branch:
+To try unreleased changes, register the marketplace from a branch (replace
+`<branch>`) or from a local checkout:
 
 ```sh
-claude plugin marketplace add Yvictor/polars_ta_extension@codex/talib-020-independent
+claude plugin marketplace add Yvictor/polars_ta_extension@<branch>
 claude plugin install polars-talib@polars-ta-extension
 
-codex plugin marketplace add Yvictor/polars_ta_extension --ref codex/talib-020-independent
+codex plugin marketplace add Yvictor/polars_ta_extension --ref <branch>
 codex plugin add polars-talib@polars-ta-extension
 ```
 
-Alternatively, from a checkout of that branch:
-
 ```sh
+# from a checkout
 claude plugin marketplace add .
 claude plugin install polars-talib@polars-ta-extension
 codex plugin marketplace add .
 codex plugin add polars-talib@polars-ta-extension
 ```
 
-After merging, remove the review marketplace with
-`claude plugin marketplace remove polars-ta-extension` or
+Such registrations track that branch until changed. To switch back, remove the
+marketplace with `claude plugin marketplace remove polars-ta-extension` or
 `codex plugin marketplace remove polars-ta-extension`, then run the default-branch
-installation commands above. Review-branch registrations track that branch until changed.
+installation commands above.
 
 ## Updates and removal
 
@@ -118,8 +119,8 @@ Choose either the native plugin or standalone skill in each tool to avoid duplic
 
 Codex's built-in `$skill-installer` can also install only the skill. Ask it to use
 repo `Yvictor/polars_ta_extension`, path
-`plugins/polars-talib/skills/polars-talib`, and the desired ref
-(`codex/talib-020-independent` during PR review; `master` after merge).
+`plugins/polars-talib/skills/polars-talib`, and the desired ref (normally
+`master`).
 
 The third-party cross-tool installer also discovers the nested skill directory:
 
@@ -146,9 +147,10 @@ The native smoke test installs both plugins in temporary configuration roots,
 checks Codex's actual `skills/list` response and cached reference files, and checks
 Claude Code's skill component inventory. It needs no credentials or model calls
 and leaves the user's normal configuration unchanged. Pass
-`--source Yvictor/polars_ta_extension@codex/talib-020-independent` to test fetching
-and installing from GitHub instead of a local checkout. CI runs the local native
-smoke test as a release gate alongside the existing wheel/source tests.
+`--source Yvictor/polars_ta_extension@<branch>` to test fetching and installing
+from GitHub instead of a local checkout. CI runs the local native smoke test as a
+required check on every push and pull request; it is not a release dependency,
+so an outage of the npm-distributed CLIs cannot block publishing wheels.
 
 Official references:
 [Codex plugin packaging](https://developers.openai.com/plugins/build/plugins),

@@ -12,9 +12,7 @@ Binary wheels include the C library.
 ## Native AI plugin installation
 
 The repository supports the same native marketplace/install flow as
-[Shioaji](https://github.com/Sinotrade/Shioaji#ai-coding-agent-skills).
-**Until PR #38 is merged, use the [review-branch commands](docs/skills.md#try-the-review-branch).**
-After merge, install from the default branch:
+[Shioaji](https://github.com/Sinotrade/Shioaji#ai-coding-agent-skills):
 
 ```sh
 # Claude Code

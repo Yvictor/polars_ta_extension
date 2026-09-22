@@ -196,7 +196,10 @@ jobs:
   release:
     name: Publish tested wheels
     if: startsWith(github.ref, 'refs/tags/')
-    needs: [wheels, compatibility, source, native-plugins]
+    # native-plugins validates repository files with third-party CLIs fetched
+    # from npm at run time; it is a required PR check but must not be able to
+    # block wheel publication when npm or those CLI versions are unavailable.
+    needs: [wheels, compatibility, source]
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/download-artifact@v7
