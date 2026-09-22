@@ -150,16 +150,22 @@ fn build_with_cmake(src_dir: &Path, prefix: &Path) {
     }
     match target_os().as_str() {
         "windows" => {
+            let (vs_platform, vcvars_platform) = match target_arch().as_str() {
+                "x86" => ("Win32", "x86"),
+                "x86_64" => ("x64", "x64"),
+                "aarch64" => ("ARM64", "arm64"),
+                other => panic!("unsupported windows target arch: {other}"),
+            };
             // Only Visual Studio generators accept `-A`.
             let generator = env::var("CMAKE_GENERATOR").unwrap_or_default();
             if generator.is_empty() || generator.contains("Visual Studio") {
-                let platform = match target_arch().as_str() {
-                    "x86" => "Win32",
-                    "x86_64" => "x64",
-                    "aarch64" => "ARM64",
-                    other => panic!("unsupported windows target arch: {other}"),
-                };
-                configure.arg("-A").arg(platform);
+                configure.arg("-A").arg(vs_platform);
+            }
+            // TA-Lib's CMakeLists requires the `Platform` variable that
+            // vcvarsall.bat exports; provide it when not building from a
+            // developer command prompt.
+            if env::var_os("Platform").is_none() {
+                configure.env("Platform", vcvars_platform);
             }
         }
         "macos" => {
