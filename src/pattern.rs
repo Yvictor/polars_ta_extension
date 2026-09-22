@@ -27,7 +27,7 @@ use talib::pattern::{ta_cdltristar, ta_cdlunique3river, ta_cdlupsidegap2crows};
 
 #[polars_expr(output_type=Int32)]
 fn cdl2crows(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -46,7 +46,7 @@ fn cdl2crows(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Int32)]
 fn cdl3blackcrows(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -65,7 +65,7 @@ fn cdl3blackcrows(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Int32)]
 fn cdl3inside(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -84,7 +84,7 @@ fn cdl3inside(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Int32)]
 fn cdl3linestrike(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -103,7 +103,7 @@ fn cdl3linestrike(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Int32)]
 fn cdl3outside(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -122,7 +122,7 @@ fn cdl3outside(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Int32)]
 fn cdl3starsinsouth(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -143,7 +143,7 @@ fn cdl3starsinsouth(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Int32)]
 fn cdl3whitesoldiers(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -164,7 +164,7 @@ fn cdl3whitesoldiers(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Int32)]
 fn cdlabandonedbaby(inputs: &[Series], kwargs: CDLKwargs) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -184,7 +184,7 @@ fn cdlabandonedbaby(inputs: &[Series], kwargs: CDLKwargs) -> PolarsResult<Series
 
 #[polars_expr(output_type=Int32)]
 fn cdladvanceblock(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -205,7 +205,7 @@ fn cdladvanceblock(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Int32)]
 fn cdlbelthold(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -226,7 +226,7 @@ fn cdlbelthold(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Int32)]
 fn cdlbreakaway(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -247,7 +247,7 @@ fn cdlbreakaway(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Int32)]
 fn cdlclosingmarubozu(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -268,7 +268,7 @@ fn cdlclosingmarubozu(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Int32)]
 fn cdlconcealbabyswall(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -289,7 +289,7 @@ fn cdlconcealbabyswall(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Int32)]
 fn cdlcounterattack(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -310,7 +310,7 @@ fn cdlcounterattack(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Int32)]
 fn cdldarkcloudcover(inputs: &[Series], kwargs: CDLKwargs) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -330,7 +330,7 @@ fn cdldarkcloudcover(inputs: &[Series], kwargs: CDLKwargs) -> PolarsResult<Serie
 
 #[polars_expr(output_type=Int32)]
 fn cdldoji(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -351,7 +351,7 @@ fn cdldoji(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Int32)]
 fn cdldojistar(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -371,7 +371,7 @@ fn cdldojistar(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Int32)]
 fn cdldragonflydoji(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -391,7 +391,7 @@ fn cdldragonflydoji(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Int32)]
 fn cdlengulfing(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -411,7 +411,7 @@ fn cdlengulfing(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Int32)]
 fn cdleveningdojistar(inputs: &[Series], kwargs: CDLKwargs) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -431,7 +431,7 @@ fn cdleveningdojistar(inputs: &[Series], kwargs: CDLKwargs) -> PolarsResult<Seri
 
 #[polars_expr(output_type=Int32)]
 fn cdleveningstar(inputs: &[Series], kwargs: CDLKwargs) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -451,7 +451,7 @@ fn cdleveningstar(inputs: &[Series], kwargs: CDLKwargs) -> PolarsResult<Series> 
 
 #[polars_expr(output_type=Int32)]
 fn cdlgapsidesidewhite(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -471,7 +471,7 @@ fn cdlgapsidesidewhite(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Int32)]
 fn cdlgravestonedoji(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -491,7 +491,7 @@ fn cdlgravestonedoji(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Int32)]
 fn cdlhammer(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -511,7 +511,7 @@ fn cdlhammer(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Int32)]
 fn cdlhangingman(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -531,7 +531,7 @@ fn cdlhangingman(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Int32)]
 fn cdlharami(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -551,7 +551,7 @@ fn cdlharami(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Int32)]
 fn cdlharamicross(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -571,7 +571,7 @@ fn cdlharamicross(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Int32)]
 fn cdlhighwave(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -591,7 +591,7 @@ fn cdlhighwave(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Int32)]
 fn cdlhikkake(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -611,7 +611,7 @@ fn cdlhikkake(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Int32)]
 fn cdlhikkakemod(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -631,7 +631,7 @@ fn cdlhikkakemod(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Int32)]
 fn cdlhomingpigeon(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -651,7 +651,7 @@ fn cdlhomingpigeon(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Int32)]
 fn cdlidentical3crows(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -671,7 +671,7 @@ fn cdlidentical3crows(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Int32)]
 fn cdlinneck(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -691,7 +691,7 @@ fn cdlinneck(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Int32)]
 fn cdlinvertedhammer(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -711,7 +711,7 @@ fn cdlinvertedhammer(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Int32)]
 fn cdlkicking(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -731,7 +731,7 @@ fn cdlkicking(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Int32)]
 fn cdlkickingbylength(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -751,7 +751,7 @@ fn cdlkickingbylength(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Int32)]
 fn cdlladderbottom(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -771,7 +771,7 @@ fn cdlladderbottom(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Int32)]
 fn cdllongleggeddoji(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -791,7 +791,7 @@ fn cdllongleggeddoji(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Int32)]
 fn cdllongline(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -811,7 +811,7 @@ fn cdllongline(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Int32)]
 fn cdlmarubozu(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -831,7 +831,7 @@ fn cdlmarubozu(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Int32)]
 fn cdlmatchinglow(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -851,7 +851,7 @@ fn cdlmatchinglow(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Int32)]
 fn cdlmathold(inputs: &[Series], kwargs: CDLKwargs) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -871,7 +871,7 @@ fn cdlmathold(inputs: &[Series], kwargs: CDLKwargs) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Int32)]
 fn cdlmorningdojistar(inputs: &[Series], kwargs: CDLKwargs) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -891,7 +891,7 @@ fn cdlmorningdojistar(inputs: &[Series], kwargs: CDLKwargs) -> PolarsResult<Seri
 
 #[polars_expr(output_type=Int32)]
 fn cdlmorningstar(inputs: &[Series], kwargs: CDLKwargs) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -911,7 +911,7 @@ fn cdlmorningstar(inputs: &[Series], kwargs: CDLKwargs) -> PolarsResult<Series> 
 
 #[polars_expr(output_type=Int32)]
 fn cdlonneck(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -931,7 +931,7 @@ fn cdlonneck(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Int32)]
 fn cdlpiercing(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -951,7 +951,7 @@ fn cdlpiercing(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Int32)]
 fn cdlrickshawman(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -971,7 +971,7 @@ fn cdlrickshawman(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Int32)]
 fn cdlrisefall3methods(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -991,7 +991,7 @@ fn cdlrisefall3methods(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Int32)]
 fn cdlseparatinglines(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -1011,7 +1011,7 @@ fn cdlseparatinglines(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Int32)]
 fn cdlshootingstar(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -1031,7 +1031,7 @@ fn cdlshootingstar(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Int32)]
 fn cdlshortline(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -1051,7 +1051,7 @@ fn cdlshortline(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Int32)]
 fn cdlspinningtop(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -1071,7 +1071,7 @@ fn cdlspinningtop(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Int32)]
 fn cdlstalledpattern(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -1091,7 +1091,7 @@ fn cdlstalledpattern(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Int32)]
 fn cdlsticksandwich(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -1111,7 +1111,7 @@ fn cdlsticksandwich(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Int32)]
 fn cdltakuri(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -1131,7 +1131,7 @@ fn cdltakuri(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Int32)]
 fn cdltasukigap(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -1151,7 +1151,7 @@ fn cdltasukigap(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Int32)]
 fn cdlthrusting(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -1171,7 +1171,7 @@ fn cdlthrusting(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Int32)]
 fn cdltristar(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -1191,7 +1191,7 @@ fn cdltristar(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Int32)]
 fn cdlunique3river(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -1211,7 +1211,7 @@ fn cdlunique3river(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Int32)]
 fn cdlupsidegap2crows(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -1231,7 +1231,7 @@ fn cdlupsidegap2crows(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Int32)]
 fn cdlxsidegap3methods(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;

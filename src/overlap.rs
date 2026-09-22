@@ -18,7 +18,7 @@ pub fn bbands_output(_: &[Field]) -> PolarsResult<Field> {
 
 #[polars_expr(output_type_func=bbands_output)]
 fn bbands(inputs: &[Series], kwargs: BBANDSKwargs) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
     let len = input.len();
@@ -37,7 +37,7 @@ fn bbands(inputs: &[Series], kwargs: BBANDSKwargs) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Float64)]
 fn ema(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
     let len = input.len();
@@ -53,7 +53,7 @@ fn ema(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Float64)]
 fn dema(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
     let len = input.len();
@@ -66,7 +66,7 @@ fn dema(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Float64)]
 fn ht_trendline(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
     let len = input.len();
@@ -79,7 +79,7 @@ fn ht_trendline(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Float64)]
 fn kama(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
     let len = input.len();
@@ -92,7 +92,7 @@ fn kama(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Float64)]
 fn ma(inputs: &[Series], kwargs: MaKwargs) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
     let len = input.len();
@@ -112,7 +112,7 @@ pub fn mama_output(_: &[Field]) -> PolarsResult<Field> {
 
 #[polars_expr(output_type_func=mama_output)]
 fn mama(inputs: &[Series], kwargs: MamaKwargs) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
     let len = input.len();
@@ -130,7 +130,7 @@ fn mama(inputs: &[Series], kwargs: MamaKwargs) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Float64)]
 fn mavp(inputs: &[Series], kwargs: MavpKwargs) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let input = &mut cast_series_to_f64(&inputs[0])?;
     let in_time_period = &mut cast_series_to_f64(&inputs[1])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
@@ -145,7 +145,7 @@ fn mavp(inputs: &[Series], kwargs: MavpKwargs) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Float64)]
 fn midpoint(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
     let len = input.len();
@@ -158,7 +158,7 @@ fn midpoint(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series>
 
 #[polars_expr(output_type=Float64)]
 fn midprice(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let high = &mut cast_series_to_f64(&inputs[0])?;
     let low = &mut cast_series_to_f64(&inputs[1])?;
     let (high_ptr, _high) = get_series_f64_ptr(high)?;
@@ -173,7 +173,7 @@ fn midprice(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series>
 
 #[polars_expr(output_type=Float64)]
 fn sar(inputs: &[Series], kwargs: SarKwargs) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let high = &mut cast_series_to_f64(&inputs[0])?;
     let low = &mut cast_series_to_f64(&inputs[1])?;
     let (high_ptr, _high) = get_series_f64_ptr(high)?;
@@ -188,7 +188,7 @@ fn sar(inputs: &[Series], kwargs: SarKwargs) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Float64)]
 fn sarext(inputs: &[Series], kwargs: SarExtKwargs) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let high = &mut cast_series_to_f64(&inputs[0])?;
     let low = &mut cast_series_to_f64(&inputs[1])?;
     let (high_ptr, _high) = get_series_f64_ptr(high)?;
@@ -203,7 +203,7 @@ fn sarext(inputs: &[Series], kwargs: SarExtKwargs) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Float64)]
 fn sma(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let input = &mut cast_series_to_f64(&inputs[0])?;
     let (in_real_ptr, _in_real) = get_series_f64_ptr(input)?;
     let len = input.len();
@@ -216,7 +216,7 @@ fn sma(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Float64)]
 fn t3(inputs: &[Series], kwargs: T3Kwargs) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let input = &mut cast_series_to_f64(&inputs[0])?;
     let (in_real_ptr, _in_real) = get_series_f64_ptr(input)?;
     let len = input.len();
@@ -229,7 +229,7 @@ fn t3(inputs: &[Series], kwargs: T3Kwargs) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Float64)]
 fn tema(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let input = &mut cast_series_to_f64(&inputs[0])?;
     let (in_real_ptr, _in_real) = get_series_f64_ptr(input)?;
     let len = input.len();
@@ -242,7 +242,7 @@ fn tema(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Float64)]
 fn trima(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let input = &mut cast_series_to_f64(&inputs[0])?;
     let (in_real_ptr, _in_real) = get_series_f64_ptr(input)?;
     let len = input.len();
@@ -255,7 +255,7 @@ fn trima(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Float64)]
 fn wma(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let input = &mut cast_series_to_f64(&inputs[0])?;
     let (in_real_ptr, _in_real) = get_series_f64_ptr(input)?;
     let len = input.len();

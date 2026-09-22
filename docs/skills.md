@@ -4,6 +4,13 @@ The same [SKILL.md](../skills/polars-talib/SKILL.md) works with Codex, Claude Co
 Cursor and other tools implementing the Agent Skills format. It teaches usage of
 the library; it does not install Python dependencies or modify agent settings.
 
+The quickest route is the cross-tool installer, which discovers `skills/*/SKILL.md`
+in this repository and installs into Claude Code, Codex, Cursor and others:
+
+```sh
+npx skills add Yvictor/polars_ta_extension
+```
+
 From a checkout of this repository, choose your tool:
 
 ```sh

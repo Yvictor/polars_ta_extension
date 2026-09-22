@@ -40,3 +40,10 @@ Inputs cast to Float64. Nulls become NaN before calling TA-Lib. Leading missing 
 In 0.2.0, BBANDS defaults to period 20, and APO/PPO use EMA (`matype=1`). To reproduce older defaults, pass `timeperiod=5` for BBANDS and `matype=0` for APO/PPO. DARKCLOUDCOVER and MATHOLD use upstream `penetration=0.5`; older wrappers incorrectly defaulted to 0.3. Floating results can differ slightly because the newer core changes rounding and fixes algorithms. Use explicit parameters and tolerant numeric comparisons when migrating.
 
 For a correctness check, compare the same Float64 input and explicit parameters with Python `TA-Lib==0.8.1`. Check output length, warm-up alignment, groups, and NaNs as well as numeric values. For performance work, benchmark release wheels on the same machine, data, Polars version and thread count. Measure the complete query and record medians; do not promise universal speedups or financial returns.
+
+## Reference files
+
+- `reference/functions.md`: every function with its namespace receiver, other inputs,
+  parameters with defaults and output names (generated from the pinned upstream API).
+- `reference/patterns.md`: worked examples for multi-symbol pipelines, struct outputs,
+  custom input columns, candlestick patterns and verification against Python `talib`.

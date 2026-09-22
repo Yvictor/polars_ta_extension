@@ -28,14 +28,22 @@ pub fn ta_code2err(ret_code: TA_RetCode) -> PolarsResult<Series> {
     ))
 }
 
-/// A plugin must validate lengths before handing raw buffers to C.
-pub fn validate_input_lengths(inputs: &[Series]) -> PolarsResult<()> {
-    if let Some(first) = inputs.first() {
-        if inputs.iter().any(|s| s.len() != first.len()) {
-            return Err(PolarsError::ShapeMismatch(
-                "TA-Lib inputs must have equal lengths".into(),
-            ));
-        }
-    }
-    Ok(())
+/// Align plugin inputs before handing raw buffers to C: length-1 inputs
+/// (Polars literals) broadcast to the common length, anything else must match.
+pub fn broadcast_inputs(inputs: &[Series]) -> PolarsResult<Vec<Series>> {
+    let len = inputs.iter().map(|s| s.len()).max().unwrap_or(0);
+    inputs
+        .iter()
+        .map(|s| {
+            if s.len() == len {
+                Ok(s.clone())
+            } else if s.len() == 1 {
+                Ok(s.new_from_index(0, len))
+            } else {
+                Err(PolarsError::ShapeMismatch(
+                    "indicator input lengths differ".into(),
+                ))
+            }
+        })
+        .collect()
 }

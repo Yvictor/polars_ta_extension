@@ -125,7 +125,8 @@ jobs:
       - name: Check generated wrappers are current
         run: |
           python scripts/generate_indicators.py
-          git diff --exit-code -- src/generated.rs talib/src/generated.rs python/polars_talib/_generated.py docs/indicators.md
+          python scripts/generate_skill_reference.py
+          git diff --exit-code -- src/generated.rs talib/src/generated.rs python/polars_talib/_generated.py docs/indicators.md skills/polars-talib/reference/functions.md
       - name: Rust crate tests
         run: cargo test --manifest-path talib/Cargo.toml
       - name: Build source distribution and install it without system TA-Lib
@@ -152,7 +153,11 @@ jobs:
           name: wheels-linux-x64
           path: dist
       - uses: astral-sh/setup-uv@v8.2.0
+      # Informational: shared runners are too noisy to gate a release on a
+      # fixed regression threshold. The comparison and raw samples are kept as
+      # a job summary and artifact for humans to judge.
       - name: Compare release wheels on the same runner
+        continue-on-error: true
         run: |
           uv venv .benchmark-base
           uv venv .benchmark-candidate
@@ -174,7 +179,7 @@ jobs:
   release:
     name: Publish tested wheels
     if: startsWith(github.ref, 'refs/tags/')
-    needs: [wheels, compatibility, source, benchmark]
+    needs: [wheels, compatibility, source]
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/download-artifact@v7

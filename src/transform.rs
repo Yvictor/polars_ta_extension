@@ -8,7 +8,7 @@ use talib::transform::ta_wclprice;
 
 #[polars_expr(output_type=Float64)]
 fn avgprice(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let open = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -27,7 +27,7 @@ fn avgprice(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Float64)]
 fn medprice(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let high = &mut cast_series_to_f64(&inputs[0])?;
     let low = &mut cast_series_to_f64(&inputs[1])?;
     let (high_ptr, _high) = get_series_f64_ptr(high)?;
@@ -42,7 +42,7 @@ fn medprice(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Float64)]
 fn typprice(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
     let close = &mut cast_series_to_f64(&inputs[0])?;
@@ -59,7 +59,7 @@ fn typprice(inputs: &[Series]) -> PolarsResult<Series> {
 
 #[polars_expr(output_type=Float64)]
 fn wclprice(inputs: &[Series]) -> PolarsResult<Series> {
-    crate::utils::validate_input_lengths(inputs)?;
+    let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
     let close = &mut cast_series_to_f64(&inputs[0])?;

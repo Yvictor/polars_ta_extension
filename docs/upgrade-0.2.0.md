@@ -57,12 +57,16 @@ current Polars runtime and the test dependency matrix do not support that set.
 CI status on the PR is the authority for whether a target has actually passed.
 
 Wheels statically include TA-Lib and require no system TA-Lib, libclang or
-separate Python TA-Lib installation. Old `DEPS_PATH`, `TA_LIBRARY_PATH` and
-`TA_INCLUDE_PATH` overrides are no longer used: one pinned source and matching
-headers avoid accidental version/ABI mixing (issue #26).
+separate Python TA-Lib installation. By default the build compiles the pinned,
+checksum-verified source so headers and library can never mismatch (issue #26).
+Packagers who must link a system TA-Lib 0.8.1 can set both `TA_LIBRARY_PATH`
+(directory with `libta-lib.a` / `ta-lib-static.lib`) and `TA_INCLUDE_PATH`
+(directory with `ta-lib/ta_func.h`); older TA-Lib versions fail at link time
+because the bindings reference the 0.8.x functions. `DEPS_PATH` is no longer used.
 
 For a source build install Rust (CI uses 1.90.0), a C/C++ build toolchain, CMake
-3.30+ and Python (Visual Studio 2026 requires CMake 4.2+). Then:
+and Python. Upstream's CMake project needs CMake 3.18+ on Linux/macOS and 3.30+
+on Windows (Visual Studio 2026 requires CMake 4.2+). Then:
 
 ```sh
 python -m pip install maturin

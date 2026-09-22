@@ -138,13 +138,20 @@ def test_new_namespace_and_struct_metadata(spec):
         assert actual.to_series().struct.fields==ta.get_functions_output_struct()[spec['name']]
 
 
-def test_new_scalar_broadcast_and_legacy_mismatch():
+def test_scalar_inputs_broadcast_for_generated_and_legacy_plugins():
     df=frame(32)
     out=df.select(ta.ao(pl.col('high'),pl.lit(99.)))
     want=talib.AO(df['high'].to_numpy(),np.full(32,99.))
     np.testing.assert_allclose(out.to_series().to_numpy(),want,equal_nan=True)
-    with pytest.raises(pl.exceptions.ComputeError, match="equal lengths"):
-        df.select(ta.add(pl.col('close'),pl.lit(1.)))
+    out=df.select(ta.add(pl.col('close'),pl.lit(1.)))
+    np.testing.assert_allclose(out.to_series().to_numpy(),df['close'].to_numpy()+1.,equal_nan=True)
+
+
+def test_mismatched_input_lengths_raise_for_generated_and_legacy_plugins():
+    df=frame(32)
+    for fn in (ta.ao, ta.add):
+        with pytest.raises(pl.exceptions.ComputeError, match="lengths differ"):
+            df.select(fn(pl.col('high'),pl.col('low').head(5)))
 
 
 def test_skill_example_pipeline():

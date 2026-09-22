@@ -57,6 +57,46 @@ can change results; the script records enough context to reject mismatched runs.
 The candidate JSON additionally measures SuperTrend, VWAP, HMA and KDJ, which do
 not exist in 0.1.6. There is no fabricated old-version ratio for these functions.
 
+## Where the speedups come from: TA-Lib core versus the wrapper
+
+The wrapper layer around the C calls is a fixed per-call cost (Polars expression
+evaluation, casting/rechunking inputs, one output allocation); it does not scale
+with the algorithm. To attribute the deltas, the same functions were timed on
+50k-row data both through Polars (`df.select(...)`, best of 3×25 runs) and by
+calling `TA_*` directly from a C program linked against the 0.4.0 library shipped
+in 0.1.6 and the 0.8.1 library shipped here (Linux x86_64, one machine).
+
+| function | C core 0.4.0 ms | C core 0.8.1 ms | core speedup | Polars 0.1.6 ms | Polars 0.2.0 ms | e2e speedup |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| sma(30) | 0.065 | 0.059 | 1.10x | 0.093 | 0.090 | 1.04x |
+| ema(30) | 0.132 | 0.103 | 1.29x | 0.169 | 0.125 | 1.35x |
+| dema(30) | 0.439 | 0.121 | 3.63x | 0.384 | 0.143 | 2.69x |
+| tema(30) | 0.582 | 0.114 | 5.10x | 0.557 | 0.138 | 4.04x |
+| trix(30) | 0.503 | 0.139 | 3.61x | 0.569 | 0.161 | 3.54x |
+| rsi(14) | 0.351 | 0.183 | 1.92x | 0.398 | 0.209 | 1.90x |
+| macd() | 0.623 | 0.123 | 5.08x | 0.590 | 0.173 | 3.40x |
+| atr(14) | 0.349 | 0.060 | 5.80x | 0.545 | 0.199 | 2.74x |
+| natr(14) | 0.351 | 0.072 | 4.90x | 0.549 | 0.202 | 2.71x |
+| bbands(20) | 0.256 | 0.193 | 1.33x | 0.356 | 0.282 | 1.26x |
+| stoch() | 0.588 | 0.585 | 1.00x | 0.839 | 0.788 | 1.07x |
+| adx(14) | 0.495 | 0.478 | 1.04x | 0.716 | 0.701 | 1.02x |
+| cdlengulfing() | 0.296 | 0.318 | 0.93x | 0.442 | 0.478 | 0.92x |
+| ht_trendline() | 3.177 | 4.326 | 0.73x | 3.664 | 4.482 | 0.82x |
+
+Readings:
+
+* Every large speedup (MACD, DEMA/TEMA/TRIX, ATR/NATR, RSI) is in the TA-Lib core:
+  upstream 0.8.x rewrote those algorithms. The end-to-end gain is smaller than the
+  core gain where the fixed wrapper cost now dominates the much shorter core time.
+* Two functions are slower in upstream 0.8.1 itself: `ht_trendline` (0.73x) and
+  `cdlengulfing` (0.93x). This is not a build-flag effect: `-O2`, `-O3` and forcing
+  `-mfma` give the same numbers, and the `target_clones("default","fma")` runtime
+  dispatch is active in the static library. Absolute cost stays below 5 ms per 50k rows.
+* The wrapper cost itself is 0.02–0.05 ms for one input and 0.13–0.2 ms for three
+  or four inputs on 50k rows, of the same order as Polars' own multi-column
+  expression evaluation (`pl.col("high") + pl.col("low")` costs about 0.09 ms on the
+  same frame). It does not copy inputs: single-chunk Float64 columns are borrowed.
+
 ## Implementation choices and regression checks
 
 Most throughput gains come from the 0.8.1 C algorithms. The Polars wrapper borrows
