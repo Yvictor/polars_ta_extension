@@ -48,7 +48,6 @@ pub fn ta_avgprice(
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
             Ok(out)
         }
@@ -96,7 +95,6 @@ pub fn ta_medprice(
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
             Ok(out)
         }
@@ -146,7 +144,6 @@ pub fn ta_typprice(
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
             Ok(out)
         }
@@ -196,7 +193,6 @@ pub fn ta_wclprice(
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
             Ok(out)
         }

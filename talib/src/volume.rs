@@ -48,7 +48,6 @@ pub fn ta_ad(
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
             Ok(out)
         }
@@ -111,7 +110,6 @@ pub fn ta_adosc(
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
             Ok(out)
         }
@@ -159,7 +157,6 @@ pub fn ta_obv(
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
             Ok(out)
         }

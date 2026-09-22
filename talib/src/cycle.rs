@@ -40,7 +40,6 @@ pub fn ta_ht_dcperiod(real_ptr: *const f64, len: usize) -> Result<Vec<f64>, TA_R
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
             Ok(out)
         }
@@ -83,7 +82,6 @@ pub fn ta_ht_dcphase(real_ptr: *const f64, len: usize) -> Result<Vec<f64>, TA_Re
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
             Ok(out)
         }
@@ -132,8 +130,7 @@ pub fn ta_ht_phasor(real_ptr: *const f64, len: usize) -> Result<(Vec<f64>, Vec<f
                 }
             } else {
                 out_in_phase.resize(len, crate::utils::CustomDefault::default());
-                    out_quadrature.resize(len, crate::utils::CustomDefault::default());
-                
+                out_quadrature.resize(len, crate::utils::CustomDefault::default());
             }
             Ok((out_in_phase, out_quadrature))
         }
@@ -182,8 +179,7 @@ pub fn ta_ht_sine(real_ptr: *const f64, len: usize) -> Result<(Vec<f64>, Vec<f64
                 }
             } else {
                 out_sine.resize(len, crate::utils::CustomDefault::default());
-                    out_leadsine.resize(len, crate::utils::CustomDefault::default());
-                
+                out_leadsine.resize(len, crate::utils::CustomDefault::default());
             }
             Ok((out_sine, out_leadsine))
         }
@@ -226,7 +222,6 @@ pub fn ta_ht_trendmode(real_ptr: *const f64, len: usize) -> Result<Vec<i32>, TA_
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
             Ok(out)
         }

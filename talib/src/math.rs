@@ -71,7 +71,6 @@ pub fn ta_add(
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
             Ok(out)
         }
@@ -119,7 +118,6 @@ pub fn ta_div(
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
             Ok(out)
         }
@@ -173,7 +171,6 @@ pub fn ta_max(
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
             Ok(out)
         }
@@ -227,7 +224,6 @@ pub fn ta_maxindex(
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
             Ok(out)
         }
@@ -281,7 +277,6 @@ pub fn ta_min(
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
             Ok(out)
         }
@@ -335,7 +330,6 @@ pub fn ta_minindex(
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
             Ok(out)
         }
@@ -397,9 +391,8 @@ pub fn ta_minmax(
                 }
             } else {
                 out_min.resize(len, crate::utils::CustomDefault::default());
-                
+
                 out_max.resize(len, crate::utils::CustomDefault::default());
-                
             }
             Ok((out_min, out_max))
         }
@@ -461,9 +454,8 @@ pub fn ta_minmaxindex(
                 }
             } else {
                 out_min.resize(len, crate::utils::CustomDefault::default());
-                
+
                 out_max.resize(len, crate::utils::CustomDefault::default());
-                
             }
             Ok((out_min, out_max))
         }

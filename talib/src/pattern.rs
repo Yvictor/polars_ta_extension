@@ -114,7 +114,6 @@ pub fn ta_cdl2crows(
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
             Ok(out)
         }
@@ -166,7 +165,6 @@ pub fn ta_cdl3blackcrows(
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
             Ok(out)
         }
@@ -218,7 +216,6 @@ pub fn ta_cdl3inside(
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
             Ok(out)
         }
@@ -271,7 +268,6 @@ pub fn ta_cdl3linestrike(
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
 
             Ok(out)
@@ -325,7 +321,6 @@ pub fn ta_cdl3outside(
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
 
             Ok(out)
@@ -379,7 +374,6 @@ pub fn ta_cdl3starsinsouth(
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
 
             Ok(out)
@@ -433,7 +427,6 @@ pub fn ta_cdl3whitesoldiers(
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
 
             Ok(out)
@@ -488,7 +481,6 @@ pub fn ta_cdlabandonedbaby(
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
             Ok(out)
         }
@@ -546,7 +538,6 @@ pub fn ta_cdladvanceblock(
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
 
             Ok(out)
@@ -601,7 +592,6 @@ pub fn ta_cdlbelthold(
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
 
             Ok(out)
@@ -660,7 +650,6 @@ pub fn ta_cdlbreakaway(
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
 
             Ok(out)
@@ -718,7 +707,6 @@ pub fn ta_cdlclosingmarubozu(
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
             Ok(out)
         }
@@ -1011,7 +999,6 @@ pub fn ta_cdldoji(
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
             Ok(out)
         }
@@ -1069,7 +1056,6 @@ pub fn ta_cdldragonflydoji(
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
             Ok(out)
         }
@@ -1127,7 +1113,6 @@ pub fn ta_cdlengulfing(
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
             Ok(out)
         }
@@ -1186,7 +1171,6 @@ pub fn ta_cdleveningdojistar(
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
 
             Ok(out)
@@ -1246,7 +1230,6 @@ pub fn ta_cdleveningstar(
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
 
             Ok(out)
@@ -1300,10 +1283,8 @@ pub fn ta_cdlgapsidesidewhite(
                     // println!("out.len(): {}", out.len());
                 }
             } else {
-                unsafe {
-                    out.resize(len, crate::utils::CustomDefault::default());
-                    // println!("out.len(): {}", out.len());
-                }
+                out.resize(len, crate::utils::CustomDefault::default());
+                // println!("out.len(): {}", out.len());
             }
             Ok(out)
         }
@@ -1637,10 +1618,8 @@ pub fn ta_cdlhighwave(
                     // println!("out.len(): {}", out.len());
                 }
             } else {
-                unsafe {
-                    out.resize(len, crate::utils::CustomDefault::default());
-                    // println!("out.len(): {}", out.len());
-                }
+                out.resize(len, crate::utils::CustomDefault::default());
+                // println!("out.len(): {}", out.len());
             }
             Ok(out)
         }

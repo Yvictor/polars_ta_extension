@@ -56,7 +56,6 @@ pub fn ta_atr(
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
             Ok(out)
         }
@@ -106,7 +105,6 @@ pub fn ta_trange(
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
             Ok(out)
         }
@@ -164,7 +162,6 @@ pub fn ta_natr(
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
             Ok(out)
         }

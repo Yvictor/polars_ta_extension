@@ -13,7 +13,7 @@ use talib_sys::{
 
 #[derive(Builder, Deserialize)]
 pub struct BBANDSKwargs {
-    #[builder(default = "5")]
+    #[builder(default = "20")]
     pub timeperiod: i32,
     #[builder(default = "2.0")]
     pub nbdevup: f64,
@@ -83,9 +83,8 @@ pub fn ta_bbands(
                 }
             } else {
                 outrealupperband.resize(len, crate::utils::CustomDefault::default());
-                    outrealmiddleband.resize(len, crate::utils::CustomDefault::default());
-                    outreallowerband.resize(len, crate::utils::CustomDefault::default());
-                
+                outrealmiddleband.resize(len, crate::utils::CustomDefault::default());
+                outreallowerband.resize(len, crate::utils::CustomDefault::default());
             }
             Ok((outrealupperband, outrealmiddleband, outreallowerband))
         }
@@ -133,7 +132,6 @@ pub fn ta_dema(
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
             Ok(out)
         }
@@ -181,7 +179,6 @@ pub fn ta_ema(
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
             Ok(out)
         }
@@ -224,7 +221,6 @@ pub fn ta_ht_trendline(real_ptr: *const f64, len: usize) -> Result<Vec<f64>, TA_
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
             Ok(out)
         }
@@ -272,7 +268,6 @@ pub fn ta_kama(
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
             Ok(out)
         }
@@ -324,7 +319,6 @@ pub fn ta_ma(real_ptr: *const f64, len: usize, kwargs: &MaKwargs) -> Result<Vec<
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
             Ok(out)
         }
@@ -388,8 +382,7 @@ pub fn ta_mama(
                 }
             } else {
                 outreal.resize(len, crate::utils::CustomDefault::default());
-                    outimag.resize(len, crate::utils::CustomDefault::default());
-                
+                outimag.resize(len, crate::utils::CustomDefault::default());
             }
             Ok((outreal, outimag))
         }
@@ -451,7 +444,6 @@ pub fn ta_mavp(
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
             Ok(out)
         }
@@ -499,7 +491,6 @@ pub fn ta_midpoint(
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
             Ok(out)
         }
@@ -549,7 +540,6 @@ pub fn ta_midprice(
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
             Ok(out)
         }
@@ -609,7 +599,6 @@ pub fn ta_sar(
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
             Ok(out)
         }
@@ -699,7 +688,6 @@ pub fn ta_sarext(
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
             Ok(out)
         }
@@ -748,7 +736,6 @@ pub fn ta_sma(
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
 
             Ok(out)

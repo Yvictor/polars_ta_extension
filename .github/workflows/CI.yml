@@ -42,6 +42,8 @@ jobs:
           python-version: '3.12'
           architecture: ${{ matrix.python-arch }}
       - uses: dtolnay/rust-toolchain@1.90.0
+        with:
+          components: rustfmt
       - uses: astral-sh/setup-uv@v8.2.0
       - name: CMake (native hosts)
         if: runner.os != 'Linux'
@@ -53,11 +55,12 @@ jobs:
           manylinux: ${{ matrix.manylinux }}
           args: --release --locked --out dist
           sccache: 'true'
+          rust-toolchain: '1.90.0'
           before-script-linux: |
             if command -v apk >/dev/null; then
               apk add --no-cache cmake make
             else
-              python3 -m pip install 'cmake>=3.30,<4'
+              /opt/python/cp312-cp312/bin/python -m pip install 'cmake>=3.30,<4'
             fi
       - name: Test installed wheel (native)
         if: ${{ !startsWith(matrix.name, 'musl-') }}
@@ -107,6 +110,8 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - uses: dtolnay/rust-toolchain@1.90.0
+        with:
+          components: rustfmt
       - uses: actions/setup-python@v6
         with:
           python-version: '3.12'

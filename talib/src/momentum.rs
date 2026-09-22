@@ -81,7 +81,6 @@ pub fn ta_adx(
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
             Ok(out)
         }
@@ -133,7 +132,6 @@ pub fn ta_adxr(
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
             Ok(out)
         }
@@ -193,7 +191,6 @@ pub fn ta_apo(
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
             Ok(out)
         }
@@ -249,8 +246,7 @@ pub fn ta_aroon(
                 }
             } else {
                 outaroondown.resize(len, crate::utils::CustomDefault::default());
-                    outaroonup.resize(len, crate::utils::CustomDefault::default());
-                
+                outaroonup.resize(len, crate::utils::CustomDefault::default());
             }
             Ok((outaroondown, outaroonup))
         }
@@ -300,7 +296,6 @@ pub fn ta_aroonosc(
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
             Ok(out)
         }
@@ -400,7 +395,6 @@ pub fn ta_cci(
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
             Ok(out)
         }
@@ -449,7 +443,6 @@ pub fn ta_cmo(
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
             Ok(out)
         }
@@ -502,7 +495,6 @@ pub fn ta_dx(
                 }
             } else {
                 outdx.resize(len, crate::utils::CustomDefault::default());
-                
             }
             Ok(outdx)
         }
@@ -797,7 +789,6 @@ pub fn ta_mfi(
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
             Ok(out)
         }
@@ -1405,8 +1396,7 @@ pub fn ta_stoch(
                 }
             } else {
                 outslowk.resize(len, crate::utils::CustomDefault::default());
-                    outslowd.resize(len, crate::utils::CustomDefault::default());
-                
+                outslowd.resize(len, crate::utils::CustomDefault::default());
             }
             Ok((outslowk, outslowd))
         }
@@ -1483,8 +1473,7 @@ pub fn ta_stochf(
                 }
             } else {
                 outfastk.resize(len, crate::utils::CustomDefault::default());
-                    outfastd.resize(len, crate::utils::CustomDefault::default());
-                
+                outfastd.resize(len, crate::utils::CustomDefault::default());
             }
             Ok((outfastk, outfastd))
         }
@@ -1561,8 +1550,7 @@ pub fn ta_stochrsi(
                 }
             } else {
                 outfastk.resize(len, crate::utils::CustomDefault::default());
-                    outfastd.resize(len, crate::utils::CustomDefault::default());
-                
+                outfastd.resize(len, crate::utils::CustomDefault::default());
             }
             Ok((outfastk, outfastd))
         }

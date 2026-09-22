@@ -57,7 +57,6 @@ pub fn ta_beta(
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
             Ok(out)
         }
@@ -113,7 +112,6 @@ pub fn ta_correl(
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
             Ok(out)
         }
@@ -167,7 +165,6 @@ pub fn ta_linearreg(
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
             Ok(out)
         }
@@ -221,7 +218,6 @@ pub fn ta_linearreg_angle(
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
             Ok(out)
         }
@@ -275,7 +271,6 @@ pub fn ta_linearreg_intercept(
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
             Ok(out)
         }
@@ -329,7 +324,6 @@ pub fn ta_linearreg_slope(
                 }
             } else {
                 out.resize(len, crate::utils::CustomDefault::default());
-                
             }
             Ok(out)
         }
