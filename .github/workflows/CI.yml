@@ -22,6 +22,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   PYO3_USE_ABI3_FORWARD_COMPATIBILITY: 1
   PYTHON_VERSION: '3.12'
@@ -34,14 +38,18 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          # sccache is off inside the manylinux containers: maturin-action installs
+          # it with pip, and the manylinux_2_28 image ships no pip for /usr/bin/python3.
           - name: linux-x86_64
             runner: ubuntu-latest
             target: x86_64
             manylinux: '2_28'
+            sccache: 'false'
           - name: linux-aarch64
             runner: ubuntu-24.04-arm
             target: aarch64
             manylinux: '2_28'
+            sccache: 'false'
           - name: macos-x86_64
             runner: macos-15-intel
             target: x86_64
@@ -64,7 +72,7 @@ jobs:
         with:
           target: ${{ matrix.target }}
           args: --release --out dist --find-interpreter
-          sccache: 'true'
+          sccache: ${{ matrix.sccache || 'true' }}
           manylinux: ${{ matrix.manylinux || 'auto' }}
 
       - name: Upload wheels
