@@ -122,4 +122,14 @@ For FFI bindings, install libclang and build
 Review and copy the resulting `OUT_DIR/bindings.rs` into
 `talib-sys/src/bindings.rs`; default builds use these portable checked-in bindings.
 
+## Publishing a release
+
+Either push a tag equal to the `pyproject.toml` version, or run the CI workflow
+manually on `master` with the `release_tag` input set to that version. A manual
+run builds and tests every wheel, then creates the tag and GitHub release from
+`.github/release-notes/<tag>.md` (falling back to GitHub's generated notes) and
+uploads the tested wheels and sdist to PyPI. Both paths refuse a tag that does
+not match the package version, and re-running a partially completed publish
+skips the release and files that already exist.
+
 See [AI skill installation](skills.md) and [benchmark methodology/results](performance.md).

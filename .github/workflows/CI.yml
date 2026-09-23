@@ -6,13 +6,23 @@ on:
     tags: ['v*', '0.*']
   pull_request:
   workflow_dispatch:
+    inputs:
+      release_tag:
+        description: >-
+          Release to publish (for example 0.2.0). After every test job passes,
+          the run tags its own commit, creates the GitHub release from
+          .github/release-notes/<tag>.md and uploads the tested wheels to PyPI.
+          Leave empty for a plain test run.
+        required: false
+        default: ''
+        type: string
 
 permissions:
   contents: read
 
 concurrency:
   group: ci-${{ github.ref }}
-  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
+  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') && github.event.inputs.release_tag == '' }}
 
 env:
   PYO3_USE_ABI3_FORWARD_COMPATIBILITY: '1'
@@ -195,13 +205,46 @@ jobs:
 
   release:
     name: Publish tested wheels
-    if: startsWith(github.ref, 'refs/tags/')
+    # Runs for a pushed release tag, or for a manual dispatch that names the
+    # release: the dispatched run creates the tag and GitHub release itself,
+    # so a tag push is not required to publish.
+    if: startsWith(github.ref, 'refs/tags/') || (github.event_name == 'workflow_dispatch' && inputs.release_tag != '')
     # native-plugins validates repository files with third-party CLIs fetched
     # from npm at run time; it is a required PR check but must not be able to
     # block wheel publication when npm or those CLI versions are unavailable.
     needs: [wheels, compatibility, source]
     runs-on: ubuntu-24.04
+    permissions:
+      contents: write
     steps:
+      - uses: actions/checkout@v6
+      - name: Check that the release tag matches the package version
+        env:
+          TAG: ${{ inputs.release_tag || github.ref_name }}
+        run: |
+          version=$(sed -n 's/^version = "\(.*\)"$/\1/p' pyproject.toml | head -n 1)
+          if [ "$TAG" != "$version" ]; then
+            echo "::error::tag $TAG does not match pyproject.toml version $version"
+            exit 1
+          fi
+      - name: Create the tag and GitHub release
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.release_tag }}
+        run: |
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "release $TAG already exists; skipping creation"
+            exit 0
+          fi
+          notes=".github/release-notes/$TAG.md"
+          if [ -f "$notes" ]; then
+            gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+              --title "$TAG" --notes-file "$notes"
+          else
+            gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+              --title "$TAG" --generate-notes
+          fi
       - uses: actions/download-artifact@v7
         with:
           pattern: wheels-*
@@ -216,4 +259,4 @@ jobs:
           MATURIN_PYPI_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
         with:
           command: upload
-          args: --non-interactive dist/*
+          args: --non-interactive --skip-existing dist/*
