@@ -1,3 +1,4 @@
+use crate::missing::{Masked, NoParams};
 use crate::utils::{cast_series_to_f64, get_series_f64_ptr, ta_code2err};
 use polars::prelude::*;
 use pyo3_polars::derive::polars_expr;
@@ -17,7 +18,11 @@ pub fn bbands_output(_: &[Field]) -> PolarsResult<Field> {
 }
 
 #[polars_expr(output_type_func=bbands_output)]
-fn bbands(inputs: &[Series], kwargs: BBANDSKwargs) -> PolarsResult<Series> {
+fn bbands(inputs: &[Series], kwargs: Masked<BBANDSKwargs>) -> PolarsResult<Series> {
+    kwargs.apply(inputs, |kwargs| bbands_unmasked(inputs, kwargs))
+}
+
+fn bbands_unmasked(inputs: &[Series], kwargs: BBANDSKwargs) -> PolarsResult<Series> {
     let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
@@ -36,7 +41,11 @@ fn bbands(inputs: &[Series], kwargs: BBANDSKwargs) -> PolarsResult<Series> {
 }
 
 #[polars_expr(output_type=Float64)]
-fn ema(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
+fn ema(inputs: &[Series], kwargs: Masked<TimePeriodKwargs>) -> PolarsResult<Series> {
+    kwargs.apply(inputs, |kwargs| ema_unmasked(inputs, kwargs))
+}
+
+fn ema_unmasked(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
     let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
@@ -52,7 +61,11 @@ fn ema(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
 }
 
 #[polars_expr(output_type=Float64)]
-fn dema(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
+fn dema(inputs: &[Series], kwargs: Masked<TimePeriodKwargs>) -> PolarsResult<Series> {
+    kwargs.apply(inputs, |kwargs| dema_unmasked(inputs, kwargs))
+}
+
+fn dema_unmasked(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
     let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
@@ -65,7 +78,11 @@ fn dema(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
 }
 
 #[polars_expr(output_type=Float64)]
-fn ht_trendline(inputs: &[Series]) -> PolarsResult<Series> {
+fn ht_trendline(inputs: &[Series], kwargs: Masked<NoParams>) -> PolarsResult<Series> {
+    kwargs.apply(inputs, |_| ht_trendline_unmasked(inputs))
+}
+
+fn ht_trendline_unmasked(inputs: &[Series]) -> PolarsResult<Series> {
     let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
@@ -78,7 +95,11 @@ fn ht_trendline(inputs: &[Series]) -> PolarsResult<Series> {
 }
 
 #[polars_expr(output_type=Float64)]
-fn kama(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
+fn kama(inputs: &[Series], kwargs: Masked<TimePeriodKwargs>) -> PolarsResult<Series> {
+    kwargs.apply(inputs, |kwargs| kama_unmasked(inputs, kwargs))
+}
+
+fn kama_unmasked(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
     let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
@@ -91,7 +112,11 @@ fn kama(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
 }
 
 #[polars_expr(output_type=Float64)]
-fn ma(inputs: &[Series], kwargs: MaKwargs) -> PolarsResult<Series> {
+fn ma(inputs: &[Series], kwargs: Masked<MaKwargs>) -> PolarsResult<Series> {
+    kwargs.apply(inputs, |kwargs| ma_unmasked(inputs, kwargs))
+}
+
+fn ma_unmasked(inputs: &[Series], kwargs: MaKwargs) -> PolarsResult<Series> {
     let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
@@ -111,7 +136,11 @@ pub fn mama_output(_: &[Field]) -> PolarsResult<Field> {
 }
 
 #[polars_expr(output_type_func=mama_output)]
-fn mama(inputs: &[Series], kwargs: MamaKwargs) -> PolarsResult<Series> {
+fn mama(inputs: &[Series], kwargs: Masked<MamaKwargs>) -> PolarsResult<Series> {
+    kwargs.apply(inputs, |kwargs| mama_unmasked(inputs, kwargs))
+}
+
+fn mama_unmasked(inputs: &[Series], kwargs: MamaKwargs) -> PolarsResult<Series> {
     let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
@@ -129,7 +158,11 @@ fn mama(inputs: &[Series], kwargs: MamaKwargs) -> PolarsResult<Series> {
 }
 
 #[polars_expr(output_type=Float64)]
-fn mavp(inputs: &[Series], kwargs: MavpKwargs) -> PolarsResult<Series> {
+fn mavp(inputs: &[Series], kwargs: Masked<MavpKwargs>) -> PolarsResult<Series> {
+    kwargs.apply(inputs, |kwargs| mavp_unmasked(inputs, kwargs))
+}
+
+fn mavp_unmasked(inputs: &[Series], kwargs: MavpKwargs) -> PolarsResult<Series> {
     let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let input = &mut cast_series_to_f64(&inputs[0])?;
     let in_time_period = &mut cast_series_to_f64(&inputs[1])?;
@@ -144,7 +177,11 @@ fn mavp(inputs: &[Series], kwargs: MavpKwargs) -> PolarsResult<Series> {
 }
 
 #[polars_expr(output_type=Float64)]
-fn midpoint(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
+fn midpoint(inputs: &[Series], kwargs: Masked<TimePeriodKwargs>) -> PolarsResult<Series> {
+    kwargs.apply(inputs, |kwargs| midpoint_unmasked(inputs, kwargs))
+}
+
+fn midpoint_unmasked(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
     let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let input = &mut cast_series_to_f64(&inputs[0])?;
     let (input_ptr, _input) = get_series_f64_ptr(input)?;
@@ -157,7 +194,11 @@ fn midpoint(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series>
 }
 
 #[polars_expr(output_type=Float64)]
-fn midprice(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
+fn midprice(inputs: &[Series], kwargs: Masked<TimePeriodKwargs>) -> PolarsResult<Series> {
+    kwargs.apply(inputs, |kwargs| midprice_unmasked(inputs, kwargs))
+}
+
+fn midprice_unmasked(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
     let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let high = &mut cast_series_to_f64(&inputs[0])?;
     let low = &mut cast_series_to_f64(&inputs[1])?;
@@ -172,7 +213,11 @@ fn midprice(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series>
 }
 
 #[polars_expr(output_type=Float64)]
-fn sar(inputs: &[Series], kwargs: SarKwargs) -> PolarsResult<Series> {
+fn sar(inputs: &[Series], kwargs: Masked<SarKwargs>) -> PolarsResult<Series> {
+    kwargs.apply(inputs, |kwargs| sar_unmasked(inputs, kwargs))
+}
+
+fn sar_unmasked(inputs: &[Series], kwargs: SarKwargs) -> PolarsResult<Series> {
     let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let high = &mut cast_series_to_f64(&inputs[0])?;
     let low = &mut cast_series_to_f64(&inputs[1])?;
@@ -187,7 +232,11 @@ fn sar(inputs: &[Series], kwargs: SarKwargs) -> PolarsResult<Series> {
 }
 
 #[polars_expr(output_type=Float64)]
-fn sarext(inputs: &[Series], kwargs: SarExtKwargs) -> PolarsResult<Series> {
+fn sarext(inputs: &[Series], kwargs: Masked<SarExtKwargs>) -> PolarsResult<Series> {
+    kwargs.apply(inputs, |kwargs| sarext_unmasked(inputs, kwargs))
+}
+
+fn sarext_unmasked(inputs: &[Series], kwargs: SarExtKwargs) -> PolarsResult<Series> {
     let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let high = &mut cast_series_to_f64(&inputs[0])?;
     let low = &mut cast_series_to_f64(&inputs[1])?;
@@ -202,7 +251,11 @@ fn sarext(inputs: &[Series], kwargs: SarExtKwargs) -> PolarsResult<Series> {
 }
 
 #[polars_expr(output_type=Float64)]
-fn sma(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
+fn sma(inputs: &[Series], kwargs: Masked<TimePeriodKwargs>) -> PolarsResult<Series> {
+    kwargs.apply(inputs, |kwargs| sma_unmasked(inputs, kwargs))
+}
+
+fn sma_unmasked(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
     let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let input = &mut cast_series_to_f64(&inputs[0])?;
     let (in_real_ptr, _in_real) = get_series_f64_ptr(input)?;
@@ -215,7 +268,11 @@ fn sma(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
 }
 
 #[polars_expr(output_type=Float64)]
-fn t3(inputs: &[Series], kwargs: T3Kwargs) -> PolarsResult<Series> {
+fn t3(inputs: &[Series], kwargs: Masked<T3Kwargs>) -> PolarsResult<Series> {
+    kwargs.apply(inputs, |kwargs| t3_unmasked(inputs, kwargs))
+}
+
+fn t3_unmasked(inputs: &[Series], kwargs: T3Kwargs) -> PolarsResult<Series> {
     let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let input = &mut cast_series_to_f64(&inputs[0])?;
     let (in_real_ptr, _in_real) = get_series_f64_ptr(input)?;
@@ -228,7 +285,11 @@ fn t3(inputs: &[Series], kwargs: T3Kwargs) -> PolarsResult<Series> {
 }
 
 #[polars_expr(output_type=Float64)]
-fn tema(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
+fn tema(inputs: &[Series], kwargs: Masked<TimePeriodKwargs>) -> PolarsResult<Series> {
+    kwargs.apply(inputs, |kwargs| tema_unmasked(inputs, kwargs))
+}
+
+fn tema_unmasked(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
     let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let input = &mut cast_series_to_f64(&inputs[0])?;
     let (in_real_ptr, _in_real) = get_series_f64_ptr(input)?;
@@ -241,7 +302,11 @@ fn tema(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
 }
 
 #[polars_expr(output_type=Float64)]
-fn trima(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
+fn trima(inputs: &[Series], kwargs: Masked<TimePeriodKwargs>) -> PolarsResult<Series> {
+    kwargs.apply(inputs, |kwargs| trima_unmasked(inputs, kwargs))
+}
+
+fn trima_unmasked(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
     let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let input = &mut cast_series_to_f64(&inputs[0])?;
     let (in_real_ptr, _in_real) = get_series_f64_ptr(input)?;
@@ -254,7 +319,11 @@ fn trima(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
 }
 
 #[polars_expr(output_type=Float64)]
-fn wma(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
+fn wma(inputs: &[Series], kwargs: Masked<TimePeriodKwargs>) -> PolarsResult<Series> {
+    kwargs.apply(inputs, |kwargs| wma_unmasked(inputs, kwargs))
+}
+
+fn wma_unmasked(inputs: &[Series], kwargs: TimePeriodKwargs) -> PolarsResult<Series> {
     let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let input = &mut cast_series_to_f64(&inputs[0])?;
     let (in_real_ptr, _in_real) = get_series_f64_ptr(input)?;

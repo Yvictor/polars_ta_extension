@@ -1173,13 +1173,15 @@ dependencies = [
 
 [[package]]
 name = "polars_talib"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "jemallocator",
  "mimalloc",
  "polars",
+ "polars-core",
  "pyo3",
  "pyo3-polars",
+ "rayon",
  "serde",
  "talib",
  "talib-sys",

@@ -1,7 +1,8 @@
 # Polars Extension for Ta-Lib
 
-Version **0.2.0** bundles **TA-Lib 0.8.1**: all **201 batch indicators**,
-including SuperTrend, VWAP, HMA, KDJ and Heikin-Ashi. Python 3.10+; Polars 1.20+.
+Version **0.2.1** bundles **TA-Lib 0.8.1**: all **201 batch indicators**,
+including SuperTrend, VWAP, HMA, KDJ and Heikin-Ashi. Python 3.10+; Polars 1.20+
+and 2.x.
 Binary wheels include the C library.
 
 - [Upgrade notes, platform matrix and source builds](docs/upgrade-0.2.0.md)
@@ -31,7 +32,7 @@ install the Python library separately.
 ## Getting Started
 
 ``` bash
-pip install 'polars-talib==0.2.0'
+pip install 'polars-talib==0.2.1'
 ```
 
 and
@@ -77,6 +78,28 @@ df.with_columns(
     ).over("symbol").alias("cdl2crows"),
     pl.col("close").ta.wclprice("high", "low").over("symbol").alias("wclprice"),
 )
+```
+
+### missing values
+
+TA-Lib does not support null, NaN or infinite inputs. Leading missing rows are
+skipped as warm-up. After the first complete row, every output row that can
+depend on a missing input is null: to the end of the partition for recursive
+indicators such as RSI, EMA, MACD or OBV, and for the indicator's lookback window
+for window-bounded ones such as MAX, WILLR or the math operators. A missing value
+never turns into a plausible number, and under `.over("symbol")` it only affects
+its own symbol. To restart an indicator after each gap instead, or to skip gaps:
+
+``` python
+# restart after every gap, per symbol
+gap = pl.col("close").is_null().cum_sum()
+df = df.with_columns(pl.col("close").ta.rsi(14).over("symbol", gap).alias("rsi_restart"))
+
+# compute over observed rows only (e.g. market-closed days), then join back
+observed = df.filter(pl.col("close").is_not_null()).with_columns(
+    pl.col("close").ta.rsi(14).over("symbol").alias("rsi_observed")
+)
+df = df.join(observed.select("symbol", "date", "rsi_observed"), on=["symbol", "date"], how="left")
 ```
 
 ### usage just like talib.abstract with more flexible

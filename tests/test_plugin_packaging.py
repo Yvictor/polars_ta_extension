@@ -8,6 +8,10 @@ import shutil
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def ta_version():
+    return re.search(r'^version = "([^"]+)"', (ROOT / "pyproject.toml").read_text(), re.M).group(1)
+
+
 def test_native_marketplaces_resolve_the_same_self_contained_plugin(tmp_path):
     sources = []
     for catalog in (
@@ -25,7 +29,7 @@ def test_native_marketplaces_resolve_the_same_self_contained_plugin(tmp_path):
     shutil.copytree(sources[0], plugin)
     for tool in ("codex", "claude", "cursor"):
         manifest = json.loads((plugin / f".{tool}-plugin/plugin.json").read_text())
-        assert manifest["name"] == "polars-talib" and manifest["version"] == "0.2.0"
+        assert manifest["name"] == "polars-talib" and manifest["version"] == ta_version()
         skill = plugin / manifest["skills"] / "polars-talib/SKILL.md"
         assert skill.is_file()
         for link in re.findall(r"\]\(([^)]+)\)", skill.read_text()):

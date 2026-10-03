@@ -116,13 +116,27 @@ def test_invalid_period_reports_error(spec):
 @pytest.mark.parametrize('spec',[f for f in API if any(p['name']=='timeperiod' for p in f['params'])],ids=lambda f:f['name'])
 @pytest.mark.parametrize('period',[2,5,31])
 def test_nondefault_period_and_internal_nan(spec,period):
+    # Upstream results are undefined for NaN inputs (issue #42): rows that can depend
+    # on the NaN are null, every other row matches upstream exactly.
+    from polars_talib._missing import WINDOW_BOUNDED
+    from polars_talib._polars_talib import lookback
     df=frame(300).with_columns(pl.when(pl.int_range(pl.len())==200).then(float('nan')).otherwise(pl.col('close')).alias('close'))
     args=[pl.col(column(i)) for i in spec['inputs']]
-    actual=arrays(df.select(getattr(ta,spec['name'])(*args,timeperiod=period)))
+    result=df.select(getattr(ta,spec['name'])(*args,timeperiod=period)).to_series()
+    fields=[result.struct.field(f) for f in result.struct.fields] if isinstance(result.dtype,pl.Struct) else [result]
     expected=getattr(talib,spec['name'].upper())(*[df[column(i)].to_numpy() for i in spec['inputs']],timeperiod=period)
     expected=list(expected) if isinstance(expected,tuple) else [expected]
-    for got,want in zip(actual,expected):
-        np.testing.assert_allclose(got,want,rtol=1e-10,atol=1e-10,equal_nan=True)
+    rows=np.arange(300)
+    if 'close' not in {column(i) for i in spec['inputs']}:
+        masked=np.zeros(300,dtype=bool)
+    elif spec['name'] in WINDOW_BOUNDED:
+        masked=(rows>=200)&(rows<=200+lookback(spec['name'],{'timeperiod':period}))
+    else:
+        masked=rows>=200
+    for got,want in zip(fields,expected):
+        assert got.is_null().to_list()==masked.tolist()
+        np.testing.assert_allclose(got.cast(pl.Float64).to_numpy()[~masked],np.asarray(want,dtype=float)[~masked],
+                                   rtol=1e-10,atol=1e-10,equal_nan=True)
 
 
 @pytest.mark.parametrize('spec',[f for f in API if getattr(ta,f['name']).__module__.endswith('._generated')],ids=lambda f:f['name'])

@@ -149,3 +149,36 @@ These runs include the shared input-broadcasting changes as well as allocation
 changes; they are not a controlled C-only attribution experiment. They address
 the measured new-indicator overhead, not a proof of optimal performance for all
 201 indicators or platforms. Correctness and bounds checks remain required.
+
+## 0.2.1: cost of missing-input masking
+
+0.2.1 checks every input for null, NaN and infinite values before calling TA-Lib
+([missing inputs](upgrade-0.2.0.md#missing-inputs)). The check runs inside each
+indicator plugin, not as a second expression. That keeps `.over(...)` at one
+plugin call per partition. Inputs of at least 131,072 rows are scanned in
+parallel on Polars' thread pool, because the scan is bound by memory bandwidth.
+When nothing is missing, the output is returned untouched.
+
+Measured on a 4-vCPU Intel Xeon 2.8 GHz VM with Polars 1.44.2. The released
+0.2.0 wheel ran on Python 3.12 and the 0.2.1 build on Python 3.11, alternating
+three rounds of 15 samples per query. Times are medians in milliseconds.
+
+| Query (1M rows) | 0.2.0 | 0.2.1 | Ratio |
+| --- | ---: | ---: | ---: |
+| RSI | 8.41 | 9.18 | 1.09 |
+| MACD (struct output) | 14.32 | 14.88 | 1.04 |
+| WILLR (3 inputs) | 9.02 | 10.69 | 1.19 |
+| CDLENGULFING (4 inputs) | 6.74 | 9.04 | 1.34 |
+| RSI `.over()`, 1,000 groups of 1,000 rows | 17.84 | 18.27 | 1.02 |
+| RSI `.over()`, 10,000 groups of 100 rows | 44.39 | 43.08 | 0.97 |
+| RSI with 1% interior nulls | 13.47 | 16.99 | 1.26 |
+
+Across all 201 indicators at 1M rows with default parameters, the total time went
+from 4,258 ms to 4,617 ms (1.08x). The per-function median ratio is 1.12 and the
+90th percentile is 1.27. With masking switched off in the same process, the scan
+costs about 0.6 ms per million input values. Relative overhead is therefore
+largest for cheap indicators with several inputs, such as AVGPRICE and
+CDLENGULFING. Grouped queries with many small partitions are unaffected. A
+first design that applied the mask as a separate plugin expression doubled the
+per-partition call overhead and was 2.4–2.8x slower with 10,000 groups, which is
+why the check now runs inside each plugin.
