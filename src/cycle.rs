@@ -1,10 +1,15 @@
+use crate::missing::{Masked, NoParams};
 use crate::utils::{cast_series_to_f64, get_series_f64_ptr, ta_code2err};
 use polars::prelude::*;
 use pyo3_polars::derive::polars_expr;
 use talib::cycle::{ta_ht_dcperiod, ta_ht_dcphase, ta_ht_phasor, ta_ht_sine, ta_ht_trendmode};
 
 #[polars_expr(output_type=Float64)]
-fn ht_dcperiod(inputs: &[Series]) -> PolarsResult<Series> {
+fn ht_dcperiod(inputs: &[Series], kwargs: Masked<NoParams>) -> PolarsResult<Series> {
+    kwargs.apply(inputs, |_| ht_dcperiod_unmasked(inputs))
+}
+
+fn ht_dcperiod_unmasked(inputs: &[Series]) -> PolarsResult<Series> {
     let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let mut real = cast_series_to_f64(&inputs[0])?;
     let (real_ptr, _real) = get_series_f64_ptr(&mut real)?;
@@ -16,7 +21,11 @@ fn ht_dcperiod(inputs: &[Series]) -> PolarsResult<Series> {
 }
 
 #[polars_expr(output_type=Float64)]
-fn ht_dcphase(inputs: &[Series]) -> PolarsResult<Series> {
+fn ht_dcphase(inputs: &[Series], kwargs: Masked<NoParams>) -> PolarsResult<Series> {
+    kwargs.apply(inputs, |_| ht_dcphase_unmasked(inputs))
+}
+
+fn ht_dcphase_unmasked(inputs: &[Series]) -> PolarsResult<Series> {
     let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let mut real = cast_series_to_f64(&inputs[0])?;
     let (real_ptr, _real) = get_series_f64_ptr(&mut real)?;
@@ -35,7 +44,11 @@ pub fn ht_phasor_output(_: &[Field]) -> PolarsResult<Field> {
 }
 
 #[polars_expr(output_type_func=ht_phasor_output)]
-fn ht_phasor(inputs: &[Series]) -> PolarsResult<Series> {
+fn ht_phasor(inputs: &[Series], kwargs: Masked<NoParams>) -> PolarsResult<Series> {
+    kwargs.apply(inputs, |_| ht_phasor_unmasked(inputs))
+}
+
+fn ht_phasor_unmasked(inputs: &[Series]) -> PolarsResult<Series> {
     let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let mut real = cast_series_to_f64(&inputs[0])?;
     let (real_ptr, _real) = get_series_f64_ptr(&mut real)?;
@@ -59,7 +72,11 @@ pub fn ht_sine_output(_: &[Field]) -> PolarsResult<Field> {
 }
 
 #[polars_expr(output_type_func=ht_sine_output)]
-fn ht_sine(inputs: &[Series]) -> PolarsResult<Series> {
+fn ht_sine(inputs: &[Series], kwargs: Masked<NoParams>) -> PolarsResult<Series> {
+    kwargs.apply(inputs, |_| ht_sine_unmasked(inputs))
+}
+
+fn ht_sine_unmasked(inputs: &[Series]) -> PolarsResult<Series> {
     let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let mut real = cast_series_to_f64(&inputs[0])?;
     let (real_ptr, _real) = get_series_f64_ptr(&mut real)?;
@@ -76,7 +93,11 @@ fn ht_sine(inputs: &[Series]) -> PolarsResult<Series> {
 }
 
 #[polars_expr(output_type=Int32)]
-fn ht_trendmode(inputs: &[Series]) -> PolarsResult<Series> {
+fn ht_trendmode(inputs: &[Series], kwargs: Masked<NoParams>) -> PolarsResult<Series> {
+    kwargs.apply(inputs, |_| ht_trendmode_unmasked(inputs))
+}
+
+fn ht_trendmode_unmasked(inputs: &[Series]) -> PolarsResult<Series> {
     let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let mut real = cast_series_to_f64(&inputs[0])?;
     let (real_ptr, _real) = get_series_f64_ptr(&mut real)?;

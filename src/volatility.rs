@@ -1,10 +1,15 @@
+use crate::missing::{Masked, NoParams};
 use crate::utils::{cast_series_to_f64, get_series_f64_ptr, ta_code2err};
 use polars::prelude::*;
 use pyo3_polars::derive::polars_expr;
 use talib::volatility::{ta_atr, ta_natr, ta_trange, ATRKwargs, NATRKwargs};
 
 #[polars_expr(output_type=Float64)]
-fn atr(inputs: &[Series], kwargs: ATRKwargs) -> PolarsResult<Series> {
+fn atr(inputs: &[Series], kwargs: Masked<ATRKwargs>) -> PolarsResult<Series> {
+    kwargs.apply(inputs, |kwargs| atr_unmasked(inputs, kwargs))
+}
+
+fn atr_unmasked(inputs: &[Series], kwargs: ATRKwargs) -> PolarsResult<Series> {
     let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let close = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -21,7 +26,11 @@ fn atr(inputs: &[Series], kwargs: ATRKwargs) -> PolarsResult<Series> {
 }
 
 #[polars_expr(output_type=Float64)]
-fn trange(inputs: &[Series]) -> PolarsResult<Series> {
+fn trange(inputs: &[Series], kwargs: Masked<NoParams>) -> PolarsResult<Series> {
+    kwargs.apply(inputs, |_| trange_unmasked(inputs))
+}
+
+fn trange_unmasked(inputs: &[Series]) -> PolarsResult<Series> {
     let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let close = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
@@ -38,7 +47,11 @@ fn trange(inputs: &[Series]) -> PolarsResult<Series> {
 }
 
 #[polars_expr(output_type=Float64)]
-fn natr(inputs: &[Series], kwargs: NATRKwargs) -> PolarsResult<Series> {
+fn natr(inputs: &[Series], kwargs: Masked<NATRKwargs>) -> PolarsResult<Series> {
+    kwargs.apply(inputs, |kwargs| natr_unmasked(inputs, kwargs))
+}
+
+fn natr_unmasked(inputs: &[Series], kwargs: NATRKwargs) -> PolarsResult<Series> {
     let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let close = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;

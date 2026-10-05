@@ -1,0 +1,138 @@
+"""Classify how far a missing input propagates through each indicator.
+
+A function is window-bounded when, for every tested parameter set, an input at
+row K affects only rows K..K+lookback, and a NaN at row K (what TA-Lib receives
+for a null) leaves every row outside that range identical to a clean run.
+Everything else is treated as recursive: a null input nulls every later row of
+its partition.
+
+Run against an installed build after changing TA-Lib or the wrappers:
+
+    python scripts/classify_missing.py
+
+It rewrites python/polars_talib/_missing.py. tests/test_missing_data.py checks
+the committed classification against fresh measurements.
+"""
+
+import json
+import warnings
+from pathlib import Path
+
+import numpy as np
+import polars as pl
+
+ROOT = Path(__file__).resolve().parents[1]
+API = {f["name"]: f for f in json.loads((ROOT / "scripts/api.json").read_text())}
+COLUMNS = {"real": "close", "real0": "close", "real1": "open"}
+N, K = 3000, 1500
+
+
+def frame():
+    """Random candles (varied bodies, shadows and gaps) so that candlestick
+    patterns fire throughout, plus a bounded series for math transforms."""
+    rng = np.random.default_rng(26)
+    close = 100 + rng.normal(0, 1, N).cumsum()
+    open_ = np.r_[close[0], close[:-1]] + rng.normal(0, 0.6, N)
+    high = np.maximum(open_, close) + np.abs(rng.normal(0, 0.5, N))
+    low = np.minimum(open_, close) - np.abs(rng.normal(0, 0.5, N))
+    return pl.DataFrame({"open": open_, "high": high, "low": low, "close": close,
+                         "volume": rng.uniform(100, 1000, N), "periods": np.full(N, 5.0),
+                         "unit": rng.uniform(-0.95, 3.0, N)})
+
+
+def column(name, function):
+    if API[function]["group"] == "Math Transform" and name == "real":
+        return "unit"  # partly inside the domains of acos, asin, ln, sqrt, ...
+    return COLUMNS.get(name, name)
+
+
+def with_row(df, factor=None, value=None):
+    """Scale (factor) or replace (value) every price/volume input at row K."""
+    row = pl.int_range(pl.len()) == K
+    changed = (lambda c: pl.col(c) * factor) if factor is not None else (lambda c: pl.lit(value, pl.Float64))
+    return df.with_columns(pl.when(row).then(changed(c)).otherwise(pl.col(c)).alias(c)
+                           for c in df.columns if c not in ("periods",))
+
+
+def variants(name):
+    """Default parameters plus every moving-average type for MA-type parameters."""
+    params = [p["name"] for p in API[name]["params"]]
+    yield {}
+    for p in params:
+        if "matype" in p:
+            for matype in range(14):
+                yield {p: matype}
+
+
+def outputs(df, name, kwargs):
+    import polars_talib as ta
+    args = [pl.col(column(i, name)) for i in API[name]["inputs"]]
+    s = df.select(getattr(ta, name)(*args, **kwargs).alias("r")).to_series()
+    fields = [s.struct.field(f) for f in s.struct.fields] if isinstance(s.dtype, pl.Struct) else [s]
+    return [f.cast(pl.Float64).to_numpy() for f in fields]
+
+
+def same(a, b):
+    return (np.isnan(a) & np.isnan(b)) | (a == b)
+
+
+def measure(name, kwargs, df=None):
+    """Return (lookback, last row affected by row K, window bound not proven).
+
+    The bound is not proven when a raw NaN at row K changes a row outside
+    K..K+lookback, or when an output has no variation after the window (for
+    example a candlestick pattern that never fires there), so the comparison
+    could not have detected a change."""
+    from polars_talib._polars_talib import lookback
+    df = frame() if df is None else df
+    base, up, down, nan = (outputs(d, name, kwargs) for d in
+                           (df, with_row(df, 1.3), with_row(df, 0.7), with_row(df, value=float("nan"))))
+    lb = lookback(name, kwargs or None)
+    reach, broken = -1, False
+    rows = np.arange(N)
+    for b, u, d, x in zip(base, up, down, nan):
+        affected = ~(same(b, u) & same(b, d))
+        if affected.any():
+            reach = max(reach, int(rows[affected].max()) - K)
+        outside = (rows < K) | (rows > K + lb)
+        broken |= bool((~same(b, x) & outside).any())
+        after = b[K + lb + 1:]
+        broken |= len(np.unique(after[np.isfinite(after)])) < 2
+    return lb, reach, broken
+
+
+def classify():
+    import polars_talib.utils as utils
+    utils.MASK_MISSING = False
+    warnings.filterwarnings("ignore")
+    df = frame()
+    bounded = []
+    for name in sorted(API):
+        ok = True
+        for kwargs in variants(name):
+            try:
+                lb, reach, broken = measure(name, kwargs, df)
+            except Exception:
+                continue  # parameter combination rejected by TA-Lib
+            if reach > lb or broken:
+                ok = False
+                break
+        if ok:
+            bounded.append(name)
+    return bounded
+
+
+def main():
+    bounded = classify()
+    body = ",\n".join(f"    {name!r}" for name in bounded)
+    (ROOT / "python/polars_talib/_missing.py").write_text(
+        "# Generated by scripts/classify_missing.py. Do not edit.\n"
+        "# Indicators whose output depends only on the last `lookback` input rows.\n"
+        "# A missing input nulls that window; every other indicator is recursive and\n"
+        "# a missing input nulls the rest of its partition.\n"
+        f"WINDOW_BOUNDED = frozenset({{\n{body},\n}})\n")
+    print(f"{len(bounded)} window-bounded, {len(API) - len(bounded)} recursive")
+
+
+if __name__ == "__main__":
+    main()

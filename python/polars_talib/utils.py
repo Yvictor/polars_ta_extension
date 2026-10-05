@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from enum import IntEnum
 from numbers import Integral, Real
+from ._missing import WINDOW_BOUNDED
 from ._param_types import INTEGER_PARAMETERS
 from pathlib import Path
 import re
@@ -50,7 +51,28 @@ def register_plugin(*, symbol: str, is_elementwise: bool,
                 kwargs[key] = int(value)
         kwargs = {key: int(value) if isinstance(value, IntEnum) else value
                   for key, value in kwargs.items()}
+    # A null input is a missing observation; TA-Lib would see it as NaN, whose
+    # results are undefined (issue #42). Each plugin nulls the output rows that
+    # depend on a null input after the first usable row: to the end for
+    # recursive indicators, for `lookback` rows otherwise. NaN and infinity are
+    # ordinary float values and reach TA-Lib unchanged. Plugins evaluate one
+    # `.over(...)` partition at a time, so the mask never crosses partitions.
+    policy = {
+        "params": kwargs or {},
+        "lookback": _lookback(symbol, kwargs) if MASK_MISSING else -1,
+        "recursive": symbol not in WINDOW_BOUNDED,
+    }
     return register_plugin_function(
-        args=args, plugin_path=lib, function_name=symbol, kwargs=kwargs,
+        args=args, plugin_path=lib, function_name=symbol, kwargs=policy,
         is_elementwise=is_elementwise, returns_scalar=returns_scalar,
     )
+
+
+# Internal switch for scripts that study raw TA-Lib output; never disable it in
+# user code, because unmasked results can contain values computed from nulls.
+MASK_MISSING = True
+
+
+def _lookback(symbol: str, kwargs: dict[str, Any] | None) -> int:
+    from ._polars_talib import lookback
+    return lookback(symbol, kwargs or None)
