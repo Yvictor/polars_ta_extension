@@ -150,35 +150,35 @@ changes; they are not a controlled C-only attribution experiment. They address
 the measured new-indicator overhead, not a proof of optimal performance for all
 201 indicators or platforms. Correctness and bounds checks remain required.
 
-## 0.2.1: cost of missing-input masking
+## 0.2.1: cost of null-input masking
 
-0.2.1 checks every input for null, NaN and infinite values before calling TA-Lib
-([missing inputs](upgrade-0.2.0.md#missing-inputs)). The check runs inside each
-indicator plugin, not as a second expression. That keeps `.over(...)` at one
-plugin call per partition. Inputs of at least 131,072 rows are scanned in
-parallel on Polars' thread pool, because the scan is bound by memory bandwidth.
-When nothing is missing, the output is returned untouched.
+0.2.1 nulls the indicator rows that depend on a null input
+([missing inputs](upgrade-0.2.0.md#missing-inputs)). Whether an input has nulls
+is read from Polars' null count, which is metadata, so inputs without nulls cost
+nothing. Only inputs that contain nulls are inspected, using their validity
+bitmaps. The check runs inside each indicator plugin, so `.over(...)` still makes
+one plugin call per partition.
 
 Measured on a 4-vCPU Intel Xeon 2.8 GHz VM with Polars 1.44.2. The released
 0.2.0 wheel ran on Python 3.12 and the 0.2.1 build on Python 3.11, alternating
-three rounds of 15 samples per query. Times are medians in milliseconds.
+three rounds of 15 samples per query. Times are medians in milliseconds; this VM
+varies by about ±15% between rounds.
 
 | Query (1M rows) | 0.2.0 | 0.2.1 | Ratio |
 | --- | ---: | ---: | ---: |
-| RSI | 8.41 | 9.18 | 1.09 |
-| MACD (struct output) | 14.32 | 14.88 | 1.04 |
-| WILLR (3 inputs) | 9.02 | 10.69 | 1.19 |
-| CDLENGULFING (4 inputs) | 6.74 | 9.04 | 1.34 |
-| RSI `.over()`, 1,000 groups of 1,000 rows | 17.84 | 18.27 | 1.02 |
-| RSI `.over()`, 10,000 groups of 100 rows | 44.39 | 43.08 | 0.97 |
-| RSI with 1% interior nulls | 13.47 | 16.99 | 1.26 |
+| RSI | 9.01 | 8.89 | 0.99 |
+| MACD (struct output) | 16.82 | 15.34 | 0.91 |
+| WILLR (3 inputs) | 9.67 | 9.82 | 1.02 |
+| CDLENGULFING (4 inputs) | 7.75 | 6.40 | 0.83 |
+| RSI with 1% interior nulls | 14.09 | 14.39 | 1.02 |
 
-Across all 201 indicators at 1M rows with default parameters, the total time went
-from 4,258 ms to 4,617 ms (1.08x). The per-function median ratio is 1.12 and the
-90th percentile is 1.27. With masking switched off in the same process, the scan
-costs about 0.6 ms per million input values. Relative overhead is therefore
-largest for cheap indicators with several inputs, such as AVGPRICE and
-CDLENGULFING. Grouped queries with many small partitions are unaffected. A
-first design that applied the mask as a separate plugin expression doubled the
-per-partition call overhead and was 2.4–2.8x slower with 10,000 groups, which is
-why the check now runs inside each plugin.
+Across all 201 indicators at 1M rows the total time was 4,491 ms for 0.2.0 and
+4,537 ms for 0.2.1 (1.01x). Toggling masking off in the same process changes
+nothing measurable. For RSI `.over()` with 1,000 and 10,000 groups, five
+alternating rounds gave medians of 22.1 vs 23.5 ms and 56.3 vs 56.2 ms.
+
+Two earlier designs were rejected. Applying the mask as a separate plugin
+expression doubled the per-partition call overhead: 2.4–2.8x slower with 10,000
+groups. Also treating NaN and infinity as missing required reading every float
+input. That cost about 0.6 ms per million input values, which made cheap
+indicators with several inputs up to 1.3x slower.

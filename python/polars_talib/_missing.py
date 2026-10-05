@@ -18,6 +18,7 @@ WINDOW_BOUNDED = frozenset({
     'cdlhikkake',
     'cdlxsidegap3methods',
     'ceil',
+    'cmou',
     'cos',
     'cosh',
     'div',

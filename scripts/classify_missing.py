@@ -1,9 +1,10 @@
 """Classify how far a missing input propagates through each indicator.
 
 A function is window-bounded when, for every tested parameter set, an input at
-row K affects only rows K..K+lookback, and a raw NaN at row K leaves every row
-outside that range identical to a clean run. Everything else is treated as
-recursive: a missing input nulls every later row of its partition.
+row K affects only rows K..K+lookback, and a NaN at row K (what TA-Lib receives
+for a null) leaves every row outside that range identical to a clean run.
+Everything else is treated as recursive: a null input nulls every later row of
+its partition.
 
 Run against an installed build after changing TA-Lib or the wrappers:
 
@@ -78,24 +79,23 @@ def same(a, b):
 def measure(name, kwargs, df=None):
     """Return (lookback, last row affected by row K, window bound not proven).
 
-    The bound is not proven when a raw NaN or infinity at row K changes a row outside
+    The bound is not proven when a raw NaN at row K changes a row outside
     K..K+lookback, or when an output has no variation after the window (for
     example a candlestick pattern that never fires there), so the comparison
     could not have detected a change."""
     from polars_talib._polars_talib import lookback
     df = frame() if df is None else df
-    base, up, down, nan, inf = (outputs(d, name, kwargs) for d in
-                                (df, with_row(df, 1.3), with_row(df, 0.7),
-                                 with_row(df, value=float("nan")), with_row(df, value=float("inf"))))
+    base, up, down, nan = (outputs(d, name, kwargs) for d in
+                           (df, with_row(df, 1.3), with_row(df, 0.7), with_row(df, value=float("nan"))))
     lb = lookback(name, kwargs or None)
     reach, broken = -1, False
     rows = np.arange(N)
-    for b, u, d, x, y in zip(base, up, down, nan, inf):
+    for b, u, d, x in zip(base, up, down, nan):
         affected = ~(same(b, u) & same(b, d))
         if affected.any():
             reach = max(reach, int(rows[affected].max()) - K)
         outside = (rows < K) | (rows > K + lb)
-        broken |= bool(((~same(b, x) | ~same(b, y)) & outside).any())
+        broken |= bool((~same(b, x) & outside).any())
         after = b[K + lb + 1:]
         broken |= len(np.unique(after[np.isfinite(after)])) < 2
     return lb, reach, broken

@@ -115,19 +115,21 @@ def test_invalid_period_reports_error(spec):
 
 @pytest.mark.parametrize('spec',[f for f in API if any(p['name']=='timeperiod' for p in f['params'])],ids=lambda f:f['name'])
 @pytest.mark.parametrize('period',[2,5,31])
-def test_nondefault_period_and_internal_nan(spec,period):
-    # Upstream results are undefined for NaN inputs (issue #42): rows that can depend
-    # on the NaN are null, every other row matches upstream exactly.
+@pytest.mark.parametrize('missing',[float('nan'),None],ids=['nan','null'])
+def test_nondefault_period_and_internal_missing(spec,period,missing):
+    # A NaN is an ordinary float and matches upstream exactly. A null is a missing
+    # observation (issue #42): rows that can depend on it are null, every other row
+    # matches upstream, which sees the null as NaN.
     from polars_talib._missing import WINDOW_BOUNDED
     from polars_talib._polars_talib import lookback
-    df=frame(300).with_columns(pl.when(pl.int_range(pl.len())==200).then(float('nan')).otherwise(pl.col('close')).alias('close'))
+    df=frame(300).with_columns(pl.when(pl.int_range(pl.len())==200).then(pl.lit(missing,pl.Float64)).otherwise(pl.col('close')).alias('close'))
     args=[pl.col(column(i)) for i in spec['inputs']]
     result=df.select(getattr(ta,spec['name'])(*args,timeperiod=period)).to_series()
     fields=[result.struct.field(f) for f in result.struct.fields] if isinstance(result.dtype,pl.Struct) else [result]
-    expected=getattr(talib,spec['name'].upper())(*[df[column(i)].to_numpy() for i in spec['inputs']],timeperiod=period)
+    expected=getattr(talib,spec['name'].upper())(*[df[column(i)].fill_null(float('nan')).to_numpy() for i in spec['inputs']],timeperiod=period)
     expected=list(expected) if isinstance(expected,tuple) else [expected]
     rows=np.arange(300)
-    if 'close' not in {column(i) for i in spec['inputs']}:
+    if missing is not None or 'close' not in {column(i) for i in spec['inputs']}:
         masked=np.zeros(300,dtype=bool)
     elif spec['name'] in WINDOW_BOUNDED:
         masked=(rows>=200)&(rows<=200+lookback(spec['name'],{'timeperiod':period}))

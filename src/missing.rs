@@ -1,30 +1,30 @@
-//! Missing-input handling shared by every indicator plugin.
+//! Null-input handling shared by every indicator plugin.
 //!
-//! TA-Lib does not support non-finite inputs: a NaN inside an input array has
-//! undefined results, and TA-Lib 0.8.1 turns it into finite values for several
-//! indicators (for example RSI returns 0.0 for every later row, issue #42).
-//! Leading missing rows are already skipped by the indicator wrappers. For any
-//! later null, NaN or infinite input, every output row that can depend on it is
-//! set to null:
+//! A Polars null marks a missing observation. TA-Lib has no notion of missing
+//! values: the wrappers hand nulls to C as NaN, and TA-Lib's results for NaN
+//! inputs are undefined; TA-Lib 0.8.1 turns them into finite values for several
+//! indicators (RSI returned 0.0 for every later row, issue #42). Leading nulls
+//! are already skipped by the indicator wrappers. For any later null input,
+//! every output row that can depend on it is set to null:
 //!
-//! * recursive or path-dependent indicators: from the missing row to the end;
-//! * window-bounded indicators: the missing row and the next `lookback` rows.
+//! * recursive or path-dependent indicators: from the null row to the end;
+//! * window-bounded indicators: the null row and the next `lookback` rows.
 //!
-//! Masking runs inside each indicator plugin, so under `.over(...)` or
-//! `group_by(...).agg(...)` it sees one partition at a time and a missing
-//! value never affects another partition. Inputs without missing values cost
-//! one vectorised scan and are returned untouched.
+//! NaN and infinity are ordinary floating-point values in Polars, so they are
+//! passed to TA-Lib unchanged; callers who mean "missing" convert them with
+//! `fill_nan(None)`. Masking runs inside each indicator plugin, so under
+//! `.over(...)` or `group_by(...).agg(...)` it sees one partition at a time and
+//! a null never affects another partition. Inputs without nulls are detected
+//! from Polars' null counts, without reading their values.
 
 use std::ffi::{CStr, CString};
 
 use polars::export::arrow::array::PrimitiveArray;
-use polars::export::arrow::bitmap::Bitmap;
+use polars::export::arrow::bitmap::{Bitmap, MutableBitmap};
 use polars::prelude::*;
-use polars_core::POOL;
 use pyo3::exceptions::PyValueError;
 use pyo3::types::PyDict;
 use pyo3::{pyfunction, PyResult};
-use rayon::prelude::*;
 use serde::Deserialize;
 use talib_sys::*;
 
@@ -99,128 +99,98 @@ pub struct Masked<K> {
 pub struct NoParams {}
 
 impl<K> Masked<K> {
-    /// Run the unmasked indicator, then null the rows that depend on missing inputs.
+    /// Run the unmasked indicator, then null the rows that depend on null inputs.
     pub fn apply(
         self,
         inputs: &[Series],
         indicator: impl FnOnce(K) -> PolarsResult<Series>,
     ) -> PolarsResult<Series> {
-        // Scan before computing: the scan pulls the inputs into cache for TA-Lib
-        // instead of re-reading them from memory afterwards.
-        let mut any_missing = false;
-        if self.lookback >= 0 {
-            for s in inputs {
-                any_missing |= has_missing(s)?;
-            }
-        }
         let output = indicator(self.params)?;
-        if !any_missing {
+        // Null counts are metadata: inputs without nulls cost nothing here.
+        if self.lookback < 0 || inputs.iter().all(|s| s.null_count() == 0) {
             return Ok(output);
         }
-        let Some(missing) = missing_rows(inputs, output.len())? else {
-            return Ok(output);
-        };
-        match masked_rows(&missing, self.lookback as usize, self.recursive) {
+        let (present, start) = presence(inputs, output.len())?;
+        match masked_rows(&present, start, self.lookback as usize, self.recursive) {
             Some(valid) => apply_validity(&output, &valid),
             None => Ok(output),
         }
     }
 }
 
-/// Inputs at least this long are scanned in parallel on Polars' thread pool:
-/// the scan is memory-bound, so spreading it over cores hides most of its cost.
-const PARALLEL_SCAN: usize = 1 << 17;
-
-macro_rules! all_finite {
-    ($name:ident, $t:ty) => {
-        fn $name(values: &[$t]) -> bool {
-            // Branch-free per block so the inner loop vectorises.
-            let block = |b: &[$t]| b.iter().fold(true, |ok, v| ok & v.is_finite());
-            if values.len() >= PARALLEL_SCAN {
-                POOL.install(|| values.par_chunks(1 << 15).all(block))
-            } else {
-                values.chunks(1024).all(block)
-            }
-        }
-    };
-}
-all_finite!(all_finite_f64, f64);
-all_finite!(all_finite_f32, f32);
-
-fn has_missing(s: &Series) -> PolarsResult<bool> {
-    if s.null_count() > 0 {
-        return Ok(true);
-    }
-    Ok(match s.dtype() {
-        DataType::Float64 => !s.f64()?.downcast_iter().all(|a| all_finite_f64(a.values())),
-        DataType::Float32 => !s.f32()?.downcast_iter().all(|a| all_finite_f32(a.values())),
-        _ => false,
-    })
-}
-
-/// Per-row missing flags for inputs known to contain a missing value. Length-one
-/// inputs are broadcast literals and apply to every row.
-fn missing_rows(inputs: &[Series], len: usize) -> PolarsResult<Option<Vec<bool>>> {
-    let mut missing = vec![false; len];
+/// Rows where every input is present (the AND of the inputs' validity), and the
+/// first row where every input is present and not NaN: the wrappers skip the
+/// rows before it as warm-up, whatever they hold. Length-one inputs are
+/// broadcast literals and apply to every row.
+fn presence(inputs: &[Series], len: usize) -> PolarsResult<(Bitmap, Option<usize>)> {
+    let mut present: Bitmap = MutableBitmap::from_len_set(len).into();
+    let mut floats = Vec::new();
     for s in inputs {
-        let values = match s.dtype() {
-            DataType::Float64 => s.clone(),
-            _ => s.cast(&DataType::Float64)?,
-        };
-        let values = values.f64()?;
-        if values.len() == 1 && len != 1 {
-            if !values.get(0).map_or(false, f64::is_finite) {
-                missing.iter_mut().for_each(|m| *m = true);
+        if s.len() == 1 && len != 1 {
+            let value = s.cast(&DataType::Float64)?.f64()?.get(0);
+            match value {
+                None => return Ok((MutableBitmap::from_len_zeroed(len).into(), None)),
+                Some(v) if v.is_nan() => return Ok((present, None)),
+                Some(_) => continue,
             }
-            continue;
         }
         polars_ensure!(
-            values.len() == len,
+            s.len() == len,
             ShapeMismatch: "indicator output length differs from its inputs"
         );
-        let mut row = 0;
-        for arr in values.downcast_iter() {
-            match arr.validity() {
-                Some(validity) => {
-                    for (v, ok) in arr.values().iter().zip(validity.iter()) {
-                        missing[row] |= !(ok && v.is_finite());
-                        row += 1;
-                    }
-                }
-                None => {
-                    for v in arr.values().iter() {
-                        missing[row] |= !v.is_finite();
-                        row += 1;
-                    }
-                }
-            }
+        let s = s.rechunk();
+        if let Some(validity) = s.chunks().first().and_then(|a| a.validity()) {
+            present = &present & validity;
+        }
+        if s.dtype().is_float() {
+            floats.push(s.cast(&DataType::Float64)?);
         }
     }
-    Ok(Some(missing))
+    let floats: Vec<&[f64]> = floats
+        .iter()
+        .map(|s| {
+            Ok(s.f64()?
+                .downcast_iter()
+                .next()
+                .map_or(&[][..], |a| a.values().as_slice()))
+        })
+        .collect::<PolarsResult<_>>()?;
+    // Usually row 0: only the warm-up prefix is inspected.
+    let start = (0..len)
+        .find(|&row| present.get_bit(row) && floats.iter().all(|values| !values[row].is_nan()));
+    Ok((present, start))
 }
 
-/// Validity after masking (false = null): missing inputs after the first
-/// complete row, plus the rows that depend on them. Leading missing rows keep
-/// the wrappers' warm-up output. None when nothing is masked.
-fn masked_rows(missing: &[bool], lookback: usize, recursive: bool) -> Option<Bitmap> {
-    let start = missing.iter().position(|m| !m)?;
-    let first = start + 1 + missing[start + 1..].iter().position(|&m| m)?;
-    let mut until = 0usize;
-    let valid: Bitmap = missing
+/// Validity after masking (false = null): null inputs after the first usable
+/// row `start`, plus the rows that depend on them. Rows before `start` keep the
+/// wrappers' warm-up output. None when nothing is masked.
+fn masked_rows(
+    present: &Bitmap,
+    start: Option<usize>,
+    lookback: usize,
+    recursive: bool,
+) -> Option<Bitmap> {
+    let len = present.len();
+    let first = present
         .iter()
         .enumerate()
-        .map(|(row, &m)| {
-            if row >= first && m {
-                until = if recursive {
-                    usize::MAX
-                } else {
-                    until.max(row.saturating_add(lookback))
-                };
+        .skip(start? + 1)
+        .find(|(_, ok)| !ok)?
+        .0;
+    let mut valid = MutableBitmap::with_capacity(len);
+    valid.extend_constant(first, true);
+    if recursive {
+        valid.extend_constant(len - first, false);
+    } else {
+        let mut until = 0usize;
+        for (row, ok) in present.iter().enumerate().skip(first) {
+            if !ok {
+                until = until.max(row.saturating_add(lookback));
             }
-            !(row >= first && row <= until)
-        })
-        .collect();
-    Some(valid)
+            valid.push(row > until);
+        }
+    }
+    Some(valid.into())
 }
 
 fn with_validity<T: polars::datatypes::PolarsNumericType>(
@@ -259,10 +229,12 @@ fn apply_validity(series: &Series, valid: &Bitmap) -> PolarsResult<Series> {
 
 #[cfg(test)]
 mod tests {
-    use super::masked_rows;
+    use super::{masked_rows, Bitmap};
 
     fn nulls(missing: &[bool], lookback: usize, recursive: bool) -> Vec<bool> {
-        masked_rows(missing, lookback, recursive)
+        let present: Bitmap = missing.iter().map(|m| !m).collect();
+        let start = missing.iter().position(|m| !m);
+        masked_rows(&present, start, lookback, recursive)
             .map(|valid| valid.iter().map(|v| !v).collect())
             .unwrap_or_else(|| vec![false; missing.len()])
     }
@@ -272,6 +244,16 @@ mod tests {
         assert_eq!(nulls(&[true, true, false, false], 2, true), [false; 4]);
         assert_eq!(nulls(&[true, true, true], 2, true), [false; 3]);
         assert_eq!(nulls(&[], 2, true), Vec::<bool>::new());
+    }
+
+    #[test]
+    fn nulls_inside_nan_warm_up_are_not_masked() {
+        // [NaN, null, x, x, null, x]: the wrapper starts at row 2.
+        let present: Bitmap = [true, false, true, true, false, true].into_iter().collect();
+        let valid = masked_rows(&present, Some(2), 0, true).unwrap();
+        let masked: Vec<bool> = valid.iter().map(|v| !v).collect();
+        assert_eq!(masked, [false, false, false, false, true, true]);
+        assert!(masked_rows(&present, None, 0, true).is_none());
     }
 
     #[test]

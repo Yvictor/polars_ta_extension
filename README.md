@@ -82,13 +82,15 @@ df.with_columns(
 
 ### missing values
 
-TA-Lib does not support null, NaN or infinite inputs. Leading missing rows are
-skipped as warm-up. After the first complete row, every output row that can
-depend on a missing input is null: to the end of the partition for recursive
-indicators such as RSI, EMA, MACD or OBV, and for the indicator's lookback window
-for window-bounded ones such as MAX, WILLR or the math operators. A missing value
-never turns into a plausible number, and under `.over("symbol")` it only affects
-its own symbol. To restart an indicator after each gap instead, or to skip gaps:
+A Polars null marks a missing observation. Leading nulls are skipped as warm-up.
+After that, every output row that can depend on a null input is null: to the end
+of the partition for recursive indicators such as RSI, EMA, MACD or OBV, and for
+the indicator's lookback window for window-bounded ones such as MAX, WILLR or the
+math operators. A null never turns into a plausible number, and under
+`.over("symbol")` it only affects its own symbol. NaN and infinity are ordinary
+float values and are passed to TA-Lib unchanged, so its results for them are
+undefined; use `pl.col("close").fill_nan(None)` when NaN means missing. To
+restart an indicator after each gap instead, or to skip gaps:
 
 ``` python
 # restart after every gap, per symbol

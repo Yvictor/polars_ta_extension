@@ -51,11 +51,12 @@ def register_plugin(*, symbol: str, is_elementwise: bool,
                 kwargs[key] = int(value)
         kwargs = {key: int(value) if isinstance(value, IntEnum) else value
                   for key, value in kwargs.items()}
-    # TA-Lib does not support non-finite inputs (issue #42). Each plugin nulls the
-    # output rows that depend on a null, NaN or infinite input after the first
-    # complete row: to the end for recursive indicators, for `lookback` rows
-    # otherwise. Plugins evaluate one `.over(...)` partition at a time, so the
-    # mask never crosses partitions.
+    # A null input is a missing observation; TA-Lib would see it as NaN, whose
+    # results are undefined (issue #42). Each plugin nulls the output rows that
+    # depend on a null input after the first usable row: to the end for
+    # recursive indicators, for `lookback` rows otherwise. NaN and infinity are
+    # ordinary float values and reach TA-Lib unchanged. Plugins evaluate one
+    # `.over(...)` partition at a time, so the mask never crosses partitions.
     policy = {
         "params": kwargs or {},
         "lookback": _lookback(symbol, kwargs) if MASK_MISSING else -1,
@@ -68,7 +69,7 @@ def register_plugin(*, symbol: str, is_elementwise: bool,
 
 
 # Internal switch for scripts that study raw TA-Lib output; never disable it in
-# user code, because unmasked results can contain values computed from NaN.
+# user code, because unmasked results can contain values computed from nulls.
 MASK_MISSING = True
 
 

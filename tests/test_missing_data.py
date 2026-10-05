@@ -1,10 +1,11 @@
-"""Missing inputs (null, NaN, +/-inf) never become indicator values (issue #42).
+"""Null inputs never become indicator values (issue #42).
 
-Rows that can depend on a missing input after the first complete row are null:
-to the end of the partition for recursive indicators, for `lookback` rows for
-window-bounded ones. Every other row is unchanged. Under `.over(...)` and
-`group_by(...).agg(...)` this holds per partition: a missing value in one
-partition never changes another partition.
+A Polars null is a missing observation. Rows that can depend on a null input
+after the first usable row are null: to the end of the partition for recursive
+indicators, for `lookback` rows for window-bounded ones. Every other row is
+unchanged. Under `.over(...)` and `group_by(...).agg(...)` this holds per
+partition: a null in one partition never changes another partition. NaN and
+infinity are ordinary float values and reach TA-Lib unchanged.
 """
 import importlib.util
 import json
@@ -50,9 +51,14 @@ def test_issue_42_rsi_after_null():
     out = df.select(ta.rsi(pl.col('close'), timeperiod=2)).to_series()
     assert out.is_null().to_list() == [False, False, False, True, True, True, True]
     assert out.head(3).to_numpy()[2] == 100.0 and np.isnan(out.head(2).to_numpy()).all()
-    nan = df.with_columns(pl.col('close').fill_null(float('nan')))
-    assert nan.select(ta.rsi(pl.col('close'), timeperiod=2)).to_series().equals(out)
     assert df.select(pl.col('close').ta.rsi(2)).to_series().equals(out)
+    # NaN is a value, not a missing observation: it reaches TA-Lib unchanged...
+    nan = df.with_columns(pl.col('close').fill_null(float('nan')))
+    raw = nan.select(ta.rsi(pl.col('close'), timeperiod=2)).to_series()
+    assert raw.null_count() == 0
+    np.testing.assert_array_equal(raw.to_numpy(), talib.RSI(nan['close'].to_numpy(), timeperiod=2))
+    # ...and `fill_nan(None)` declares it missing.
+    assert nan.select(ta.rsi(pl.col('close').fill_nan(None), timeperiod=2)).to_series().equals(out)
 
 
 def test_window_bounded_classification_is_current():
@@ -77,20 +83,34 @@ def test_lookback_matches_upstream(spec):
     assert lookback(name, params) == want
 
 
-@pytest.mark.parametrize('kind', [None, float('nan'), float('inf'), float('-inf')], ids=['null', 'nan', 'inf', '-inf'])
 @pytest.mark.parametrize('spec', API, ids=lambda f: f['name'])
-def test_missing_input_nulls_exactly_the_dependent_rows(spec, kind):
+def test_null_input_nulls_exactly_the_dependent_rows(spec):
     name = spec['name']
     df = classify.frame()
     clean = run(df, name)
-    missing = run(classify.with_row(df, value=kind), name)
+    missing = run(classify.with_row(df, value=None), name)
     dependent = [~(same(c, u) & same(c, d)) for c, u, d in
                  zip(clean, run(classify.with_row(df, 1.3), name), run(classify.with_row(df, 0.7), name))]
     mask = expected_mask(name)
     for c, m, dep in zip(clean, missing, dependent):
         assert m.is_null().to_numpy().tolist() == mask.tolist()
-        assert not (dep & ~mask).any(), 'a row depending on the missing input escaped the mask'
+        assert not (dep & ~mask).any(), 'a row depending on the null input escaped the mask'
         assert same(c, m)[~mask].all(), 'a row outside the mask changed'
+
+
+@pytest.mark.parametrize('kind', [float('nan'), float('inf'), float('-inf')], ids=['nan', 'inf', '-inf'])
+@pytest.mark.parametrize('spec', API, ids=lambda f: f['name'])
+def test_non_finite_values_reach_talib_unchanged(spec, kind):
+    import polars_talib.utils as utils
+    df = classify.with_row(classify.frame(), value=kind)
+    masked = run(df, spec['name'])
+    try:
+        utils.MASK_MISSING = False
+        raw = run(df, spec['name'])
+    finally:
+        utils.MASK_MISSING = True
+    for m, r in zip(masked, raw):
+        assert m.null_count() == 0 and m.equals(r)
 
 
 @pytest.mark.parametrize('kind', [None, float('nan')], ids=['null', 'nan'])
@@ -100,7 +120,7 @@ def test_missing_value_in_any_single_input(column, kind):
         pl.when(pl.int_range(pl.len()) == K).then(pl.lit(kind, pl.Float64)).otherwise(pl.col(column)).alias(column))
     for name in ('obv', 'atr', 'willr', 'supertrend', 'cdlengulfing', 'macd', 'ad'):
         inputs = {classify.column(i, name) for i in classify.API[name]['inputs']}
-        expected = expected_mask(name) if column in inputs else np.zeros(N, dtype=bool)
+        expected = expected_mask(name) if kind is None and column in inputs else np.zeros(N, dtype=bool)
         for field in run(df, name):
             assert field.is_null().to_numpy().tolist() == expected.tolist(), (name, column)
 
@@ -148,15 +168,15 @@ INDICATORS = {key: case[3] for key, case in CASES.items()}
 def policy_nulls(part, key):
     """Independent restatement of the policy for one partition."""
     function, params, inputs, _ = CASES[key]
-    values = part.select(inputs).to_numpy().astype(float)
-    missing = ~np.isfinite(values).all(axis=1)
+    null = part.select(pl.any_horizontal(pl.col(c).is_null() for c in inputs)).to_series().to_numpy()
+    nan = part.select(pl.any_horizontal(pl.col(c).is_nan() for c in inputs)).to_series().fill_null(False).to_numpy()
     rows = np.arange(len(part))
-    complete = np.nonzero(~missing)[0]
+    usable = np.nonzero(~null & ~nan)[0]  # the wrappers start here; earlier rows are warm-up
     nulls = np.zeros(len(part), dtype=bool)
-    if not len(complete):
+    if not len(usable):
         return nulls
     lb = lookback(function, params or None)
-    for k in rows[missing & (rows > complete[0])]:
+    for k in rows[null & (rows > usable[0])]:
         nulls |= (rows >= k) if function not in WINDOW_BOUNDED else ((rows >= k) & (rows <= k + lb))
     return nulls
 
@@ -199,7 +219,8 @@ def alone(df, make, keys=('sym',)):
 
 NULL_LAYOUTS = {
     'interior': {'A': {'close': [10]}, 'C': {'high': [30], 'volume': [31]}},
-    'nan': {'A': {'close_nan': [12]}, 'B': {'low_nan': [25]}},
+    'nan-values-are-not-missing': {'A': {'close_nan': [12]}, 'B': {'low_nan': [25]}},
+    'null-inside-nan-warm-up': {'A': {'close_nan': [0, 1], 'close': [2]}, 'C': {'close': [15]}},
     'last-row-before-next-partition': {'A': {'close': [39], 'high': [39], 'low': [39], 'open': [39]}},
     'leading-and-interior': {'A': {'close': [0, 1]}, 'B': {'close': [0, 20]}},
     'every-row-of-one-partition': {'B': {c: list(range(40)) for c in ('open', 'high', 'low', 'close', 'volume')}},
