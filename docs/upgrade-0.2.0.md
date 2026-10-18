@@ -10,7 +10,7 @@
   indicators, and `lookback` rows for window-bounded ones. Rows that do not
   depend on a null are unchanged. See [missing inputs](#missing-inputs).
 - **Polars 2 (issue #41).** The dependency is now `polars>=1.20,<3`; CI tests
-  Polars 1.20, 1.44 and 2.0 release candidates.
+  Polars 1.20, 1.44 and 2.0.
 
 `polars-talib` is version 0.2.1; the `talib` and `talib-sys` crates remain
 0.2.0. Everything below applies to both 0.2.0 and 0.2.1.
@@ -106,7 +106,7 @@ computing and join the result back by timestamp.
 ## Platforms and build requirements
 
 Python requires CPython 3.10+ and Polars `>=1.20,<3`. CI tests Polars 1.20.0,
-1.44.2 and 2.0.0rc2 against Python 3.10, 3.11, 3.13 and 3.14, and Python 3.12
+1.44.2 and 2.0.0 against Python 3.10, 3.11, 3.13 and 3.14, and Python 3.12
 with Polars 1.44.2 on every wheel platform.
 
 | Wheel platform | Architectures | Runtime validation |
