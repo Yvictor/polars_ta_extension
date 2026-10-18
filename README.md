@@ -33,6 +33,8 @@ install the Python library separately.
 
 ``` bash
 pip install 'polars-talib==0.2.1'
+# or, in a uv project
+uv add 'polars-talib==0.2.1'
 ```
 
 and
