@@ -12,7 +12,8 @@ permissions:
 
 concurrency:
   group: ci-${{ github.ref }}
-  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
+  # Only pull-request runs are superseded; a master or tag run may be publishing.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
   PYO3_USE_ABI3_FORWARD_COMPATIBILITY: '1'
@@ -195,25 +196,49 @@ jobs:
 
   release:
     name: Publish tested wheels
-    if: startsWith(github.ref, 'refs/tags/')
+    # Two ways to publish, both after every test job passes:
+    # - push a tag equal to the pyproject.toml version;
+    # - merge to master a commit whose version has no tag yet and which carries
+    #   .github/release-notes/<version>.md: this run then creates the tag and
+    #   GitHub release from that file with the workflow token.
+    if: github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/master')
     # native-plugins validates repository files with third-party CLIs fetched
     # from npm at run time; it is a required PR check but must not be able to
     # block wheel publication when npm or those CLI versions are unavailable.
     needs: [wheels, compatibility, source]
     runs-on: ubuntu-24.04
+    permissions:
+      contents: write
     steps:
+      - uses: actions/checkout@v6
+      - name: Decide what to publish
+        id: plan
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: scripts/release_plan.sh
+      - name: Create the tag and GitHub release
+        if: steps.plan.outputs.create == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.plan.outputs.version }}
+        run: |
+          gh release create "$VERSION" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+            --title "$VERSION" --notes-file ".github/release-notes/$VERSION.md"
       - uses: actions/download-artifact@v7
+        if: steps.plan.outputs.publish == 'true'
         with:
           pattern: wheels-*
           merge-multiple: true
           path: dist
       - uses: actions/download-artifact@v7
+        if: steps.plan.outputs.publish == 'true'
         with:
           name: sdist
           path: dist
       - uses: PyO3/maturin-action@v1.46.0
+        if: steps.plan.outputs.publish == 'true'
         env:
           MATURIN_PYPI_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
         with:
           command: upload
-          args: --non-interactive dist/*
+          args: --non-interactive --skip-existing dist/*

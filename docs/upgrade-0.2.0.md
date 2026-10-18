@@ -176,4 +176,13 @@ For FFI bindings, install libclang and build
 Review and copy the resulting `OUT_DIR/bindings.rs` into
 `talib-sys/src/bindings.rs`; default builds use these portable checked-in bindings.
 
+## Publishing a release
+
+Bump the version in `pyproject.toml` and `Cargo.toml`, add
+`.github/release-notes/<version>.md` in the same pull request, and merge it.
+The CI run on master then runs every test job and, when that version has no tag
+yet, creates the tag and GitHub release from the notes file and uploads the
+tested wheels and sdist to PyPI. Pushing a tag equal to the version still works
+too. Merges without a notes file for an untagged version publish nothing.
+
 See [AI skill installation](skills.md) and [benchmark methodology/results](performance.md).
