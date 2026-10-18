@@ -6524,7 +6524,7 @@ _legacy_output_structs = get_functions_output_struct
 def get_functions_output_struct():
     return {**_legacy_output_structs(), **_NEW_STRUCTS}
 
-__version__ = "0.2.0"
+__version__ = "0.2.1"
 
 for _names in __function_groups__.values():
     _names.sort()

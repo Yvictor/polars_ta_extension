@@ -1,6 +1,7 @@
 mod cycle;
 mod generated;
 mod math;
+mod missing;
 mod momentum;
 mod overlap;
 mod pattern;
@@ -58,11 +59,13 @@ fn polars_ta(_py: Python, m: &PyModule) -> PyResult<()> {
     let linked_version = ta_version();
     if linked_version.split_whitespace().next() != Some("0.8.1") {
         return Err(PyRuntimeError::new_err(format!(
-            "polars-talib 0.2.0 requires TA-Lib 0.8.1; linked library reports {linked_version}"
+            "polars-talib {} requires TA-Lib 0.8.1; linked library reports {linked_version}",
+            env!("CARGO_PKG_VERSION")
         )));
     }
     m.add_function(wrap_pyfunction!(initialize, m)?)?;
     m.add_function(wrap_pyfunction!(shutdown, m)?)?;
     m.add_function(wrap_pyfunction!(version, m)?)?;
+    m.add_function(wrap_pyfunction!(missing::lookback, m)?)?;
     Ok(())
 }

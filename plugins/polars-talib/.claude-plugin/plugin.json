@@ -1,6 +1,6 @@
 {
   "name": "polars-talib",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Use all 201 TA-Lib indicators in native Polars expressions, grouped time series and lazy pipelines.",
   "author": {
     "name": "Yvictor",

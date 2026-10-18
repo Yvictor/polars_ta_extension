@@ -1,10 +1,15 @@
+use crate::missing::{Masked, NoParams};
 use crate::utils::{cast_series_to_f64, get_series_f64_ptr, ta_code2err};
 use polars::prelude::*;
 use pyo3_polars::derive::polars_expr;
 use talib::volume::{ta_ad, ta_adosc, ta_obv, ADOSCKwargs};
 
 #[polars_expr(output_type=Float64)]
-fn obv(inputs: &[Series]) -> PolarsResult<Series> {
+fn obv(inputs: &[Series], kwargs: Masked<NoParams>) -> PolarsResult<Series> {
+    kwargs.apply(inputs, |_| obv_unmasked(inputs))
+}
+
+fn obv_unmasked(inputs: &[Series]) -> PolarsResult<Series> {
     let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let close = &mut cast_series_to_f64(&inputs[0])?;
     let volume = &mut cast_series_to_f64(&inputs[1])?;
@@ -19,7 +24,11 @@ fn obv(inputs: &[Series]) -> PolarsResult<Series> {
 }
 
 #[polars_expr(output_type=Float64)]
-fn ad(inputs: &[Series]) -> PolarsResult<Series> {
+fn ad(inputs: &[Series], kwargs: Masked<NoParams>) -> PolarsResult<Series> {
+    kwargs.apply(inputs, |_| ad_unmasked(inputs))
+}
+
+fn ad_unmasked(inputs: &[Series]) -> PolarsResult<Series> {
     let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let high = &mut cast_series_to_f64(&inputs[1])?;
     let low = &mut cast_series_to_f64(&inputs[2])?;
@@ -38,7 +47,11 @@ fn ad(inputs: &[Series]) -> PolarsResult<Series> {
 }
 
 #[polars_expr(output_type=Float64)]
-fn adosc(inputs: &[Series], kwargs: ADOSCKwargs) -> PolarsResult<Series> {
+fn adosc(inputs: &[Series], kwargs: Masked<ADOSCKwargs>) -> PolarsResult<Series> {
+    kwargs.apply(inputs, |kwargs| adosc_unmasked(inputs, kwargs))
+}
+
+fn adosc_unmasked(inputs: &[Series], kwargs: ADOSCKwargs) -> PolarsResult<Series> {
     let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let close = &mut cast_series_to_f64(&inputs[0])?;
     let high = &mut cast_series_to_f64(&inputs[1])?;

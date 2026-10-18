@@ -1,3 +1,4 @@
+use crate::missing::Masked;
 use crate::utils::{cast_series_to_f64, get_series_f64_ptr, ta_code2err};
 use polars::prelude::*;
 use pyo3_polars::derive::polars_expr;
@@ -9,7 +10,11 @@ use talib::statistic::{
 };
 
 #[polars_expr(output_type=Float64)]
-fn beta(inputs: &[Series], kwargs: BetaKwargs) -> PolarsResult<Series> {
+fn beta(inputs: &[Series], kwargs: Masked<BetaKwargs>) -> PolarsResult<Series> {
+    kwargs.apply(inputs, |kwargs| beta_unmasked(inputs, kwargs))
+}
+
+fn beta_unmasked(inputs: &[Series], kwargs: BetaKwargs) -> PolarsResult<Series> {
     let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let real0 = &mut cast_series_to_f64(&inputs[0])?;
     let real1 = &mut cast_series_to_f64(&inputs[1])?;
@@ -24,7 +29,11 @@ fn beta(inputs: &[Series], kwargs: BetaKwargs) -> PolarsResult<Series> {
 }
 
 #[polars_expr(output_type=Float64)]
-fn correl(inputs: &[Series], kwargs: CorrelKwargs) -> PolarsResult<Series> {
+fn correl(inputs: &[Series], kwargs: Masked<CorrelKwargs>) -> PolarsResult<Series> {
+    kwargs.apply(inputs, |kwargs| correl_unmasked(inputs, kwargs))
+}
+
+fn correl_unmasked(inputs: &[Series], kwargs: CorrelKwargs) -> PolarsResult<Series> {
     let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let real0 = &mut cast_series_to_f64(&inputs[0])?;
     let real1 = &mut cast_series_to_f64(&inputs[1])?;
@@ -39,7 +48,11 @@ fn correl(inputs: &[Series], kwargs: CorrelKwargs) -> PolarsResult<Series> {
 }
 
 #[polars_expr(output_type=Float64)]
-fn linearreg(inputs: &[Series], kwargs: LinearRegKwargs) -> PolarsResult<Series> {
+fn linearreg(inputs: &[Series], kwargs: Masked<LinearRegKwargs>) -> PolarsResult<Series> {
+    kwargs.apply(inputs, |kwargs| linearreg_unmasked(inputs, kwargs))
+}
+
+fn linearreg_unmasked(inputs: &[Series], kwargs: LinearRegKwargs) -> PolarsResult<Series> {
     let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let real = &mut cast_series_to_f64(&inputs[0])?;
     let (real_ptr, _real) = get_series_f64_ptr(real)?;
@@ -52,7 +65,17 @@ fn linearreg(inputs: &[Series], kwargs: LinearRegKwargs) -> PolarsResult<Series>
 }
 
 #[polars_expr(output_type=Float64)]
-fn linearreg_angle(inputs: &[Series], kwargs: LinearRegAngleKwargs) -> PolarsResult<Series> {
+fn linearreg_angle(
+    inputs: &[Series],
+    kwargs: Masked<LinearRegAngleKwargs>,
+) -> PolarsResult<Series> {
+    kwargs.apply(inputs, |kwargs| linearreg_angle_unmasked(inputs, kwargs))
+}
+
+fn linearreg_angle_unmasked(
+    inputs: &[Series],
+    kwargs: LinearRegAngleKwargs,
+) -> PolarsResult<Series> {
     let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let real = &mut cast_series_to_f64(&inputs[0])?;
     let (real_ptr, _real) = get_series_f64_ptr(real)?;
@@ -67,6 +90,15 @@ fn linearreg_angle(inputs: &[Series], kwargs: LinearRegAngleKwargs) -> PolarsRes
 #[polars_expr(output_type=Float64)]
 fn linearreg_intercept(
     inputs: &[Series],
+    kwargs: Masked<LinearRegInterceptKwargs>,
+) -> PolarsResult<Series> {
+    kwargs.apply(inputs, |kwargs| {
+        linearreg_intercept_unmasked(inputs, kwargs)
+    })
+}
+
+fn linearreg_intercept_unmasked(
+    inputs: &[Series],
     kwargs: LinearRegInterceptKwargs,
 ) -> PolarsResult<Series> {
     let real = &mut cast_series_to_f64(&inputs[0])?;
@@ -80,7 +112,17 @@ fn linearreg_intercept(
 }
 
 #[polars_expr(output_type=Float64)]
-fn linearreg_slope(inputs: &[Series], kwargs: LinearRegSlopeKwargs) -> PolarsResult<Series> {
+fn linearreg_slope(
+    inputs: &[Series],
+    kwargs: Masked<LinearRegSlopeKwargs>,
+) -> PolarsResult<Series> {
+    kwargs.apply(inputs, |kwargs| linearreg_slope_unmasked(inputs, kwargs))
+}
+
+fn linearreg_slope_unmasked(
+    inputs: &[Series],
+    kwargs: LinearRegSlopeKwargs,
+) -> PolarsResult<Series> {
     let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let real = &mut cast_series_to_f64(&inputs[0])?;
     let (real_ptr, _real) = get_series_f64_ptr(real)?;
@@ -93,7 +135,11 @@ fn linearreg_slope(inputs: &[Series], kwargs: LinearRegSlopeKwargs) -> PolarsRes
 }
 
 #[polars_expr(output_type=Float64)]
-fn stddev(inputs: &[Series], kwargs: StdDevKwargs) -> PolarsResult<Series> {
+fn stddev(inputs: &[Series], kwargs: Masked<StdDevKwargs>) -> PolarsResult<Series> {
+    kwargs.apply(inputs, |kwargs| stddev_unmasked(inputs, kwargs))
+}
+
+fn stddev_unmasked(inputs: &[Series], kwargs: StdDevKwargs) -> PolarsResult<Series> {
     let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let real = &mut cast_series_to_f64(&inputs[0])?;
     let (real_ptr, _real) = get_series_f64_ptr(real)?;
@@ -109,7 +155,11 @@ fn stddev(inputs: &[Series], kwargs: StdDevKwargs) -> PolarsResult<Series> {
 }
 
 #[polars_expr(output_type=Float64)]
-fn tsf(inputs: &[Series], kwargs: TsfKwargs) -> PolarsResult<Series> {
+fn tsf(inputs: &[Series], kwargs: Masked<TsfKwargs>) -> PolarsResult<Series> {
+    kwargs.apply(inputs, |kwargs| tsf_unmasked(inputs, kwargs))
+}
+
+fn tsf_unmasked(inputs: &[Series], kwargs: TsfKwargs) -> PolarsResult<Series> {
     let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let real = &mut cast_series_to_f64(&inputs[0])?;
     let (real_ptr, _real) = get_series_f64_ptr(real)?;
@@ -125,7 +175,11 @@ fn tsf(inputs: &[Series], kwargs: TsfKwargs) -> PolarsResult<Series> {
 }
 
 #[polars_expr(output_type=Float64)]
-fn var(inputs: &[Series], kwargs: VarKwargs) -> PolarsResult<Series> {
+fn var(inputs: &[Series], kwargs: Masked<VarKwargs>) -> PolarsResult<Series> {
+    kwargs.apply(inputs, |kwargs| var_unmasked(inputs, kwargs))
+}
+
+fn var_unmasked(inputs: &[Series], kwargs: VarKwargs) -> PolarsResult<Series> {
     let inputs = &crate::utils::broadcast_inputs(inputs)?;
     let real = &mut cast_series_to_f64(&inputs[0])?;
     let (real_ptr, _real) = get_series_f64_ptr(real)?;

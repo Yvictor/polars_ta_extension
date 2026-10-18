@@ -149,3 +149,36 @@ These runs include the shared input-broadcasting changes as well as allocation
 changes; they are not a controlled C-only attribution experiment. They address
 the measured new-indicator overhead, not a proof of optimal performance for all
 201 indicators or platforms. Correctness and bounds checks remain required.
+
+## 0.2.1: cost of null-input masking
+
+0.2.1 nulls the indicator rows that depend on a null input
+([missing inputs](upgrade-0.2.0.md#missing-inputs)). Whether an input has nulls
+is read from Polars' null count, which is metadata, so inputs without nulls cost
+nothing. Only inputs that contain nulls are inspected, using their validity
+bitmaps. The check runs inside each indicator plugin, so `.over(...)` still makes
+one plugin call per partition.
+
+Measured on a 4-vCPU Intel Xeon 2.8 GHz VM with Polars 1.44.2. The released
+0.2.0 wheel ran on Python 3.12 and the 0.2.1 build on Python 3.11, alternating
+three rounds of 15 samples per query. Times are medians in milliseconds; this VM
+varies by about ±15% between rounds.
+
+| Query (1M rows) | 0.2.0 | 0.2.1 | Ratio |
+| --- | ---: | ---: | ---: |
+| RSI | 9.01 | 8.89 | 0.99 |
+| MACD (struct output) | 16.82 | 15.34 | 0.91 |
+| WILLR (3 inputs) | 9.67 | 9.82 | 1.02 |
+| CDLENGULFING (4 inputs) | 7.75 | 6.40 | 0.83 |
+| RSI with 1% interior nulls | 14.09 | 14.39 | 1.02 |
+
+Across all 201 indicators at 1M rows the total time was 4,491 ms for 0.2.0 and
+4,537 ms for 0.2.1 (1.01x). Toggling masking off in the same process changes
+nothing measurable. For RSI `.over()` with 1,000 and 10,000 groups, five
+alternating rounds gave medians of 22.1 vs 23.5 ms and 56.3 vs 56.2 ms.
+
+Two earlier designs were rejected. Applying the mask as a separate plugin
+expression doubled the per-partition call overhead: 2.4–2.8x slower with 10,000
+groups. Also treating NaN and infinity as missing required reading every float
+input. That cost about 0.6 ms per million input values, which made cheap
+indicators with several inputs up to 1.3x slower.
