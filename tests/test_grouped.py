@@ -93,5 +93,8 @@ def test_expression_keys_with_duplicate_source_names():
 ])
 def test_nested_binary_and_null_keys_stay_above_plugin_abi(keys):
     data=frame(60).with_columns(keys)
+    # Polars 1.20 cannot group FixedSizeList directly; its List conversion has
+    # identical key equality and provides the independent window reference.
+    reference_key = pl.col('key').arr.to_list() if isinstance(keys.dtype,pl.Array) else pl.col('key')
     assert_frame_equal(data.select(ta.by_group('rsi',by='key',timeperiod=2).alias('r')),
-                       data.select(ta.rsi(timeperiod=2).over('key').alias('r')),check_exact=True)
+                       data.select(ta.rsi(timeperiod=2).over(reference_key).alias('r')),check_exact=True)

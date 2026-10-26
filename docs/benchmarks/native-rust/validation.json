@@ -18,5 +18,9 @@
     "docs/benchmarks/native-rust/candidate-1.json",
     "docs/benchmarks/native-rust/candidate-2.json",
     "docs/benchmarks/native-rust/candidate-3.json"
-  ]
+  ],
+  "additional_local_polars_full_suites": {
+    "1.20.0": 5714,
+    "2.0.0": 5714
+  }
 }

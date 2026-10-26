@@ -78,6 +78,8 @@ claim bit equivalence or universal all-input equivalence.
 
 - Original release wheel: **4,624 tests passed**, unchanged baseline suite.
 - Reviewed native release wheel: **5,714 Python tests passed**; **5 Rust unit tests passed**.
+- On the same CPython 3.12 Mac wheel, the complete **5,714-test suite also passed
+  separately on Polars 1.20.0 and 2.0.0**, in addition to benchmark runtime 1.44.2.
 - Original-vs-native capture: **10,110 cases**, **2,041,958 checked values**, **0 failures**.
 - All 201 functions are covered, including Float32/Float64, length and lookback
   boundaries, parameters and default sentinels, all existing MA modes, domain and

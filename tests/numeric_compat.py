@@ -1,4 +1,5 @@
 """TA-Lib 0.8.3 reorders floating arithmetic; discrete outputs remain exact."""
+import inspect
 import polars as pl
 from polars.testing import assert_frame_equal, assert_series_equal
 
@@ -13,4 +14,8 @@ def different(a: pl.Expr, b: pl.Expr) -> pl.Expr:
 
 def assert_compatible(actual, expected):
     compare = assert_frame_equal if isinstance(actual, pl.DataFrame) else assert_series_equal
-    compare(actual, expected, check_exact=False, rel_tol=1e-10, abs_tol=1e-10)
+    # Polars renamed rtol/atol to rel_tol/abs_tol after the supported 1.20 floor.
+    tolerance = ({"rel_tol": 1e-10, "abs_tol": 1e-10}
+                 if "rel_tol" in inspect.signature(compare).parameters
+                 else {"rtol": 1e-10, "atol": 1e-10})
+    compare(actual, expected, check_exact=False, **tolerance)
