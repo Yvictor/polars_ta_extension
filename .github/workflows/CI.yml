@@ -54,6 +54,12 @@ jobs:
           args: --release --locked --out dist
           sccache: 'true'
           rust-toolchain: '1.90.0'
+          # maturin-action installs sccache with python3; the container's
+          # system Python has no pip, unlike the manylinux interpreter.
+          before-script-linux: |
+            if test -x /opt/python/cp312-cp312/bin/python; then
+              export PATH=/opt/python/cp312-cp312/bin:$PATH
+            fi
       - name: Test installed wheel (native)
         if: ${{ !startsWith(matrix.name, 'musl-') }}
         shell: bash
