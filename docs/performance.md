@@ -1,5 +1,8 @@
 # Performance measurements
 
+For the native Rust migration, see [current release-wheel comparison](native-rust-migration.md).
+The measurements below describe the earlier 0.1.6 to 0.2.0 C-backend upgrade.
+
 The measured release wheel improves the main long-series indicators while keeping
 native Polars execution. These are measurements on one Linux x86_64 machine, not
 a claim of a globally optimal implementation or identical speedups on every CPU.

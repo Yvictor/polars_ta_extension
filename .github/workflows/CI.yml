@@ -46,9 +46,6 @@ jobs:
         with:
           components: rustfmt
       - uses: astral-sh/setup-uv@v8.2.0
-      - name: CMake (native hosts)
-        if: runner.os != 'Linux'
-        run: uv pip install --system 'cmake>=4.2,<5'
       - name: Build self-contained release wheel
         uses: PyO3/maturin-action@v1.46.0
         with:
@@ -57,15 +54,6 @@ jobs:
           args: --release --locked --out dist
           sccache: 'true'
           rust-toolchain: '1.90.0'
-          before-script-linux: |
-            if test -x /opt/python/cp312-cp312/bin/python; then
-              export PATH=/opt/python/cp312-cp312/bin:$PATH
-            fi
-            if command -v apk >/dev/null; then
-              apk add --no-cache cmake make
-            else
-              python3 -m pip install 'cmake>=4.2,<5'
-            fi
       - name: Test installed wheel (native)
         if: ${{ !startsWith(matrix.name, 'musl-') }}
         shell: bash
@@ -136,18 +124,16 @@ jobs:
         with:
           python-version: '3.12'
       - uses: astral-sh/setup-uv@v8.2.0
-      - run: uv pip install --system maturin 'cmake>=4.2,<5' pytest numpy 'TA-Lib==0.8.1' 'polars==1.44.2' pytest-benchmark
+      - run: uv pip install --system maturin pytest numpy 'TA-Lib==0.8.1' 'polars==1.44.2' pytest-benchmark
       - name: Check Python dependency lock
         run: uv lock --check
       - name: Check generated wrappers are current
         run: |
           python scripts/generate_indicators.py
           python scripts/generate_skill_reference.py
-          git diff --exit-code -- src/generated.rs talib/src/generated.rs python/polars_talib/_generated.py python/polars_talib/_param_types.py docs/indicators.md plugins/polars-talib/skills/polars-talib/reference/functions.md
+          git diff --exit-code -- src/generated.rs python/polars_talib/_grouped_abi.py python/polars_talib/_generated.py python/polars_talib/_param_types.py docs/indicators.md plugins/polars-talib/skills/polars-talib/reference/functions.md
       - name: Rust crate tests
-        run: cargo test --manifest-path talib/Cargo.toml
-      - name: Validate system-library overrides
-        run: python scripts/check_build_overrides.py
+        run: cargo test --lib --locked
       - name: Build source distribution and install it without system TA-Lib
         run: |
           maturin sdist --out dist
@@ -157,6 +143,51 @@ jobs:
         with:
           name: sdist
           path: dist/*.tar.gz
+
+  migration-differential:
+    name: Native migration / original release differential
+    needs: wheels
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          path: candidate-source
+      - uses: actions/checkout@v6
+        with:
+          ref: b2bbc26d41ec80823c8bffb0cc436a97f29911cc
+          path: baseline-source
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - uses: dtolnay/rust-toolchain@1.90.0
+      - uses: astral-sh/setup-uv@v8.2.0
+      - uses: actions/download-artifact@v7
+        with:
+          name: wheels-linux-x64
+          path: candidate-dist
+      - name: Build original release from the fixed baseline
+        working-directory: baseline-source
+        run: |
+          uv venv --python 3.12 .venv
+          uv pip install --python .venv maturin 'cmake>=4.2,<5' 'polars==1.44.2' 'numpy==2.5.3'
+          export PATH="$PWD/.venv/bin:$PATH"
+          maturin build --release --locked --out ../baseline-dist
+          uv pip install --python .venv --no-deps ../baseline-dist/*.whl
+      - name: Compare every public indicator including grouped and missing data
+        run: |
+          uv venv --python 3.12 candidate-env
+          uv pip install --python candidate-env candidate-dist/*.whl 'polars==1.44.2' 'numpy==2.5.3'
+          baseline-source/.venv/bin/python candidate-source/scripts/migration_probe.py --capture baseline.npz
+          candidate-env/bin/python candidate-source/scripts/migration_probe.py --capture candidate.npz
+          candidate-env/bin/python candidate-source/scripts/migration_probe.py --compare baseline.npz candidate.npz --report differential.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: migration-differential
+          path: |
+            baseline.npz
+            candidate.npz
+            differential.json
 
   benchmark:
     name: Release benchmark
@@ -179,7 +210,7 @@ jobs:
         run: |
           uv venv .benchmark-base
           uv venv .benchmark-candidate
-          uv pip install --python .benchmark-base 'polars-talib==0.1.6' 'polars==1.44.2' 'numpy==2.5.3'
+          uv pip install --python .benchmark-base 'polars-talib==0.2.1' 'polars==1.44.2' 'numpy==2.5.3'
           uv pip install --python .benchmark-candidate dist/*.whl 'polars==1.44.2' 'numpy==2.5.3'
           .benchmark-base/bin/python scripts/benchmark.py --output baseline.json --repeats 51 --pin-cpus 4
           .benchmark-candidate/bin/python scripts/benchmark.py --output candidate.json --repeats 51 --pin-cpus 4
@@ -205,7 +236,7 @@ jobs:
     # native-plugins validates repository files with third-party CLIs fetched
     # from npm at run time; it is a required PR check but must not be able to
     # block wheel publication when npm or those CLI versions are unavailable.
-    needs: [wheels, compatibility, source]
+    needs: [wheels, compatibility, source, migration-differential]
     runs-on: ubuntu-24.04
     permissions:
       contents: write

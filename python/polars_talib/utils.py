@@ -32,7 +32,8 @@ def parse_into_expr(expr: IntoExpr, *, str_as_lit: bool = False,
 
 def register_plugin(*, symbol: str, is_elementwise: bool,
                     kwargs: dict[str, Any] | None = None, args: list[IntoExpr],
-                    lib: str | Path, returns_scalar: bool = False) -> pl.Expr:
+                    lib: str | Path, returns_scalar: bool = False,
+                    group_by: list[pl.Expr] | None = None) -> pl.Expr:
     if kwargs:
         kwargs = dict(kwargs)
         for key in INTEGER_PARAMETERS.get(symbol, ()):
@@ -62,8 +63,15 @@ def register_plugin(*, symbol: str, is_elementwise: bool,
         "lookback": _lookback(symbol, kwargs) if MASK_MISSING else -1,
         "recursive": symbol not in WINDOW_BOUNDED,
     }
+    native_symbol = symbol
+    if group_by is not None:
+        # Host Polars encodes full keys before the frozen plugin ABI boundary.
+        # Raw String/Array/categorical layouts differ across supported runtimes.
+        keys = pl.struct([key.alias(f"__talib_key_{i}") for i, key in enumerate(group_by)])
+        args = [*args, keys.rank("dense").cast(pl.UInt32)]
+        native_symbol += "_by_group"
     return register_plugin_function(
-        args=args, plugin_path=lib, function_name=symbol, kwargs=policy,
+        args=args, plugin_path=lib, function_name=native_symbol, kwargs=policy,
         is_elementwise=is_elementwise, returns_scalar=returns_scalar,
     )
 

@@ -1,0 +1,369 @@
+{
+  "aggregation": "median of three per-process medians,31 samples each,5 warmups",
+  "metadata": {
+    "cpu": "Apple M6",
+    "memory_bytes": 34359738368,
+    "logical_cpus": 12,
+    "python": "3.12.14",
+    "platform": "macOS-27.0.1-arm64-arm-64bit",
+    "polars": "1.44.2",
+    "numpy": "2.5.3",
+    "rust": "1.90.0",
+    "profile": "release (maturin --release --locked), portable CPU target",
+    "threads": 4,
+    "repeats": 31,
+    "warmups": 5
+  },
+  "baseline_source_sha256": "f1bae62655e4b18a1cbf77bbbe2b0a3cbfd7cb46099637af1b827b1e9207ff34",
+  "native_source_sha256": "4a81e5f34fbde681305efb4d6f4b0a7d9d5df936e54dc52b39494b60fd22f998",
+  "measurements": {
+    "ema/1000": {
+      "baseline_median_ms": 0.010958,
+      "native_median_ms": 0.011417,
+      "baseline_over_native": 0.9597967942541824,
+      "baseline_round_medians_ms": [
+        0.010667,
+        0.011209,
+        0.010958
+      ],
+      "native_round_medians_ms": [
+        0.011417,
+        0.011291,
+        0.011791
+      ]
+    },
+    "rsi/1000": {
+      "baseline_median_ms": 0.011708,
+      "native_median_ms": 0.011917,
+      "baseline_over_native": 0.9824620290341528,
+      "baseline_round_medians_ms": [
+        0.011708,
+        0.011792,
+        0.011334
+      ],
+      "native_round_medians_ms": [
+        0.012083,
+        0.011917,
+        0.011792
+      ]
+    },
+    "macd/1000": {
+      "baseline_median_ms": 0.01525,
+      "native_median_ms": 0.0155,
+      "baseline_over_native": 0.9838709677419355,
+      "baseline_round_medians_ms": [
+        0.015083,
+        0.01525,
+        0.015708
+      ],
+      "native_round_medians_ms": [
+        0.015209,
+        0.0155,
+        0.015916
+      ]
+    },
+    "atr/1000": {
+      "baseline_median_ms": 0.031208,
+      "native_median_ms": 0.027292,
+      "baseline_over_native": 1.143485270408911,
+      "baseline_round_medians_ms": [
+        0.028334,
+        0.031208,
+        0.035708
+      ],
+      "native_round_medians_ms": [
+        0.027292,
+        0.025916,
+        0.034541
+      ]
+    },
+    "mix8/1000": {
+      "baseline_median_ms": 0.078959,
+      "native_median_ms": 0.079833,
+      "baseline_over_native": 0.9890521463555172,
+      "baseline_round_medians_ms": [
+        0.085667,
+        0.078959,
+        0.076375
+      ],
+      "native_round_medians_ms": [
+        0.085208,
+        0.07725,
+        0.079833
+      ]
+    },
+    "ema/1000000": {
+      "baseline_median_ms": 1.165708,
+      "native_median_ms": 0.986125,
+      "baseline_over_native": 1.1821097731017873,
+      "baseline_round_medians_ms": [
+        1.121958,
+        1.171958,
+        1.165708
+      ],
+      "native_round_medians_ms": [
+        0.986125,
+        0.984833,
+        0.989541
+      ]
+    },
+    "rsi/1000000": {
+      "baseline_median_ms": 1.875375,
+      "native_median_ms": 1.897792,
+      "baseline_over_native": 0.9881878519879945,
+      "baseline_round_medians_ms": [
+        1.806167,
+        1.876584,
+        1.875375
+      ],
+      "native_round_medians_ms": [
+        1.895292,
+        1.897792,
+        1.910583
+      ]
+    },
+    "macd/1000000": {
+      "baseline_median_ms": 1.796916,
+      "native_median_ms": 1.629208,
+      "baseline_over_native": 1.1029383602339295,
+      "baseline_round_medians_ms": [
+        1.730084,
+        1.804375,
+        1.796916
+      ],
+      "native_round_medians_ms": [
+        1.622083,
+        1.629208,
+        1.636292
+      ]
+    },
+    "atr/1000000": {
+      "baseline_median_ms": 0.842375,
+      "native_median_ms": 0.880084,
+      "baseline_over_native": 0.9571529535817036,
+      "baseline_round_medians_ms": [
+        0.860875,
+        0.842375,
+        0.841
+      ],
+      "native_round_medians_ms": [
+        0.880084,
+        0.879834,
+        0.880958
+      ]
+    },
+    "mix8/1000000": {
+      "baseline_median_ms": 7.694333,
+      "native_median_ms": 8.032708,
+      "baseline_over_native": 0.9578753516248818,
+      "baseline_round_medians_ms": [
+        8.08525,
+        7.687459,
+        7.694333
+      ],
+      "native_round_medians_ms": [
+        7.737708,
+        8.032708,
+        8.150541
+      ]
+    },
+    "grouped_ema/1000x1000": {
+      "baseline_median_ms": 4.966208,
+      "native_median_ms": 5.237916,
+      "baseline_over_native": 0.9481266977171836,
+      "baseline_round_medians_ms": [
+        5.617958,
+        4.966208,
+        4.90075
+      ],
+      "native_round_medians_ms": [
+        5.174583,
+        5.347333,
+        5.237916
+      ],
+      "dispatcher_median_ms": 9.330833,
+      "baseline_over_dispatcher": 0.5322362965878823,
+      "dispatcher_round_medians_ms": [
+        9.489416,
+        9.059792,
+        9.330833
+      ]
+    },
+    "grouped_atr/1000x1000": {
+      "baseline_median_ms": 8.539917,
+      "native_median_ms": 9.071958,
+      "baseline_over_native": 0.9413532337781988,
+      "baseline_round_medians_ms": [
+        8.539917,
+        8.470167,
+        8.954667
+      ],
+      "native_round_medians_ms": [
+        9.071958,
+        9.908417,
+        8.87125
+      ],
+      "dispatcher_median_ms": 9.163458,
+      "baseline_over_dispatcher": 0.9319535267144784,
+      "dispatcher_round_medians_ms": [
+        9.464708,
+        9.163458,
+        8.942916
+      ]
+    },
+    "grouped_mix8/1000x1000": {
+      "baseline_median_ms": 30.230709,
+      "native_median_ms": 31.260666,
+      "baseline_over_native": 0.9670526213357067,
+      "baseline_round_medians_ms": [
+        30.151292,
+        30.726208,
+        30.230709
+      ],
+      "native_round_medians_ms": [
+        31.260666,
+        30.330959,
+        31.864209
+      ],
+      "dispatcher_median_ms": 23.544834,
+      "baseline_over_dispatcher": 1.2839635650011378,
+      "dispatcher_round_medians_ms": [
+        23.747584,
+        23.544834,
+        23.393625
+      ]
+    },
+    "grouped_ema/10000x100": {
+      "baseline_median_ms": 21.014041,
+      "native_median_ms": 20.661375,
+      "baseline_over_native": 1.0170688543235868,
+      "baseline_round_medians_ms": [
+        21.045375,
+        20.87775,
+        21.014041
+      ],
+      "native_round_medians_ms": [
+        20.512084,
+        20.661375,
+        20.742542
+      ],
+      "dispatcher_median_ms": 12.310625,
+      "baseline_over_dispatcher": 1.7069840889475554,
+      "dispatcher_round_medians_ms": [
+        12.310625,
+        10.769042,
+        13.005916
+      ]
+    },
+    "grouped_atr/10000x100": {
+      "baseline_median_ms": 37.650417,
+      "native_median_ms": 39.256833,
+      "baseline_over_native": 0.9590793276676189,
+      "baseline_round_medians_ms": [
+        35.241875,
+        37.81425,
+        37.650417
+      ],
+      "native_round_medians_ms": [
+        38.270875,
+        39.256833,
+        39.601792
+      ],
+      "dispatcher_median_ms": 13.101709,
+      "baseline_over_dispatcher": 2.8737027360323757,
+      "dispatcher_round_medians_ms": [
+        12.668542,
+        13.101709,
+        14.957334
+      ]
+    },
+    "grouped_mix8/10000x100": {
+      "baseline_median_ms": 158.73325,
+      "native_median_ms": 154.013542,
+      "baseline_over_native": 1.0306447597965118,
+      "baseline_round_medians_ms": [
+        151.503042,
+        158.73325,
+        165.468084
+      ],
+      "native_round_medians_ms": [
+        147.224166,
+        154.013542,
+        164.175416
+      ],
+      "dispatcher_median_ms": 51.475875,
+      "baseline_over_dispatcher": 3.083643551469499,
+      "dispatcher_round_medians_ms": [
+        51.475875,
+        51.316458,
+        53.605791
+      ]
+    },
+    "grouped_ema/2000x100_interleaved": {
+      "baseline_median_ms": 3.537125,
+      "native_median_ms": 3.338084,
+      "baseline_over_native": 1.059627319144755,
+      "baseline_round_medians_ms": [
+        3.537125,
+        3.5295,
+        3.678792
+      ],
+      "native_round_medians_ms": [
+        3.405542,
+        3.332292,
+        3.338084
+      ],
+      "dispatcher_median_ms": 5.526791,
+      "baseline_over_dispatcher": 0.6399961569018984,
+      "dispatcher_round_medians_ms": [
+        6.415625,
+        5.461583,
+        5.526791
+      ]
+    },
+    "grouped_atr/2000x100_interleaved": {
+      "baseline_median_ms": 6.827125,
+      "native_median_ms": 7.385583,
+      "baseline_over_native": 0.9243853870439206,
+      "baseline_round_medians_ms": [
+        6.571375,
+        6.827125,
+        7.020625
+      ],
+      "native_round_medians_ms": [
+        7.385583,
+        7.234959,
+        7.628708
+      ],
+      "dispatcher_median_ms": 5.744541,
+      "baseline_over_dispatcher": 1.1884543952249622,
+      "dispatcher_round_medians_ms": [
+        5.472458,
+        6.105625,
+        5.744541
+      ]
+    },
+    "grouped_mix8/2000x100_interleaved": {
+      "baseline_median_ms": 31.6015,
+      "native_median_ms": 28.581,
+      "baseline_over_native": 1.1056820964976732,
+      "baseline_round_medians_ms": [
+        30.591459,
+        31.6015,
+        33.074167
+      ],
+      "native_round_medians_ms": [
+        27.969917,
+        28.581,
+        30.312125
+      ],
+      "dispatcher_median_ms": 13.751416,
+      "baseline_over_dispatcher": 2.2980542512858313,
+      "dispatcher_round_medians_ms": [
+        13.101916,
+        15.056416,
+        13.751416
+      ]
+    }
+  }
+}

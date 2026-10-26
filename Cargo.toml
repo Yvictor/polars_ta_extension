@@ -13,13 +13,14 @@ crate-type = ["cdylib"]
 
 
 [dependencies]
-pyo3 = { version = "0.20", features = ["extension-module", "abi3-py310"] }
+pyo3 = { version = "0.20", features = ["abi3-py310"] }
 pyo3-polars = { version = "0.10.0", features = ["derive"] }
 polars = {version = "0.36.2", features = ["dtype-struct"]}
 # "performant", "lazy", "dtype-array"
 serde = { version = "*", features = ["derive"] }
-talib-sys = { path = "talib-sys"}
-talib = { path = "talib"}
+ta-lib = "=0.8.3"
+rayon = "1.10"
+polars-core = { version = "0.36.2", default-features = false }
 
 [target.'cfg(any(not(target_os = "linux"), use_mimalloc))'.dependencies]
 mimalloc = { version = "0.1", default-features = false }

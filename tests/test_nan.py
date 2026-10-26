@@ -3,6 +3,7 @@ import polars as pl
 import polars_talib as plta
 import talib
 from talib import abstract
+from numeric_compat import different, assert_compatible
 
 
 @pytest.fixture
@@ -79,7 +80,7 @@ def test_ema_eq(df_ohlc: pl.DataFrame):
     not_eq = df_ohlc.with_columns(
         pl.col("close").ta.ema(3).alias("ema3"),
         talib.EMA(df_ohlc["close"], timeperiod=3).alias("EMA3"),
-    ).select(((pl.col("ema3") != pl.col("EMA3")).sum()).alias("not_eq"))["not_eq"][0]
+    ).select(((different(pl.col("ema3"), pl.col("EMA3"))).sum()).alias("not_eq"))["not_eq"][0]
     assert not_eq == 0
 
 
@@ -87,7 +88,7 @@ def test_midprice_eq(df_ohlc: pl.DataFrame):
     not_eq = df_ohlc.with_columns(
         pl.col("high").ta.midprice(pl.col("low"), 3).alias("midprice3"),
         talib.MIDPRICE(df_ohlc["high"], df_ohlc["low"], timeperiod=3).alias("MIDPRICE3"),
-    ).select(((pl.col("midprice3") != pl.col("MIDPRICE3")).sum()).alias("not_eq"))["not_eq"][0]
+    ).select(((different(pl.col("midprice3"), pl.col("MIDPRICE3"))).sum()).alias("not_eq"))["not_eq"][0]
     assert not_eq == 0
 
 
@@ -95,7 +96,7 @@ def test_sar_eq(df_ohlc: pl.DataFrame):
     not_eq = df_ohlc.with_columns(
         pl.col("high").ta.sar(pl.col("low"), acceleration=0.02, maximum=0.2).alias("expr"),
         talib.SAR(df_ohlc["high"], df_ohlc["low"], acceleration=0.02, maximum=0.2).alias("talib"),
-    ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+    ).select(((different(pl.col("expr"), pl.col("talib"))).sum()).alias("not_eq"))["not_eq"][0]
     assert not_eq == 0
 
 
@@ -103,7 +104,7 @@ def test_adx_eq(df_ohlc: pl.DataFrame):
     not_eq = df_ohlc.with_columns(
         pl.col("close").ta.adx(pl.col("high"), pl.col("low"), 3).alias("expr"),
         talib.ADX(df_ohlc["high"], df_ohlc["low"], df_ohlc["close"], timeperiod=3).alias("talib"),
-    ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+    ).select(((different(pl.col("expr"), pl.col("talib"))).sum()).alias("not_eq"))["not_eq"][0]
     assert not_eq == 0
 
 
@@ -113,7 +114,7 @@ def test_mfi_eq(df_ohlc: pl.DataFrame):
         talib.MFI(
             df_ohlc["high"], df_ohlc["low"], df_ohlc["close"], df_ohlc["volume"], timeperiod=3
         ).alias("talib"),
-    ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+    ).select(((different(pl.col("expr"), pl.col("talib"))).sum()).alias("not_eq"))["not_eq"][0]
 
     assert not_eq == 0
 
@@ -142,7 +143,7 @@ def test_abstract_math_transform_eq(df_ohlc: pl.DataFrame, func: str):
     not_eq = df_ohlc.with_columns(
         getattr(plta, func)().alias("expr"),
         getattr(abstract, func.upper())(df_ohlc).alias("talib"),
-    ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+    ).select(((different(pl.col("expr"), pl.col("talib"))).sum()).alias("not_eq"))["not_eq"][0]
 
     assert not_eq == 0
 
@@ -188,11 +189,11 @@ def test_abstract_momentum_eq(df_ohlc: pl.DataFrame, func: str):
         not_eq = df_ohlc.with_columns(
             getattr(plta, func)().alias("expr"),
             expected.alias("talib"),
-        ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+        ).select(((different(pl.col("expr"), pl.col("talib"))).sum()).alias("not_eq"))["not_eq"][0]
         assert not_eq == 0
     else:
         res = df_ohlc.select(getattr(plta, func)().alias("expr")).unnest("expr")
-        assert res.equals(expected)
+        assert_compatible(res, expected)
 
 
 @pytest.mark.parametrize(
@@ -230,11 +231,11 @@ def test_abstract_overlap_eq(df_ohlc: pl.DataFrame, func: str):
         not_eq = df_ohlc.with_columns(
             expr.alias("expr"),
             expected.alias("talib"),
-        ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+        ).select(((different(pl.col("expr"), pl.col("talib"))).sum()).alias("not_eq"))["not_eq"][0]
         assert not_eq == 0
     else:
         res = df_ohlc.select(getattr(plta, func)().alias("expr")).unnest("expr")
-        assert res.equals(expected)
+        assert_compatible(res, expected)
 
 
 @pytest.mark.parametrize(
@@ -310,11 +311,11 @@ def test_abstract_pattern_eq(df_ohlc: pl.DataFrame, func: str):
         not_eq = df_ohlc.with_columns(
             expr.alias("expr"),
             expected.alias("talib"),
-        ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+        ).select(((different(pl.col("expr"), pl.col("talib"))).sum()).alias("not_eq"))["not_eq"][0]
         assert not_eq == 0
     else:
         res = df_ohlc.select(getattr(plta, func)().alias("expr")).unnest("expr")
-        assert res.equals(expected)
+        assert_compatible(res, expected)
 
 
 @pytest.mark.parametrize(
@@ -338,11 +339,11 @@ def test_abstract_statistic_eq(df_ohlc: pl.DataFrame, func: str):
         not_eq = df_ohlc.with_columns(
             expr.alias("expr"),
             expected.alias("talib"),
-        ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+        ).select(((different(pl.col("expr"), pl.col("talib"))).sum()).alias("not_eq"))["not_eq"][0]
         assert not_eq == 0
     else:
         res = df_ohlc.select(getattr(plta, func)().alias("expr")).unnest("expr")
-        assert res.equals(expected)
+        assert_compatible(res, expected)
 
 
 @pytest.mark.parametrize("func", ["avgprice", "medprice", "typprice", "wclprice"])
@@ -353,11 +354,11 @@ def test_abstract_price_transform_eq(df_ohlc: pl.DataFrame, func: str):
         not_eq = df_ohlc.with_columns(
             expr.alias("expr"),
             expected.alias("talib"),
-        ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+        ).select(((different(pl.col("expr"), pl.col("talib"))).sum()).alias("not_eq"))["not_eq"][0]
         assert not_eq == 0
     else:
         res = df_ohlc.select(getattr(plta, func)().alias("expr")).unnest("expr")
-        assert res.equals(expected)
+        assert_compatible(res, expected)
 
 
 @pytest.mark.parametrize(
@@ -371,11 +372,11 @@ def test_abstract_volatility_eq(df_ohlc: pl.DataFrame, func: str):
         not_eq = df_ohlc.with_columns(
             expr.alias("expr"),
             expected.alias("talib"),
-        ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+        ).select(((different(pl.col("expr"), pl.col("talib"))).sum()).alias("not_eq"))["not_eq"][0]
         assert not_eq == 0
     else:
         res = df_ohlc.select(getattr(plta, func)().alias("expr")).unnest("expr")
-        assert res.equals(expected)
+        assert_compatible(res, expected)
 
 
 @pytest.mark.parametrize(
@@ -389,8 +390,8 @@ def test_abstract_volume_eq(df_ohlc: pl.DataFrame, func: str):
         not_eq = df_ohlc.with_columns(
             expr.alias("expr"),
             expected.alias("talib"),
-        ).select(((pl.col("expr") != pl.col("talib")).sum()).alias("not_eq"))["not_eq"][0]
+        ).select(((different(pl.col("expr"), pl.col("talib"))).sum()).alias("not_eq"))["not_eq"][0]
         assert not_eq == 0
     else:
         res = df_ohlc.select(getattr(plta, func)().alias("expr")).unnest("expr")
-        assert res.equals(expected)
+        assert_compatible(res, expected)

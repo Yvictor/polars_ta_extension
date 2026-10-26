@@ -1,0 +1,9 @@
+{
+  "kind": "diagnostic only, not end-to-end speed claim",
+  "rust": "1.90.0 release portable",
+  "rows": 1000000,
+  "repetitions": 101,
+  "original_ms": 0.48503341584158416,
+  "boolean_reduction_ms": 0.1984521386138614,
+  "predicate": "!v.is_finite() || v.abs() > 1024; fold uses boolean bitwise OR with same truth values"
+}

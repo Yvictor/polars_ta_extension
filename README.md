@@ -1,9 +1,9 @@
 # Polars Extension for Ta-Lib
 
-Version **0.2.1** bundles **TA-Lib 0.8.1**: all **201 batch indicators**,
-including SuperTrend, VWAP, HMA, KDJ and Heikin-Ashi. Python 3.10+; Polars 1.20+
-and 2.x.
-Binary wheels include the C library.
+This branch uses the official **native Rust `ta-lib` 0.8.3 crate** for the existing
+**201 batch indicators**, with explicit compatibility paths for 0.8.1 semantics.
+Python 3.10+; Polars 1.20+ and 2.x. Source builds no longer compile the C TA-Lib library.
+See [migration evidence and compatibility limits](docs/native-rust-migration.md).
 
 - [Upgrade notes, platform matrix and source builds](docs/upgrade-0.2.0.md)
 - [Install the skill for Codex, Claude Code or Cursor](docs/skills.md)

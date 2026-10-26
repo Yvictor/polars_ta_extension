@@ -1,0 +1,504 @@
+/* TA-LIB Copyright (c) 1999-2026, Mario Fortier
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or
+ * without modification, are permitted provided that the following
+ * conditions are met:
+ *
+ * - Redistributions of source code must retain the above copyright
+ *   notice, this list of conditions and the following disclaimer.
+ *
+ * - Redistributions in binary form must reproduce the above copyright
+ *   notice, this list of conditions and the following disclaimer in
+ *   the documentation and/or other materials provided with the
+ *   distribution.
+ *
+ * - Neither name of author nor the names of its contributors
+ *   may be used to endorse or promote products derived from this
+ *   software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ * REGENTS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+ * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+// Adapted batch-only compatibility kernel from TA-Lib v0.8.1 (bbands).
+use super::*;
+#[allow(
+    non_snake_case,
+    unused_variables,
+    dead_code,
+    unused_mut,
+    unused_assignments,
+    unused_parens
+)]
+impl CompatCore {
+    pub fn bbands_lookback(
+        &self,
+        mut optInTimePeriod: i32,
+        mut optInNbDevUp: f64,
+        mut optInNbDevDn: f64,
+        mut optInMAType: MAType,
+    ) -> Result<usize, RetCode> {
+        if ((optInTimePeriod) as i32) == (i32::MIN) {
+            optInTimePeriod = 20;
+        } else if (((optInTimePeriod) as i32) < 2) || (((optInTimePeriod) as i32) > 100000) {
+            return Err(RetCode::BadParam);
+        }
+        if optInNbDevUp == Self::REAL_DEFAULT {
+            optInNbDevUp = 2e0;
+        } else if !((optInNbDevUp >= Self::REAL_MIN) && (optInNbDevUp <= Self::REAL_MAX)) {
+            return Err(RetCode::BadParam);
+        }
+        if optInNbDevDn == Self::REAL_DEFAULT {
+            optInNbDevDn = 2e0;
+        } else if !((optInNbDevDn >= Self::REAL_MIN) && (optInNbDevDn <= Self::REAL_MAX)) {
+            return Err(RetCode::BadParam);
+        }
+        if optInMAType == MAType::DEFAULT {
+            optInMAType = MAType::SMA;
+        }
+        let mut maLookback: usize = 0_usize;
+        let mut stddevLookback: usize = 0_usize;
+        // A band value needs BOTH the middle-band moving average and the standard
+        // deviation of the outer bands, so the first valid output is the later of the
+        // two lookbacks. For every MA type whose lookback is at least
+        // optInTimePeriod-1 this equals the MA lookback (unchanged); it rises above it
+        // only when the MA lookback is the smaller one - TA_MAType_MAMA at
+        // optInTimePeriod >= 34 (constant MAMA lookback 32) and TA_MAType_DISABLED
+        // (MA lookback 0, issue #93). Reporting the honest value keeps
+        // outBegIdx == lookback: issue #99 kept it at the MA lookback, which
+        // under-reported those cases (outBegIdx > lookback) and broke streaming, whose
+        // Open is tied to lookback+1. The middle band still begins at the MA's earlier
+        // begIdx internally and is realigned to this later bar in bbands() below.
+        maLookback = self.ma_lookback(optInTimePeriod, optInMAType)?;
+        stddevLookback = self.stddev_lookback(optInTimePeriod, 1.0)?;
+        return Ok((if maLookback > stddevLookback {
+            maLookback
+        } else {
+            stddevLookback
+        }) as usize);
+    }
+    fn bbands_impl(
+        &self,
+        startIdx: usize,
+        endIdx: usize,
+        inReal: &[f64],
+        mut optInTimePeriod: i32,
+        mut optInNbDevUp: f64,
+        mut optInNbDevDn: f64,
+        mut optInMAType: MAType,
+        outBegIdx: &mut usize,
+        outNBElement: &mut usize,
+        outRealUpperBand: &mut [f64],
+        outRealMiddleBand: &mut [f64],
+        outRealLowerBand: &mut [f64],
+    ) -> RetCode {
+        if startIdx > Core::INDEX_MAX {
+            return RetCode::OutOfRangeStartIndex;
+        }
+        if endIdx > Core::INDEX_MAX || endIdx < startIdx {
+            return RetCode::OutOfRangeEndIndex;
+        }
+        if ((optInTimePeriod) as i32) == (i32::MIN) {
+            optInTimePeriod = 20;
+        } else if (((optInTimePeriod) as i32) < 2) || (((optInTimePeriod) as i32) > 100000) {
+            return RetCode::BadParam;
+        }
+        if optInNbDevUp == Self::REAL_DEFAULT {
+            optInNbDevUp = 2e0;
+        } else if !((optInNbDevUp >= Self::REAL_MIN) && (optInNbDevUp <= Self::REAL_MAX)) {
+            return RetCode::BadParam;
+        }
+        if optInNbDevDn == Self::REAL_DEFAULT {
+            optInNbDevDn = 2e0;
+        } else if !((optInNbDevDn >= Self::REAL_MIN) && (optInNbDevDn <= Self::REAL_MAX)) {
+            return RetCode::BadParam;
+        }
+        if optInMAType == MAType::DEFAULT {
+            optInMAType = MAType::SMA;
+        }
+        let _assertLb = self
+            .bbands_lookback(optInTimePeriod, optInNbDevUp, optInNbDevDn, optInMAType)
+            .unwrap_or(usize::MAX);
+        let _assertStart = if startIdx > _assertLb {
+            startIdx
+        } else {
+            _assertLb
+        };
+        assert!(_assertStart > endIdx || endIdx < inReal.len());
+        assert!(_assertStart > endIdx || endIdx - _assertStart < outRealUpperBand.len());
+        assert!(_assertStart > endIdx || endIdx - _assertStart < outRealMiddleBand.len());
+        assert!(_assertStart > endIdx || endIdx - _assertStart < outRealLowerBand.len());
+        if (!outRealUpperBand.is_empty()
+            && !outRealMiddleBand.is_empty()
+            && outRealUpperBand.as_ptr() == outRealMiddleBand.as_ptr())
+            || (!outRealUpperBand.is_empty()
+                && !outRealLowerBand.is_empty()
+                && outRealUpperBand.as_ptr() == outRealLowerBand.as_ptr())
+            || (!outRealMiddleBand.is_empty()
+                && !outRealLowerBand.is_empty()
+                && outRealMiddleBand.as_ptr() == outRealLowerBand.as_ptr())
+        {
+            return RetCode::BadParam;
+        }
+        let mut startIdx = startIdx;
+        let mut retCode: RetCode = RetCode::Success;
+        let mut i: usize = 0_usize;
+        let mut maBegIdx: usize = 0_usize;
+        let mut shiftIdx: usize = 0_usize;
+        let mut tempReal: f64 = 0.0_f64;
+        let mut tempReal2: f64 = 0.0_f64;
+        let mut tempBuffer1: Vec<f64> = Vec::new();
+        let mut tempBuffer2: Vec<f64> = Vec::new();
+        if optInMAType == MAType::SMA {
+            // SMA fast path: the middle band (SMA) and the standard deviation share one
+            // pass over the window below. Bit-identical to the general MA + STDDEV path
+            // (which the stream composes for every MA type).
+            //
+            // Identify TWO temporary buffers among the outputs so the calculation
+            // needs no memory allocation; whenever possible make tempBuffer1 be the
+            // middle band output, saving one copy operation.
+            // Rust: C's pointer election here is a rename, so the calculation runs
+            // directly in the caller's slices:
+            //   C's `tempBuffer1` is `outRealMiddleBand`
+            //   C's `tempBuffer2` is `outRealUpperBand`
+            // This function therefore allocates nothing, exactly as the C does.
+            // The aliasing arms, the input-alias guard and the copy-back are all
+            // unreachable here: `&[T]` and `&mut [T]` parameters can never
+            // overlap, and neither can two `&mut [T]`. See issue #146.
+            // One pass with two independent recurrences: the SMA running sum (maTotal,
+            // mean -> tempBuffer1, bit-identical to TA_MA(SMA)) and the shifted-data
+            // variance (-> tempBuffer2, bit-identical to TA_STDDEV/TA_VAR - see var.c).
+            // The variance carries its own shift and reseed; the SMA sum is untouched by
+            // it. tempBuffer1/2 never alias inReal (checked above).
+            let mut maTotal: f64 = 0.0_f64;
+            let mut shift: f64 = 0.0_f64;
+            let mut varTotal1: f64 = 0.0_f64;
+            let mut varTotal2: f64 = 0.0_f64;
+            let mut meanValue1: f64 = 0.0_f64;
+            let mut variance: f64 = 0.0_f64;
+            let mut _invPeriod: f64 = 0.0_f64;
+            let mut _tempReal: f64 = 0.0_f64;
+            let mut _i: usize = 0_usize;
+            let mut _j: usize = 0_usize;
+            let mut _outIdx: usize = 0_usize;
+            let mut _trailingIdx: usize = 0_usize;
+            let mut _windowStart: usize = 0_usize;
+            let mut _lookbackTotal: usize = 0_usize;
+            let mut _barsSinceReseed: usize = 0_usize;
+            _lookbackTotal = (optInTimePeriod - 1) as usize;
+            if startIdx < _lookbackTotal {
+                startIdx = _lookbackTotal;
+            }
+            if startIdx > endIdx {
+                (*outBegIdx) = 0;
+                (*outNBElement) = 0;
+                return RetCode::Success;
+            }
+            _invPeriod = 1.0 / (optInTimePeriod as f64);
+            _trailingIdx = startIdx - _lookbackTotal;
+            shift = inReal[_trailingIdx];
+            maTotal = 0.0;
+            varTotal1 = 0.0;
+            varTotal2 = 0.0;
+            // for( _j = _trailingIdx; _j < startIdx; _j += 1 )
+            _j = _trailingIdx;
+            while _j < startIdx {
+                maTotal += inReal[_j];
+                _tempReal = inReal[_j] - shift;
+                varTotal1 += _tempReal;
+                _tempReal *= _tempReal;
+                varTotal2 += _tempReal;
+                _j += 1;
+            }
+            _i = startIdx;
+            _outIdx = 0;
+            _barsSinceReseed = (32 * optInTimePeriod) as usize;
+            loop {
+                maTotal += inReal[_i];
+                _tempReal = inReal[_i] - shift;
+                varTotal1 += _tempReal;
+                _tempReal *= _tempReal;
+                varTotal2 += _tempReal;
+                meanValue1 = varTotal1 * _invPeriod;
+                variance = varTotal2 * _invPeriod - meanValue1 * meanValue1;
+                outRealMiddleBand[_outIdx] = maTotal / ((optInTimePeriod) as f64);
+                maTotal -= inReal[_trailingIdx];
+                _tempReal = inReal[_trailingIdx] - shift;
+                varTotal1 -= _tempReal;
+                _tempReal *= _tempReal;
+                varTotal2 -= _tempReal;
+                _trailingIdx += 1;
+                _barsSinceReseed -= 1;
+                if variance < 0.000001 * (varTotal2 * _invPeriod)
+                    || _tempReal > 1000000.0 * varTotal2
+                    || _barsSinceReseed <= 0
+                {
+                    _barsSinceReseed = (32 * optInTimePeriod) as usize;
+                    _windowStart = _i - _lookbackTotal;
+                    _tempReal = 0.0;
+                    for _j in (_windowStart as usize)..(_i as usize) + 1 {
+                        _tempReal += inReal[_j];
+                    }
+                    _j = (_i as usize) + 1;
+                    shift = _tempReal * _invPeriod;
+                    varTotal1 = 0.0;
+                    varTotal2 = 0.0;
+                    for _j in (_windowStart as usize)..(_i as usize) + 1 {
+                        _tempReal = inReal[_j] - shift;
+                        varTotal1 += _tempReal;
+                        _tempReal *= _tempReal;
+                        varTotal2 += _tempReal;
+                    }
+                    _j = (_i as usize) + 1;
+                    meanValue1 = varTotal1 * _invPeriod;
+                    variance = varTotal2 * _invPeriod - meanValue1 * meanValue1;
+                    // The floor from var.c, verbatim: it owns both the sign and the
+                    // dead-zone, so the square root below can be unconditional.
+                    if variance < 0.000000000001 * (varTotal2 * _invPeriod) {
+                        variance = 0.0;
+                    }
+                    _tempReal = inReal[_windowStart] - shift;
+                    varTotal1 -= _tempReal;
+                    _tempReal *= _tempReal;
+                    varTotal2 -= _tempReal;
+                }
+                // The TA_EPSILON test that used to stand here compared a SQUARED
+                // quantity to a fixed 1e-14 and flattened all three bands onto each
+                // other for any finely quoted series (#243). What replaces it skips
+                // the root ONLY where the answer is already known, because the
+                // reseed floor above has made it exactly 0 -- worth doing because
+                // this root, unlike stddev.c's, sits in the fused loop with a
+                // carried dependency and cannot vectorize, so running it on flat
+                // input cost 1.59x.
+                //
+                // `!= 0.0` and not `> 0.0`: the two differ only on NaN, and `> 0.0`
+                // sends it to the false arm, which would emit a zero-width band
+                // where stddev.c, BBANDS' own non-SMA paths and BBANDS_Open all
+                // return NaN. Reaching it needs a squared deviation to overflow
+                // (|x| ~ 1.3e154, far outside TA_REAL_MAX), so nothing in the
+                // declared domain can tell the two apart -- but there is no reason
+                // to buy the disagreement, and `!= 0.0` is what this is for.
+                outRealUpperBand[_outIdx] = (if variance != 0.0 {
+                    (variance).sqrt()
+                } else {
+                    0.0
+                });
+                _outIdx += 1;
+                _i += 1;
+                if !(_i <= endIdx) {
+                    break;
+                }
+            }
+            (*outNBElement) = _outIdx;
+            (*outBegIdx) = startIdx;
+            // Now do a tight loop to calculate the upper/lower band at the same time.
+            if optInNbDevUp == optInNbDevDn {
+                // for( i = 0; i < ((((*outNBElement) as usize)) as usize); i += 1 )
+                i = 0;
+                while i < (((*outNBElement) as usize) as usize) {
+                    tempReal = outRealUpperBand[i] * optInNbDevUp;
+                    tempReal2 = outRealMiddleBand[i];
+                    outRealUpperBand[i] = tempReal2 + tempReal;
+                    outRealLowerBand[i] = tempReal2 - tempReal;
+                    i += 1;
+                }
+            } else {
+                // for( i = 0; i < ((((*outNBElement) as usize)) as usize); i += 1 )
+                i = 0;
+                while i < (((*outNBElement) as usize) as usize) {
+                    tempReal = outRealUpperBand[i];
+                    tempReal2 = outRealMiddleBand[i];
+                    outRealUpperBand[i] = (tempReal as f64).mul_add(optInNbDevUp, tempReal2);
+                    outRealLowerBand[i] = tempReal2 - tempReal * optInNbDevDn;
+                    i += 1;
+                }
+            }
+            return RetCode::Success;
+        }
+        // General path (every MA type other than SMA): the middle band is the moving
+        // average and the deviation is the standard deviation of the input, combined
+        // at the same bar. Two intermediate buffers are allocated so the input may
+        // safely alias an output (it is only read here).
+        // Nothing to produce: the range is shorter than the lookback. Return before
+        // touching anything.
+        //
+        // Without this the moving average below runs first, and for the MA types whose
+        // lookback is BELOW the deviation's - TA_MAType_DISABLED (MA lookback 0) and
+        // TA_MAType_MAMA at optInTimePeriod >= 34 - it reads the whole range and
+        // computes a middle band the empty standard deviation then discards.
+        // Observably identical (the empty deviation already yields 0,0 here), but it
+        // is the difference between "a range shorter than the lookback reads nothing"
+        // being true of this function and being false: with a caller-supplied inReal
+        // that stops short of endIdx, that discarded work is an out-of-bounds read.
+        // The SMA fast path above needs no such guard - its own lookback IS the
+        // deviation's, so its clamp already covers it. Pinned by the zero-length
+        // no-I/O probe over every guarded core, at every MA type.
+        if self
+            .bbands_lookback(optInTimePeriod, optInNbDevUp, optInNbDevDn, optInMAType)
+            .unwrap_or(usize::MAX)
+            > endIdx
+        {
+            (*outBegIdx) = 0;
+            (*outNBElement) = 0;
+            return RetCode::Success;
+        }
+        tempBuffer1 = vec![0.0_f64; ((endIdx - startIdx + 1) * 1) as usize];
+        tempBuffer2 = vec![0.0_f64; ((endIdx - startIdx + 1) * 1) as usize];
+        // Calculate the middle band moving average.
+        let _xr0 = match self.ma(
+            startIdx,
+            endIdx,
+            inReal,
+            optInTimePeriod,
+            optInMAType,
+            &mut tempBuffer1[..],
+        ) {
+            Ok(_r) => _r,
+            Err(_e) => return _e,
+        };
+        (*outBegIdx) = _xr0.beg_idx;
+        (*outNBElement) = _xr0.count;
+        retCode = RetCode::Success;
+        if ((*outNBElement) as usize) == 0 {
+            (*outNBElement) = 0;
+            return retCode;
+        }
+        // Remember where the moving average begins, to realign it below.
+        maBegIdx = ((*outBegIdx) as usize) as usize;
+        // Calculate the Standard Deviation into tempBuffer2.
+        let _xr1 = match self.stddev(
+            ((*outBegIdx) as usize) as usize,
+            endIdx,
+            inReal,
+            optInTimePeriod,
+            1.0,
+            &mut tempBuffer2[..],
+        ) {
+            Ok(_r) => _r,
+            Err(_e) => return _e,
+        };
+        (*outBegIdx) = _xr1.beg_idx;
+        (*outNBElement) = _xr1.count;
+        retCode = RetCode::Success;
+        // When the standard deviation (lookback optInTimePeriod-1) clamps to a later
+        // begIdx than the moving average did - as with TA_MAType_MAMA (constant
+        // lookback 32) and optInTimePeriod >= 34 - the MA in tempBuffer1 still starts
+        // at the earlier maBegIdx. Copy it forward from that shift into the middle
+        // band so each band value pairs the moving average and standard deviation of
+        // the same bar. The guarded subtraction keeps shiftIdx non-negative even when
+        // the standard deviation produced no output (an empty range leaves *outBegIdx
+        // at 0), which the unconditional copy below then handles as a zero-length move.
+        if (((*outBegIdx) as usize) as usize) > maBegIdx {
+            shiftIdx = (((*outBegIdx) as usize) as usize) - maBegIdx;
+        } else {
+            shiftIdx = 0;
+        }
+        {
+            let _n = ((*outNBElement) * 1) as usize;
+            let _di = (0) as usize;
+            let _si = (shiftIdx) as usize;
+            outRealMiddleBand[_di.._di + _n].copy_from_slice(&tempBuffer1[_si.._si + _n]);
+        };
+        // Now do a tight loop to calculate the upper/lower band at the same time.
+        if optInNbDevUp == optInNbDevDn {
+            // for( i = 0; i < ((((*outNBElement) as usize)) as usize); i += 1 )
+            i = 0;
+            while i < (((*outNBElement) as usize) as usize) {
+                tempReal = tempBuffer2[i] * optInNbDevUp;
+                tempReal2 = outRealMiddleBand[i];
+                outRealUpperBand[i] = tempReal2 + tempReal;
+                outRealLowerBand[i] = tempReal2 - tempReal;
+                i += 1;
+            }
+        } else {
+            // for( i = 0; i < ((((*outNBElement) as usize)) as usize); i += 1 )
+            i = 0;
+            while i < (((*outNBElement) as usize) as usize) {
+                tempReal2 = outRealMiddleBand[i];
+                outRealUpperBand[i] =
+                    (((tempBuffer2[i] as f64).mul_add(optInNbDevUp, tempReal2)) as f64);
+                outRealLowerBand[i] = ((tempReal2 - tempBuffer2[i] * optInNbDevDn) as f64);
+                i += 1;
+            }
+        }
+        return RetCode::Success;
+    }
+    pub fn bbands(
+        &self,
+        startIdx: usize,
+        endIdx: usize,
+        inReal: &[f64],
+        optInTimePeriod: i32,
+        optInNbDevUp: f64,
+        optInNbDevDn: f64,
+        optInMAType: MAType,
+        outRealUpperBand: &mut [f64],
+        outRealMiddleBand: &mut [f64],
+        outRealLowerBand: &mut [f64],
+    ) -> Result<OutRange, RetCode> {
+        if startIdx > Core::INDEX_MAX {
+            return Err(RetCode::OutOfRangeStartIndex);
+        }
+        if endIdx > Core::INDEX_MAX || endIdx < startIdx {
+            return Err(RetCode::OutOfRangeEndIndex);
+        }
+        let _guardLb =
+            self.bbands_lookback(optInTimePeriod, optInNbDevUp, optInNbDevDn, optInMAType)?;
+        let _guardStart = if startIdx > _guardLb {
+            startIdx
+        } else {
+            _guardLb
+        };
+        if inReal.len() < endIdx + 1 {
+            return Err(RetCode::BadParam);
+        }
+        let _guardOutLen = if _guardStart > endIdx {
+            0
+        } else {
+            endIdx - _guardStart + 1
+        };
+        if outRealUpperBand.len() < _guardOutLen {
+            return Err(RetCode::BadParam);
+        }
+        if outRealMiddleBand.len() < _guardOutLen {
+            return Err(RetCode::BadParam);
+        }
+        if outRealLowerBand.len() < _guardOutLen {
+            return Err(RetCode::BadParam);
+        }
+        let mut outBegIdx: usize = 0;
+        let mut outNBElement: usize = 0;
+        let retCode = self.bbands_impl(
+            startIdx,
+            endIdx,
+            inReal,
+            optInTimePeriod,
+            optInNbDevUp,
+            optInNbDevDn,
+            optInMAType,
+            &mut outBegIdx,
+            &mut outNBElement,
+            outRealUpperBand,
+            outRealMiddleBand,
+            outRealLowerBand,
+        );
+        match retCode {
+            RetCode::Success => Ok(OutRange {
+                beg_idx: outBegIdx,
+                count: outNBElement,
+            }),
+            e => Err(e),
+        }
+    }
+}

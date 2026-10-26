@@ -1,6 +1,5 @@
 use polars::datatypes::DataType;
-use polars::prelude::{ChunkFillNullValue, IntoSeries, PolarsError, PolarsResult, Series};
-use talib_sys::TA_RetCode;
+use polars::prelude::{PolarsError, PolarsResult, Series};
 
 pub fn cast_series_to_f64(series: &Series) -> PolarsResult<Series> {
     Ok(match series.dtype() {
@@ -8,24 +7,6 @@ pub fn cast_series_to_f64(series: &Series) -> PolarsResult<Series> {
         _ => series.cast(&DataType::Float64),
     }?
     .rechunk())
-}
-
-/// Borrow contiguous, non-null values: C never mutates its inputs.
-/// The optional owner keeps a null-to-NaN conversion alive for the FFI call.
-pub fn get_series_f64_ptr(series: &mut Series) -> PolarsResult<(*const f64, Option<Series>)> {
-    if series.null_count() != 0 {
-        let owner = series.f64()?.fill_null_with_values(f64::NAN)?.into_series();
-        let ptr = owner.f64()?.cont_slice()?.as_ptr();
-        Ok((ptr, Some(owner)))
-    } else {
-        Ok((series.f64()?.cont_slice()?.as_ptr(), None))
-    }
-}
-
-pub fn ta_code2err(ret_code: TA_RetCode) -> PolarsResult<Series> {
-    Err(PolarsError::ComputeError(
-        format!("Could not compute indicator, err: {:?}", ret_code).into(),
-    ))
 }
 
 /// Align plugin inputs before handing raw buffers to C: length-1 inputs
