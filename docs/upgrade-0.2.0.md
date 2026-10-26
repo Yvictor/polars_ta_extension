@@ -124,7 +124,7 @@ CI status on the PR is the authority for whether a target has actually passed.
 
 The native Rust migration replaces the C build with the pinned official `ta-lib`
 crate. See [native migration](native-rust-migration.md) for source-build commands,
-compatibility paths, the explicit grouped dispatcher, and measured evidence.
+compatibility paths, ordinary `.over()` execution boundaries, and CI evidence.
 The release history and changes above describe the prior 0.2.x C releases.
 
 ## Maintaining the generated API

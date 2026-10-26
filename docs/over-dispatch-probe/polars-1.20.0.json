@@ -1,0 +1,223 @@
+{
+  "polars": "1.20.0",
+  "bare_column_meta_available": true,
+  "outcomes": [
+    {
+      "case": "interleaved_nullable/direct",
+      "status": "pass",
+      "calls": [
+        {
+          "dtype": "List(Float64)",
+          "list_rows": 1
+        }
+      ]
+    },
+    {
+      "case": "interleaved_nullable/over/group_to_rows",
+      "status": "error",
+      "error": "InvalidOperationError",
+      "message": "'implode' followed by an aggregation is not allowed",
+      "calls": []
+    },
+    {
+      "case": "interleaved_nullable/over/join",
+      "status": "error",
+      "error": "InvalidOperationError",
+      "message": "'implode' followed by an aggregation is not allowed",
+      "calls": []
+    },
+    {
+      "case": "interleaved_nullable/over/explode",
+      "status": "error",
+      "error": "InvalidOperationError",
+      "message": "'implode' followed by an aggregation is not allowed",
+      "calls": []
+    },
+    {
+      "case": "interleaved_nullable/group_by_agg",
+      "status": "pass",
+      "calls": [
+        {
+          "dtype": "List(Float64)",
+          "list_rows": 3
+        }
+      ]
+    },
+    {
+      "case": "empty/direct",
+      "status": "pass",
+      "calls": [
+        {
+          "dtype": "List(Float64)",
+          "list_rows": 1
+        }
+      ]
+    },
+    {
+      "case": "empty/over/group_to_rows",
+      "status": "error",
+      "error": "InvalidOperationError",
+      "message": "'implode' followed by an aggregation is not allowed",
+      "calls": []
+    },
+    {
+      "case": "empty/over/join",
+      "status": "error",
+      "error": "InvalidOperationError",
+      "message": "'implode' followed by an aggregation is not allowed",
+      "calls": []
+    },
+    {
+      "case": "empty/over/explode",
+      "status": "error",
+      "error": "InvalidOperationError",
+      "message": "'implode' followed by an aggregation is not allowed",
+      "calls": []
+    },
+    {
+      "case": "empty/group_by_agg",
+      "status": "pass",
+      "calls": [
+        {
+          "dtype": "List(Float64)",
+          "list_rows": 0
+        }
+      ]
+    },
+    {
+      "case": "one_group/direct",
+      "status": "pass",
+      "calls": [
+        {
+          "dtype": "List(Float64)",
+          "list_rows": 1
+        }
+      ]
+    },
+    {
+      "case": "one_group/over/group_to_rows",
+      "status": "error",
+      "error": "InvalidOperationError",
+      "message": "'implode' followed by an aggregation is not allowed",
+      "calls": []
+    },
+    {
+      "case": "one_group/over/join",
+      "status": "error",
+      "error": "InvalidOperationError",
+      "message": "'implode' followed by an aggregation is not allowed",
+      "calls": []
+    },
+    {
+      "case": "one_group/over/explode",
+      "status": "error",
+      "error": "InvalidOperationError",
+      "message": "'implode' followed by an aggregation is not allowed",
+      "calls": []
+    },
+    {
+      "case": "one_group/group_by_agg",
+      "status": "pass",
+      "calls": [
+        {
+          "dtype": "List(Float64)",
+          "list_rows": 1
+        }
+      ]
+    },
+    {
+      "case": "chunked/direct",
+      "status": "pass",
+      "calls": [
+        {
+          "dtype": "List(Float64)",
+          "list_rows": 1
+        }
+      ]
+    },
+    {
+      "case": "chunked/over/group_to_rows",
+      "status": "error",
+      "error": "InvalidOperationError",
+      "message": "'implode' followed by an aggregation is not allowed",
+      "calls": []
+    },
+    {
+      "case": "chunked/over/join",
+      "status": "error",
+      "error": "InvalidOperationError",
+      "message": "'implode' followed by an aggregation is not allowed",
+      "calls": []
+    },
+    {
+      "case": "chunked/over/explode",
+      "status": "error",
+      "error": "InvalidOperationError",
+      "message": "'implode' followed by an aggregation is not allowed",
+      "calls": []
+    },
+    {
+      "case": "chunked/group_by_agg",
+      "status": "pass",
+      "calls": [
+        {
+          "dtype": "List(Float64)",
+          "list_rows": 3
+        }
+      ]
+    },
+    {
+      "case": "ordered_over",
+      "status": "error",
+      "error": "InvalidOperationError",
+      "message": "'implode' followed by an aggregation is not allowed",
+      "calls": []
+    },
+    {
+      "case": "filter_before/selected",
+      "status": "pass",
+      "calls": [
+        {
+          "dtype": "List(Float64)",
+          "list_rows": 1
+        }
+      ]
+    },
+    {
+      "case": "filter_before/empty",
+      "status": "pass",
+      "calls": [
+        {
+          "dtype": "List(Float64)",
+          "list_rows": 1
+        }
+      ]
+    },
+    {
+      "case": "filter_after",
+      "status": "pass",
+      "calls": [
+        {
+          "dtype": "List(Float64)",
+          "list_rows": 1
+        }
+      ]
+    },
+    {
+      "case": "scalar/literal",
+      "status": "error",
+      "error": "InvalidOperationError",
+      "message": "'implode' followed by an aggregation is not allowed",
+      "calls": []
+    },
+    {
+      "case": "scalar/aggregate_scalar",
+      "status": "error",
+      "error": "InvalidOperationError",
+      "message": "'implode' followed by an aggregation is not allowed",
+      "calls": []
+    }
+  ],
+  "passed": 11,
+  "errors": 15
+}

@@ -24,6 +24,9 @@ checked corpus includes both signs, leading/internal placement and MA types.
 This coverage is not a general guarantee for arbitrary nonfinite inputs; explicitly
 convert nonfinite values to null when they mean missing.
 
-For performance, compare release wheels on identical data, versions and thread
-counts with repeated measurements. `by_group` avoids per-group plugin calls,
-but its exact key grouping and gather/scatter can cost more on some workloads.
+Users retain ordinary `.over(...)` on native Polars expressions. The supported
+plugin callback receives one current partition and no group positions. Follow
+the documented engine/ABI boundary before proposing transparent batching.
+For performance claims, use the same CI job to rebuild the original and candidate
+release wheels with identical runtime dependencies, alternate repeated processes,
+check all timed outputs, and report raw distributions and uncertainty.

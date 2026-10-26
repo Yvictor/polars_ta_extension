@@ -12,10 +12,6 @@ fn ac(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
         compute(FuncId::AC, inputs, &params, &[0, 1], &[])
     })
 }
-#[polars_expr(output_type=Float64)]
-fn ac_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::AC, inputs, kwargs, &[0, 1], &[])
-}
 fn accbands_output(_: &[Field]) -> PolarsResult<Field> {
     Ok(Field::new(
         "",
@@ -38,25 +34,11 @@ fn accbands(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
         )
     })
 }
-#[polars_expr(output_type_func=accbands_output)]
-fn accbands_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(
-        FuncId::ACCBANDS,
-        inputs,
-        kwargs,
-        &[0, 1, 2],
-        &["upperband", "middleband", "lowerband"],
-    )
-}
 #[polars_expr(output_type=Float64)]
 fn acos(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::ACOS, inputs, &params, &[0], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn acos_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::ACOS, inputs, kwargs, &[0], &[])
 }
 #[polars_expr(output_type=Float64)]
 fn ad(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -65,18 +47,10 @@ fn ad(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     })
 }
 #[polars_expr(output_type=Float64)]
-fn ad_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::AD, inputs, kwargs, &[1, 2, 0, 3], &[])
-}
-#[polars_expr(output_type=Float64)]
 fn add(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::ADD, inputs, &params, &[0, 1], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn add_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::ADD, inputs, kwargs, &[0, 1], &[])
 }
 #[polars_expr(output_type=Float64)]
 fn adosc(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -85,18 +59,10 @@ fn adosc(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     })
 }
 #[polars_expr(output_type=Float64)]
-fn adosc_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::ADOSC, inputs, kwargs, &[1, 2, 0, 3], &[])
-}
-#[polars_expr(output_type=Float64)]
 fn adr(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::ADR, inputs, &params, &[0, 1], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn adr_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::ADR, inputs, kwargs, &[0, 1], &[])
 }
 #[polars_expr(output_type=Float64)]
 fn adx(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -105,18 +71,10 @@ fn adx(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     })
 }
 #[polars_expr(output_type=Float64)]
-fn adx_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::ADX, inputs, kwargs, &[1, 2, 0], &[])
-}
-#[polars_expr(output_type=Float64)]
 fn adxr(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::ADXR, inputs, &params, &[1, 2, 0], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn adxr_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::ADXR, inputs, kwargs, &[1, 2, 0], &[])
 }
 #[polars_expr(output_type=Float64)]
 fn ao(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -125,18 +83,10 @@ fn ao(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     })
 }
 #[polars_expr(output_type=Float64)]
-fn ao_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::AO, inputs, kwargs, &[0, 1], &[])
-}
-#[polars_expr(output_type=Float64)]
 fn apo(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::APO, inputs, &params, &[0], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn apo_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::APO, inputs, kwargs, &[0], &[])
 }
 fn aroon_output(_: &[Field]) -> PolarsResult<Field> {
     Ok(Field::new(
@@ -159,25 +109,11 @@ fn aroon(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
         )
     })
 }
-#[polars_expr(output_type_func=aroon_output)]
-fn aroon_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(
-        FuncId::AROON,
-        inputs,
-        kwargs,
-        &[0, 1],
-        &["aroondown", "aroonup"],
-    )
-}
 #[polars_expr(output_type=Float64)]
 fn aroonosc(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::AROONOSC, inputs, &params, &[0, 1], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn aroonosc_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::AROONOSC, inputs, kwargs, &[0, 1], &[])
 }
 #[polars_expr(output_type=Float64)]
 fn asin(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -186,18 +122,10 @@ fn asin(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     })
 }
 #[polars_expr(output_type=Float64)]
-fn asin_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::ASIN, inputs, kwargs, &[0], &[])
-}
-#[polars_expr(output_type=Float64)]
 fn atan(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::ATAN, inputs, &params, &[0], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn atan_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::ATAN, inputs, kwargs, &[0], &[])
 }
 #[polars_expr(output_type=Float64)]
 fn atr(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -206,28 +134,16 @@ fn atr(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     })
 }
 #[polars_expr(output_type=Float64)]
-fn atr_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::ATR, inputs, kwargs, &[1, 2, 0], &[])
-}
-#[polars_expr(output_type=Float64)]
 fn avgdev(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::AVGDEV, inputs, &params, &[0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
-fn avgdev_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::AVGDEV, inputs, kwargs, &[0], &[])
-}
-#[polars_expr(output_type=Float64)]
 fn avgprice(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::AVGPRICE, inputs, &params, &[0, 1, 2, 3], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn avgprice_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::AVGPRICE, inputs, kwargs, &[0, 1, 2, 3], &[])
 }
 fn bbands_output(_: &[Field]) -> PolarsResult<Field> {
     Ok(Field::new(
@@ -251,25 +167,11 @@ fn bbands(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
         )
     })
 }
-#[polars_expr(output_type_func=bbands_output)]
-fn bbands_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(
-        FuncId::BBANDS,
-        inputs,
-        kwargs,
-        &[0],
-        &["upperband", "middleband", "lowerband"],
-    )
-}
 #[polars_expr(output_type=Float64)]
 fn beta(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::BETA, inputs, &params, &[0, 1], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn beta_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::BETA, inputs, kwargs, &[0, 1], &[])
 }
 #[polars_expr(output_type=Float64)]
 fn bop(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -278,18 +180,10 @@ fn bop(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     })
 }
 #[polars_expr(output_type=Float64)]
-fn bop_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::BOP, inputs, kwargs, &[0, 1, 2, 3], &[])
-}
-#[polars_expr(output_type=Float64)]
 fn cci(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::CCI, inputs, &params, &[1, 2, 0], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn cci_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::CCI, inputs, kwargs, &[1, 2, 0], &[])
 }
 #[polars_expr(output_type=Int32)]
 fn cdl2crows(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -298,18 +192,10 @@ fn cdl2crows(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> 
     })
 }
 #[polars_expr(output_type=Int32)]
-fn cdl2crows_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::CDL2CROWS, inputs, kwargs, &[0, 1, 2, 3], &[])
-}
-#[polars_expr(output_type=Int32)]
 fn cdl3blackcrows(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::CDL3BLACKCROWS, inputs, &params, &[0, 1, 2, 3], &[])
     })
-}
-#[polars_expr(output_type=Int32)]
-fn cdl3blackcrows_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::CDL3BLACKCROWS, inputs, kwargs, &[0, 1, 2, 3], &[])
 }
 #[polars_expr(output_type=Int32)]
 fn cdl3inside(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -318,28 +204,16 @@ fn cdl3inside(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series>
     })
 }
 #[polars_expr(output_type=Int32)]
-fn cdl3inside_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::CDL3INSIDE, inputs, kwargs, &[0, 1, 2, 3], &[])
-}
-#[polars_expr(output_type=Int32)]
 fn cdl3linestrike(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::CDL3LINESTRIKE, inputs, &params, &[0, 1, 2, 3], &[])
     })
 }
 #[polars_expr(output_type=Int32)]
-fn cdl3linestrike_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::CDL3LINESTRIKE, inputs, kwargs, &[0, 1, 2, 3], &[])
-}
-#[polars_expr(output_type=Int32)]
 fn cdl3outside(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::CDL3OUTSIDE, inputs, &params, &[0, 1, 2, 3], &[])
     })
-}
-#[polars_expr(output_type=Int32)]
-fn cdl3outside_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::CDL3OUTSIDE, inputs, kwargs, &[0, 1, 2, 3], &[])
 }
 #[polars_expr(output_type=Int32)]
 fn cdl3starsinsouth(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -354,10 +228,6 @@ fn cdl3starsinsouth(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<S
     })
 }
 #[polars_expr(output_type=Int32)]
-fn cdl3starsinsouth_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::CDL3STARSINSOUTH, inputs, kwargs, &[0, 1, 2, 3], &[])
-}
-#[polars_expr(output_type=Int32)]
 fn cdl3whitesoldiers(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(
@@ -368,16 +238,6 @@ fn cdl3whitesoldiers(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<
             &[],
         )
     })
-}
-#[polars_expr(output_type=Int32)]
-fn cdl3whitesoldiers_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(
-        FuncId::CDL3WHITESOLDIERS,
-        inputs,
-        kwargs,
-        &[0, 1, 2, 3],
-        &[],
-    )
 }
 #[polars_expr(output_type=Int32)]
 fn cdlabandonedbaby(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -392,18 +252,10 @@ fn cdlabandonedbaby(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<S
     })
 }
 #[polars_expr(output_type=Int32)]
-fn cdlabandonedbaby_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::CDLABANDONEDBABY, inputs, kwargs, &[0, 1, 2, 3], &[])
-}
-#[polars_expr(output_type=Int32)]
 fn cdladvanceblock(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::CDLADVANCEBLOCK, inputs, &params, &[0, 1, 2, 3], &[])
     })
-}
-#[polars_expr(output_type=Int32)]
-fn cdladvanceblock_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::CDLADVANCEBLOCK, inputs, kwargs, &[0, 1, 2, 3], &[])
 }
 #[polars_expr(output_type=Int32)]
 fn cdlbelthold(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -412,18 +264,10 @@ fn cdlbelthold(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series
     })
 }
 #[polars_expr(output_type=Int32)]
-fn cdlbelthold_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::CDLBELTHOLD, inputs, kwargs, &[0, 1, 2, 3], &[])
-}
-#[polars_expr(output_type=Int32)]
 fn cdlbreakaway(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::CDLBREAKAWAY, inputs, &params, &[0, 1, 2, 3], &[])
     })
-}
-#[polars_expr(output_type=Int32)]
-fn cdlbreakaway_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::CDLBREAKAWAY, inputs, kwargs, &[0, 1, 2, 3], &[])
 }
 #[polars_expr(output_type=Int32)]
 fn cdlclosingmarubozu(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -438,16 +282,6 @@ fn cdlclosingmarubozu(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult
     })
 }
 #[polars_expr(output_type=Int32)]
-fn cdlclosingmarubozu_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(
-        FuncId::CDLCLOSINGMARUBOZU,
-        inputs,
-        kwargs,
-        &[0, 1, 2, 3],
-        &[],
-    )
-}
-#[polars_expr(output_type=Int32)]
 fn cdlconcealbabyswall(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(
@@ -458,16 +292,6 @@ fn cdlconcealbabyswall(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResul
             &[],
         )
     })
-}
-#[polars_expr(output_type=Int32)]
-fn cdlconcealbabyswall_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(
-        FuncId::CDLCONCEALBABYSWALL,
-        inputs,
-        kwargs,
-        &[0, 1, 2, 3],
-        &[],
-    )
 }
 #[polars_expr(output_type=Int32)]
 fn cdlcounterattack(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -482,10 +306,6 @@ fn cdlcounterattack(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<S
     })
 }
 #[polars_expr(output_type=Int32)]
-fn cdlcounterattack_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::CDLCOUNTERATTACK, inputs, kwargs, &[0, 1, 2, 3], &[])
-}
-#[polars_expr(output_type=Int32)]
 fn cdldarkcloudcover(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(
@@ -498,34 +318,16 @@ fn cdldarkcloudcover(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<
     })
 }
 #[polars_expr(output_type=Int32)]
-fn cdldarkcloudcover_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(
-        FuncId::CDLDARKCLOUDCOVER,
-        inputs,
-        kwargs,
-        &[0, 1, 2, 3],
-        &[],
-    )
-}
-#[polars_expr(output_type=Int32)]
 fn cdldoji(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::CDLDOJI, inputs, &params, &[0, 1, 2, 3], &[])
     })
 }
 #[polars_expr(output_type=Int32)]
-fn cdldoji_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::CDLDOJI, inputs, kwargs, &[0, 1, 2, 3], &[])
-}
-#[polars_expr(output_type=Int32)]
 fn cdldojistar(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::CDLDOJISTAR, inputs, &params, &[0, 1, 2, 3], &[])
     })
-}
-#[polars_expr(output_type=Int32)]
-fn cdldojistar_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::CDLDOJISTAR, inputs, kwargs, &[0, 1, 2, 3], &[])
 }
 #[polars_expr(output_type=Int32)]
 fn cdldragonflydoji(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -540,18 +342,10 @@ fn cdldragonflydoji(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<S
     })
 }
 #[polars_expr(output_type=Int32)]
-fn cdldragonflydoji_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::CDLDRAGONFLYDOJI, inputs, kwargs, &[0, 1, 2, 3], &[])
-}
-#[polars_expr(output_type=Int32)]
 fn cdlengulfing(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::CDLENGULFING, inputs, &params, &[0, 1, 2, 3], &[])
     })
-}
-#[polars_expr(output_type=Int32)]
-fn cdlengulfing_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::CDLENGULFING, inputs, kwargs, &[0, 1, 2, 3], &[])
 }
 #[polars_expr(output_type=Int32)]
 fn cdleveningdojistar(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -566,24 +360,10 @@ fn cdleveningdojistar(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult
     })
 }
 #[polars_expr(output_type=Int32)]
-fn cdleveningdojistar_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(
-        FuncId::CDLEVENINGDOJISTAR,
-        inputs,
-        kwargs,
-        &[0, 1, 2, 3],
-        &[],
-    )
-}
-#[polars_expr(output_type=Int32)]
 fn cdleveningstar(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::CDLEVENINGSTAR, inputs, &params, &[0, 1, 2, 3], &[])
     })
-}
-#[polars_expr(output_type=Int32)]
-fn cdleveningstar_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::CDLEVENINGSTAR, inputs, kwargs, &[0, 1, 2, 3], &[])
 }
 #[polars_expr(output_type=Int32)]
 fn cdlgapsidesidewhite(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -598,16 +378,6 @@ fn cdlgapsidesidewhite(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResul
     })
 }
 #[polars_expr(output_type=Int32)]
-fn cdlgapsidesidewhite_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(
-        FuncId::CDLGAPSIDESIDEWHITE,
-        inputs,
-        kwargs,
-        &[0, 1, 2, 3],
-        &[],
-    )
-}
-#[polars_expr(output_type=Int32)]
 fn cdlgravestonedoji(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(
@@ -620,24 +390,10 @@ fn cdlgravestonedoji(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<
     })
 }
 #[polars_expr(output_type=Int32)]
-fn cdlgravestonedoji_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(
-        FuncId::CDLGRAVESTONEDOJI,
-        inputs,
-        kwargs,
-        &[0, 1, 2, 3],
-        &[],
-    )
-}
-#[polars_expr(output_type=Int32)]
 fn cdlhammer(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::CDLHAMMER, inputs, &params, &[0, 1, 2, 3], &[])
     })
-}
-#[polars_expr(output_type=Int32)]
-fn cdlhammer_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::CDLHAMMER, inputs, kwargs, &[0, 1, 2, 3], &[])
 }
 #[polars_expr(output_type=Int32)]
 fn cdlhangingman(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -646,18 +402,10 @@ fn cdlhangingman(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Seri
     })
 }
 #[polars_expr(output_type=Int32)]
-fn cdlhangingman_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::CDLHANGINGMAN, inputs, kwargs, &[0, 1, 2, 3], &[])
-}
-#[polars_expr(output_type=Int32)]
 fn cdlharami(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::CDLHARAMI, inputs, &params, &[0, 1, 2, 3], &[])
     })
-}
-#[polars_expr(output_type=Int32)]
-fn cdlharami_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::CDLHARAMI, inputs, kwargs, &[0, 1, 2, 3], &[])
 }
 #[polars_expr(output_type=Int32)]
 fn cdlharamicross(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -666,18 +414,10 @@ fn cdlharamicross(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Ser
     })
 }
 #[polars_expr(output_type=Int32)]
-fn cdlharamicross_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::CDLHARAMICROSS, inputs, kwargs, &[0, 1, 2, 3], &[])
-}
-#[polars_expr(output_type=Int32)]
 fn cdlhighwave(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::CDLHIGHWAVE, inputs, &params, &[0, 1, 2, 3], &[])
     })
-}
-#[polars_expr(output_type=Int32)]
-fn cdlhighwave_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::CDLHIGHWAVE, inputs, kwargs, &[0, 1, 2, 3], &[])
 }
 #[polars_expr(output_type=Int32)]
 fn cdlhikkake(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -686,28 +426,16 @@ fn cdlhikkake(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series>
     })
 }
 #[polars_expr(output_type=Int32)]
-fn cdlhikkake_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::CDLHIKKAKE, inputs, kwargs, &[0, 1, 2, 3], &[])
-}
-#[polars_expr(output_type=Int32)]
 fn cdlhikkakemod(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::CDLHIKKAKEMOD, inputs, &params, &[0, 1, 2, 3], &[])
     })
 }
 #[polars_expr(output_type=Int32)]
-fn cdlhikkakemod_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::CDLHIKKAKEMOD, inputs, kwargs, &[0, 1, 2, 3], &[])
-}
-#[polars_expr(output_type=Int32)]
 fn cdlhomingpigeon(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::CDLHOMINGPIGEON, inputs, &params, &[0, 1, 2, 3], &[])
     })
-}
-#[polars_expr(output_type=Int32)]
-fn cdlhomingpigeon_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::CDLHOMINGPIGEON, inputs, kwargs, &[0, 1, 2, 3], &[])
 }
 #[polars_expr(output_type=Int32)]
 fn cdlidentical3crows(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -722,24 +450,10 @@ fn cdlidentical3crows(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult
     })
 }
 #[polars_expr(output_type=Int32)]
-fn cdlidentical3crows_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(
-        FuncId::CDLIDENTICAL3CROWS,
-        inputs,
-        kwargs,
-        &[0, 1, 2, 3],
-        &[],
-    )
-}
-#[polars_expr(output_type=Int32)]
 fn cdlinneck(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::CDLINNECK, inputs, &params, &[0, 1, 2, 3], &[])
     })
-}
-#[polars_expr(output_type=Int32)]
-fn cdlinneck_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::CDLINNECK, inputs, kwargs, &[0, 1, 2, 3], &[])
 }
 #[polars_expr(output_type=Int32)]
 fn cdlinvertedhammer(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -754,24 +468,10 @@ fn cdlinvertedhammer(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<
     })
 }
 #[polars_expr(output_type=Int32)]
-fn cdlinvertedhammer_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(
-        FuncId::CDLINVERTEDHAMMER,
-        inputs,
-        kwargs,
-        &[0, 1, 2, 3],
-        &[],
-    )
-}
-#[polars_expr(output_type=Int32)]
 fn cdlkicking(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::CDLKICKING, inputs, &params, &[0, 1, 2, 3], &[])
     })
-}
-#[polars_expr(output_type=Int32)]
-fn cdlkicking_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::CDLKICKING, inputs, kwargs, &[0, 1, 2, 3], &[])
 }
 #[polars_expr(output_type=Int32)]
 fn cdlkickingbylength(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -786,24 +486,10 @@ fn cdlkickingbylength(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult
     })
 }
 #[polars_expr(output_type=Int32)]
-fn cdlkickingbylength_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(
-        FuncId::CDLKICKINGBYLENGTH,
-        inputs,
-        kwargs,
-        &[0, 1, 2, 3],
-        &[],
-    )
-}
-#[polars_expr(output_type=Int32)]
 fn cdlladderbottom(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::CDLLADDERBOTTOM, inputs, &params, &[0, 1, 2, 3], &[])
     })
-}
-#[polars_expr(output_type=Int32)]
-fn cdlladderbottom_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::CDLLADDERBOTTOM, inputs, kwargs, &[0, 1, 2, 3], &[])
 }
 #[polars_expr(output_type=Int32)]
 fn cdllongleggeddoji(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -818,24 +504,10 @@ fn cdllongleggeddoji(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<
     })
 }
 #[polars_expr(output_type=Int32)]
-fn cdllongleggeddoji_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(
-        FuncId::CDLLONGLEGGEDDOJI,
-        inputs,
-        kwargs,
-        &[0, 1, 2, 3],
-        &[],
-    )
-}
-#[polars_expr(output_type=Int32)]
 fn cdllongline(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::CDLLONGLINE, inputs, &params, &[0, 1, 2, 3], &[])
     })
-}
-#[polars_expr(output_type=Int32)]
-fn cdllongline_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::CDLLONGLINE, inputs, kwargs, &[0, 1, 2, 3], &[])
 }
 #[polars_expr(output_type=Int32)]
 fn cdlmarubozu(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -844,28 +516,16 @@ fn cdlmarubozu(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series
     })
 }
 #[polars_expr(output_type=Int32)]
-fn cdlmarubozu_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::CDLMARUBOZU, inputs, kwargs, &[0, 1, 2, 3], &[])
-}
-#[polars_expr(output_type=Int32)]
 fn cdlmatchinglow(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::CDLMATCHINGLOW, inputs, &params, &[0, 1, 2, 3], &[])
     })
 }
 #[polars_expr(output_type=Int32)]
-fn cdlmatchinglow_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::CDLMATCHINGLOW, inputs, kwargs, &[0, 1, 2, 3], &[])
-}
-#[polars_expr(output_type=Int32)]
 fn cdlmathold(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::CDLMATHOLD, inputs, &params, &[0, 1, 2, 3], &[])
     })
-}
-#[polars_expr(output_type=Int32)]
-fn cdlmathold_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::CDLMATHOLD, inputs, kwargs, &[0, 1, 2, 3], &[])
 }
 #[polars_expr(output_type=Int32)]
 fn cdlmorningdojistar(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -880,24 +540,10 @@ fn cdlmorningdojistar(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult
     })
 }
 #[polars_expr(output_type=Int32)]
-fn cdlmorningdojistar_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(
-        FuncId::CDLMORNINGDOJISTAR,
-        inputs,
-        kwargs,
-        &[0, 1, 2, 3],
-        &[],
-    )
-}
-#[polars_expr(output_type=Int32)]
 fn cdlmorningstar(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::CDLMORNINGSTAR, inputs, &params, &[0, 1, 2, 3], &[])
     })
-}
-#[polars_expr(output_type=Int32)]
-fn cdlmorningstar_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::CDLMORNINGSTAR, inputs, kwargs, &[0, 1, 2, 3], &[])
 }
 #[polars_expr(output_type=Int32)]
 fn cdlonneck(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -906,28 +552,16 @@ fn cdlonneck(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> 
     })
 }
 #[polars_expr(output_type=Int32)]
-fn cdlonneck_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::CDLONNECK, inputs, kwargs, &[0, 1, 2, 3], &[])
-}
-#[polars_expr(output_type=Int32)]
 fn cdlpiercing(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::CDLPIERCING, inputs, &params, &[0, 1, 2, 3], &[])
     })
 }
 #[polars_expr(output_type=Int32)]
-fn cdlpiercing_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::CDLPIERCING, inputs, kwargs, &[0, 1, 2, 3], &[])
-}
-#[polars_expr(output_type=Int32)]
 fn cdlrickshawman(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::CDLRICKSHAWMAN, inputs, &params, &[0, 1, 2, 3], &[])
     })
-}
-#[polars_expr(output_type=Int32)]
-fn cdlrickshawman_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::CDLRICKSHAWMAN, inputs, kwargs, &[0, 1, 2, 3], &[])
 }
 #[polars_expr(output_type=Int32)]
 fn cdlrisefall3methods(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -942,16 +576,6 @@ fn cdlrisefall3methods(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResul
     })
 }
 #[polars_expr(output_type=Int32)]
-fn cdlrisefall3methods_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(
-        FuncId::CDLRISEFALL3METHODS,
-        inputs,
-        kwargs,
-        &[0, 1, 2, 3],
-        &[],
-    )
-}
-#[polars_expr(output_type=Int32)]
 fn cdlseparatinglines(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(
@@ -964,24 +588,10 @@ fn cdlseparatinglines(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult
     })
 }
 #[polars_expr(output_type=Int32)]
-fn cdlseparatinglines_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(
-        FuncId::CDLSEPARATINGLINES,
-        inputs,
-        kwargs,
-        &[0, 1, 2, 3],
-        &[],
-    )
-}
-#[polars_expr(output_type=Int32)]
 fn cdlshootingstar(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::CDLSHOOTINGSTAR, inputs, &params, &[0, 1, 2, 3], &[])
     })
-}
-#[polars_expr(output_type=Int32)]
-fn cdlshootingstar_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::CDLSHOOTINGSTAR, inputs, kwargs, &[0, 1, 2, 3], &[])
 }
 #[polars_expr(output_type=Int32)]
 fn cdlshortline(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -990,18 +600,10 @@ fn cdlshortline(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Serie
     })
 }
 #[polars_expr(output_type=Int32)]
-fn cdlshortline_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::CDLSHORTLINE, inputs, kwargs, &[0, 1, 2, 3], &[])
-}
-#[polars_expr(output_type=Int32)]
 fn cdlspinningtop(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::CDLSPINNINGTOP, inputs, &params, &[0, 1, 2, 3], &[])
     })
-}
-#[polars_expr(output_type=Int32)]
-fn cdlspinningtop_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::CDLSPINNINGTOP, inputs, kwargs, &[0, 1, 2, 3], &[])
 }
 #[polars_expr(output_type=Int32)]
 fn cdlstalledpattern(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -1016,16 +618,6 @@ fn cdlstalledpattern(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<
     })
 }
 #[polars_expr(output_type=Int32)]
-fn cdlstalledpattern_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(
-        FuncId::CDLSTALLEDPATTERN,
-        inputs,
-        kwargs,
-        &[0, 1, 2, 3],
-        &[],
-    )
-}
-#[polars_expr(output_type=Int32)]
 fn cdlsticksandwich(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(
@@ -1038,18 +630,10 @@ fn cdlsticksandwich(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<S
     })
 }
 #[polars_expr(output_type=Int32)]
-fn cdlsticksandwich_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::CDLSTICKSANDWICH, inputs, kwargs, &[0, 1, 2, 3], &[])
-}
-#[polars_expr(output_type=Int32)]
 fn cdltakuri(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::CDLTAKURI, inputs, &params, &[0, 1, 2, 3], &[])
     })
-}
-#[polars_expr(output_type=Int32)]
-fn cdltakuri_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::CDLTAKURI, inputs, kwargs, &[0, 1, 2, 3], &[])
 }
 #[polars_expr(output_type=Int32)]
 fn cdltasukigap(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -1058,18 +642,10 @@ fn cdltasukigap(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Serie
     })
 }
 #[polars_expr(output_type=Int32)]
-fn cdltasukigap_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::CDLTASUKIGAP, inputs, kwargs, &[0, 1, 2, 3], &[])
-}
-#[polars_expr(output_type=Int32)]
 fn cdlthrusting(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::CDLTHRUSTING, inputs, &params, &[0, 1, 2, 3], &[])
     })
-}
-#[polars_expr(output_type=Int32)]
-fn cdlthrusting_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::CDLTHRUSTING, inputs, kwargs, &[0, 1, 2, 3], &[])
 }
 #[polars_expr(output_type=Int32)]
 fn cdltristar(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -1078,18 +654,10 @@ fn cdltristar(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series>
     })
 }
 #[polars_expr(output_type=Int32)]
-fn cdltristar_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::CDLTRISTAR, inputs, kwargs, &[0, 1, 2, 3], &[])
-}
-#[polars_expr(output_type=Int32)]
 fn cdlunique3river(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::CDLUNIQUE3RIVER, inputs, &params, &[0, 1, 2, 3], &[])
     })
-}
-#[polars_expr(output_type=Int32)]
-fn cdlunique3river_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::CDLUNIQUE3RIVER, inputs, kwargs, &[0, 1, 2, 3], &[])
 }
 #[polars_expr(output_type=Int32)]
 fn cdlupsidegap2crows(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -1104,16 +672,6 @@ fn cdlupsidegap2crows(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult
     })
 }
 #[polars_expr(output_type=Int32)]
-fn cdlupsidegap2crows_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(
-        FuncId::CDLUPSIDEGAP2CROWS,
-        inputs,
-        kwargs,
-        &[0, 1, 2, 3],
-        &[],
-    )
-}
-#[polars_expr(output_type=Int32)]
 fn cdlxsidegap3methods(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(
@@ -1125,25 +683,11 @@ fn cdlxsidegap3methods(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResul
         )
     })
 }
-#[polars_expr(output_type=Int32)]
-fn cdlxsidegap3methods_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(
-        FuncId::CDLXSIDEGAP3METHODS,
-        inputs,
-        kwargs,
-        &[0, 1, 2, 3],
-        &[],
-    )
-}
 #[polars_expr(output_type=Float64)]
 fn ceil(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::CEIL, inputs, &params, &[0], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn ceil_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::CEIL, inputs, kwargs, &[0], &[])
 }
 #[polars_expr(output_type=Float64)]
 fn cmf(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -1152,18 +696,10 @@ fn cmf(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     })
 }
 #[polars_expr(output_type=Float64)]
-fn cmf_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::CMF, inputs, kwargs, &[0, 1, 2, 3], &[])
-}
-#[polars_expr(output_type=Float64)]
 fn cmo(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::CMO, inputs, &params, &[0], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn cmo_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::CMO, inputs, kwargs, &[0], &[])
 }
 #[polars_expr(output_type=Float64)]
 fn cmou(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -1172,18 +708,10 @@ fn cmou(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     })
 }
 #[polars_expr(output_type=Float64)]
-fn cmou_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::CMOU, inputs, kwargs, &[0], &[])
-}
-#[polars_expr(output_type=Float64)]
 fn coppock(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::COPPOCK, inputs, &params, &[0], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn coppock_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::COPPOCK, inputs, kwargs, &[0], &[])
 }
 #[polars_expr(output_type=Float64)]
 fn correl(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -1192,18 +720,10 @@ fn correl(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     })
 }
 #[polars_expr(output_type=Float64)]
-fn correl_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::CORREL, inputs, kwargs, &[0, 1], &[])
-}
-#[polars_expr(output_type=Float64)]
 fn cos(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::COS, inputs, &params, &[0], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn cos_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::COS, inputs, kwargs, &[0], &[])
 }
 #[polars_expr(output_type=Float64)]
 fn cosh(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -1212,18 +732,10 @@ fn cosh(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     })
 }
 #[polars_expr(output_type=Float64)]
-fn cosh_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::COSH, inputs, kwargs, &[0], &[])
-}
-#[polars_expr(output_type=Float64)]
 fn cumsum(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::CUMSUM, inputs, &params, &[0], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn cumsum_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::CUMSUM, inputs, kwargs, &[0], &[])
 }
 #[polars_expr(output_type=Float64)]
 fn cvi(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -1232,28 +744,16 @@ fn cvi(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     })
 }
 #[polars_expr(output_type=Float64)]
-fn cvi_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::CVI, inputs, kwargs, &[0, 1], &[])
-}
-#[polars_expr(output_type=Float64)]
 fn dema(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::DEMA, inputs, &params, &[0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
-fn dema_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::DEMA, inputs, kwargs, &[0], &[])
-}
-#[polars_expr(output_type=Float64)]
 fn div(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::DIV, inputs, &params, &[0, 1], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn div_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::DIV, inputs, kwargs, &[0, 1], &[])
 }
 fn donchian_output(_: &[Field]) -> PolarsResult<Field> {
     Ok(Field::new(
@@ -1277,25 +777,11 @@ fn donchian(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
         )
     })
 }
-#[polars_expr(output_type_func=donchian_output)]
-fn donchian_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(
-        FuncId::DONCHIAN,
-        inputs,
-        kwargs,
-        &[0, 1],
-        &["upperband", "middleband", "lowerband"],
-    )
-}
 #[polars_expr(output_type=Float64)]
 fn dpo(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::DPO, inputs, &params, &[0], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn dpo_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::DPO, inputs, kwargs, &[0], &[])
 }
 #[polars_expr(output_type=Float64)]
 fn dx(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -1304,18 +790,10 @@ fn dx(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     })
 }
 #[polars_expr(output_type=Float64)]
-fn dx_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::DX, inputs, kwargs, &[1, 2, 0], &[])
-}
-#[polars_expr(output_type=Float64)]
 fn efi(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::EFI, inputs, &params, &[0, 1], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn efi_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::EFI, inputs, kwargs, &[0, 1], &[])
 }
 #[polars_expr(output_type=Float64)]
 fn ema(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -1324,18 +802,10 @@ fn ema(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     })
 }
 #[polars_expr(output_type=Float64)]
-fn ema_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::EMA, inputs, kwargs, &[0], &[])
-}
-#[polars_expr(output_type=Float64)]
 fn er(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::ER, inputs, &params, &[0], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn er_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::ER, inputs, kwargs, &[0], &[])
 }
 fn eri_output(_: &[Field]) -> PolarsResult<Field> {
     Ok(Field::new(
@@ -1358,25 +828,11 @@ fn eri(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
         )
     })
 }
-#[polars_expr(output_type_func=eri_output)]
-fn eri_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(
-        FuncId::ERI,
-        inputs,
-        kwargs,
-        &[0, 1, 2],
-        &["bullpower", "bearpower"],
-    )
-}
 #[polars_expr(output_type=Float64)]
 fn exp(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::EXP, inputs, &params, &[0], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn exp_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::EXP, inputs, kwargs, &[0], &[])
 }
 #[polars_expr(output_type=Float64)]
 fn floor(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -1385,18 +841,10 @@ fn floor(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     })
 }
 #[polars_expr(output_type=Float64)]
-fn floor_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::FLOOR, inputs, kwargs, &[0], &[])
-}
-#[polars_expr(output_type=Float64)]
 fn fosc(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::FOSC, inputs, &params, &[0], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn fosc_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::FOSC, inputs, kwargs, &[0], &[])
 }
 fn fractal_output(_: &[Field]) -> PolarsResult<Field> {
     Ok(Field::new(
@@ -1418,16 +866,6 @@ fn fractal(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
             &["swinghigh", "swinglow"],
         )
     })
-}
-#[polars_expr(output_type_func=fractal_output)]
-fn fractal_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(
-        FuncId::FRACTAL,
-        inputs,
-        kwargs,
-        &[0, 1],
-        &["swinghigh", "swinglow"],
-    )
 }
 fn ha_output(_: &[Field]) -> PolarsResult<Field> {
     Ok(Field::new(
@@ -1452,25 +890,11 @@ fn ha(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
         )
     })
 }
-#[polars_expr(output_type_func=ha_output)]
-fn ha_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(
-        FuncId::HA,
-        inputs,
-        kwargs,
-        &[0, 1, 2, 3],
-        &["haopen", "hahigh", "halow", "haclose"],
-    )
-}
 #[polars_expr(output_type=Float64)]
 fn hma(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::HMA, inputs, &params, &[0], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn hma_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::HMA, inputs, kwargs, &[0], &[])
 }
 #[polars_expr(output_type=Float64)]
 fn ht_dcperiod(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -1479,18 +903,10 @@ fn ht_dcperiod(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series
     })
 }
 #[polars_expr(output_type=Float64)]
-fn ht_dcperiod_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::HT_DCPERIOD, inputs, kwargs, &[0], &[])
-}
-#[polars_expr(output_type=Float64)]
 fn ht_dcphase(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::HT_DCPHASE, inputs, &params, &[0], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn ht_dcphase_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::HT_DCPHASE, inputs, kwargs, &[0], &[])
 }
 fn ht_phasor_output(_: &[Field]) -> PolarsResult<Field> {
     Ok(Field::new(
@@ -1513,16 +929,6 @@ fn ht_phasor(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> 
         )
     })
 }
-#[polars_expr(output_type_func=ht_phasor_output)]
-fn ht_phasor_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(
-        FuncId::HT_PHASOR,
-        inputs,
-        kwargs,
-        &[0],
-        &["inphase", "quadrature"],
-    )
-}
 fn ht_sine_output(_: &[Field]) -> PolarsResult<Field> {
     Ok(Field::new(
         "",
@@ -1544,29 +950,17 @@ fn ht_sine(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
         )
     })
 }
-#[polars_expr(output_type_func=ht_sine_output)]
-fn ht_sine_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::HT_SINE, inputs, kwargs, &[0], &["sine", "leadsine"])
-}
 #[polars_expr(output_type=Float64)]
 fn ht_trendline(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::HT_TRENDLINE, inputs, &params, &[0], &[])
     })
 }
-#[polars_expr(output_type=Float64)]
-fn ht_trendline_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::HT_TRENDLINE, inputs, kwargs, &[0], &[])
-}
 #[polars_expr(output_type=Int32)]
 fn ht_trendmode(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::HT_TRENDMODE, inputs, &params, &[0], &[])
     })
-}
-#[polars_expr(output_type=Int32)]
-fn ht_trendmode_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::HT_TRENDMODE, inputs, kwargs, &[0], &[])
 }
 #[polars_expr(output_type=Float64)]
 fn imi(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -1575,18 +969,10 @@ fn imi(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     })
 }
 #[polars_expr(output_type=Float64)]
-fn imi_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::IMI, inputs, kwargs, &[0, 1], &[])
-}
-#[polars_expr(output_type=Float64)]
 fn kama(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::KAMA, inputs, &params, &[0], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn kama_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::KAMA, inputs, kwargs, &[0], &[])
 }
 fn kc_output(_: &[Field]) -> PolarsResult<Field> {
     Ok(Field::new(
@@ -1610,16 +996,6 @@ fn kc(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
         )
     })
 }
-#[polars_expr(output_type_func=kc_output)]
-fn kc_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(
-        FuncId::KC,
-        inputs,
-        kwargs,
-        &[0, 1, 2],
-        &["upperband", "middleband", "lowerband"],
-    )
-}
 fn kdj_output(_: &[Field]) -> PolarsResult<Field> {
     Ok(Field::new(
         "",
@@ -1636,19 +1012,11 @@ fn kdj(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
         compute(FuncId::KDJ, inputs, &params, &[0, 1, 2], &["k", "d", "j"])
     })
 }
-#[polars_expr(output_type_func=kdj_output)]
-fn kdj_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::KDJ, inputs, kwargs, &[0, 1, 2], &["k", "d", "j"])
-}
 #[polars_expr(output_type=Float64)]
 fn linearreg(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::LINEARREG, inputs, &params, &[0], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn linearreg_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::LINEARREG, inputs, kwargs, &[0], &[])
 }
 #[polars_expr(output_type=Float64)]
 fn linearreg_angle(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -1657,18 +1025,10 @@ fn linearreg_angle(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Se
     })
 }
 #[polars_expr(output_type=Float64)]
-fn linearreg_angle_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::LINEARREG_ANGLE, inputs, kwargs, &[0], &[])
-}
-#[polars_expr(output_type=Float64)]
 fn linearreg_intercept(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::LINEARREG_INTERCEPT, inputs, &params, &[0], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn linearreg_intercept_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::LINEARREG_INTERCEPT, inputs, kwargs, &[0], &[])
 }
 #[polars_expr(output_type=Float64)]
 fn linearreg_slope(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -1677,18 +1037,10 @@ fn linearreg_slope(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Se
     })
 }
 #[polars_expr(output_type=Float64)]
-fn linearreg_slope_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::LINEARREG_SLOPE, inputs, kwargs, &[0], &[])
-}
-#[polars_expr(output_type=Float64)]
 fn ln(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::LN, inputs, &params, &[0], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn ln_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::LN, inputs, kwargs, &[0], &[])
 }
 #[polars_expr(output_type=Float64)]
 fn log10(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -1697,18 +1049,10 @@ fn log10(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     })
 }
 #[polars_expr(output_type=Float64)]
-fn log10_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::LOG10, inputs, kwargs, &[0], &[])
-}
-#[polars_expr(output_type=Float64)]
 fn ma(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::MA, inputs, &params, &[0], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn ma_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::MA, inputs, kwargs, &[0], &[])
 }
 fn macd_output(_: &[Field]) -> PolarsResult<Field> {
     Ok(Field::new(
@@ -1732,16 +1076,6 @@ fn macd(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
         )
     })
 }
-#[polars_expr(output_type_func=macd_output)]
-fn macd_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(
-        FuncId::MACD,
-        inputs,
-        kwargs,
-        &[0],
-        &["macd", "macdsignal", "macdhist"],
-    )
-}
 fn macdext_output(_: &[Field]) -> PolarsResult<Field> {
     Ok(Field::new(
         "",
@@ -1763,16 +1097,6 @@ fn macdext(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
             &["macd", "macdsignal", "macdhist"],
         )
     })
-}
-#[polars_expr(output_type_func=macdext_output)]
-fn macdext_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(
-        FuncId::MACDEXT,
-        inputs,
-        kwargs,
-        &[0],
-        &["macd", "macdsignal", "macdhist"],
-    )
 }
 fn macdfix_output(_: &[Field]) -> PolarsResult<Field> {
     Ok(Field::new(
@@ -1796,16 +1120,6 @@ fn macdfix(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
         )
     })
 }
-#[polars_expr(output_type_func=macdfix_output)]
-fn macdfix_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(
-        FuncId::MACDFIX,
-        inputs,
-        kwargs,
-        &[0],
-        &["macd", "macdsignal", "macdhist"],
-    )
-}
 fn mama_output(_: &[Field]) -> PolarsResult<Field> {
     Ok(Field::new(
         "",
@@ -1821,19 +1135,11 @@ fn mama(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
         compute(FuncId::MAMA, inputs, &params, &[0], &["mama", "fama"])
     })
 }
-#[polars_expr(output_type_func=mama_output)]
-fn mama_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::MAMA, inputs, kwargs, &[0], &["mama", "fama"])
-}
 #[polars_expr(output_type=Float64)]
 fn marketfi(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::MARKETFI, inputs, &params, &[0, 1, 2], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn marketfi_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::MARKETFI, inputs, kwargs, &[0, 1, 2], &[])
 }
 #[polars_expr(output_type=Float64)]
 fn massi(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -1842,18 +1148,10 @@ fn massi(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     })
 }
 #[polars_expr(output_type=Float64)]
-fn massi_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::MASSI, inputs, kwargs, &[0, 1], &[])
-}
-#[polars_expr(output_type=Float64)]
 fn mavp(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::MAVP, inputs, &params, &[0, 1], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn mavp_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::MAVP, inputs, kwargs, &[0, 1], &[])
 }
 #[polars_expr(output_type=Float64)]
 fn max(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -1861,19 +1159,11 @@ fn max(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
         compute(FuncId::MAX, inputs, &params, &[0], &[])
     })
 }
-#[polars_expr(output_type=Float64)]
-fn max_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::MAX, inputs, kwargs, &[0], &[])
-}
 #[polars_expr(output_type=Int32)]
 fn maxindex(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::MAXINDEX, inputs, &params, &[0], &[])
     })
-}
-#[polars_expr(output_type=Int32)]
-fn maxindex_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::MAXINDEX, inputs, kwargs, &[0], &[])
 }
 #[polars_expr(output_type=Float64)]
 fn medprice(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -1882,18 +1172,10 @@ fn medprice(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     })
 }
 #[polars_expr(output_type=Float64)]
-fn medprice_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::MEDPRICE, inputs, kwargs, &[0, 1], &[])
-}
-#[polars_expr(output_type=Float64)]
 fn mfi(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::MFI, inputs, &params, &[1, 2, 0, 3], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn mfi_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::MFI, inputs, kwargs, &[1, 2, 0, 3], &[])
 }
 #[polars_expr(output_type=Float64)]
 fn midpoint(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -1902,18 +1184,10 @@ fn midpoint(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     })
 }
 #[polars_expr(output_type=Float64)]
-fn midpoint_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::MIDPOINT, inputs, kwargs, &[0], &[])
-}
-#[polars_expr(output_type=Float64)]
 fn midprice(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::MIDPRICE, inputs, &params, &[0, 1], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn midprice_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::MIDPRICE, inputs, kwargs, &[0, 1], &[])
 }
 #[polars_expr(output_type=Float64)]
 fn min(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -1921,19 +1195,11 @@ fn min(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
         compute(FuncId::MIN, inputs, &params, &[0], &[])
     })
 }
-#[polars_expr(output_type=Float64)]
-fn min_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::MIN, inputs, kwargs, &[0], &[])
-}
 #[polars_expr(output_type=Int32)]
 fn minindex(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::MININDEX, inputs, &params, &[0], &[])
     })
-}
-#[polars_expr(output_type=Int32)]
-fn minindex_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::MININDEX, inputs, kwargs, &[0], &[])
 }
 fn minmax_output(_: &[Field]) -> PolarsResult<Field> {
     Ok(Field::new(
@@ -1949,10 +1215,6 @@ fn minmax(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::MINMAX, inputs, &params, &[0], &["min", "max"])
     })
-}
-#[polars_expr(output_type_func=minmax_output)]
-fn minmax_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::MINMAX, inputs, kwargs, &[0], &["min", "max"])
 }
 fn minmaxindex_output(_: &[Field]) -> PolarsResult<Field> {
     Ok(Field::new(
@@ -1975,25 +1237,11 @@ fn minmaxindex(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series
         )
     })
 }
-#[polars_expr(output_type_func=minmaxindex_output)]
-fn minmaxindex_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(
-        FuncId::MINMAXINDEX,
-        inputs,
-        kwargs,
-        &[0],
-        &["minidx", "maxidx"],
-    )
-}
 #[polars_expr(output_type=Float64)]
 fn minus_di(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::MINUS_DI, inputs, &params, &[1, 2, 0], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn minus_di_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::MINUS_DI, inputs, kwargs, &[1, 2, 0], &[])
 }
 #[polars_expr(output_type=Float64)]
 fn minus_dm(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -2002,18 +1250,10 @@ fn minus_dm(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     })
 }
 #[polars_expr(output_type=Float64)]
-fn minus_dm_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::MINUS_DM, inputs, kwargs, &[0, 1], &[])
-}
-#[polars_expr(output_type=Float64)]
 fn mom(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::MOM, inputs, &params, &[0], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn mom_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::MOM, inputs, kwargs, &[0], &[])
 }
 #[polars_expr(output_type=Float64)]
 fn mult(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -2022,18 +1262,10 @@ fn mult(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     })
 }
 #[polars_expr(output_type=Float64)]
-fn mult_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::MULT, inputs, kwargs, &[0, 1], &[])
-}
-#[polars_expr(output_type=Float64)]
 fn natr(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::NATR, inputs, &params, &[1, 2, 0], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn natr_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::NATR, inputs, kwargs, &[1, 2, 0], &[])
 }
 #[polars_expr(output_type=Float64)]
 fn nvi(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -2042,18 +1274,10 @@ fn nvi(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     })
 }
 #[polars_expr(output_type=Float64)]
-fn nvi_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::NVI, inputs, kwargs, &[0, 1], &[])
-}
-#[polars_expr(output_type=Float64)]
 fn obv(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::OBV, inputs, &params, &[0, 1], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn obv_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::OBV, inputs, kwargs, &[0, 1], &[])
 }
 #[polars_expr(output_type=Float64)]
 fn percentile(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -2062,18 +1286,10 @@ fn percentile(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series>
     })
 }
 #[polars_expr(output_type=Float64)]
-fn percentile_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::PERCENTILE, inputs, kwargs, &[0], &[])
-}
-#[polars_expr(output_type=Float64)]
 fn percentrank(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::PERCENTRANK, inputs, &params, &[0], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn percentrank_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::PERCENTRANK, inputs, kwargs, &[0], &[])
 }
 #[polars_expr(output_type=Float64)]
 fn plus_di(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -2082,18 +1298,10 @@ fn plus_di(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     })
 }
 #[polars_expr(output_type=Float64)]
-fn plus_di_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::PLUS_DI, inputs, kwargs, &[1, 2, 0], &[])
-}
-#[polars_expr(output_type=Float64)]
 fn plus_dm(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::PLUS_DM, inputs, &params, &[0, 1], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn plus_dm_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::PLUS_DM, inputs, kwargs, &[0, 1], &[])
 }
 #[polars_expr(output_type=Float64)]
 fn ppo(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -2102,18 +1310,10 @@ fn ppo(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     })
 }
 #[polars_expr(output_type=Float64)]
-fn ppo_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::PPO, inputs, kwargs, &[0], &[])
-}
-#[polars_expr(output_type=Float64)]
 fn pvi(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::PVI, inputs, &params, &[0, 1], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn pvi_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::PVI, inputs, kwargs, &[0, 1], &[])
 }
 #[polars_expr(output_type=Float64)]
 fn pvo(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -2122,18 +1322,10 @@ fn pvo(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     })
 }
 #[polars_expr(output_type=Float64)]
-fn pvo_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::PVO, inputs, kwargs, &[0], &[])
-}
-#[polars_expr(output_type=Float64)]
 fn pvt(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::PVT, inputs, &params, &[0, 1], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn pvt_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::PVT, inputs, kwargs, &[0, 1], &[])
 }
 #[polars_expr(output_type=Float64)]
 fn qstick(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -2142,18 +1334,10 @@ fn qstick(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     })
 }
 #[polars_expr(output_type=Float64)]
-fn qstick_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::QSTICK, inputs, kwargs, &[0, 1], &[])
-}
-#[polars_expr(output_type=Float64)]
 fn rma(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::RMA, inputs, &params, &[0], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn rma_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::RMA, inputs, kwargs, &[0], &[])
 }
 #[polars_expr(output_type=Float64)]
 fn roc(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -2162,18 +1346,10 @@ fn roc(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     })
 }
 #[polars_expr(output_type=Float64)]
-fn roc_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::ROC, inputs, kwargs, &[0], &[])
-}
-#[polars_expr(output_type=Float64)]
 fn rocp(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::ROCP, inputs, &params, &[0], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn rocp_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::ROCP, inputs, kwargs, &[0], &[])
 }
 #[polars_expr(output_type=Float64)]
 fn rocr(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -2182,18 +1358,10 @@ fn rocr(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     })
 }
 #[polars_expr(output_type=Float64)]
-fn rocr_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::ROCR, inputs, kwargs, &[0], &[])
-}
-#[polars_expr(output_type=Float64)]
 fn rocr100(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::ROCR100, inputs, &params, &[0], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn rocr100_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::ROCR100, inputs, kwargs, &[0], &[])
 }
 #[polars_expr(output_type=Float64)]
 fn rsi(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -2202,18 +1370,10 @@ fn rsi(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     })
 }
 #[polars_expr(output_type=Float64)]
-fn rsi_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::RSI, inputs, kwargs, &[0], &[])
-}
-#[polars_expr(output_type=Float64)]
 fn rvi(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::RVI, inputs, &params, &[0], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn rvi_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::RVI, inputs, kwargs, &[0], &[])
 }
 #[polars_expr(output_type=Float64)]
 fn rvol(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -2222,18 +1382,10 @@ fn rvol(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     })
 }
 #[polars_expr(output_type=Float64)]
-fn rvol_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::RVOL, inputs, kwargs, &[0], &[])
-}
-#[polars_expr(output_type=Float64)]
 fn sar(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::SAR, inputs, &params, &[0, 1], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn sar_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::SAR, inputs, kwargs, &[0, 1], &[])
 }
 #[polars_expr(output_type=Float64)]
 fn sarext(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -2242,18 +1394,10 @@ fn sarext(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     })
 }
 #[polars_expr(output_type=Float64)]
-fn sarext_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::SAREXT, inputs, kwargs, &[0, 1], &[])
-}
-#[polars_expr(output_type=Float64)]
 fn sin(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::SIN, inputs, &params, &[0], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn sin_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::SIN, inputs, kwargs, &[0], &[])
 }
 #[polars_expr(output_type=Float64)]
 fn sinh(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -2262,18 +1406,10 @@ fn sinh(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     })
 }
 #[polars_expr(output_type=Float64)]
-fn sinh_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::SINH, inputs, kwargs, &[0], &[])
-}
-#[polars_expr(output_type=Float64)]
 fn sma(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::SMA, inputs, &params, &[0], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn sma_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::SMA, inputs, kwargs, &[0], &[])
 }
 fn smi_output(_: &[Field]) -> PolarsResult<Field> {
     Ok(Field::new(
@@ -2296,16 +1432,6 @@ fn smi(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
         )
     })
 }
-#[polars_expr(output_type_func=smi_output)]
-fn smi_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(
-        FuncId::SMI,
-        inputs,
-        kwargs,
-        &[0, 1, 2],
-        &["smi", "smisignal"],
-    )
-}
 #[polars_expr(output_type=Float64)]
 fn sqrt(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
@@ -2313,18 +1439,10 @@ fn sqrt(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     })
 }
 #[polars_expr(output_type=Float64)]
-fn sqrt_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::SQRT, inputs, kwargs, &[0], &[])
-}
-#[polars_expr(output_type=Float64)]
 fn stddev(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::STDDEV, inputs, &params, &[0], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn stddev_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::STDDEV, inputs, kwargs, &[0], &[])
 }
 fn stoch_output(_: &[Field]) -> PolarsResult<Field> {
     Ok(Field::new(
@@ -2347,16 +1465,6 @@ fn stoch(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
         )
     })
 }
-#[polars_expr(output_type_func=stoch_output)]
-fn stoch_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(
-        FuncId::STOCH,
-        inputs,
-        kwargs,
-        &[1, 2, 0],
-        &["slowk", "slowd"],
-    )
-}
 fn stochf_output(_: &[Field]) -> PolarsResult<Field> {
     Ok(Field::new(
         "",
@@ -2378,16 +1486,6 @@ fn stochf(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
         )
     })
 }
-#[polars_expr(output_type_func=stochf_output)]
-fn stochf_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(
-        FuncId::STOCHF,
-        inputs,
-        kwargs,
-        &[1, 2, 0],
-        &["fastk", "fastd"],
-    )
-}
 fn stochrsi_output(_: &[Field]) -> PolarsResult<Field> {
     Ok(Field::new(
         "",
@@ -2403,10 +1501,6 @@ fn stochrsi(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
         compute(FuncId::STOCHRSI, inputs, &params, &[0], &["fastk", "fastd"])
     })
 }
-#[polars_expr(output_type_func=stochrsi_output)]
-fn stochrsi_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::STOCHRSI, inputs, kwargs, &[0], &["fastk", "fastd"])
-}
 #[polars_expr(output_type=Float64)]
 fn sub(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
@@ -2414,18 +1508,10 @@ fn sub(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     })
 }
 #[polars_expr(output_type=Float64)]
-fn sub_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::SUB, inputs, kwargs, &[0, 1], &[])
-}
-#[polars_expr(output_type=Float64)]
 fn sum(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::SUM, inputs, &params, &[0], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn sum_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::SUM, inputs, kwargs, &[0], &[])
 }
 fn supertrend_output(_: &[Field]) -> PolarsResult<Field> {
     Ok(Field::new(
@@ -2448,25 +1534,11 @@ fn supertrend(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series>
         )
     })
 }
-#[polars_expr(output_type_func=supertrend_output)]
-fn supertrend_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(
-        FuncId::SUPERTREND,
-        inputs,
-        kwargs,
-        &[0, 1, 2],
-        &["supertrend", "trend"],
-    )
-}
 #[polars_expr(output_type=Float64)]
 fn t3(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::T3, inputs, &params, &[0], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn t3_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::T3, inputs, kwargs, &[0], &[])
 }
 #[polars_expr(output_type=Float64)]
 fn tan(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -2475,18 +1547,10 @@ fn tan(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     })
 }
 #[polars_expr(output_type=Float64)]
-fn tan_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::TAN, inputs, kwargs, &[0], &[])
-}
-#[polars_expr(output_type=Float64)]
 fn tanh(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::TANH, inputs, &params, &[0], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn tanh_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::TANH, inputs, kwargs, &[0], &[])
 }
 #[polars_expr(output_type=Float64)]
 fn tema(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -2495,18 +1559,10 @@ fn tema(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     })
 }
 #[polars_expr(output_type=Float64)]
-fn tema_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::TEMA, inputs, kwargs, &[0], &[])
-}
-#[polars_expr(output_type=Float64)]
 fn trange(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::TRANGE, inputs, &params, &[1, 2, 0], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn trange_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::TRANGE, inputs, kwargs, &[1, 2, 0], &[])
 }
 #[polars_expr(output_type=Float64)]
 fn trima(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -2515,18 +1571,10 @@ fn trima(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     })
 }
 #[polars_expr(output_type=Float64)]
-fn trima_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::TRIMA, inputs, kwargs, &[0], &[])
-}
-#[polars_expr(output_type=Float64)]
 fn trix(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::TRIX, inputs, &params, &[0], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn trix_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::TRIX, inputs, kwargs, &[0], &[])
 }
 #[polars_expr(output_type=Float64)]
 fn tsf(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -2535,18 +1583,10 @@ fn tsf(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     })
 }
 #[polars_expr(output_type=Float64)]
-fn tsf_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::TSF, inputs, kwargs, &[0], &[])
-}
-#[polars_expr(output_type=Float64)]
 fn tsi(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::TSI, inputs, &params, &[0], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn tsi_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::TSI, inputs, kwargs, &[0], &[])
 }
 #[polars_expr(output_type=Float64)]
 fn typprice(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -2555,18 +1595,10 @@ fn typprice(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     })
 }
 #[polars_expr(output_type=Float64)]
-fn typprice_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::TYPPRICE, inputs, kwargs, &[1, 2, 0], &[])
-}
-#[polars_expr(output_type=Float64)]
 fn ultosc(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::ULTOSC, inputs, &params, &[1, 2, 0], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn ultosc_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::ULTOSC, inputs, kwargs, &[1, 2, 0], &[])
 }
 #[polars_expr(output_type=Float64)]
 fn var(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -2575,18 +1607,10 @@ fn var(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     })
 }
 #[polars_expr(output_type=Float64)]
-fn var_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::VAR, inputs, kwargs, &[0], &[])
-}
-#[polars_expr(output_type=Float64)]
 fn vhf(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::VHF, inputs, &params, &[0], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn vhf_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::VHF, inputs, kwargs, &[0], &[])
 }
 fn vortex_output(_: &[Field]) -> PolarsResult<Field> {
     Ok(Field::new(
@@ -2609,25 +1633,11 @@ fn vortex(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
         )
     })
 }
-#[polars_expr(output_type_func=vortex_output)]
-fn vortex_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(
-        FuncId::VORTEX,
-        inputs,
-        kwargs,
-        &[0, 1, 2],
-        &["plusvi", "minusvi"],
-    )
-}
 #[polars_expr(output_type=Float64)]
 fn vwap(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::VWAP, inputs, &params, &[0, 1, 2, 3], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn vwap_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::VWAP, inputs, kwargs, &[0, 1, 2, 3], &[])
 }
 #[polars_expr(output_type=Float64)]
 fn vwma(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -2636,18 +1646,10 @@ fn vwma(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     })
 }
 #[polars_expr(output_type=Float64)]
-fn vwma_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::VWMA, inputs, kwargs, &[0, 1], &[])
-}
-#[polars_expr(output_type=Float64)]
 fn wad(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::WAD, inputs, &params, &[0, 1, 2], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn wad_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::WAD, inputs, kwargs, &[0, 1, 2], &[])
 }
 #[polars_expr(output_type=Float64)]
 fn wclprice(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -2656,18 +1658,10 @@ fn wclprice(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     })
 }
 #[polars_expr(output_type=Float64)]
-fn wclprice_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::WCLPRICE, inputs, kwargs, &[1, 2, 0], &[])
-}
-#[polars_expr(output_type=Float64)]
 fn willr(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::WILLR, inputs, &params, &[1, 2, 0], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn willr_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::WILLR, inputs, kwargs, &[1, 2, 0], &[])
 }
 #[polars_expr(output_type=Float64)]
 fn wma(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
@@ -2676,16 +1670,8 @@ fn wma(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     })
 }
 #[polars_expr(output_type=Float64)]
-fn wma_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::WMA, inputs, kwargs, &[0], &[])
-}
-#[polars_expr(output_type=Float64)]
 fn zlema(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
         compute(FuncId::ZLEMA, inputs, &params, &[0], &[])
     })
-}
-#[polars_expr(output_type=Float64)]
-fn zlema_by_group(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    crate::grouped::compute_grouped(FuncId::ZLEMA, inputs, kwargs, &[0], &[])
 }

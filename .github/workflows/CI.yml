@@ -137,7 +137,7 @@ jobs:
         run: |
           python scripts/generate_indicators.py
           python scripts/generate_skill_reference.py
-          git diff --exit-code -- src/generated.rs python/polars_talib/_grouped_abi.py python/polars_talib/_generated.py python/polars_talib/_param_types.py docs/indicators.md plugins/polars-talib/skills/polars-talib/reference/functions.md
+          git diff --exit-code -- src/generated.rs python/polars_talib/_generated.py python/polars_talib/_param_types.py docs/indicators.md plugins/polars-talib/skills/polars-talib/reference/functions.md
       - name: Rust crate tests
         run: cargo test --lib --locked
       - name: Build source distribution and install it without system TA-Lib
@@ -196,40 +196,65 @@ jobs:
             differential.json
 
   benchmark:
-    name: Release benchmark
-    needs: wheels
+    name: Release benchmark / rebuilt baseline on same runner
     runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      RUSTUP_TOOLCHAIN: '1.90.0'
+      CARGO_PROFILE_RELEASE_DEBUG: 'false'
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          path: candidate-source
+      - uses: actions/checkout@v6
+        with:
+          ref: b2bbc26d41ec80823c8bffb0cc436a97f29911cc
+          path: baseline-source
       - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
-      - uses: actions/download-artifact@v7
-        with:
-          name: wheels-linux-x64
-          path: dist
+      - uses: dtolnay/rust-toolchain@1.90.0
       - uses: astral-sh/setup-uv@v8.2.0
-      # Informational: shared runners are too noisy to gate a release on a
-      # fixed regression threshold. The comparison and raw samples are kept as
-      # a job summary and artifact for humans to judge.
-      - name: Compare release wheels on the same runner
+      # Both portable release wheels are rebuilt here, on this runner, with
+      # the same compiler, allocator platform, Python and runtime dependencies.
+      # No downloaded wheel, published package timing or other runner is used.
+      - name: Build both release wheels sequentially
         run: |
-          uv venv .benchmark-base
-          uv venv .benchmark-candidate
-          uv pip install --python .benchmark-base 'polars-talib==0.2.1' 'polars==1.44.2' 'numpy==2.5.3'
-          uv pip install --python .benchmark-candidate dist/*.whl 'polars==1.44.2' 'numpy==2.5.3'
-          .benchmark-base/bin/python scripts/benchmark.py --output baseline.json --repeats 51 --pin-cpus 4
-          .benchmark-candidate/bin/python scripts/benchmark.py --output candidate.json --repeats 51 --pin-cpus 4
-          python scripts/compare_benchmarks.py baseline.json candidate.json --output comparison.md --report-only
-          cat comparison.md >> "$GITHUB_STEP_SUMMARY"
+          uv venv --python 3.12 baseline-env
+          uv venv --python 3.12 candidate-env
+          uv pip install --python baseline-env 'maturin==1.15.0' 'cmake==4.4.4' 'polars==1.44.2' 'numpy==2.5.3'
+          uv pip install --python candidate-env 'maturin==1.15.0' 'cmake==4.4.4' 'polars==1.44.2' 'numpy==2.5.3'
+          mkdir -p benchmark-results
+          export PATH="$PWD/baseline-env/bin:$PATH"
+          (cd baseline-source && maturin build --release --locked --out ../baseline-dist) > benchmark-results/baseline-build.log 2>&1
+          (cd candidate-source && maturin build --release --locked --out ../candidate-dist) > benchmark-results/candidate-build.log 2>&1
+          uv pip install --python baseline-env --no-deps baseline-dist/*.whl
+          uv pip install --python candidate-env --no-deps candidate-dist/*.whl
+          rustc --version --verbose > benchmark-results/toolchain.txt
+          cc --version >> benchmark-results/toolchain.txt
+          cmake --version >> benchmark-results/toolchain.txt
+          lscpu > benchmark-results/lscpu.txt
+          cat /proc/meminfo > benchmark-results/meminfo.txt
+          uv pip freeze --python baseline-env > benchmark-results/baseline-dependencies.txt
+          uv pip freeze --python candidate-env > benchmark-results/candidate-dependencies.txt
+      - name: Check outputs and alternate repeated measurements
+        run: |
+          candidate-env/bin/python candidate-source/scripts/migration_ci_benchmark.py \
+            --baseline-python baseline-env/bin/python --baseline-source baseline-source \
+            --candidate-python candidate-env/bin/python --candidate-source candidate-source \
+            --output benchmark-results --pairs 6 --repeats 51 --threads 4
+          cat benchmark-results/comparison.md >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: benchmark
+          name: migration-benchmark
           path: |
-            baseline.json
-            candidate.json
-            comparison.md
+            benchmark-results/*.json
+            benchmark-results/*.md
+            benchmark-results/*.txt
+            benchmark-results/*.log
+          if-no-files-found: error
 
   release:
     name: Publish tested wheels

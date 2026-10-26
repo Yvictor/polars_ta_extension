@@ -44,8 +44,6 @@ def cases():
             label=functions[0] if len(functions)==1 else 'mix8'
             key=f'grouped_{label}/{groups}x{bars}'+('_interleaved' if interleaved else '')
             yield key,data,[getattr(ta,f)().over('symbol').alias(f) for f in functions]
-            if hasattr(ta,'by_group'):
-                yield key+'_dispatcher',data,[ta.by_group(f,by='symbol').alias(f) for f in functions]
 
 
 def flatten(result):
@@ -61,22 +59,29 @@ def main():
     p.add_argument('--output',type=Path,required=True);p.add_argument('--repeats',type=int,default=31)
     p.add_argument('--reference',type=Path);p.add_argument('--write-reference',type=Path)
     p.add_argument('--source-root',type=Path,required=True);p.add_argument('--label',required=True)
+    p.add_argument('--check-only',action='store_true')
     args=p.parse_args()
     if args.repeats<5:p.error('at least five repetitions required')
     reference=np.load(args.reference,allow_pickle=False) if args.reference else None
-    values={};results={};load_start=os.getloadavg()
+    values={};results={};load_start=os.getloadavg();checked_values=0
     for name,data,exprs in cases():
         query=data.lazy().select(exprs)
         result=query.collect()
+        if reference is not None:
+            assert str(result.schema)==str(reference[name+'_schema']), f'{name}: schema differs'
+        if args.write_reference:values[name+'_schema']=np.array(str(result.schema))
         columns=flatten(result)
         for i,column in enumerate(columns):
-            slot=name.removesuffix('_dispatcher')+f'_{i}'
+            slot=name+f'_{i}'
             numeric=column.fill_null(0).to_numpy();nulls=column.is_null().to_numpy()
             if reference is not None:
                 np.testing.assert_array_equal(nulls,reference[slot+'_null'])
+                np.testing.assert_array_equal(np.isnan(numeric),np.isnan(reference[slot]))
                 np.testing.assert_allclose(numeric,reference[slot],rtol=1e-10,atol=1e-10,equal_nan=True,err_msg=name)
+                checked_values+=len(numeric)
             if args.write_reference:
                 values[slot]=numeric;values[slot+'_null']=nulls
+        if args.check_only:continue
         for _ in range(5):query.collect()
         samples=[]
         gc.disable()
@@ -104,13 +109,16 @@ def main():
         except (subprocess.CalledProcessError,OSError):pass
     elif Path('/proc/cpuinfo').is_file():
         cpu=next((s.split(':',1)[1].strip() for s in Path('/proc/cpuinfo').read_text().splitlines() if s.startswith('model name')),cpu)
-    payload={'label':args.label,'cpu':cpu,'memory_bytes':memory,'logical_cpus':os.cpu_count(),
+    commit=subprocess.check_output(['git','-C',str(args.source_root),'rev-parse','HEAD'],text=True).strip()
+    payload={'label':args.label,'commit':commit,'cpu':cpu,'memory_bytes':memory,'logical_cpus':os.cpu_count(),
              'python':platform.python_version(),'platform':platform.platform(),'polars':pl.__version__,
              'numpy':np.__version__,'package':version('polars-talib'),'talib':ta.__talib_version__,
-             'rust':'1.90.0','profile':'release (maturin --release --locked), portable CPU target',
+             'rust':subprocess.check_output(['rustc','--version'],text=True).strip(),
+             'profile':'release (maturin --release --locked), portable CPU target',
              'threads':pl.thread_pool_size(),'repeats':args.repeats,'warmups':5,
              'load_start':load_start,'load_end':os.getloadavg(),'source_sha256':source.hexdigest(),
              'correctness_reference':str(args.reference) if args.reference else None,
+             'checked_values':checked_values,'affinity':sorted(os.sched_getaffinity(0)) if hasattr(os,'sched_getaffinity') else None,
              'results':results}
     args.output.parent.mkdir(parents=True,exist_ok=True);args.output.write_text(json.dumps(payload,indent=2)+'\n')
     print(json.dumps({n:round(r['median_ms'],4) for n,r in results.items()},indent=2))
