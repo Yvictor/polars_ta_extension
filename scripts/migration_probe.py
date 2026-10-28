@@ -47,6 +47,8 @@ def frame(n, pattern='random', dtype=pl.Float64):
         condition = pl.int_range(pl.len()) < (1 if 'infinity' in pattern else 3) if pattern.startswith('leading') else pl.int_range(pl.len()).is_in([7, 85])
         df = df.with_columns(pl.when(condition).then(pl.lit(value,pl.Float64)).otherwise(pl.col(c)).alias(c)
                              for c in df.columns if c != 'periods')
+    if pattern in ('all_null','all_nan'):
+        df=df.with_columns(pl.lit(None if pattern=='all_null' else float('nan'),pl.Float64).alias(c) for c in df.columns if c!='periods')
     df = df.cast(dtype)
     if pattern == 'chunked':
         df = pl.concat([df.slice(i,17) for i in range(0,n,17)],rechunk=False)
@@ -66,7 +68,7 @@ def cases():
         for n in (0,1,2,10,29,30,31,64,257):
             yield f'{name}/length/{n}', spec, frame(n), {}, None
         for pattern in ('constant','zero','trend','flat_then_move','move_then_flat','fraction_then_zero','tiny',
-                        'leading_null','leading_nan','null','nan','infinity','negative_infinity','leading_infinity','leading_negative_infinity','chunked','domain','high_offset','micro_offset','large_constant','large_finite','high_volume'):
+                        'all_null','all_nan','leading_null','leading_nan','null','nan','infinity','negative_infinity','leading_infinity','leading_negative_infinity','chunked','domain','high_offset','micro_offset','large_constant','large_finite','high_volume'):
             yield f'{name}/{pattern}', spec, frame(192,pattern), {}, None
         from polars_talib._polars_talib import lookback
         lb=lookback(name,None)
@@ -105,6 +107,13 @@ def cases():
                 data=frame(400,'fraction_then_zero')
                 if name=='pvo':data=data.with_columns(pl.col('close').alias('volume'))
                 yield f'{name}/dead_window/{ma}',spec,data,{'matype':ma},None
+    spec=next(f for f in API if f['name']=='mavp')
+    for matype in range(14):
+        for maximum in (31,200):
+            for pattern in ('random','high_offset'):
+                for variable in (False,True):
+                    df=frame(320,pattern).with_columns(pl.Series('periods',np.resize([2.,5.,31.,float(maximum)] if variable else [float(maximum)],320)))
+                    yield f'mavp/output_init/{matype}/{maximum}/{pattern}/{variable}',spec,df,{'matype':matype,'minperiod':2,'maxperiod':maximum},None
     for name,params in [('percentile' ,{'timeperiod':10001}),('percentrank',{'timeperiod':10001}),
                          ('mavp',{'minperiod':2,'maxperiod':10001})]:
         spec=next(f for f in API if f['name']==name)
@@ -141,7 +150,7 @@ def capture(path):
     print(json.dumps({'cases':len(meta['cases']),'talib':ta.__talib_version__,'path':str(path)},indent=2))
 
 
-def compare(baseline,candidate,report):
+def compare(baseline,candidate,report,require_exact=False):
     old=np.load(baseline,allow_pickle=False); new=np.load(candidate,allow_pickle=False)
     om=json.loads(str(old['metadata'])); nm=json.loads(str(new['metadata']))
     failures=[]; bit_different=0; max_abs=0.; checked=0
@@ -159,6 +168,8 @@ def compare(baseline,candidate,report):
                 valid=~mask
                 av=av[valid];bv=bv[valid];checked+=len(av)
                 exact=np.array_equal(av,bv,equal_nan=True)
+                if exact and av.dtype.kind=='f':
+                    exact=np.array_equal(np.signbit(av[~np.isnan(av)]),np.signbit(bv[~np.isnan(bv)]))
                 if not exact: bit_different+=1
                 finite=np.isfinite(av)&np.isfinite(bv)
                 if finite.any(): max_abs=max(max_abs,float(np.max(np.abs(av[finite]-bv[finite]))))
@@ -166,7 +177,12 @@ def compare(baseline,candidate,report):
                 if '/tiny' in key:
                     scale=float(np.max(np.abs(av[np.isfinite(av)]))) if np.isfinite(av).any() else 0.
                     atol=min(atol,scale*1e-10)
-                equal=(av==bv) if av.dtype.kind in 'iu' else np.isclose(av,bv,rtol=1e-10,atol=atol,equal_nan=True)
+                if av.dtype.kind in 'iu':
+                    equal=av==bv
+                elif require_exact:
+                    equal=((av==bv)&(np.signbit(av)==np.signbit(bv))) | (np.isnan(av)&np.isnan(bv))
+                else:
+                    equal=np.isclose(av,bv,rtol=1e-10,atol=atol,equal_nan=True)
                 if not equal.all():
                     reason.append('values differ')
                     indices=np.flatnonzero(~equal)[:5]
@@ -178,7 +194,7 @@ def compare(baseline,candidate,report):
             'candidate_sha256':hashlib.sha256(candidate.read_bytes()).hexdigest(),
             'baseline_runtime':{k:v for k,v in om.items() if k not in ('cases','api')},
             'candidate_runtime':{k:v for k,v in nm.items() if k not in ('cases','api')},
-            'rtol':1e-10,'atol':1e-10,'tiny_case_atol':'min(1e-10, max_abs_finite_reference * 1e-10)','cases':len(om['cases']),'checked_values':checked,
+            'require_exact':require_exact,'rtol':0. if require_exact else 1e-10,'atol':0. if require_exact else 1e-10,'tiny_case_atol':0. if require_exact else 'min(1e-10, max_abs_finite_reference * 1e-10)','cases':len(om['cases']),'checked_values':checked,
             'api_signatures_match':api_match,'fields_with_bit_differences':bit_different,
             'max_absolute_difference':max_abs,'failures':failures}
     report.parent.mkdir(parents=True,exist_ok=True);report.write_text(json.dumps(result,indent=2,allow_nan=True)+'\n')
@@ -190,9 +206,10 @@ def compare(baseline,candidate,report):
 def main():
     p=argparse.ArgumentParser();p.add_argument('--capture',type=Path)
     p.add_argument('--compare',nargs=2,type=Path);p.add_argument('--report',type=Path)
+    p.add_argument('--exact',action='store_true',help='Require equal numeric values, preserving NaN equality; no float tolerance')
     args=p.parse_args()
     if args.capture: capture(args.capture)
-    else: raise SystemExit(compare(*args.compare,args.report))
+    else: raise SystemExit(compare(*args.compare,args.report,require_exact=args.exact))
 
 
 if __name__=='__main__': main()

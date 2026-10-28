@@ -20,9 +20,10 @@ existing Python expressions
 
 Inputs borrow contiguous Float64 values where possible. Casts/rechunking and
 null-to-NaN conversions own their buffers until the call finishes. Outputs are
-initialized zeroed allocations; only warmup and unwritten rows are filled with
-NaN. No uninitialized slice or raw C pointer reaches a kernel. Integer padding
-stays zero. All returned ranges are checked before exposing results.
+initialized NaN allocations. Explicit warmup and unwritten-range NaN padding
+is retained. The earlier delivered `e626bf4` used zeroed real allocations; the
+[allocation follow-up](output-allocation.md) tests the allocator-sensitive change.
+No uninitialized slice or raw C pointer reaches a kernel. Integer padding stays zero. All returned ranges are checked before exposing results.
 
 The old `talib`/`talib-sys` subcrates, vendored C archive, CMake build and external
 TA-Lib override path are removed. Rust/Python/linker tooling remains necessary;
@@ -141,6 +142,13 @@ No alternate expression or list wrapper ships, and no grouped-batching speedup
 is claimed for the final implementation. No upstream PR or message was sent.
 
 ## Release-build performance: CI is the comparison source
+
+The [allocation follow-up](output-allocation.md) extends this methodology to
+three builds (original, delivered zero-init, current NaN-init), one- and
+four-thread runs, the missing 100 × 10,000-row layout, Polars controls and
+process page-fault samples. The earlier two-build results belong to delivered
+commit `e626bf4`; do not attribute them to the current follow-up head.
+
 
 The `Release benchmark / rebuilt baseline on same runner` job rebuilds both
 commit `b2bbc26d41ec80823c8bffb0cc436a97f29911cc` and the exact pull-request head,

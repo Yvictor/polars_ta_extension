@@ -125,7 +125,10 @@ pub fn compute(
         .outputs
         .iter()
         .map(|o| match o.kind {
-            OutputType::Real => Output::Real(vec![0.; len]),
+            // Use initialized NaNs rather than the allocator's zeroed/calloc path.
+            // Zeroed allocations can have different page-fault costs in grouped calls.
+            // Keep explicit range padding below; integer warmups remain zero.
+            OutputType::Real => Output::Real(vec![f64::NAN; len]),
             OutputType::Integer => Output::Integer(vec![0; len]),
         })
         .collect::<Vec<_>>();

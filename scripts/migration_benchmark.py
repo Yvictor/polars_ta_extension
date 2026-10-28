@@ -6,6 +6,7 @@ and keep POLARS_MAX_THREADS identical. No build or corpus job may run alongside.
 from __future__ import annotations
 import argparse
 import gc
+import fnmatch
 import hashlib
 from importlib.metadata import version
 import json
@@ -15,6 +16,10 @@ import platform
 import statistics
 import subprocess
 import time
+try:
+    import resource
+except ImportError:
+    resource = None
 import numpy as np
 import polars as pl
 import polars_talib as ta
@@ -30,20 +35,25 @@ def frame(rows,bars):
                          'volume':rng.uniform(100,1000,rows),'symbol':np.arange(rows)//bars})
 
 
-def cases():
+def cases(diagnostic=False):
     for n in (1000,1_000_000):
         data=frame(n,1000)
         for f in ('ema','rsi','macd','atr'):
             yield f'{f}/{n}',data,[getattr(ta,f)().alias(f)]
         yield f'mix8/{n}',data,[getattr(ta,f)().alias(f) for f in FUNCTIONS]
-    for groups,bars,interleaved in ((1000,1000,False),(10000,100,False),(2000,100,True)):
+    layouts=[(100,10000,False),(1000,1000,False),(10000,100,False),(2000,100,True)]
+    if diagnostic:layouts += [(50000,20,False),(10,100000,False),(1,1000000,False)]
+    for groups,bars,interleaved in layouts:
         data=frame(groups*bars,bars)
         if interleaved:
             data=data.with_row_index('_row').with_columns((pl.col('_row')%bars).alias('_within')).sort('_within','symbol').drop('_row','_within')
-        for functions in (('ema',),('atr',),FUNCTIONS):
+        choices=(('ema',),('atr',),FUNCTIONS) if bars in (100,1000,10000) else (('ema',),('atr',))
+        for functions in choices:
             label=functions[0] if len(functions)==1 else 'mix8'
             key=f'grouped_{label}/{groups}x{bars}'+('_interleaved' if interleaved else '')
             yield key,data,[getattr(ta,f)().over('symbol').alias(f) for f in functions]
+        suffix='_interleaved' if interleaved else ''
+        yield f'control_cumsum/{groups}x{bars}'+suffix,data,[pl.col('close').cum_sum().over('symbol').alias('control')]
 
 
 def flatten(result):
@@ -60,11 +70,15 @@ def main():
     p.add_argument('--reference',type=Path);p.add_argument('--write-reference',type=Path)
     p.add_argument('--source-root',type=Path,required=True);p.add_argument('--label',required=True)
     p.add_argument('--check-only',action='store_true')
+    p.add_argument('--diagnostic',action='store_true',help='Add the one-thread fixed-row-count group-size sweep')
+    p.add_argument('--exact-reference',action='store_true',help='Compare numeric values and signed zeros without tolerance; NaNs compare equal')
+    p.add_argument('--case-filter',action='append',default=[],help='Optional workload glob; CI leaves this empty to run all cases')
     args=p.parse_args()
     if args.repeats<5:p.error('at least five repetitions required')
     reference=np.load(args.reference,allow_pickle=False) if args.reference else None
     values={};results={};load_start=os.getloadavg();checked_values=0
-    for name,data,exprs in cases():
+    for name,data,exprs in cases(args.diagnostic):
+        if args.case_filter and not any(fnmatch.fnmatchcase(name,p) for p in args.case_filter):continue
         query=data.lazy().select(exprs)
         result=query.collect()
         if reference is not None:
@@ -77,22 +91,33 @@ def main():
             if reference is not None:
                 np.testing.assert_array_equal(nulls,reference[slot+'_null'])
                 np.testing.assert_array_equal(np.isnan(numeric),np.isnan(reference[slot]))
-                np.testing.assert_allclose(numeric,reference[slot],rtol=1e-10,atol=1e-10,equal_nan=True,err_msg=name)
+                if args.exact_reference:
+                    np.testing.assert_array_equal(numeric,reference[slot],err_msg=name)
+                    np.testing.assert_array_equal(np.signbit(numeric[~np.isnan(numeric)]),np.signbit(reference[slot][~np.isnan(numeric)]),err_msg=name)
+                else:
+                    np.testing.assert_allclose(numeric,reference[slot],rtol=1e-10,atol=1e-10,equal_nan=True,err_msg=name)
                 checked_values+=len(numeric)
             if args.write_reference:
                 values[slot]=numeric;values[slot+'_null']=nulls
         if args.check_only:continue
         for _ in range(5):query.collect()
-        samples=[]
+        samples=[];minor=[];major=[]
         gc.disable()
         try:
             for _ in range(args.repeats):
+                before=resource.getrusage(resource.RUSAGE_SELF) if resource is not None else None
                 start=time.perf_counter_ns();result=query.collect();elapsed=time.perf_counter_ns()-start
+                after=resource.getrusage(resource.RUSAGE_SELF) if resource is not None else None
                 assert result.height==data.height
                 samples.append(elapsed/1e6)
+                if before is not None:
+                    minor.append(after.ru_minflt-before.ru_minflt)
+                    major.append(after.ru_majflt-before.ru_majflt)
         finally:gc.enable()
         results[name]={'median_ms':statistics.median(samples),'min_ms':min(samples),'samples_ms':samples,
-                       'rows':data.height,'output_fields':len(columns)}
+                       'rows':data.height,'output_fields':len(columns),
+                       'minor_faults':minor if resource is not None else None,
+                       'major_faults':major if resource is not None else None}
     if args.write_reference:np.savez_compressed(args.write_reference,**values)
     source=hashlib.sha256()
     for path in sorted(args.source_root.rglob('*')):
@@ -115,10 +140,11 @@ def main():
              'numpy':np.__version__,'package':version('polars-talib'),'talib':ta.__talib_version__,
              'rust':subprocess.check_output(['rustc','--version'],text=True).strip(),
              'profile':'release (maturin --release --locked), portable CPU target',
-             'threads':pl.thread_pool_size(),'repeats':args.repeats,'warmups':5,
+             'threads':pl.thread_pool_size(),'repeats':args.repeats,'warmups':5,'diagnostic':args.diagnostic,
+             'fault_counter':'getrusage(RUSAGE_SELF), process counters across query threads including engine/Python/allocator activity between reads' if resource is not None else None,
              'load_start':load_start,'load_end':os.getloadavg(),'source_sha256':source.hexdigest(),
-             'correctness_reference':str(args.reference) if args.reference else None,
-             'checked_values':checked_values,'affinity':sorted(os.sched_getaffinity(0)) if hasattr(os,'sched_getaffinity') else None,
+             'correctness_reference':str(args.reference) if args.reference else None,'exact_reference':args.exact_reference,
+             'case_filters':args.case_filter,'checked_values':checked_values,'affinity':sorted(os.sched_getaffinity(0)) if hasattr(os,'sched_getaffinity') else None,
              'results':results}
     args.output.parent.mkdir(parents=True,exist_ok=True);args.output.write_text(json.dumps(payload,indent=2)+'\n')
     print(json.dumps({n:round(r['median_ms'],4) for n,r in results.items()},indent=2))

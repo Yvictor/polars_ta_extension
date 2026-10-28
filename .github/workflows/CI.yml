@@ -196,9 +196,9 @@ jobs:
             differential.json
 
   benchmark:
-    name: Release benchmark / rebuilt baseline on same runner
+    name: Release benchmark / original vs zero-init vs NaN-init
     runs-on: ubuntu-24.04
-    timeout-minutes: 45
+    timeout-minutes: 75
     env:
       RUSTUP_TOOLCHAIN: '1.90.0'
       CARGO_PROFILE_RELEASE_DEBUG: 'false'
@@ -210,50 +210,58 @@ jobs:
       - uses: actions/checkout@v6
         with:
           ref: b2bbc26d41ec80823c8bffb0cc436a97f29911cc
-          path: baseline-source
+          path: original-source
+      - uses: actions/checkout@v6
+        with:
+          ref: e626bf485a0b4957c034fd85dc0520b6c3b76a01
+          path: zero-source
       - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
       - uses: dtolnay/rust-toolchain@1.90.0
       - uses: astral-sh/setup-uv@v8.2.0
-      # Both portable release wheels are rebuilt here, on this runner, with
-      # the same compiler, allocator platform, Python and runtime dependencies.
-      # No downloaded wheel, published package timing or other runner is used.
-      - name: Build both release wheels sequentially
+      # All three builds are portable release wheels on this one runner. No
+      # published wheel, local timing or wheel built by another job is compared.
+      - name: Build all three release wheels sequentially
         run: |
-          uv venv --python 3.12 baseline-env
-          uv venv --python 3.12 candidate-env
-          uv pip install --python baseline-env 'maturin==1.15.0' 'cmake==4.4.4' 'polars==1.44.2' 'numpy==2.5.3'
-          uv pip install --python candidate-env 'maturin==1.15.0' 'cmake==4.4.4' 'polars==1.44.2' 'numpy==2.5.3'
           mkdir -p benchmark-results
-          export PATH="$PWD/baseline-env/bin:$PATH"
-          (cd baseline-source && maturin build --release --locked --out ../baseline-dist) > benchmark-results/baseline-build.log 2>&1
-          (cd candidate-source && maturin build --release --locked --out ../candidate-dist) > benchmark-results/candidate-build.log 2>&1
-          uv pip install --python baseline-env --no-deps baseline-dist/*.whl
-          uv pip install --python candidate-env --no-deps candidate-dist/*.whl
+          for side in original zero candidate; do
+            uv venv --python 3.12 "$side-env"
+            uv pip install --python "$side-env" 'maturin==1.15.0' 'cmake==4.4.4' 'polars==1.44.2' 'numpy==2.5.3'
+          done
+          export PATH="$PWD/original-env/bin:$PATH"
+          for side in original zero candidate; do
+            (cd "$side-source" && maturin build --release --locked --out "../$side-dist") > "benchmark-results/$side-build.log" 2>&1
+            uv pip install --python "$side-env" --no-deps "$side-dist/"*.whl
+            uv pip freeze --python "$side-env" > "benchmark-results/$side-dependencies.txt"
+          done
+          sha256sum original-dist/*.whl zero-dist/*.whl candidate-dist/*.whl > benchmark-results/wheel-sha256.txt
           rustc --version --verbose > benchmark-results/toolchain.txt
           cc --version >> benchmark-results/toolchain.txt
           cmake --version >> benchmark-results/toolchain.txt
           lscpu > benchmark-results/lscpu.txt
           cat /proc/meminfo > benchmark-results/meminfo.txt
-          uv pip freeze --python baseline-env > benchmark-results/baseline-dependencies.txt
-          uv pip freeze --python candidate-env > benchmark-results/candidate-dependencies.txt
-      - name: Check outputs and alternate repeated measurements
+      - name: Original compatibility and exact zero-init versus NaN-init corpus
         run: |
-          candidate-env/bin/python candidate-source/scripts/migration_ci_benchmark.py \
-            --baseline-python baseline-env/bin/python --baseline-source baseline-source \
+          mkdir -p benchmark-results/corpus
+          for side in original zero candidate; do
+            "$side-env/bin/python" candidate-source/scripts/migration_probe.py --capture "benchmark-results/corpus/$side.npz"
+          done
+          candidate-env/bin/python candidate-source/scripts/migration_probe.py --compare benchmark-results/corpus/original.npz benchmark-results/corpus/candidate.npz --report benchmark-results/corpus/original-vs-candidate.json
+          candidate-env/bin/python candidate-source/scripts/migration_probe.py --compare benchmark-results/corpus/zero.npz benchmark-results/corpus/candidate.npz --exact --report benchmark-results/corpus/zero-vs-candidate-exact.json
+      - name: Check workloads and alternate repeated three-build measurements
+        run: |
+          candidate-env/bin/python candidate-source/scripts/allocation_ci_benchmark.py \
+            --original-python original-env/bin/python --original-source original-source \
+            --zero-python zero-env/bin/python --zero-source zero-source \
             --candidate-python candidate-env/bin/python --candidate-source candidate-source \
-            --output benchmark-results --pairs 6 --repeats 51 --threads 4
+            --output benchmark-results --rounds 6 --repeats 51 --thread-counts 1 4
           cat benchmark-results/comparison.md >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: migration-benchmark
-          path: |
-            benchmark-results/*.json
-            benchmark-results/*.md
-            benchmark-results/*.txt
-            benchmark-results/*.log
+          name: migration-allocation-benchmark
+          path: benchmark-results/
           if-no-files-found: error
 
   release:
