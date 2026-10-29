@@ -74,6 +74,12 @@ jobs:
             (cd "sources/$side" && "$GITHUB_WORKSPACE/envs/$side/bin/python" -m maturin build --release --locked --interpreter "$GITHUB_WORKSPACE/envs/$side/bin/python" --out "$GITHUB_WORKSPACE/wheels/$side") > "ablation-results/$side-build.log" 2>&1
             uv pip install --python "envs/$side" --no-deps "wheels/$side/"*.whl
             uv pip freeze --python "envs/$side" > "ablation-results/$side-dependencies.txt"
+            if [[ "$side" != original ]]; then
+              commit_var="${side^^}_COMMIT"
+              python control-source/scripts/kernel_stage_benchmark.py --snapshot-side "$side" \
+                --source "sources/$side" --commit "${!commit_var}" --python "$PWD/envs/$side/bin/python" \
+                --target-dir "$CARGO_TARGET_DIR" --wheel-dir wheels --output ablation-results
+            fi
           done
           git -C control-source rev-parse HEAD > ablation-results/controller-commit.txt
           cp control-source/.github/workflows/kernel-ablation.yml ablation-results/workflow.yml
@@ -125,6 +131,7 @@ jobs:
         if: always()
         with:
           name: focused-kernel-allocation-evidence
+          include-hidden-files: true
           path: |
             ablation-results/
             wheels/

@@ -10,9 +10,10 @@ import re
 import statistics
 import shutil
 import subprocess
+import sys
 import time
 
-from kernel_ablation_benchmark import SIDES, ORDERS, sha256, verify_build
+from kernel_ablation_benchmark import SIDES, ORDERS, sha256, verify_build, source_record, identity, wheel_record, flags_record
 
 LENGTHS = (1000, 10000, 1000000)
 MODES = ('newcall', 'setup', 'kernel', 'ffi', 'materialize', 'full', 'init_zero_int', 'init_nan_real')
@@ -50,18 +51,44 @@ def fingerprint_value(raw):
     return int.from_bytes(bytes.fromhex(raw), 'little')
 
 
-def native_dependency_records(target, expected_rustflags=()):
-    """Follow actual native cdylib Cargo dependency fingerprints, never a global rlib glob."""
+def cargo_inventory(target, expected_rustflags=()):
     root = target / 'release/.fingerprint'
     names = ('ta_lib', 'polars', 'serde', 'jemallocator')
     parents = []
-    for path in root.glob('polars_talib-*/lib-_polars_talib.json'):
-        data = json.loads(path.read_text())
-        deps = {entry[1]: entry[3] for entry in data['deps']}
-        if set(names) <= deps.keys() and data['rustflags'] == list(expected_rustflags):
-            parents.append((path, {name: deps[name] for name in names}))
-    if not parents or any(deps != parents[0][1] for _, deps in parents):
-        raise ValueError('native wheel dependency fingerprints missing or disagree')
+    for pattern in ('*/lib-_polars_talib.json', '*/test-lib-_polars_talib.json'):
+        for path in sorted(root.glob(pattern)):
+            data = json.loads(path.read_text())
+            deps = {entry[1]: entry[3] for entry in data['deps']}
+            raw = path.with_suffix('')
+            reasons = []
+            if path.name.startswith('test-'): reasons.append('test artifact, not product cdylib')
+            if not path.parent.name.startswith('polars_talib-'): reasons.append('different package')
+            if not set(names) <= deps.keys(): reasons.append('missing native direct dependencies: ' + repr(sorted(set(names) - deps.keys())))
+            if data['rustflags'] != list(expected_rustflags): reasons.append('rustflags differ: ' + repr(data['rustflags']))
+            parents.append({'path': str(path), 'metadata': data, 'raw_fingerprint': raw.read_text().strip() if raw.exists() else None,
+                            'selected': not reasons, 'filter_reasons': reasons})
+    dependencies = []
+    for name in names:
+        for path in sorted(root.glob('*/lib-' + name + '.json')):
+            raw = path.with_suffix('')
+            dependencies.append({'name': name, 'path': str(path), 'metadata': json.loads(path.read_text()),
+                                 'raw_fingerprint': raw.read_text().strip() if raw.exists() else None})
+    return {'parents': parents, 'dependencies': dependencies, 'expected_rustflags': list(expected_rustflags)}
+
+
+def native_dependency_records(target, expected_rustflags=(), inventory_path=None):
+    """Select the current product graph immediately after its wheel build."""
+    root = target / 'release/.fingerprint'
+    names = ('ta_lib', 'polars', 'serde', 'jemallocator')
+    inventory = cargo_inventory(target, expected_rustflags)
+    if inventory_path is not None:
+        inventory_path.write_text(json.dumps(inventory, indent=2) + '\n')
+    parents = [(Path(row['path']), {name: {entry[1]: entry[3] for entry in row['metadata']['deps']}[name] for name in names})
+               for row in inventory['parents'] if row['selected']]
+    if not parents:
+        raise ValueError('zero native product parents; unfiltered candidates=' + str(len(inventory['parents'])) + '; inventory=' + str(inventory_path))
+    if any(deps != parents[0][1] for _, deps in parents):
+        raise ValueError('native product parents disagree: ' + repr([(str(path), deps) for path, deps in parents]) + '; inventory=' + str(inventory_path))
     resolved = {}; evidence = {}
     for path, _ in parents:
         raw_parent = path.with_suffix('')
@@ -78,11 +105,56 @@ def native_dependency_records(target, expected_rustflags=()):
                 if artifact.is_file() and metadata.is_file():
                     matches.append((artifact, path, metadata))
         if len(matches) != 1:
-            raise ValueError('native dependency fingerprint does not select exactly one artifact: ' + name)
+            raise ValueError('native dependency fingerprint does not select exactly one artifact: ' + name + '; expected=' + str(expected) + '; matches=' + repr(matches))
         artifact, fingerprint, metadata = matches[0]
         resolved[name] = artifact
         evidence[str(fingerprint)] = sha256(fingerprint); evidence[str(metadata)] = sha256(metadata)
     return resolved, evidence
+
+
+def snapshot(args):
+    folder = args.output / 'linkage' / args.snapshot_side; folder.mkdir(parents=True, exist_ok=True)
+    inventory_path = folder / 'unfiltered-cargo-inventory.json'
+    dependencies, files = native_dependency_records(args.target_dir, inventory_path=inventory_path)
+    copies = {}
+    for original, digest in files.items():
+        source = Path(original)
+        destination = folder / 'cargo-fingerprints' / source.parent.name / source.name
+        destination.parent.mkdir(parents=True, exist_ok=True); shutil.copyfile(source, destination)
+        if sha256(destination) != digest: raise ValueError('fingerprint snapshot copy changed')
+        copies[str(destination)] = digest
+    installed = identity(args.python)
+    record = {'side': args.snapshot_side, 'source': source_record(args.source, args.commit),
+              'identity': installed, 'wheel': wheel_record(args.wheel_dir / args.snapshot_side, installed),
+              'flags': flags_record(), 'dependencies': {name: {'path': str(path), 'sha256': sha256(path)} for name, path in dependencies.items()},
+              'fingerprint_files': copies, 'inventory_path': str(inventory_path), 'inventory_sha256': sha256(inventory_path)}
+    (folder / 'product-linkage.json').write_text(json.dumps(record, indent=2) + '\n')
+
+
+def product_dependency_records(args, provenance):
+    """Use retained wheel-time graphs even after Cargo has replaced current parent metadata."""
+    dependencies = None; hashes = None; evidence = {}
+    for side in SIDES:
+        path = args.output / 'linkage' / side / 'product-linkage.json'
+        record = json.loads(path.read_text())
+        build = provenance['builds'][side]
+        if (record['side'] != side or record['source'] != build['source'] or record['identity'] != build['identity']
+                or record['wheel'] != build['wheel'] or record['flags'] != provenance['flags']):
+            raise ValueError('product linkage snapshot does not cover measured wheel: ' + side)
+        files = {**record['fingerprint_files'], record['inventory_path']: record['inventory_sha256']}
+        if any(sha256(name) != digest for name, digest in files.items()):
+            raise ValueError('product fingerprint snapshot changed: ' + side)
+        actual = {name: entry['sha256'] for name, entry in record['dependencies'].items()}
+        paths = {name: Path(entry['path']) for name, entry in record['dependencies'].items()}
+        if set(actual) != {'ta_lib', 'polars', 'serde', 'jemallocator'}:
+            raise ValueError('product direct dependency inventory changed')
+        if any(sha256(paths[name]) != digest for name, digest in actual.items()):
+            raise ValueError('product rlib changed: ' + side)
+        if dependencies is not None and (paths != dependencies or actual != hashes):
+            raise ValueError('four product wheel dependency graphs disagree')
+        dependencies = paths; hashes = actual
+        evidence.update(files); evidence[str(path)] = sha256(path)
+    return dependencies, evidence
 
 
 def mapper(source):
@@ -101,7 +173,8 @@ def build(args):
     if len(archives) != 1:
         raise ValueError('exactly one original C archive required: ' + repr(archives))
     archive = archives[0]
-    dependencies, dependency_fingerprints = native_dependency_records(args.target_dir)
+    (folder / 'post-contract-cargo-inventory.json').write_text(json.dumps(cargo_inventory(args.target_dir), indent=2) + '\n')
+    dependencies, dependency_fingerprints = product_dependency_records(args, provenance)
     command = [str(args.base_python.absolute()), '-c',
                'import sys;sys.path.insert(0,sys.argv[1]);from migration_benchmark import frame;frame(1000000,1000)["close"].to_numpy().astype("<f8").tofile(sys.argv[2])',
                str(HERE), str(folder / 'input.bin')]
@@ -233,6 +306,17 @@ def measure(args):
 
 
 def main():
+    if '--snapshot-side' in sys.argv:
+        parser = argparse.ArgumentParser(description='Snapshot the exact product dependency graph immediately after a native wheel build')
+        parser.add_argument('--snapshot-side', choices=SIDES, required=True)
+        for name in ('source', 'python', 'wheel-dir', 'target-dir', 'output'):
+            parser.add_argument('--' + name, type=Path, required=True)
+        parser.add_argument('--commit', required=True)
+        args = parser.parse_args()
+        for name in ('source', 'wheel_dir', 'target_dir', 'output'):
+            setattr(args, name, getattr(args, name).resolve())
+        snapshot(args)
+        return
     parser = argparse.ArgumentParser(description=__doc__)
     for side in (*SIDES, 'original'):
         parser.add_argument('--' + side + '-python', type=Path, required=True)

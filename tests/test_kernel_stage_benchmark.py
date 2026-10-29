@@ -109,3 +109,62 @@ def test_raw_fingerprint_endianness_matches_actual_rust190_cargo_artifact():
     # [12302415943370065676, "polars", false, 12829913266768297537].
     # Its .fingerprint/polars-e3f1f97ac13c28e9/lib-polars file contains this raw hex.
     assert stages.fingerprint_value('41becbec23020db2') == 12829913266768297537
+
+
+def test_zero_product_parent_retains_unfiltered_c_and_test_filter_reasons(tmp_path):
+    root = tmp_path / 'release/.fingerprint/polars_talib-current'; root.mkdir(parents=True)
+    (root / 'lib-_polars_talib.json').write_text(json.dumps({'deps': [[1, 'talib', False, 8]], 'rustflags': []}))
+    (root / 'test-lib-_polars_talib.json').write_text(json.dumps({'deps': [[1, name, False, i] for i, name in enumerate(('polars', 'serde', 'ta_lib', 'jemallocator'))], 'rustflags': []}))
+    inventory = tmp_path / 'ordinary-inventory.json'
+    with pytest.raises(ValueError, match='zero native product parents; unfiltered candidates=2'):
+        stages.native_dependency_records(tmp_path, inventory_path=inventory)
+    data = json.loads(inventory.read_text())
+    assert all(not p['selected'] for p in data['parents'])
+    assert any('missing native' in reason for p in data['parents'] for reason in p['filter_reasons'])
+    assert any('test artifact' in reason for p in data['parents'] for reason in p['filter_reasons'])
+
+
+def linkage_fixture(tmp_path):
+    from types import SimpleNamespace
+    dependencies = {}
+    for name in ('ta_lib', 'polars', 'serde', 'jemallocator'):
+        path = tmp_path / (name + '.rlib'); path.write_bytes(name.encode())
+        dependencies[name] = {'path': str(path), 'sha256': stages.sha256(path)}
+    provenance = {'flags': {'rustc': 'Rust1.90'}, 'builds': {}}
+    for side in stages.SIDES:
+        folder = tmp_path / 'linkage' / side; folder.mkdir(parents=True)
+        fingerprint = folder / 'raw-parent'; fingerprint.write_bytes(b'wheel-time-raw-fingerprint')
+        inventory = folder / 'inventory.json'; inventory.write_text('{}')
+        build = {'source': {'commit': side}, 'identity': {'native': side}, 'wheel': {'sha256': side}}
+        provenance['builds'][side] = build
+        record = {'side': side, **build, 'flags': provenance['flags'], 'dependencies': dependencies,
+                  'fingerprint_files': {str(fingerprint): stages.sha256(fingerprint)},
+                  'inventory_path': str(inventory), 'inventory_sha256': stages.sha256(inventory)}
+        (folder / 'product-linkage.json').write_text(json.dumps(record))
+    return SimpleNamespace(output=tmp_path), provenance
+
+
+def test_wheel_time_dependency_graph_survives_later_c_and_test_parent_overwrite(tmp_path):
+    args, provenance = linkage_fixture(tmp_path)
+    current = tmp_path / 'release/.fingerprint/polars_talib-current'; current.mkdir(parents=True)
+    (current / 'lib-_polars_talib.json').write_text(json.dumps({'deps': [[1, 'talib', False, 9]], 'rustflags': []}))
+    found, evidence = stages.product_dependency_records(args, provenance)
+    assert set(found) == {'ta_lib', 'polars', 'serde', 'jemallocator'}
+    assert all(p.is_file() for p in found.values())
+    assert len(evidence) == 12
+
+
+@pytest.mark.parametrize('change', ['source', 'snapshot', 'rlib', 'disagreeing_graph'])
+def test_product_graph_snapshot_rejects_changed_wheel_source_or_dependencies(tmp_path, change):
+    args, provenance = linkage_fixture(tmp_path)
+    folder = tmp_path / 'linkage/mmi'; path = folder / 'product-linkage.json'
+    record = json.loads(path.read_text())
+    if change == 'source':
+        record['source']['commit'] = 'different'; path.write_text(json.dumps(record))
+    elif change == 'snapshot': (folder / 'raw-parent').write_bytes(b'unit-test-fingerprint-overwrite')
+    elif change == 'rlib': (tmp_path / 'polars.rlib').write_bytes(b'wrong-features')
+    else:
+        different = tmp_path / 'different-polars.rlib'; different.write_bytes(b'different-polars')
+        record['dependencies']['polars'] = {'path': str(different), 'sha256': stages.sha256(different)}
+        path.write_text(json.dumps(record))
+    with pytest.raises(ValueError): stages.product_dependency_records(args, provenance)
