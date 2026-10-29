@@ -1,4 +1,4 @@
-"""Three immutable MAVP primary arms; full captures precede isolated timing."""
+"""Canonical MAVP floor-elision probe; full captures precede isolated timing."""
 import argparse
 import gzip
 import hashlib
@@ -19,7 +19,7 @@ import time
 
 BASELINE = '4334163d3a1f5019aa9051342316b936a4dfb994'
 CONTROL = 'b3f0fa17d0e3485c39ed042d86fff7116c0430a4'
-CANDIDATE = 'UNSELECTED_SOURCE_PIN_DO_NOT_RUN'
+CANDIDATE = '08ae6a75ad32c91e7ffe8c10d00460d73589819a'
 C_COMMIT = 'b2bbc26d41ec80823c8bffb0cc436a97f29911cc'
 C_ARCHIVE = 'talib-sys/vendor/ta-lib-0.8.1-src.tar.gz'
 C_SHA = 'ec59ccd88c0c77f618587d858787c8f9d06c40460a09d66751926f6fd670f985'
@@ -48,6 +48,24 @@ ITERATIONS = {100:1000, 1000:100, 10000:10, 1000000:1}
 FLAGS = {'RUSTFLAGS':'', 'CARGO_ENCODED_RUSTFLAGS':'', 'CARGO_PROFILE_RELEASE_LTO':'thin',
          'CARGO_PROFILE_RELEASE_CODEGEN_UNITS':'1', 'CARGO_PROFILE_RELEASE_DEBUG':'false'}
 
+
+def managed_runtime_proof(text):
+    java = re.search(r'Running Java BatchApiTest \(on the jar\)\.\.\.\s*BatchApiTest: ALL PASS \((\d+) checks\)\s*OK', text)
+    csharp = re.search(r'Running C# tests \(net10\.0\)\.\.\.\s*TALib C# tests on \.NET 10[^\n]*\n(.*?)All \d+ C# suite\(s\) passed\.', text, re.S)
+    if java is None or csharp is None or 'SKIPPED' in csharp.group(0):
+        raise ValueError('actual Java and net10.0 C# BatchApiTest execution is required')
+    cs_counts = re.findall(r'BatchApiTest: ALL PASS \((\d+) checks\)', csharp.group(1))
+    if len(cs_counts) != 1:
+        raise ValueError('exactly one successful C# BatchApiTest runtime result required')
+    # The immutable candidate calls the guard matrix before either success line:
+    # three checks each for352 rejected and96 defaulted calls, plus reach.
+    matrix_floor = 3 * (352 + 96) + 1
+    counts = {'java_batch_checks': int(java.group(1)), 'csharp_batch_checks': int(cs_counts[0])}
+    if any(value < matrix_floor for value in counts.values()):
+        raise ValueError('BatchApiTest did not reach the MAVP guard-matrix check floor')
+    return {**counts, 'matrix_minimum_checks': matrix_floor,
+            'rejected_matrix_floor': 352, 'defaulted_matrix_floor': 96,
+            'java_suite_executed': True, 'csharp_net10_suite_executed': True}
 
 def sha256(path):
     digest=hashlib.sha256()

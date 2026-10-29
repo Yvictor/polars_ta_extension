@@ -1,4 +1,4 @@
-name: MAVP allocation evidence with direct MA MAMA controls
+name: Canonical MAVP floor-elision evidence with MAMA controls
 
 on:
   push:
@@ -13,7 +13,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  MAVP_CANDIDATE_COMMIT: 'UNSELECTED_SOURCE_PIN_DO_NOT_RUN'
+  MAVP_CANDIDATE_COMMIT: '08ae6a75ad32c91e7ffe8c10d00460d73589819a'
   RUSTUP_TOOLCHAIN: '1.97.0'
   CARGO_BUILD_JOBS: '4'
   RUSTFLAGS: ''
@@ -31,9 +31,9 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 120
     steps:
-      - name: Reject unselected or non-immutable source pin before checkout
+      - name: Verify canonical floor-elision source pin before checkout
         run: |
-          [[ "$MAVP_CANDIDATE_COMMIT" =~ ^[0-9a-f]{40}$ ]] || { echo "Source candidate is unselected; review is required before launch."; exit 1; }
+          [[ "$MAVP_CANDIDATE_COMMIT" =~ ^[0-9a-f]{40}$ ]] || { echo "Canonical floor-elision candidate must have an immutable full pin."; exit 1; }
       - uses: actions/checkout@v6
         with:
           path: control-source
@@ -99,6 +99,14 @@ jobs:
         run: |
           set -o pipefail
           python scripts/build.py libraries --language=java,csharp 2>&1 | tee ../mavp-three-arm-results/managed-libraries.log
+          python - <<'PY'
+          import json, sys
+          from pathlib import Path
+          sys.path.insert(0, "../control-source/scripts")
+          from mavp_three_arm_benchmark import managed_runtime_proof
+          proof = managed_runtime_proof(Path("../mavp-three-arm-results/managed-libraries.log").read_text())
+          Path("../mavp-three-arm-results/managed-runtime-proof.json").write_text(json.dumps(proof, indent=2) + "\n")
+          PY
           dotnet build-server shutdown
           git diff --exit-code
       - name: Build identical primary harnesses with pinned registry and original C references

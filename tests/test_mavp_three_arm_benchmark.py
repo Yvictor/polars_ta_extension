@@ -272,9 +272,11 @@ def test_shared_period_preparation_keeps_ema_wma_as_affected_workloads():
         assert rows[keys[2]]['is_unchanged_control'] and not rows[keys[2]]['is_other_ma_workload']
         assert all(rows[key]['is_reference_backend'] for key in keys[3:])
 
-def test_candidate_placeholder_blocks_all_launch_paths(tmp_path):
+def test_canonical_floor_pin_is_selected_and_placeholder_still_blocks(tmp_path,monkeypatch):
     from types import SimpleNamespace
-    assert m.CANDIDATE == 'UNSELECTED_SOURCE_PIN_DO_NOT_RUN'
+    assert m.CANDIDATE == '08ae6a75ad32c91e7ffe8c10d00460d73589819a'
+    assert m.arm_pins(SimpleNamespace(candidate_commit=m.CANDIDATE))['candidate'] == m.CANDIDATE
+    monkeypatch.setattr(m,'CANDIDATE','UNSELECTED_SOURCE_PIN_DO_NOT_RUN')
     for pin in [m.CANDIDATE, "a"*40, "9f66a5b075f6f2b578118f9b913a5f5ca5540a69"]:
         with pytest.raises(ValueError, match="unselected"):
             m.arm_pins(SimpleNamespace(candidate_commit=pin))
@@ -302,10 +304,21 @@ def test_managed_library_and_source_gates_precede_every_timer():
     assert "java-version: '21'" in text
     assert 'global-json-file: candidate/global.json' in text
     assert '10.0.112' in text and text.index('Verify pinned managed SDK contract') < text.index('actions/setup-dotnet')
-    assert text.index('Reject unselected') < text.index('actions/checkout')
+    assert text.index('Verify canonical floor-elision') < text.index('actions/checkout')
     assert text.index('libraries --language=java,csharp') < text.index('Build identical primary')
     assert text.index('full-c-rust-regression.log') < text.index('measure 4104')
     assert 'measure 3888' not in text
+    assert text.index('managed_runtime_proof') < text.index('Build identical primary')
+    log = ('Running Java BatchApiTest (on the jar)... BatchApiTest: ALL PASS (1494 checks)\nOK\n'
+           'Running C# tests (net10.0)... TALib C# tests on .NET 10.0.3\n'
+           'BatchApiTest: ALL PASS (1494 checks)\nAll 11 C# suite(s) passed.\n')
+    proof=m.managed_runtime_proof(log)
+    assert proof['matrix_minimum_checks']==1345 and proof['java_batch_checks']==1494
+    assert proof['csharp_net10_suite_executed']
+    for bad in [log.replace('1494','149'),log.replace('BatchApiTest: ALL PASS','BatchApiTest compiled'),
+                log.replace('net10.0','net9.0'),log.replace('Running Java BatchApiTest','Built Java BatchApiTest'),
+                log.replace('All 11 C# suite(s) passed.','SKIPPED no runtime')]:
+        with pytest.raises(ValueError):m.managed_runtime_proof(bad)
 
 @pytest.mark.parametrize('case',['ma_control/MAMA/100','ma_control/MAMA/1000000'])
 @pytest.mark.parametrize('backend',m.BACKENDS)
