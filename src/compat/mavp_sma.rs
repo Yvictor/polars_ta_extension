@@ -92,11 +92,18 @@ pub(super) fn call(
         if last < 0 {
             continue;
         }
-        let last = last as usize;
+        // `last` was recorded from `selected`, so width <= count. The
+        // lookback proves start >= period - 1, and start + count == price.len().
+        // Cut every iterator to the same checked width before any stores;
+        // their zip therefore visits exactly the original 0..=last rows.
+        let width = last as usize + 1;
+        let selected = &selected[..width];
+        let incoming = &price[start..][..width];
+        let output = &mut output[..width];
         if period == 1 {
-            for i in 0..=last {
-                if selected[i] == period {
-                    output[i] = price[start + i];
+            for ((&value, &chosen), slot) in incoming.iter().zip(selected).zip(output.iter_mut()) {
+                if chosen == period {
+                    *slot = value;
                 }
             }
         } else {
@@ -106,12 +113,18 @@ pub(super) fn call(
             for &value in &price[start - lag..start] {
                 total += value;
             }
-            for i in 0..=last {
-                total += price[start + i];
+            let outgoing = &price[start - lag..][..width];
+            for (((&incoming, &outgoing), &chosen), slot) in incoming
+                .iter()
+                .zip(outgoing)
+                .zip(selected)
+                .zip(output.iter_mut())
+            {
+                total += incoming;
                 let value = total;
-                total -= price[start - lag + i];
-                if selected[i] == period {
-                    output[i] = value / f64::from(period);
+                total -= outgoing;
+                if chosen == period {
+                    *slot = value / f64::from(period);
                 }
             }
         }
@@ -191,6 +204,115 @@ mod tests {
         }
         assert_eq!(cases, 840);
     }
+    #[test]
+    fn unequal_selected_prefixes_match_each_direct_sma_without_touching_tail() {
+        let core = crate::native::core();
+        let mut checked = 0;
+        for n in [31usize, 32, 33, 64, 65, 257, 1025] {
+            for pattern in 0..4 {
+                let price: Vec<_> = (0..n)
+                    .map(|i| match pattern {
+                        0 => 100. + ((i * 17) % 97) as f64 / 100.,
+                        1 => {
+                            if i % 2 == 0 {
+                                -0.
+                            } else {
+                                0.
+                            }
+                        }
+                        2 => {
+                            if i == n / 2 {
+                                f64::NEG_INFINITY
+                            } else {
+                                100.
+                            }
+                        }
+                        _ => {
+                            if i == n / 2 {
+                                f64::NAN
+                            } else {
+                                100.
+                            }
+                        }
+                    })
+                    .collect();
+                let start = 29;
+                let count = n - start;
+                // Different last uses, including single-row prefixes and a
+                // final selected row, exercise all four equal-width cuts.
+                let periods: Vec<_> = (0..n)
+                    .map(|i| {
+                        if i == start {
+                            1.
+                        } else if i == start + 1 {
+                            30.
+                        } else if i + 1 == n {
+                            2.
+                        } else {
+                            [3., 5., 9., 14.][i % 4]
+                        }
+                    })
+                    .collect();
+                let mut output = vec![POISON; count + 8];
+                let range = call(&price, &periods, 1, 30, &mut output).unwrap();
+                assert_eq!((range.beg_idx, range.count), (start, count));
+                for period in [1, 2, 3, 5, 9, 14, 30] {
+                    let mut direct = vec![POISON; count];
+                    let range = core
+                        .ma(start, n - 1, &price, period, MAType::SMA, &mut direct)
+                        .unwrap();
+                    assert_eq!((range.beg_idx, range.count), (start, count));
+                    for (i, &selected) in periods[start..].iter().enumerate() {
+                        if selected == f64::from(period) {
+                            assert!(
+                                same(output[i], direct[i]),
+                                "n{n}/pattern{pattern}/period{period}/row{i}"
+                            );
+                            if period == 1 {
+                                assert_eq!(output[i].to_bits(), price[start + i].to_bits());
+                            }
+                            checked += 1;
+                        }
+                    }
+                }
+                assert!(output[count..]
+                    .iter()
+                    .all(|v| v.to_bits() == POISON.to_bits()));
+            }
+        }
+        assert_eq!(checked, 5216);
+    }
+
+    #[test]
+    fn maximum_lag_and_minimal_output_preserve_range_and_canaries() {
+        let price: Vec<_> = (0..10003).map(|i| 100. + (i % 17) as f64 / 100.).collect();
+        let mut periods = vec![1.; price.len()];
+        periods[9999..].copy_from_slice(&[1., 10000., 2., 1.]);
+        let mut expected = vec![POISON; 4];
+        let range = crate::native::core()
+            .mavp(
+                0,
+                price.len() - 1,
+                &price,
+                &periods,
+                1,
+                10000,
+                MAType::SMA,
+                &mut expected,
+            )
+            .unwrap();
+        let mut storage = [POISON; 6];
+        let actual = call(&price, &periods, 1, 10000, &mut storage[1..5]).unwrap();
+        assert_eq!((actual.beg_idx, actual.count), (range.beg_idx, range.count));
+        assert_eq!(actual.count, 4);
+        assert!(storage[1..5]
+            .iter()
+            .zip(&expected)
+            .all(|(&a, &b)| same(a, b)));
+        assert_eq!(storage[0].to_bits(), POISON.to_bits());
+        assert_eq!(storage[5].to_bits(), POISON.to_bits());
+    }
+
     #[test]
     fn helper_matches_released_parameter_and_buffer_rejections() {
         let price = vec![100.; 64];
