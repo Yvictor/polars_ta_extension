@@ -94,6 +94,8 @@ def generate():
         ("python/polars_talib/_generated.py", py),
     ]:
         (ROOT / path).write_text("\n".join(lines) + "\n")
+    from generate_usage_examples import generate as generate_examples
+    generate_examples()
     integer_params = {
         f["name"]: [p["name"] for p in f["params"] if p["type"] != "double"]
         for f in api

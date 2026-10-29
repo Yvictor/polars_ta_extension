@@ -138,7 +138,7 @@ jobs:
           python scripts/generate_indicators.py
           python scripts/generate_skill_reference.py
           python scripts/generate_usage_manifest.py
-          git diff --exit-code -- src/generated.rs python/polars_talib/_generated.py python/polars_talib/_param_types.py scripts/public_api_coverage.json docs/indicators.md plugins/polars-talib/skills/polars-talib/reference/functions.md
+          git diff --exit-code -- src/generated.rs python/polars_talib/__init__.py python/polars_talib/_generated.py python/polars_talib/_param_types.py scripts/public_api_coverage.json docs/indicators.md plugins/polars-talib/skills/polars-talib/reference/functions.md
       - name: Rust crate tests
         run: cargo test --lib --locked
       - name: Build source distribution and install it without system TA-Lib

@@ -235,3 +235,19 @@ def test_namespace_default_columns_and_invalid_call_forms(name):
     check_official(name, df, native_order, {}, actual)
     with pytest.raises(TypeError): method(unknown_indicator_option=1)
     with pytest.raises(TypeError): method(*([pl.col('close')] * len(sig.parameters)))
+
+
+@pytest.mark.parametrize('name', sorted(SPECS))
+def test_published_docstring_examples_execute_and_match_defaults(name):
+    df = usage_frame()
+    reference = df.select(getattr(ta, name)().alias('result'))['result']
+    for function in (getattr(ta, name), getattr(ta.TAExpr, name)):
+        count = 0
+        for line in (inspect.getdoc(function) or '').splitlines():
+            line = line.strip()
+            if line.startswith(('pl.col(', 'ta.')):
+                count += 1
+                expression = eval(line, {'pl': pl, 'ta': ta, '__builtins__': {}})
+                actual = df.lazy().select(expression.alias('result')).collect()['result']
+                assert_exact(actual, reference)
+        assert count == 1, (name, function)

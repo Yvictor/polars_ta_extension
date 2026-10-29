@@ -226,7 +226,7 @@ class TAExpr(TAExprMixin):
 
     def ht_dcperiod(self) -> pl.Expr:
         """Hilbert Transform - Dominant Cycle Period (Cycle Indicators)
-        pl.col("close").ta.ht_dcperiod()
+        pl.col('close').ta.ht_dcperiod()
 
         Inputs:
             real: (any ndarray)
@@ -242,7 +242,7 @@ class TAExpr(TAExprMixin):
 
     def ht_dcphase(self) -> pl.Expr:
         """Hilbert Transform - Dominant Cycle Phase (Cycle Indicators)
-        pl.col("close").ta.ht_dcphase()
+        pl.col('close').ta.ht_dcphase()
 
         Inputs:
             real: (any ndarray)
@@ -258,7 +258,7 @@ class TAExpr(TAExprMixin):
 
     def ht_phasor(self) -> pl.Expr:
         """Hilbert Transform - Phasor Components (Cycle Indicators)
-        pl.col("close").ta.ht_phasor()
+        pl.col('close').ta.ht_phasor()
 
         Inputs:
             real: (any ndarray)
@@ -275,7 +275,7 @@ class TAExpr(TAExprMixin):
 
     def ht_sine(self) -> pl.Expr:
         """Hilbert Transform - SineWave (Cycle Indicators)
-        pl.col("close").ta.ht_sine()
+        pl.col('close').ta.ht_sine()
 
         Inputs:
             real: (any ndarray)
@@ -292,7 +292,7 @@ class TAExpr(TAExprMixin):
 
     def ht_trendmode(self) -> pl.Expr:
         """Hilbert Transform - Trend vs Cycle Mode (Cycle Indicators)
-        pl.col("close").ta.ht_trendmode()
+        pl.col('close').ta.ht_trendmode()
 
         Inputs:
             real: (any ndarray)
@@ -308,7 +308,7 @@ class TAExpr(TAExprMixin):
 
     def add(self, b: IntoExpr) -> pl.Expr:
         """Vectorized addition
-        pl.col("a").ta.add(pl.col("b"))
+        pl.col('high').ta.add('low')
 
         Inputs:
             a: (any ndarray)
@@ -325,7 +325,7 @@ class TAExpr(TAExprMixin):
 
     def div(self, b: IntoExpr) -> pl.Expr:
         """Vectorized division
-        pl.col("a").ta.div(pl.col("b"))
+        pl.col('high').ta.div('low')
 
         Inputs:
             a: (any ndarray)
@@ -342,7 +342,7 @@ class TAExpr(TAExprMixin):
 
     def max(self, timeperiod: int = 30) -> pl.Expr:
         """Highest value over a specified period (Math Operators)
-        pl.col("close").ta.max(timeperiod=30)
+        pl.col('close').ta.max(timeperiod=30)
 
         Inputs:
             prices: ['close']
@@ -361,7 +361,7 @@ class TAExpr(TAExprMixin):
 
     def maxindex(self, timeperiod: int = 30) -> pl.Expr:
         """Index of highest value over a specified period (Math Operators)
-        pl.col("close").ta.maxindex(timeperiod=30)
+        pl.col('close').ta.maxindex(timeperiod=30)
 
         Inputs:
             prices: ['close']
@@ -380,7 +380,7 @@ class TAExpr(TAExprMixin):
 
     def min(self, timeperiod: int = 30) -> pl.Expr:
         """Lowest value over a specified period (Math Operators)
-        pl.col("close").ta.min(timeperiod=30)
+        pl.col('close').ta.min(timeperiod=30)
 
         Inputs:
             prices: ['close']
@@ -399,7 +399,7 @@ class TAExpr(TAExprMixin):
 
     def minindex(self, timeperiod: int = 30) -> pl.Expr:
         """Index of lowest value over a specified period (Math Operators)
-        pl.col("close").ta.minindex(timeperiod=30)
+        pl.col('close').ta.minindex(timeperiod=30)
 
         Inputs:
             prices: ['close']
@@ -418,7 +418,7 @@ class TAExpr(TAExprMixin):
 
     def minmax(self, timeperiod: int = 30) -> pl.Expr:
         """Lowest and highest values over a specified period (Math Operators)
-        pl.col("close").ta.minmax(timeperiod=30)
+        pl.col('close').ta.minmax(timeperiod=30)
 
         Inputs:
             prices: ['close']
@@ -438,7 +438,7 @@ class TAExpr(TAExprMixin):
 
     def minmaxindex(self, timeperiod: int = 30) -> pl.Expr:
         """Indexes of lowest and highest values over a specified period (Math Operators)
-        pl.col("close").ta.minmaxindex(timeperiod=30)
+        pl.col('close').ta.minmaxindex(timeperiod=30)
 
         Inputs:
             prices: ['close']
@@ -458,7 +458,7 @@ class TAExpr(TAExprMixin):
 
     def mult(self, b: IntoExpr) -> pl.Expr:
         """Vectorized multiplication
-        pl.col("a").ta.mult(pl.col("b"))
+        pl.col('high').ta.mult('low')
 
         Inputs:
             a: (any ndarray)
@@ -475,7 +475,7 @@ class TAExpr(TAExprMixin):
 
     def sub(self, b: IntoExpr) -> pl.Expr:
         """Vectorized subtraction
-        pl.col("a").ta.sub(pl.col("b"))
+        pl.col('high').ta.sub('low')
 
         Inputs:
             a: (any ndarray)
@@ -492,7 +492,7 @@ class TAExpr(TAExprMixin):
 
     def sum(self, timeperiod: int = 30) -> pl.Expr:
         """Summation (Math Operators)
-        pl.col("close").ta.sum(timeperiod=30)
+        pl.col('close').ta.sum(timeperiod=30)
 
         Inputs:
             prices: ['close']
@@ -511,7 +511,7 @@ class TAExpr(TAExprMixin):
 
     def acos(self) -> pl.Expr:
         """Vectorized acos
-        pl.col("a").ta.acos()
+        pl.col('close').ta.acos()
 
         Inputs:
             a: (any ndarray)
@@ -527,7 +527,7 @@ class TAExpr(TAExprMixin):
 
     def asin(self) -> pl.Expr:
         """Vectorized asin
-        pl.col("a").ta.asin()
+        pl.col('close').ta.asin()
 
         Inputs:
             a: (any ndarray)
@@ -543,7 +543,7 @@ class TAExpr(TAExprMixin):
 
     def atan(self) -> pl.Expr:
         """Vectorized atan
-        pl.col("a").ta.atan()
+        pl.col('close').ta.atan()
 
         Inputs:
             a: (any ndarray)
@@ -559,7 +559,7 @@ class TAExpr(TAExprMixin):
 
     def ceil(self) -> pl.Expr:
         """Vectorized ceil
-        pl.col("a").ta.ceil()
+        pl.col('close').ta.ceil()
 
         Inputs:
             a: (any ndarray)
@@ -575,7 +575,7 @@ class TAExpr(TAExprMixin):
 
     def cos(self) -> pl.Expr:
         """Vectorized cos
-        pl.col("a").ta.cos()
+        pl.col('close').ta.cos()
 
         Inputs:
             a: (any ndarray)
@@ -591,7 +591,7 @@ class TAExpr(TAExprMixin):
 
     def cosh(self) -> pl.Expr:
         """Vectorized cosh
-        pl.col("a").ta.cosh()
+        pl.col('close').ta.cosh()
 
         Inputs:
             a: (any ndarray)
@@ -607,7 +607,7 @@ class TAExpr(TAExprMixin):
 
     def exp(self) -> pl.Expr:
         """Vectorized exp
-        pl.col("a").ta.exp()
+        pl.col('close').ta.exp()
 
         Inputs:
             a: (any ndarray)
@@ -623,7 +623,7 @@ class TAExpr(TAExprMixin):
 
     def floor(self) -> pl.Expr:
         """Vectorized floor
-        pl.col("a").ta.floor()
+        pl.col('close').ta.floor()
 
         Inputs:
             a: (any ndarray)
@@ -639,7 +639,7 @@ class TAExpr(TAExprMixin):
 
     def ln(self) -> pl.Expr:
         """Vectorized ln
-        pl.col("a").ta.ln()
+        pl.col('close').ta.ln()
 
         Inputs:
             a: (any ndarray)
@@ -655,7 +655,7 @@ class TAExpr(TAExprMixin):
 
     def log10(self) -> pl.Expr:
         """Vectorized log10
-        pl.col("a").ta.log10()
+        pl.col('close').ta.log10()
 
         Inputs:
             a: (any ndarray)
@@ -671,7 +671,7 @@ class TAExpr(TAExprMixin):
 
     def sin(self) -> pl.Expr:
         """Vectorized sin
-        pl.col("a").ta.sin()
+        pl.col('close').ta.sin()
 
         Inputs:
             a: (any ndarray)
@@ -687,7 +687,7 @@ class TAExpr(TAExprMixin):
 
     def sinh(self) -> pl.Expr:
         """Vectorized sinh
-        pl.col("a").ta.sinh()
+        pl.col('close').ta.sinh()
 
         Inputs:
             a: (any ndarray)
@@ -703,7 +703,7 @@ class TAExpr(TAExprMixin):
 
     def sqrt(self) -> pl.Expr:
         """Vectorized sqrt
-        pl.col("a").ta.sqrt()
+        pl.col('close').ta.sqrt()
 
         Inputs:
             a: (any ndarray)
@@ -719,7 +719,7 @@ class TAExpr(TAExprMixin):
 
     def tan(self) -> pl.Expr:
         """Vectorized tan
-        pl.col("a").ta.tan()
+        pl.col('close').ta.tan()
 
         Inputs:
             a: (any ndarray)
@@ -735,7 +735,7 @@ class TAExpr(TAExprMixin):
 
     def tanh(self) -> pl.Expr:
         """Vectorized tanh
-        pl.col("a").ta.tanh()
+        pl.col('close').ta.tanh()
 
         Inputs:
             a: (any ndarray)
@@ -753,7 +753,7 @@ class TAExpr(TAExprMixin):
         self, high: IntoExpr = pl.col("high"), low: IntoExpr = pl.col("low"), timeperiod: int = 14
     ) -> pl.Expr:
         """Average Directional Movement Index (Momentum Indicators)
-        pl.col("close").ta.adx("high", "low", timeperiod=14)
+        pl.col('close').ta.adx('high', 'low', timeperiod=14)
 
         Inputs:
             prices: ['high', 'low', 'close']
@@ -776,7 +776,7 @@ class TAExpr(TAExprMixin):
         self, high: IntoExpr = pl.col("high"), low: IntoExpr = pl.col("low"), timeperiod: int = 14
     ) -> pl.Expr:
         """Average Directional Movement Index Rating (Momentum Indicators)
-        pl.col("close").ta.adxr("high", "low", timeperiod=14)
+        pl.col('close').ta.adxr('high', 'low', timeperiod=14)
 
         Inputs:
             prices: ['high', 'low', 'close']
@@ -797,7 +797,7 @@ class TAExpr(TAExprMixin):
 
     def apo(self, fastperiod: int = 12, slowperiod: int = 26, matype: int = 1) -> pl.Expr:
         """Absolute Price Oscillator (Momentum Indicators)
-        pl.col("close").ta.apo(fastperiod=12, slowperiod=26, matype=1)
+        pl.col('close').ta.apo(fastperiod=12, slowperiod=26, matype=1)
 
         Inputs:
             prices: ['close']
@@ -822,7 +822,7 @@ class TAExpr(TAExprMixin):
 
     def aroon(self, low: IntoExpr = pl.col("low"), timeperiod: int = 14) -> pl.Expr:
         """Aroon (Momentum Indicators)
-        pl.col("high").ta.aroon("low", timeperiod=14)
+        pl.col('high').ta.aroon('low', timeperiod=14)
         Inputs:
             prices: ['high', 'low']
         Parameters:
@@ -843,7 +843,7 @@ class TAExpr(TAExprMixin):
 
     def aroonosc(self, low: IntoExpr = pl.col("low"), timeperiod: int = 14) -> pl.Expr:
         """Aroon Oscillator (Momentum Indicators)
-        pl.col("high").ta.aroonosc("low", timeperiod=14)
+        pl.col('high').ta.aroonosc('low', timeperiod=14)
 
         Inputs:
             prices: ['high', 'low']
@@ -869,7 +869,7 @@ class TAExpr(TAExprMixin):
         close: IntoExpr = pl.col("close"),
     ) -> pl.Expr:
         """Balance Of Power (Momentum Indicators)
-        pl.col("open").ta.bop("high", "low", "close")
+        pl.col('open').ta.bop('high', 'low', 'close')
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
@@ -887,7 +887,7 @@ class TAExpr(TAExprMixin):
         self, high: IntoExpr = pl.col("high"), low: IntoExpr = pl.col("low"), timeperiod: int = 14
     ) -> pl.Expr:
         """Commodity Channel Index (Momentum Indicators)
-        pl.col("close").ta.cci("high", "low", timeperiod=14)
+        pl.col('close').ta.cci('high', 'low', timeperiod=14)
 
         Inputs:
             prices: ['high', 'low', 'close']
@@ -908,7 +908,7 @@ class TAExpr(TAExprMixin):
 
     def cmo(self, timeperiod: int = 14) -> pl.Expr:
         """Chande Momentum Oscillator (Momentum Indicators)
-        pl.col("close").ta.cmo(timeperiod=14)
+        pl.col('close').ta.cmo(timeperiod=14)
 
         Inputs:
             prices: ['close']
@@ -931,7 +931,7 @@ class TAExpr(TAExprMixin):
         self, high: IntoExpr = pl.col("high"), low: IntoExpr = pl.col("low"), timeperiod: int = 14
     ) -> pl.Expr:
         """Directional Movement Index (Momentum Indicators)
-        pl.col("close").ta.dx("high", "low", timeperiod=14)
+        pl.col('close').ta.dx('high', 'low', timeperiod=14)
 
         Inputs:
             prices: ['high', 'low', 'close']
@@ -952,7 +952,7 @@ class TAExpr(TAExprMixin):
 
     def macd(self, fastperiod: int = 12, slowperiod: int = 26, signalperiod: int = 9) -> pl.Expr:
         """Moving Average Convergence/Divergence (Momentum Indicators)
-        pl.col("close").ta.macd(fastperiod=12, slowperiod=26, signalperiod=9)
+        pl.col('close').ta.macd(fastperiod=12, slowperiod=26, signalperiod=9)
 
         Inputs:
             prices: ['close']
@@ -987,7 +987,7 @@ class TAExpr(TAExprMixin):
         signalmatype: int = 0,
     ) -> pl.Expr:
         """MACD with controllable MA type (Momentum Indicators)
-        pl.col("close").ta.macdext(fastperiod=12, slowperiod=26, signalperiod=9, fastmatype=0, slowmatype=0, signalmatype=0)
+        pl.col('close').ta.macdext(fastperiod=12, fastmatype=0, slowperiod=26, slowmatype=0, signalperiod=9, signalmatype=0)
 
         Inputs:
             prices: ['close']
@@ -1020,7 +1020,7 @@ class TAExpr(TAExprMixin):
 
     def macdfix(self, signalperiod: int = 9) -> pl.Expr:
         """Moving Average Convergence/Divergence Fix 12/26 (Momentum Indicators)
-        pl.col("close").ta.macdfix(signalperiod=9)
+        pl.col('close').ta.macdfix(signalperiod=9)
 
         Inputs:
             prices: ['close']
@@ -1049,7 +1049,7 @@ class TAExpr(TAExprMixin):
         timeperiod: int = 14,
     ) -> pl.Expr:
         """Money Flow Index (Momentum Indicators)
-        pl.col("close").ta.mfi("high", "low", "volume", timeperiod=14)
+        pl.col('close').ta.mfi('high', 'low', 'volume', timeperiod=14)
 
         Inputs:
             prices: ['high', 'low', 'close', 'volume']
@@ -1072,7 +1072,7 @@ class TAExpr(TAExprMixin):
         self, high: IntoExpr = pl.col("high"), low: IntoExpr = pl.col("low"), timeperiod: int = 14
     ) -> pl.Expr:
         """Minus Directional Indicator (Momentum Indicators)
-        pl.col("close").ta.minus_di("high", "low", timeperiod=14)
+        pl.col('close').ta.minus_di('high', 'low', timeperiod=14)
 
         Inputs:
             prices: ['high', 'low', 'close']
@@ -1093,7 +1093,7 @@ class TAExpr(TAExprMixin):
 
     def minus_dm(self, low: IntoExpr = pl.col("low"), timeperiod: int = 14) -> pl.Expr:
         """Minus Directional Movement (Momentum Indicators)
-        pl.col("high").ta.minus_dm("low", timeperiod=14)
+        pl.col('high').ta.minus_dm('low', timeperiod=14)
 
         Inputs:
             prices: ['high', 'low']
@@ -1114,7 +1114,7 @@ class TAExpr(TAExprMixin):
 
     def mom(self, timeperiod: int = 10) -> pl.Expr:
         """Momentum (Momentum Indicators)
-        pl.col("close").ta.mom(timeperiod=10)
+        pl.col('close').ta.mom(timeperiod=10)
 
         Inputs:
             prices: ['close']
@@ -1137,7 +1137,7 @@ class TAExpr(TAExprMixin):
         self, high: IntoExpr = pl.col("high"), low: IntoExpr = pl.col("low"), timeperiod: int = 14
     ) -> pl.Expr:
         """Plus Directional Indicator (Momentum Indicators)
-        pl.col("close").ta.plus_di("high", "low", timeperiod=14)
+        pl.col('close').ta.plus_di('high', 'low', timeperiod=14)
 
         Inputs:
             prices: ['high', 'low', 'close']
@@ -1158,7 +1158,7 @@ class TAExpr(TAExprMixin):
 
     def plus_dm(self, low: IntoExpr = pl.col("low"), timeperiod: int = 14) -> pl.Expr:
         """Plus Directional Movement (Momentum Indicators)
-        pl.col("high").ta.plus_dm("low", timeperiod=14)
+        pl.col('high').ta.plus_dm('low', timeperiod=14)
 
         Inputs:
             prices: ['high', 'low']
@@ -1179,7 +1179,7 @@ class TAExpr(TAExprMixin):
 
     def ppo(self, fastperiod: int = 12, slowperiod: int = 26, matype: int = 1) -> pl.Expr:
         """Percentage Price Oscillator (Momentum Indicators)
-        pl.col("close").ta.ppo(fastperiod=12, slowperiod=26, matype=1)
+        pl.col('close').ta.ppo(fastperiod=12, slowperiod=26, matype=1)
 
         Inputs:
             prices: ['close']
@@ -1204,7 +1204,7 @@ class TAExpr(TAExprMixin):
 
     def roc(self, timeperiod: int = 10) -> pl.Expr:
         """Rate of change : ((price/prevPrice)-1)*100 (Momentum Indicators)
-        pl.col("close").ta.roc(timeperiod=10)
+        pl.col('close').ta.roc(timeperiod=10)
 
         Inputs:
             prices: ['close']
@@ -1225,7 +1225,7 @@ class TAExpr(TAExprMixin):
 
     def rocp(self, timeperiod: int = 10) -> pl.Expr:
         """Rate of change Percentage: (price-prevPrice)/prevPrice (Momentum Indicators)
-        pl.col("close").ta.rocp(timeperiod=10)
+        pl.col('close').ta.rocp(timeperiod=10)
 
         Inputs:
             prices: ['close']
@@ -1246,7 +1246,7 @@ class TAExpr(TAExprMixin):
 
     def rocr(self, timeperiod: int = 10) -> pl.Expr:
         """Rate of change ratio: (price/prevPrice) (Momentum Indicators)
-        pl.col("close").ta.rocr(timeperiod=10)
+        pl.col('close').ta.rocr(timeperiod=10)
 
         Inputs:
             prices: ['close']
@@ -1267,7 +1267,7 @@ class TAExpr(TAExprMixin):
 
     def rocr100(self, timeperiod: int = 10) -> pl.Expr:
         """Rate of change ratio 100 scale: (price/prevPrice)*100 (Momentum Indicators)
-        pl.col("close").ta.rocr100(timeperiod=10)
+        pl.col('close').ta.rocr100(timeperiod=10)
 
         Inputs:
             prices: ['close']
@@ -1288,7 +1288,7 @@ class TAExpr(TAExprMixin):
 
     def rsi(self, timeperiod: int = 14) -> pl.Expr:
         """Relative Strength Index (Momentum Indicators)
-        pl.col("close").ta.rsi(timeperiod=14)
+        pl.col('close').ta.rsi(timeperiod=14)
 
         Inputs:
             prices: ['close']
@@ -1318,7 +1318,7 @@ class TAExpr(TAExprMixin):
         slowd_matype: int = 0,
     ) -> pl.Expr:
         """Stochastic (Momentum Indicators)
-        pl.col("close").ta.stoch("high", "low", fastk_period=5, slowk_period=3, slowk_matype=0, slowd_period=3, slowd_matype=0)
+        pl.col('close').ta.stoch('high', 'low', fastk_period=5, slowk_period=3, slowk_matype=0, slowd_period=3, slowd_matype=0)
 
         Inputs:
             prices: ['high', 'low', 'close']
@@ -1355,7 +1355,7 @@ class TAExpr(TAExprMixin):
         fastd_matype: int = 0,
     ) -> pl.Expr:
         """Stochastic Fast (Momentum Indicators)
-        pl.col("close").ta.stochf("high", "low", fastk_period=5, fastd_period=3, fastd_matype=0)
+        pl.col('close').ta.stochf('high', 'low', fastk_period=5, fastd_period=3, fastd_matype=0)
 
         Inputs:
             prices: ['high', 'low', 'close']
@@ -1387,7 +1387,7 @@ class TAExpr(TAExprMixin):
         fastd_matype: int = 0,
     ) -> pl.Expr:
         """Stochastic Relative Strength Index (Momentum Indicators)
-        pl.col("close").ta.stochrsi(timeperiod=14, fastk_period=5, fastd_period=3, fastd_matype=0)
+        pl.col('close').ta.stochrsi(timeperiod=14, fastk_period=5, fastd_period=3, fastd_matype=0)
 
         Inputs:
             prices: ['close']
@@ -1415,7 +1415,7 @@ class TAExpr(TAExprMixin):
 
     def trix(self, timeperiod: int = 30) -> pl.Expr:
         """1-day Rate-Of-Change (ROC) of a Triple Smooth EMA (Momentum Indicators)
-        pl.col("close").ta.trix(timeperiod=30)
+        pl.col('close').ta.trix(timeperiod=30)
 
         Inputs:
             prices: ['close']
@@ -1443,7 +1443,7 @@ class TAExpr(TAExprMixin):
         timeperiod3: int = 28,
     ) -> pl.Expr:
         """Ultimate Oscillator (Momentum Indicators)
-        pl.col("close").ta.ultosc("high", "low", timeperiod1=7, timeperiod2=14, timeperiod3=28)
+        pl.col('close').ta.ultosc('high', 'low', timeperiod1=7, timeperiod2=14, timeperiod3=28)
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
@@ -1470,7 +1470,7 @@ class TAExpr(TAExprMixin):
         self, high: IntoExpr = pl.col("high"), low: IntoExpr = pl.col("low"), timeperiod: int = 14
     ) -> pl.Expr:
         """Williams' %R (Momentum Indicators)
-        pl.col("close").ta.willr("high", "low", timeperiod=14)
+        pl.col('close').ta.willr('high', 'low', timeperiod=14)
 
         Inputs:
             prices: ['high', 'low', 'close']
@@ -1493,7 +1493,7 @@ class TAExpr(TAExprMixin):
         self, timeperiod: int = 20, nbdevup: float = 2.0, nbdevdn: float = 2.0, matype: int = 0
     ) -> pl.Expr:
         """Bollinger Bands (Overlap Studies)
-        ta.pol("close").ta.bbands(timeperiod=20, nbdevup=2.0, nbdevdn=2.0, matype=0)
+        pl.col('close').ta.bbands(timeperiod=20, nbdevup=2.0, nbdevdn=2.0, matype=0)
 
         Inputs:
             real: (any ndarray)
@@ -1525,7 +1525,7 @@ class TAExpr(TAExprMixin):
         timeperiod: int = 30,
     ) -> pl.Expr:
         """Double Exponential Moving Average (Overlap Studies)
-        ta.pol("close").ta.ema(timeperiod=30)
+        pl.col('close').ta.ema(timeperiod=30)
 
         Inputs:
             real: (any ndarray)
@@ -1546,7 +1546,7 @@ class TAExpr(TAExprMixin):
 
     def dema(self, timeperiod: int = 30) -> pl.Expr:
         """Double Exponential Moving Average (Overlap Studies)
-        ta.pol("close").ta.dema(timeperiod=30)
+        pl.col('close').ta.dema(timeperiod=30)
 
         Inputs:
             real: (any ndarray)
@@ -1567,7 +1567,7 @@ class TAExpr(TAExprMixin):
 
     def ht_trendline(self) -> pl.Expr:
         """Hilbert Transform - Instantaneous Trendline (Overlap Studies)
-        ta.pol("close").ta.ht_trendline()
+        pl.col('close').ta.ht_trendline()
 
         Inputs:
             real: (any ndarray)
@@ -1583,7 +1583,7 @@ class TAExpr(TAExprMixin):
 
     def kama(self, timeperiod: int = 30) -> pl.Expr:
         """Kaufman Adaptive Moving Average (Overlap Studies)
-        ta.pol("close").ta.kama(timeperiod=30)
+        pl.col('close').ta.kama(timeperiod=30)
 
         Inputs:
             real: (any ndarray)
@@ -1604,7 +1604,7 @@ class TAExpr(TAExprMixin):
 
     def ma(self, timeperiod: int = 30, matype: int = 0) -> pl.Expr:
         """Moving average (Overlap Studies)
-        ta.pol("close").ta.ma(timeperiod=30, matype=0)
+        pl.col('close').ta.ma(timeperiod=30, matype=0)
 
         Inputs:
             real: (any ndarray)
@@ -1627,7 +1627,7 @@ class TAExpr(TAExprMixin):
 
     def mama(self, fastlimit: float = 0.5, slowlimit: float = 0.05) -> pl.Expr:
         """MESA Adaptive Moving Average (Overlap Studies)
-        ta.pol("close").ta.mama(fastlimit=0.5, slowlimit=0.05)
+        pl.col('close').ta.mama(fastlimit=0.5, slowlimit=0.05)
 
         Inputs:
             real: (any ndarray)
@@ -1653,7 +1653,7 @@ class TAExpr(TAExprMixin):
         self, periods: IntoExpr, minperiod: int = 2, maxperiod: int = 30, matype: int = 0
     ) -> pl.Expr:
         """Moving average with variable period (Overlap Studies)
-        ta.pol("close").ta.mavp(periods, minperiod=2, maxperiod=30, matype=0)
+        pl.col('close').ta.mavp('periods', minperiod=2, maxperiod=30, matype=0)
 
         Inputs:
             real: (any ndarray)
@@ -1679,7 +1679,7 @@ class TAExpr(TAExprMixin):
 
     def midpoint(self, timeperiod: int = 14) -> pl.Expr:
         """MidPoint over period (Overlap Studies)
-        ta.pol("close").ta.midpoint(timeperiod=14)
+        pl.col('close').ta.midpoint(timeperiod=14)
 
         Inputs:
             real: (any ndarray)
@@ -1700,7 +1700,7 @@ class TAExpr(TAExprMixin):
 
     def midprice(self, low: IntoExpr = pl.col("low"), timeperiod: int = 14) -> pl.Expr:
         """Midpoint Price over period (Overlap Studies)
-        ta.pol("high").ta.midprice(pl.col("low"), timeperiod=14)
+        pl.col('high').ta.midprice('low', timeperiod=14)
 
         Inputs:
             high: (any ndarray)
@@ -1724,7 +1724,7 @@ class TAExpr(TAExprMixin):
         self, low: IntoExpr = pl.col("low"), acceleration: float = 0.02, maximum: float = 0.2
     ) -> pl.Expr:
         """Parabolic SAR (Overlap Studies)
-        ta.pol("high").ta.sar(pl.col("low"), acceleration=0.02, maximum=0.2)
+        pl.col('high').ta.sar('low', acceleration=0.02, maximum=0.2)
 
         Inputs:
             high: (any ndarray)
@@ -1759,7 +1759,7 @@ class TAExpr(TAExprMixin):
         accelerationmaxshort: float = 0.2,
     ) -> pl.Expr:
         """Parabolic SAR - Extended (Overlap Studies)
-        ta.pol("high").ta.sarext(pl.col("low"), accelerationinitlong=0.02, accelerationlong=0.02)
+        pl.col('high').ta.sarext('low', startvalue=0.0, offsetonreverse=0.0, accelerationinitlong=0.02, accelerationlong=0.02, accelerationmaxlong=0.2, accelerationinitshort=0.02, accelerationshort=0.02, accelerationmaxshort=0.2)
 
         Inputs:
             high: (any ndarray)
@@ -1795,7 +1795,7 @@ class TAExpr(TAExprMixin):
 
     def sma(self, timeperiod: int = 30) -> pl.Expr:
         """Simple Moving Average (Overlap Studies)
-        ta.pol("close").ta.sma(timeperiod=30)
+        pl.col('close').ta.sma(timeperiod=30)
 
         Inputs:
             real: (any ndarray)
@@ -1816,7 +1816,7 @@ class TAExpr(TAExprMixin):
 
     def t3(self, timeperiod: int = 5, vfactor: float = 0.7) -> pl.Expr:
         """Triple Exponential Moving Average T3 (Overlap Studies)
-        ta.pol("close").ta.t3(timeperiod=5, vfactor=0.7)
+        pl.col('close').ta.t3(timeperiod=5, vfactor=0.7)
 
         Inputs:
             real: (any ndarray)
@@ -1839,7 +1839,7 @@ class TAExpr(TAExprMixin):
 
     def tema(self, timeperiod: int = 30) -> pl.Expr:
         """Triple Exponential Moving Average (Overlap Studies)
-        ta.pol("close").ta.tema(timeperiod=30)
+        pl.col('close').ta.tema(timeperiod=30)
 
         Inputs:
             real: (any ndarray)
@@ -1860,7 +1860,7 @@ class TAExpr(TAExprMixin):
 
     def trima(self, timeperiod: int = 30) -> pl.Expr:
         """Triangular Moving Average (Overlap Studies)
-        ta.pol("close").ta.trima(timeperiod=30)
+        pl.col('close').ta.trima(timeperiod=30)
 
         Inputs:
             real: (any ndarray)
@@ -1881,7 +1881,7 @@ class TAExpr(TAExprMixin):
 
     def wma(self, timeperiod: int = 30) -> pl.Expr:
         """Weighted Moving Average (Overlap Studies)
-        ta.pol("close").ta.wma(timeperiod=30)
+        pl.col('close').ta.wma(timeperiod=30)
 
         Inputs:
             real: (any ndarray)
@@ -1904,7 +1904,7 @@ class TAExpr(TAExprMixin):
         self, high: IntoExpr = pl.col("high"), low: IntoExpr = pl.col("low"), timeperiod: int = 14
     ) -> pl.Expr:
         """Normalized Average True Range (Volatility Indicators)
-        pl.col("close").ta.natr("high", "low", [, timeperiod=?])
+        pl.col('close').ta.natr('high', 'low', timeperiod=14)
 
         Inputs:
             prices: ['high', 'low', 'close']
@@ -1930,13 +1930,12 @@ class TAExpr(TAExprMixin):
         close: IntoExpr = pl.col("close"),
     ):
         """Two Crows (Pattern Recognition)
-            pl.col("open").ta.cdl2crows(pl.col("high"), pl.col("low"), pl.col("close"))
+        pl.col('open').ta.cdl2crows('high', 'low', 'close')
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -1952,13 +1951,12 @@ class TAExpr(TAExprMixin):
         close: IntoExpr = pl.col("close"),
     ):
         """Three Black Crows (Pattern Recognition)
-            pl.col("open").ta.cdl3blackcrows(pl.col("high"), pl.col("low"), pl.col("close"))
+        pl.col('open').ta.cdl3blackcrows('high', 'low', 'close')
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -1974,13 +1972,12 @@ class TAExpr(TAExprMixin):
         close: IntoExpr = pl.col("close"),
     ):
         """Three Inside Up/Down (Pattern Recognition)
-            pl.col("open").ta.cdl3inside(pl.col("high"), pl.col("low"), pl.col("close"))
+        pl.col('open').ta.cdl3inside('high', 'low', 'close')
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -1996,13 +1993,12 @@ class TAExpr(TAExprMixin):
         close: IntoExpr = pl.col("close"),
     ):
         """Three-Line Strike  (Pattern Recognition)
-            pl.col("open").ta.cdl3linestrike(pl.col("high"), pl.col("low"), pl.col("close"))
+        pl.col('open').ta.cdl3linestrike('high', 'low', 'close')
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -2018,13 +2014,12 @@ class TAExpr(TAExprMixin):
         close: IntoExpr = pl.col("close"),
     ):
         """Three Outside Up/Down (Pattern Recognition)
-            pl.col("open").ta.cdl3outside(pl.col("high"), pl.col("low"), pl.col("close"))
+        pl.col('open').ta.cdl3outside('high', 'low', 'close')
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -2040,13 +2035,12 @@ class TAExpr(TAExprMixin):
         close: IntoExpr = pl.col("close"),
     ):
         """Three Stars In The South (Pattern Recognition)
-            pl.col("open").ta.cdl3starsinsouth(pl.col("high"), pl.col("low"), pl.col("close"))
+        pl.col('open').ta.cdl3starsinsouth('high', 'low', 'close')
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -2062,13 +2056,12 @@ class TAExpr(TAExprMixin):
         close: IntoExpr = pl.col("close"),
     ):
         """Three Advancing White Soldiers (Pattern Recognition)
-            pl.col("open").ta.cdl3whitesoldiers(pl.col("high"), pl.col("low"), pl.col("close"))
+        pl.col('open').ta.cdl3whitesoldiers('high', 'low', 'close')
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -2085,7 +2078,7 @@ class TAExpr(TAExprMixin):
         penetration: float = 0.3,
     ):
         """Abandoned Baby (Pattern Recognition)
-            pl.col("open").ta.cdlabandonedbaby(pl.col("high"), pl.col("low"), pl.col("close"), penetration=0.3)
+        pl.col('open').ta.cdlabandonedbaby('high', 'low', 'close', penetration=0.3)
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
@@ -2093,7 +2086,6 @@ class TAExpr(TAExprMixin):
             penetration: 0.3
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -2112,13 +2104,12 @@ class TAExpr(TAExprMixin):
         close: IntoExpr = pl.col("close"),
     ):
         """Advance Block (Pattern Recognition)
-            pl.col("open").ta.cdladvanceblock(pl.col("high"), pl.col("low"), pl.col("close"))
+        pl.col('open').ta.cdladvanceblock('high', 'low', 'close')
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -2134,13 +2125,12 @@ class TAExpr(TAExprMixin):
         close: IntoExpr = pl.col("close"),
     ):
         """Belt-hold (Pattern Recognition)
-            pl.col("open").ta.cdlbelthold(pl.col("high"), pl.col("low"), pl.col("close"))
+        pl.col('open').ta.cdlbelthold('high', 'low', 'close')
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -2156,13 +2146,12 @@ class TAExpr(TAExprMixin):
         close: IntoExpr = pl.col("close"),
     ):
         """Breakaway (Pattern Recognition)
-            pl.col("open").ta.cdlbreakaway(pl.col("high"), pl.col("low"), pl.col("close"))
+        pl.col('open').ta.cdlbreakaway('high', 'low', 'close')
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -2178,13 +2167,12 @@ class TAExpr(TAExprMixin):
         close: IntoExpr = pl.col("close"),
     ):
         """Closing Marubozu (Pattern Recognition)
-            pl.col("open").ta.cdlclosingmarubozu(pl.col("high"), pl.col("low"), pl.col("close"))
+        pl.col('open').ta.cdlclosingmarubozu('high', 'low', 'close')
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -2200,13 +2188,12 @@ class TAExpr(TAExprMixin):
         close: IntoExpr = pl.col("close"),
     ):
         """Concealing Baby Swallow (Pattern Recognition)
-            pl.col("open").ta.cdlconcealbabyswall(pl.col("high"), pl.col("low"), pl.col("close"))
+        pl.col('open').ta.cdlconcealbabyswall('high', 'low', 'close')
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -2222,13 +2209,12 @@ class TAExpr(TAExprMixin):
         close: IntoExpr = pl.col("close"),
     ):
         """Counterattack (Pattern Recognition)
-            pl.col("open").ta.cdlcounterattack(pl.col("high"), pl.col("low"), pl.col("close"))
+        pl.col('open').ta.cdlcounterattack('high', 'low', 'close')
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -2245,7 +2231,7 @@ class TAExpr(TAExprMixin):
         penetration: float = 0.5,
     ):
         """Dark Cloud Cover (Pattern Recognition)
-            pl.col("open").ta.cdldarkcloudcover(pl.col("high"), pl.col("low"), pl.col("close"), penetration=0.3)
+        pl.col('open').ta.cdldarkcloudcover('high', 'low', 'close', penetration=0.5)
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
@@ -2253,7 +2239,6 @@ class TAExpr(TAExprMixin):
             penetration: 0.5
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -2272,13 +2257,12 @@ class TAExpr(TAExprMixin):
         close: IntoExpr = pl.col("close"),
     ):
         """Doji (Pattern Recognition)
-            pl.col("open").ta.cdldoji(pl.col("high"), pl.col("low"), pl.col("close"))
+        pl.col('open').ta.cdldoji('high', 'low', 'close')
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -2294,13 +2278,12 @@ class TAExpr(TAExprMixin):
         close: IntoExpr = pl.col("close"),
     ):
         """Doji Star (Pattern Recognition)
-            pl.col("open").ta.cdldojistar(pl.col("high"), pl.col("low"), pl.col("close"))
+        pl.col('open').ta.cdldojistar('high', 'low', 'close')
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -2316,13 +2299,12 @@ class TAExpr(TAExprMixin):
         close: IntoExpr = pl.col("close"),
     ):
         """Dragonfly Doji (Pattern Recognition)
-            pl.col("open").ta.cdldragonflydoji(pl.col("high"), pl.col("low"), pl.col("close"))
+        pl.col('open').ta.cdldragonflydoji('high', 'low', 'close')
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -2338,13 +2320,12 @@ class TAExpr(TAExprMixin):
         close: IntoExpr = pl.col("close"),
     ):
         """Engulfing Pattern (Pattern Recognition)
-            pl.col("open").ta.cdlengulfing(pl.col("high"), pl.col("low"), pl.col("close"))
+        pl.col('open').ta.cdlengulfing('high', 'low', 'close')
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -2361,7 +2342,7 @@ class TAExpr(TAExprMixin):
         penetration: float = 0.3,
     ):
         """Evening Doji Star (Pattern Recognition)
-            pl.col("open").ta.cdleveningdojistar(pl.col("high"), pl.col("low"), pl.col("close"), penetration=0.3)
+        pl.col('open').ta.cdleveningdojistar('high', 'low', 'close', penetration=0.3)
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
@@ -2369,7 +2350,6 @@ class TAExpr(TAExprMixin):
             penetration: 0.3
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -2389,7 +2369,7 @@ class TAExpr(TAExprMixin):
         penetration: float = 0.3,
     ):
         """Evening Star (Pattern Recognition)
-            pl.col("open").ta.cdleveningstar(pl.col("high"), pl.col("low"), pl.col("close"), penetration=0.3)
+        pl.col('open').ta.cdleveningstar('high', 'low', 'close', penetration=0.3)
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
@@ -2397,7 +2377,6 @@ class TAExpr(TAExprMixin):
             penetration: 0.3
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -2416,13 +2395,12 @@ class TAExpr(TAExprMixin):
         close: IntoExpr = pl.col("close"),
     ):
         """Up/Down-gap side-by-side white lines (Pattern Recognition)
-            pl.col("open").ta.cdlgapsidesidewhite(pl.col("high"), pl.col("low"), pl.col("close"))
+        pl.col('open').ta.cdlgapsidesidewhite('high', 'low', 'close')
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -2438,13 +2416,12 @@ class TAExpr(TAExprMixin):
         close: IntoExpr = pl.col("close"),
     ):
         """Gravestone Doji (Pattern Recognition)
-            pl.col("open").ta.cdlgravestonedoji(pl.col("high"), pl.col("low"), pl.col("close"))
+        pl.col('open').ta.cdlgravestonedoji('high', 'low', 'close')
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -2460,13 +2437,12 @@ class TAExpr(TAExprMixin):
         close: IntoExpr = pl.col("close"),
     ):
         """Hammer (Pattern Recognition)
-            pl.col("open").ta.cdlhammer(pl.col("high"), pl.col("low"), pl.col("close"))
+        pl.col('open').ta.cdlhammer('high', 'low', 'close')
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -2482,13 +2458,12 @@ class TAExpr(TAExprMixin):
         close: IntoExpr = pl.col("close"),
     ):
         """Hanging Man (Pattern Recognition)
-            pl.col("open").ta.cdlhangingman(pl.col("high"), pl.col("low"), pl.col("close"))
+        pl.col('open').ta.cdlhangingman('high', 'low', 'close')
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -2504,13 +2479,12 @@ class TAExpr(TAExprMixin):
         close: IntoExpr = pl.col("close"),
     ):
         """Harami Pattern (Pattern Recognition)
-            pl.col("open").ta.cdlharami(pl.col("high"), pl.col("low"), pl.col("close"))
+        pl.col('open').ta.cdlharami('high', 'low', 'close')
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -2526,13 +2500,12 @@ class TAExpr(TAExprMixin):
         close: IntoExpr = pl.col("close"),
     ):
         """Harami Cross Pattern (Pattern Recognition)
-            pl.col("open").ta.cdlharamicross(pl.col("high"), pl.col("low"), pl.col("close"))
+        pl.col('open').ta.cdlharamicross('high', 'low', 'close')
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -2548,13 +2521,12 @@ class TAExpr(TAExprMixin):
         close: IntoExpr = pl.col("close"),
     ):
         """High-Wave Candle (Pattern Recognition)
-            pl.col("open").ta.cdlhighwave(pl.col("high"), pl.col("low"), pl.col("close"))
+        pl.col('open').ta.cdlhighwave('high', 'low', 'close')
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -2570,13 +2542,12 @@ class TAExpr(TAExprMixin):
         close: IntoExpr = pl.col("close"),
     ):
         """Hikkake Pattern (Pattern Recognition)
-            pl.col("open").ta.cdlhikkake(pl.col("high"), pl.col("low"), pl.col("close"))
+        pl.col('open').ta.cdlhikkake('high', 'low', 'close')
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -2592,13 +2563,12 @@ class TAExpr(TAExprMixin):
         close: IntoExpr = pl.col("close"),
     ):
         """Modified Hikkake Pattern (Pattern Recognition)
-            pl.col("open").ta.cdlhikkakemod(pl.col("high"), pl.col("low"), pl.col("close"))
+        pl.col('open').ta.cdlhikkakemod('high', 'low', 'close')
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -2614,13 +2584,12 @@ class TAExpr(TAExprMixin):
         close: IntoExpr = pl.col("close"),
     ):
         """Homing Pigeon (Pattern Recognition)
-            pl.col("open").ta.cdlhomingpigeon(pl.col("high"), pl.col("low"), pl.col("close"))
+        pl.col('open').ta.cdlhomingpigeon('high', 'low', 'close')
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -2636,13 +2605,12 @@ class TAExpr(TAExprMixin):
         close: IntoExpr = pl.col("close"),
     ):
         """Identical Three Crows (Pattern Recognition)
-            pl.col("open").ta.cdlidentical3crows(pl.col("high"), pl.col("low"), pl.col("close"))
+        pl.col('open').ta.cdlidentical3crows('high', 'low', 'close')
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -2658,13 +2626,12 @@ class TAExpr(TAExprMixin):
         close: IntoExpr = pl.col("close"),
     ):
         """In-Neck Pattern (Pattern Recognition)
-            pl.col("open").ta.cdlinneck(pl.col("high"), pl.col("low"), pl.col("close"))
+        pl.col('open').ta.cdlinneck('high', 'low', 'close')
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -2680,13 +2647,12 @@ class TAExpr(TAExprMixin):
         close: IntoExpr = pl.col("close"),
     ):
         """Inverted Hammer (Pattern Recognition)
-            pl.col("open").ta.cdlinvertedhammer(pl.col("high"), pl.col("low"), pl.col("close"))
+        pl.col('open').ta.cdlinvertedhammer('high', 'low', 'close')
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -2702,13 +2668,12 @@ class TAExpr(TAExprMixin):
         close: IntoExpr = pl.col("close"),
     ):
         """Kicking (Pattern Recognition)
-            pl.col("open").ta.cdlkicking(pl.col("high"), pl.col("low"), pl.col("close"))
+        pl.col('open').ta.cdlkicking('high', 'low', 'close')
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -2724,13 +2689,12 @@ class TAExpr(TAExprMixin):
         close: IntoExpr = pl.col("close"),
     ):
         """Kicking - bull/bear determined by the longer marubozu (Pattern Recognition)
-            pl.col("open").ta.cdlkickingbylength(pl.col("high"), pl.col("low"), pl.col("close"))
+        pl.col('open').ta.cdlkickingbylength('high', 'low', 'close')
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -2746,13 +2710,12 @@ class TAExpr(TAExprMixin):
         close: IntoExpr = pl.col("close"),
     ):
         """Ladder Bottom (Pattern Recognition)
-            pl.col("open").ta.cdlladderbottom(pl.col("high"), pl.col("low"), pl.col("close"))
+        pl.col('open').ta.cdlladderbottom('high', 'low', 'close')
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -2768,13 +2731,12 @@ class TAExpr(TAExprMixin):
         close: IntoExpr = pl.col("close"),
     ):
         """Long Legged Doji (Pattern Recognition)
-            pl.col("open").ta.cdllongleggeddoji(pl.col("high"), pl.col("low"), pl.col("close"))
+        pl.col('open').ta.cdllongleggeddoji('high', 'low', 'close')
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -2790,13 +2752,12 @@ class TAExpr(TAExprMixin):
         close: IntoExpr = pl.col("close"),
     ):
         """Long Line Candle (Pattern Recognition)
-            pl.col("open").ta.cdllongline(pl.col("high"), pl.col("low"), pl.col("close"))
+        pl.col('open').ta.cdllongline('high', 'low', 'close')
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -2812,13 +2773,12 @@ class TAExpr(TAExprMixin):
         close: IntoExpr = pl.col("close"),
     ):
         """Marubozu (Pattern Recognition)
-            pl.col("open").ta.cdlmarubozu(pl.col("high"), pl.col("low"), pl.col("close"))
+        pl.col('open').ta.cdlmarubozu('high', 'low', 'close')
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -2834,13 +2794,12 @@ class TAExpr(TAExprMixin):
         close: IntoExpr = pl.col("close"),
     ):
         """Matching Low (Pattern Recognition)
-            pl.col("open").ta.cdlmatchinglow(pl.col("high"), pl.col("low"), pl.col("close"))
+        pl.col('open').ta.cdlmatchinglow('high', 'low', 'close')
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -2857,7 +2816,7 @@ class TAExpr(TAExprMixin):
         penetration: float = 0.5,
     ):
         """Mat Hold (Pattern Recognition)
-            pl.col("open").ta.cdlmathold(pl.col("high"), pl.col("low"), pl.col("close"), penetration=0.3)
+        pl.col('open').ta.cdlmathold('high', 'low', 'close', penetration=0.5)
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
@@ -2865,7 +2824,6 @@ class TAExpr(TAExprMixin):
             penetration: 0.5
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -2885,7 +2843,7 @@ class TAExpr(TAExprMixin):
         penetration: float = 0.3,
     ):
         """Morning Doji Star (Pattern Recognition)
-            pl.col("open").ta.cdlmorningdojistar(pl.col("high"), pl.col("low"), pl.col("close"), penetration=0.3)
+        pl.col('open').ta.cdlmorningdojistar('high', 'low', 'close', penetration=0.3)
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
@@ -2893,7 +2851,6 @@ class TAExpr(TAExprMixin):
             penetration: 0.3
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -2913,7 +2870,7 @@ class TAExpr(TAExprMixin):
         penetration: float = 0.3,
     ):
         """Morning Star (Pattern Recognition)
-            pl.col("open").ta.cdlmorningstar(pl.col("high"), pl.col("low"), pl.col("close"), penetration=0.3)
+        pl.col('open').ta.cdlmorningstar('high', 'low', 'close', penetration=0.3)
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
@@ -2921,7 +2878,6 @@ class TAExpr(TAExprMixin):
             penetration: 0.3
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -2940,13 +2896,12 @@ class TAExpr(TAExprMixin):
         close: IntoExpr = pl.col("close"),
     ):
         """On-Neck Pattern (Pattern Recognition)
-            pl.col("open").ta.cdlonneck(pl.col("high"), pl.col("low"), pl.col("close"))
+        pl.col('open').ta.cdlonneck('high', 'low', 'close')
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -2962,13 +2917,12 @@ class TAExpr(TAExprMixin):
         close: IntoExpr = pl.col("close"),
     ):
         """Piercing Pattern (Pattern Recognition)
-            pl.col("open").ta.cdlpiercing(pl.col("high"), pl.col("low"), pl.col("close"))
+        pl.col('open').ta.cdlpiercing('high', 'low', 'close')
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -2984,13 +2938,12 @@ class TAExpr(TAExprMixin):
         close: IntoExpr = pl.col("close"),
     ):
         """Rickshaw Man (Pattern Recognition)
-            pl.col("open").ta.cdlrickshawman(pl.col("high"), pl.col("low"), pl.col("close"))
+        pl.col('open').ta.cdlrickshawman('high', 'low', 'close')
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -3006,13 +2959,12 @@ class TAExpr(TAExprMixin):
         close: IntoExpr = pl.col("close"),
     ):
         """Rising/Falling Three Methods (Pattern Recognition)
-            pl.col("open").ta.cdlrisefall3methods(pl.col("high"), pl.col("low"), pl.col("close"))
+        pl.col('open').ta.cdlrisefall3methods('high', 'low', 'close')
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -3028,13 +2980,12 @@ class TAExpr(TAExprMixin):
         close: IntoExpr = pl.col("close"),
     ):
         """Separating Lines (Pattern Recognition)
-            pl.col("open").ta.cdlseparatinglines(pl.col("high"), pl.col("low"), pl.col("close"))
+        pl.col('open').ta.cdlseparatinglines('high', 'low', 'close')
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -3050,13 +3001,12 @@ class TAExpr(TAExprMixin):
         close: IntoExpr = pl.col("close"),
     ):
         """Shooting Star (Pattern Recognition)
-            pl.col("open").ta.cdlshootingstar(pl.col("high"), pl.col("low"), pl.col("close"))
+        pl.col('open').ta.cdlshootingstar('high', 'low', 'close')
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -3072,13 +3022,12 @@ class TAExpr(TAExprMixin):
         close: IntoExpr = pl.col("close"),
     ):
         """Short Line Candle (Pattern Recognition)
-            pl.col("open").ta.cdlshortline(pl.col("high"), pl.col("low"), pl.col("close"))
+        pl.col('open').ta.cdlshortline('high', 'low', 'close')
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -3094,13 +3043,12 @@ class TAExpr(TAExprMixin):
         close: IntoExpr = pl.col("close"),
     ):
         """Spinning Top (Pattern Recognition)
-            pl.col("open").ta.cdlspinningtop(pl.col("high"), pl.col("low"), pl.col("close"))
+        pl.col('open').ta.cdlspinningtop('high', 'low', 'close')
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -3116,13 +3064,12 @@ class TAExpr(TAExprMixin):
         close: IntoExpr = pl.col("close"),
     ):
         """Stalled Pattern (Pattern Recognition)
-            pl.col("open").ta.cdlstalledpattern(pl.col("high"), pl.col("low"), pl.col("close"))
+        pl.col('open').ta.cdlstalledpattern('high', 'low', 'close')
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -3138,13 +3085,12 @@ class TAExpr(TAExprMixin):
         close: IntoExpr = pl.col("close"),
     ):
         """Stick Sandwich (Pattern Recognition)
-            pl.col("open").ta.cdlsticksandwich(pl.col("high"), pl.col("low"), pl.col("close"))
+        pl.col('open').ta.cdlsticksandwich('high', 'low', 'close')
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -3160,13 +3106,12 @@ class TAExpr(TAExprMixin):
         close: IntoExpr = pl.col("close"),
     ):
         """Takuri (Dragonfly Doji with very long lower shadow) (Pattern Recognition)
-            pl.col("open").ta.cdltakuri(pl.col("high"), pl.col("low"), pl.col("close"))
+        pl.col('open').ta.cdltakuri('high', 'low', 'close')
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -3182,13 +3127,12 @@ class TAExpr(TAExprMixin):
         close: IntoExpr = pl.col("close"),
     ):
         """Tasuki Gap (Pattern Recognition)
-            pl.col("open").ta.cdltasukigap(pl.col("high"), pl.col("low"), pl.col("close"))
+        pl.col('open').ta.cdltasukigap('high', 'low', 'close')
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -3204,13 +3148,12 @@ class TAExpr(TAExprMixin):
         close: IntoExpr = pl.col("close"),
     ):
         """Thrusting Pattern (Pattern Recognition)
-            pl.col("open").ta.cdlthrusting(pl.col("high"), pl.col("low"), pl.col("close"))
+        pl.col('open').ta.cdlthrusting('high', 'low', 'close')
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -3226,13 +3169,12 @@ class TAExpr(TAExprMixin):
         close: IntoExpr = pl.col("close"),
     ):
         """Tristar Pattern (Pattern Recognition)
-            pl.col("open").ta.cdltristar(pl.col("high"), pl.col("low"), pl.col("close"))
+        pl.col('open').ta.cdltristar('high', 'low', 'close')
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -3248,13 +3190,12 @@ class TAExpr(TAExprMixin):
         close: IntoExpr = pl.col("close"),
     ):
         """Unique 3 River (Pattern Recognition)
-            pl.col("open").ta.cdlunique3river(pl.col("high"), pl.col("low"), pl.col("close"))
+        pl.col('open').ta.cdlunique3river('high', 'low', 'close')
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -3270,13 +3211,12 @@ class TAExpr(TAExprMixin):
         close: IntoExpr = pl.col("close"),
     ):
         """Upside Gap Two Crows (Pattern Recognition)
-            pl.col("open").ta.cdlupsidegap2crows(pl.col("high"), pl.col("low"), pl.col("close"))
+        pl.col('open').ta.cdlupsidegap2crows('high', 'low', 'close')
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -3292,13 +3232,12 @@ class TAExpr(TAExprMixin):
         close: IntoExpr = pl.col("close"),
     ):
         """Upside/Downside Gap Three Methods (Pattern Recognition)
-            pl.col("open").ta.cdlxsidegap3methods(pl.col("high"), pl.col("low"), pl.col("close"))
+        pl.col('open').ta.cdlxsidegap3methods('high', 'low', 'close')
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
         Outputs:
             integer (values are -100, 0 or 100)
-
         """
         return register_plugin(
             args=[self._expr, high, low, close],
@@ -3314,8 +3253,8 @@ class TAExpr(TAExprMixin):
         close: IntoExpr = pl.col("close"),
     ):
         """Average Price (Price Transform)
+        pl.col('open').ta.avgprice('high', 'low', 'close')
 
-        pl.col("close").ta.avgprice("high", "low", "close")
 
         Inputs:
             prices: ['open', 'high', 'low', 'close']
@@ -3331,7 +3270,7 @@ class TAExpr(TAExprMixin):
 
     def medprice(self, low: IntoExpr = pl.col("low")):
         """Median Price (Price Transform)
-        pl.col("high").ta.medprice("low")
+        pl.col('high').ta.medprice('low')
 
         Inputs:
             prices: ['high', 'low']
@@ -3347,7 +3286,7 @@ class TAExpr(TAExprMixin):
 
     def typprice(self, high: IntoExpr = pl.col("high"), low: IntoExpr = pl.col("low")):
         """Typical Price (Price Transform)
-        pl.col("close").ta.typprice("high", "low")
+        pl.col('close').ta.typprice('high', 'low')
 
         Inputs:
             prices: ['high', 'low', 'close']
@@ -3363,7 +3302,7 @@ class TAExpr(TAExprMixin):
 
     def wclprice(self, high: IntoExpr = pl.col("high"), low: IntoExpr = pl.col("low")):
         """Weighted Close Price (Price Transform)
-        pl.col("close").ta.wclprice("high", "low")
+        pl.col('close').ta.wclprice('high', 'low')
 
         Inputs:
             prices: ['high', 'low', 'close']
@@ -3379,7 +3318,7 @@ class TAExpr(TAExprMixin):
 
     def beta(self, real: IntoExpr, timeperiod: int = 5):
         """Beta (Statistic Functions)
-        pl.col("close").ta.beta(pl.col("high"), timeperiod=5)
+        pl.col('high').ta.beta('low', timeperiod=5)
         Inputs:
             real0
             real1
@@ -3400,7 +3339,7 @@ class TAExpr(TAExprMixin):
 
     def correl(self, real: IntoExpr, timeperiod: int = 30):
         """Pearson's Correlation Coefficient (r) (Statistic Functions)
-        pl.col("close").ta.correl(pl.col("high"), timeperiod=30)
+        pl.col('high').ta.correl('low', timeperiod=30)
         Inputs:
             real0
             real1
@@ -3421,7 +3360,7 @@ class TAExpr(TAExprMixin):
 
     def linearreg(self, timeperiod: int = 14):
         """Linear Regression (Statistic Functions)
-        pl.col("close").ta.linearreg(timeperiod=14)
+        pl.col('close').ta.linearreg(timeperiod=14)
         Inputs:
             real
         Parameters:
@@ -3441,7 +3380,7 @@ class TAExpr(TAExprMixin):
 
     def linearreg_angle(self, timeperiod: int = 14):
         """Linear Regression Angle (Statistic Functions)
-        pl.col("close").ta.linearreg_angle(timeperiod=14)
+        pl.col('close').ta.linearreg_angle(timeperiod=14)
         Inputs:
             real
         Parameters:
@@ -3461,7 +3400,7 @@ class TAExpr(TAExprMixin):
 
     def linearreg_intercept(self, timeperiod: int = 14):
         """Linear Regression Intercept (Statistic Functions)
-        pl.col("close").ta.linearreg_intercept(timeperiod=14)
+        pl.col('close').ta.linearreg_intercept(timeperiod=14)
         Inputs:
             real
         Parameters:
@@ -3481,7 +3420,7 @@ class TAExpr(TAExprMixin):
 
     def linearreg_slope(self, timeperiod: int = 14):
         """Linear Regression Slope (Statistic Functions)
-        pl.col("close").ta.linearreg_slope(timeperiod=14)
+        pl.col('close').ta.linearreg_slope(timeperiod=14)
         Inputs:
             real
         Parameters:
@@ -3501,7 +3440,7 @@ class TAExpr(TAExprMixin):
 
     def stddev(self, timeperiod: int = 5, nbdev: float = 1.0):
         """Standard Deviation (Statistic Functions)
-        pl.col("close").ta.stddev(timeperiod=5, nbdev=1.0)
+        pl.col('close').ta.stddev(timeperiod=5, nbdev=1.0)
         Inputs:
             real
         Parameters:
@@ -3523,7 +3462,7 @@ class TAExpr(TAExprMixin):
 
     def tsf(self, timeperiod: int = 14):
         """Time Series Forecast (Statistic Functions)
-        pl.col("close").ta.tsf(timeperiod=14)
+        pl.col('close').ta.tsf(timeperiod=14)
         Inputs:
             real
         Parameters:
@@ -3543,7 +3482,7 @@ class TAExpr(TAExprMixin):
 
     def var(self, timeperiod: int = 5, nbdev: float = 1.0):
         """Variance (Statistic Functions)
-        pl.col("close").ta.var(timeperiod=5, nbdev=1.0)
+        pl.col('close').ta.var(timeperiod=5, nbdev=1.0)
         Inputs:
             real
         Parameters:
@@ -3565,6 +3504,7 @@ class TAExpr(TAExprMixin):
 
     def obv(self, volume: IntoExpr = pl.col("volume")):
         """OBV(close, volume)
+        pl.col('close').ta.obv('volume')
 
         On Balance Volume (Volume Indicators)
 
@@ -3587,8 +3527,7 @@ class TAExpr(TAExprMixin):
         volume: IntoExpr = pl.col("volume"),
     ):
         """Chaikin A/D Line (Volume Indicators)
-        pl.col("close").ta.ad(pl.col("high"), pl.col("low"), pl.col("volume"))
-
+        pl.col('close').ta.ad('high', 'low', 'volume')
         """
         return register_plugin(
             args=[self._expr, high, low, volume],
@@ -3606,7 +3545,7 @@ class TAExpr(TAExprMixin):
         slowperiod: int = 10,
     ):
         """Chaikin A/D Oscillator (Volume Indicators)
-        pl.col("close").ta.adosc(pl.col("high"), pl.col("low"), pl.col("volume"), timeperiod=3)
+        pl.col('close').ta.adosc('high', 'low', 'volume', fastperiod=3, slowperiod=10)
 
         Parameters:
             fastperiod: 3
@@ -3629,7 +3568,7 @@ class TAExpr(TAExprMixin):
         self, high: IntoExpr = pl.col("high"), low: IntoExpr = pl.col("low"), timeperiod: int = 14
     ):
         """Average True Range (Volatility Indicators)
-        pl.col("close").ta.atr("high", "low", [, timeperiod=?])
+        pl.col('close').ta.atr('high', 'low', timeperiod=14)
 
         Inputs:
             prices: ['high', 'low', 'close']
@@ -3650,7 +3589,7 @@ class TAExpr(TAExprMixin):
 
     def trange(self, high: IntoExpr = pl.col("high"), low: IntoExpr = pl.col("low")) -> pl.Expr:
         """True Range (Volatility Indicators)
-        pl.col("close").ta.trange("high", "low")
+        pl.col('close').ta.trange('high', 'low')
 
         Inputs:
             prices: ['high', 'low', 'close']
@@ -3667,7 +3606,7 @@ class TAExpr(TAExprMixin):
 
 def ht_dcperiod(real: IntoExpr = pl.col("close")) -> pl.Expr:
     """Hilbert Transform - Dominant Cycle Period (Cycle Indicators)
-    pl.col("close").ta.ht_dcperiod()
+    ta.ht_dcperiod('close')
 
     Inputs:
         real
@@ -3679,7 +3618,7 @@ def ht_dcperiod(real: IntoExpr = pl.col("close")) -> pl.Expr:
 
 def ht_dcphase(real: IntoExpr = pl.col("close")) -> pl.Expr:
     """Hilbert Transform - Dominant Cycle Phase (Cycle Indicators)
-    pl.col("close").ta.ht_dcphase()
+    ta.ht_dcphase('close')
 
     Inputs:
         real
@@ -3691,7 +3630,7 @@ def ht_dcphase(real: IntoExpr = pl.col("close")) -> pl.Expr:
 
 def ht_phasor(real: IntoExpr = pl.col("close")) -> pl.Expr:
     """Hilbert Transform - Phasor Components (Cycle Indicators)
-    pl.col("close").ta.ht_phasor()
+    ta.ht_phasor('close')
 
     Inputs:
         real
@@ -3703,7 +3642,7 @@ def ht_phasor(real: IntoExpr = pl.col("close")) -> pl.Expr:
 
 def ht_sine(real: IntoExpr = pl.col("close")) -> pl.Expr:
     """Hilbert Transform - SineWave (Cycle Indicators)
-    pl.col("close").ta.ht_sine()
+    ta.ht_sine('close')
 
     Inputs:
         real
@@ -3715,7 +3654,7 @@ def ht_sine(real: IntoExpr = pl.col("close")) -> pl.Expr:
 
 def ht_trendmode(real: IntoExpr = pl.col("close")) -> pl.Expr:
     """Hilbert Transform - Trend vs Cycle Mode (Cycle Indicators)
-    pl.col("close").ta.ht_trendmode()
+    ta.ht_trendmode('close')
 
     Inputs:
         real
@@ -3730,7 +3669,7 @@ def add(
     real1: IntoExpr = pl.col("low"),
 ) -> pl.Expr:
     """Vector Arithmetic Add (Math Operators)
-    pl.col("high").ta.add(pl.col("low"))
+    ta.add('high', 'low')
 
     Inputs:
         real0
@@ -3746,7 +3685,7 @@ def div(
     real1: IntoExpr = pl.col("low"),
 ) -> pl.Expr:
     """Vector Arithmetic Div (Math Operators)
-    pl.col("high").ta.div(pl.col("low"))
+    ta.div('high', 'low')
 
     Inputs:
         real0
@@ -3762,7 +3701,7 @@ def max(
     timeperiod: int = 30,
 ) -> pl.Expr:
     """Highest value over a specified period (Math Operators)
-    pl.col("close").ta.max(timeperiod=30)
+    ta.max('close', timeperiod=30)
 
     Inputs:
         prices: ['close']
@@ -3779,7 +3718,7 @@ def maxindex(
     timeperiod: int = 30,
 ) -> pl.Expr:
     """Index of highest value over a specified period (Math Operators)
-    pl.col("close").ta.maxindex(timeperiod=30)
+    ta.maxindex('close', timeperiod=30)
 
     Inputs:
         prices: ['close']
@@ -3796,7 +3735,7 @@ def min(
     timeperiod: int = 30,
 ) -> pl.Expr:
     """Lowest value over a specified period (Math Operators)
-    pl.col("close").ta.min(timeperiod=30)
+    ta.min('close', timeperiod=30)
 
     Inputs:
         prices: ['close']
@@ -3813,7 +3752,7 @@ def minindex(
     timeperiod: int = 30,
 ) -> pl.Expr:
     """Index of lowest value over a specified period (Math Operators)
-    pl.col("close").ta.minindex(timeperiod=30)
+    ta.minindex('close', timeperiod=30)
 
     Inputs:
         prices: ['close']
@@ -3830,7 +3769,7 @@ def minmax(
     timeperiod: int = 30,
 ) -> pl.Expr:
     """Lowest and highest values over a specified period (Math Operators)
-    pl.col("close").ta.minmax(timeperiod=30)
+    ta.minmax('close', timeperiod=30)
 
     Inputs:
         prices: ['close']
@@ -3847,7 +3786,7 @@ def minmaxindex(
     timeperiod: int = 30,
 ) -> pl.Expr:
     """Indexes of lowest and highest values over a specified period (Math Operators)
-    pl.col("close").ta.minmaxindex(timeperiod=30)
+    ta.minmaxindex('close', timeperiod=30)
 
     Inputs:
         prices: ['close']
@@ -3864,7 +3803,7 @@ def mult(
     real1: IntoExpr = pl.col("low"),
 ) -> pl.Expr:
     """Vector Arithmetic Mult (Math Operators)
-    pl.col("high").ta.mult(pl.col("low"))
+    ta.mult('high', 'low')
 
     Inputs:
         real0
@@ -3880,7 +3819,7 @@ def sub(
     real1: IntoExpr = pl.col("low"),
 ) -> pl.Expr:
     """Vector Arithmetic Substraction (Math Operators)
-    pl.col("high").ta.sub(pl.col("low"))
+    ta.sub('high', 'low')
 
     Inputs:
         real0
@@ -3896,7 +3835,7 @@ def sum(
     timeperiod: int = 30,
 ) -> pl.Expr:
     """Summation (Math Operators)
-    pl.col("close").ta.sum(timeperiod=30)
+    ta.sum('close', timeperiod=30)
 
     Inputs:
         prices: ['close']
@@ -3912,7 +3851,7 @@ def acos(
     real: IntoExpr = pl.col("close"),
 ) -> pl.Expr:
     """Vector Trigonometric ACos (Math Operators)
-    pl.col("close").ta.acos()
+    ta.acos('close')
 
     Inputs:
         real
@@ -3926,7 +3865,7 @@ def asin(
     real: IntoExpr = pl.col("close"),
 ) -> pl.Expr:
     """Vector Trigonometric ASin (Math Operators)
-    pl.col("close").ta.asin()
+    ta.asin('close')
 
     Inputs:
         real
@@ -3940,7 +3879,7 @@ def atan(
     real: IntoExpr = pl.col("close"),
 ) -> pl.Expr:
     """Vector Trigonometric ATan (Math Operators)
-    pl.col("close").ta.atan()
+    ta.atan('close')
 
     Inputs:
         real
@@ -3954,7 +3893,7 @@ def ceil(
     real: IntoExpr = pl.col("close"),
 ) -> pl.Expr:
     """Vector Ceil (Math Operators)
-    pl.col("close").ta.ceil()
+    ta.ceil('close')
 
     Inputs:
         real
@@ -3968,7 +3907,7 @@ def cos(
     real: IntoExpr = pl.col("close"),
 ) -> pl.Expr:
     """Vector Trigonometric Cos (Math Operators)
-    pl.col("close").ta.cos()
+    ta.cos('close')
 
     Inputs:
         real
@@ -3982,7 +3921,7 @@ def cosh(
     real: IntoExpr = pl.col("close"),
 ) -> pl.Expr:
     """Vector Trigonometric Cosh (Math Operators)
-    pl.col("close").ta.cosh()
+    ta.cosh('close')
 
     Inputs:
         real
@@ -3996,7 +3935,7 @@ def exp(
     real: IntoExpr = pl.col("close"),
 ) -> pl.Expr:
     """Vector Arithmetic Exp (Math Operators)
-    pl.col("close").ta.exp()
+    ta.exp('close')
 
     Inputs:
         real
@@ -4010,7 +3949,7 @@ def floor(
     real: IntoExpr = pl.col("close"),
 ) -> pl.Expr:
     """Vector Floor (Math Operators)
-    pl.col("close").ta.floor()
+    ta.floor('close')
 
     Inputs:
         real
@@ -4024,7 +3963,7 @@ def ln(
     real: IntoExpr = pl.col("close"),
 ) -> pl.Expr:
     """Vector Log Natural (Math Operators)
-    pl.col("close").ta.ln()
+    ta.ln('close')
 
     Inputs:
         real
@@ -4038,7 +3977,7 @@ def log10(
     real: IntoExpr = pl.col("close"),
 ) -> pl.Expr:
     """Vector Log10 (Math Operators)
-    pl.col("close").ta.log10()
+    ta.log10('close')
 
     Inputs:
         real
@@ -4052,7 +3991,7 @@ def sin(
     real: IntoExpr = pl.col("close"),
 ) -> pl.Expr:
     """Vector Trigonometric Sin (Math Operators)
-    pl.col("close").ta.sin()
+    ta.sin('close')
 
     Inputs:
         real
@@ -4066,7 +4005,7 @@ def sinh(
     real: IntoExpr = pl.col("close"),
 ) -> pl.Expr:
     """Vector Trigonometric Sinh (Math Operators)
-    pl.col("close").ta.sinh()
+    ta.sinh('close')
 
     Inputs:
         real
@@ -4080,7 +4019,7 @@ def sqrt(
     real: IntoExpr = pl.col("close"),
 ) -> pl.Expr:
     """Vector Square Root (Math Operators)
-    pl.col("close").ta.sqrt()
+    ta.sqrt('close')
 
     Inputs:
         real
@@ -4094,7 +4033,7 @@ def tan(
     real: IntoExpr = pl.col("close"),
 ) -> pl.Expr:
     """Vector Trigonometric Tan (Math Operators)
-    pl.col("close").ta.tan()
+    ta.tan('close')
 
     Inputs:
         real
@@ -4108,7 +4047,7 @@ def tanh(
     real: IntoExpr = pl.col("close"),
 ) -> pl.Expr:
     """Vector Trigonometric Tanh (Math Operators)
-    pl.col("close").ta.tanh()
+    ta.tanh('close')
 
     Inputs:
         real
@@ -4125,7 +4064,7 @@ def adx(
     timeperiod: int = 14,
 ) -> pl.Expr:
     """Average Directional Movement Index (Momentum Indicators)
-    pl.col("close").ta.adx(pl.col("high"), pl.col("low"), timeperiod=14)
+    ta.adx('high', 'low', 'close', timeperiod=14)
 
     Inputs:
         prices: ['high', 'low', 'close']
@@ -4144,7 +4083,7 @@ def adxr(
     timeperiod: int = 14,
 ) -> pl.Expr:
     """Average Directional Movement Index Rating (Momentum Indicators)
-    pl.col("close").ta.adxr(pl.col("high"), pl.col("low"), timeperiod=14)
+    ta.adxr('high', 'low', 'close', timeperiod=14)
 
     Inputs:
         prices: ['high', 'low', 'close']
@@ -4163,7 +4102,7 @@ def apo(
     matype: int = 1,
 ) -> pl.Expr:
     """Absolute Price Oscillator (Momentum Indicators)
-    pl.col("close").ta.apo(timeperiod=12, matype=1)
+    ta.apo('close', fastperiod=12, slowperiod=26, matype=1)
 
     Inputs:
         real
@@ -4183,7 +4122,7 @@ def aroon(
     timeperiod: int = 14,
 ) -> pl.Expr:
     """Aroon (Momentum Indicators)
-    pl.col("close").ta.aroon(pl.col("high"), pl.col("low"), timeperiod=14)
+    ta.aroon('high', 'low', timeperiod=14)
 
     Inputs:
         prices: ['high', 'low']
@@ -4201,7 +4140,7 @@ def aroonosc(
     timeperiod: int = 14,
 ) -> pl.Expr:
     """Aroon Oscillator (Momentum Indicators)
-    pl.col("close").ta.aroonosc(pl.col("high"), pl.col("low"), timeperiod=14)
+    ta.aroonosc('high', 'low', timeperiod=14)
 
     Inputs:
         prices: ['high', 'low']
@@ -4220,7 +4159,7 @@ def bop(
     close: IntoExpr = pl.col("close"),
 ) -> pl.Expr:
     """Balance Of Power (Momentum Indicators)
-    pl.col("open").ta.bop(pl.col("high"), pl.col("low"), pl.col("close"))
+    ta.bop('open', 'high', 'low', 'close')
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
@@ -4237,7 +4176,7 @@ def cci(
     timeperiod: int = 14,
 ) -> pl.Expr:
     """Commodity Channel Index (Momentum Indicators)
-    pl.col("close").ta.cci(pl.col("high"), pl.col("low"), timeperiod=14)
+    ta.cci('high', 'low', 'close', timeperiod=14)
 
     Inputs:
         prices: ['high', 'low', 'close']
@@ -4254,7 +4193,7 @@ def cmo(
     timeperiod: int = 14,
 ) -> pl.Expr:
     """Chande Momentum Oscillator (Momentum Indicators)
-    pl.col("close").ta.cmo(timeperiod=14)
+    ta.cmo('close', timeperiod=14)
 
     Inputs:
         real
@@ -4273,7 +4212,7 @@ def dx(
     timeperiod: int = 14,
 ) -> pl.Expr:
     """Directional Movement Index (Momentum Indicators)
-    pl.col("close").ta.dx(pl.col("high"), pl.col("low"), timeperiod=14)
+    ta.dx('high', 'low', 'close', timeperiod=14)
 
     Inputs:
         prices: ['high', 'low', 'close']
@@ -4292,7 +4231,7 @@ def macd(
     signalperiod: int = 9,
 ) -> pl.Expr:
     """Moving Average Convergence/Divergence (Momentum Indicators)
-    pl.col("close").ta.macd(timeperiod=12, signalperiod=9)
+    ta.macd('close', fastperiod=12, slowperiod=26, signalperiod=9)
 
     Inputs:
         real
@@ -4316,7 +4255,7 @@ def macdext(
     signalmatype: int = 0,
 ) -> pl.Expr:
     """MACD with controllable MA type (Momentum Indicators)
-    pl.col("close").ta.macdext(timeperiod=12, signalperiod=9)
+    ta.macdext('close', fastperiod=12, fastmatype=0, slowperiod=26, slowmatype=0, signalperiod=9, signalmatype=0)
 
     Inputs:
         real
@@ -4342,7 +4281,7 @@ def macdext(
 
 def macdfix(real: IntoExpr = pl.col("close"), signalperiod: int = 9) -> pl.Expr:
     """Moving Average Convergence/Divergence Fix 12/26 (Momentum Indicators)
-    pl.col("close").ta.macdfix(signalperiod=9)
+    ta.macdfix('close', signalperiod=9)
 
     Inputs:
         real
@@ -4362,7 +4301,7 @@ def mfi(
     timeperiod: int = 14,
 ) -> pl.Expr:
     """Money Flow Index (Momentum Indicators)
-    pl.col("close").ta.mfi(pl.col("high"), pl.col("low"), pl.col("volume"), timeperiod=14)
+    ta.mfi('high', 'low', 'close', 'volume', timeperiod=14)
 
     Inputs:
         prices: ['high', 'low', 'close']
@@ -4382,7 +4321,7 @@ def minus_di(
     timeperiod: int = 14,
 ) -> pl.Expr:
     """Minus Directional Indicator (Momentum Indicators)
-    pl.col("close").ta.minus_di(pl.col("high"), pl.col("low"), timeperiod=14)
+    ta.minus_di('high', 'low', 'close', timeperiod=14)
 
     Inputs:
         prices: ['high', 'low', 'close']
@@ -4400,7 +4339,7 @@ def minus_dm(
     timeperiod: int = 14,
 ) -> pl.Expr:
     """Minus Directional Movement (Momentum Indicators)
-    pl.col("high").ta.minus_dm("low", timeperiod=14)
+    ta.minus_dm('high', 'low', timeperiod=14)
 
     Inputs:
         prices: ['high', 'low']
@@ -4417,7 +4356,7 @@ def mom(
     timeperiod: int = 10,
 ) -> pl.Expr:
     """Momentum (Momentum Indicators)
-    pl.col("close").ta.mom(timeperiod=10)
+    ta.mom('close', timeperiod=10)
 
     Inputs:
         real
@@ -4436,7 +4375,7 @@ def plus_di(
     timeperiod: int = 14,
 ) -> pl.Expr:
     """Plus Directional Indicator (Momentum Indicators)
-    pl.col("close").ta.plus_di(pl.col("high"), pl.col("low"), timeperiod=14)
+    ta.plus_di('high', 'low', 'close', timeperiod=14)
 
     Inputs:
         prices: ['high', 'low', 'close']
@@ -4454,7 +4393,7 @@ def plus_dm(
     timeperiod: int = 14,
 ) -> pl.Expr:
     """Plus Directional Movement (Momentum Indicators)
-    pl.col("high").ta.plus_dm("low", timeperiod=14)
+    ta.plus_dm('high', 'low', timeperiod=14)
 
     Inputs:
         prices: ['high', 'low']
@@ -4473,7 +4412,7 @@ def ppo(
     matype: int = 1,
 ) -> pl.Expr:
     """Percentage Price Oscillator (Momentum Indicators)
-    pl.col("close").ta.ppo(timeperiod=12, matype=1)
+    ta.ppo('close', fastperiod=12, slowperiod=26, matype=1)
 
     Inputs:
         real
@@ -4492,7 +4431,7 @@ def roc(
     timeperiod: int = 10,
 ) -> pl.Expr:
     """Rate of change : ((price/prevPrice)-1)*100 (Momentum Indicators)
-    pl.col("close").ta.roc(timeperiod=10)
+    ta.roc('close', timeperiod=10)
 
     Inputs:
         real
@@ -4509,7 +4448,7 @@ def rocp(
     timeperiod: int = 10,
 ) -> pl.Expr:
     """Rate of change Percentage: (price-prevPrice)/prevPrice (Momentum Indicators)
-    pl.col("close").ta.rocp(timeperiod=10)
+    ta.rocp('close', timeperiod=10)
 
     Inputs:
         real
@@ -4526,7 +4465,7 @@ def rocr(
     timeperiod: int = 10,
 ) -> pl.Expr:
     """Rate of change ratio: (price/prevPrice) (Momentum Indicators)
-    pl.col("close").ta.rocr(timeperiod=10)
+    ta.rocr('close', timeperiod=10)
 
     Inputs:
         real
@@ -4543,7 +4482,7 @@ def rocr100(
     timeperiod: int = 10,
 ) -> pl.Expr:
     """Rate of change ratio 100 scale: (price/prevPrice)*100 (Momentum Indicators)
-    pl.col("close").ta.rocr100(timeperiod=10)
+    ta.rocr100('close', timeperiod=10)
 
     Inputs:
         real
@@ -4560,7 +4499,7 @@ def rsi(
     timeperiod: int = 14,
 ) -> pl.Expr:
     """Relative Strength Index (Momentum Indicators)
-    pl.col("close").ta.rsi(timeperiod=14)
+    ta.rsi('close', timeperiod=14)
 
     Inputs:
         real
@@ -4583,7 +4522,7 @@ def stoch(
     slowd_matype: int = 0,
 ) -> pl.Expr:
     """Stochastic (Momentum Indicators)
-    pl.col("close").ta.stoch(pl.col("high"), pl.col("low"), timeperiod=5)
+    ta.stoch('high', 'low', 'close', fastk_period=5, slowk_period=3, slowk_matype=0, slowd_period=3, slowd_matype=0)
 
     Inputs:
         prices: ['high', 'low', 'close']
@@ -4616,7 +4555,7 @@ def stochf(
     fastd_matype: int = 0,
 ) -> pl.Expr:
     """Stochastic Fast (Momentum Indicators)
-    pl.col("close").ta.stochf(pl.col("high"), pl.col("low"), timeperiod=5)
+    ta.stochf('high', 'low', 'close', fastk_period=5, fastd_period=3, fastd_matype=0)
 
     Inputs:
         prices: ['high', 'low', 'close']
@@ -4640,7 +4579,7 @@ def stochrsi(
     fastd_matype: int = 0,
 ) -> pl.Expr:
     """Stochastic Relative Strength Index (Momentum Indicators)
-    pl.col("close").ta.stochrsi(timeperiod=14)
+    ta.stochrsi('close', timeperiod=14, fastk_period=5, fastd_period=3, fastd_matype=0)
 
     Inputs:
         prices: ['close']
@@ -4663,7 +4602,7 @@ def stochrsi(
 
 def trix(price: IntoExpr = pl.col("close"), timeperiod: int = 30) -> pl.Expr:
     """1-day Rate-Of-Change (ROC) of a Triple Smooth EMA (Momentum Indicators)
-    pl.col("close").ta.trix(timeperiod=30)
+    ta.trix('close', timeperiod=30)
 
     Inputs:
         prices: ['close']
@@ -4684,7 +4623,7 @@ def ultosc(
     timeperiod3: int = 28,
 ) -> pl.Expr:
     """Ultimate Oscillator (Momentum Indicators)
-    pl.col("close").ta.ultosc(pl.col("high"), pl.col("low"), timeperiod1=7, timeperiod2=14, timeperiod3=28)
+    ta.ultosc('high', 'low', 'close', timeperiod1=7, timeperiod2=14, timeperiod3=28)
 
     Inputs:
         prices: ['high', 'low', 'close']
@@ -4707,7 +4646,7 @@ def willr(
     timeperiod: int = 14,
 ) -> pl.Expr:
     """Williams' %R (Momentum Indicators)
-    pl.col("close").ta.willr(pl.col("high"), pl.col("low"), timeperiod=14)
+    ta.willr('high', 'low', 'close', timeperiod=14)
 
     Inputs:
         prices: ['high', 'low', 'close']
@@ -4727,7 +4666,7 @@ def bbands(
     matype: int = 0,
 ) -> pl.Expr:
     """Bollinger Bands (Overlap Studies)
-    pl.col("close").ta.bbands(timeperiod=20, nbdevup=2.0, nbdevdn=2.0, matype=0)
+    ta.bbands('close', timeperiod=20, nbdevup=2.0, nbdevdn=2.0, matype=0)
 
     Inputs:
         real
@@ -4747,7 +4686,7 @@ def dema(
     timeperiod: int = 30,
 ) -> pl.Expr:
     """Double Exponential Moving Average (Overlap Studies)
-    pl.col("close").ta.dema(timeperiod=30)
+    ta.dema('close', timeperiod=30)
 
     Inputs:
         real
@@ -4764,7 +4703,7 @@ def ema(
     timeperiod: int = 30,
 ) -> pl.Expr:
     """Exponential Moving Average (Overlap Studies)
-    pl.col("close").ta.ema(timeperiod=30)
+    ta.ema('close', timeperiod=30)
 
     Inputs:
         real
@@ -4780,7 +4719,7 @@ def ht_trendline(
     real: IntoExpr = pl.col("close"),
 ) -> pl.Expr:
     """Hilbert Transform - Instantaneous Trendline (Overlap Studies)
-    pl.col("close").ta.ht_trendline()
+    ta.ht_trendline('close')
 
     Inputs:
         real
@@ -4795,7 +4734,7 @@ def kama(
     timeperiod: int = 30,
 ) -> pl.Expr:
     """Kaufman Adaptive Moving Average (Overlap Studies)
-    pl.col("close").ta.kama(timeperiod=30)
+    ta.kama('close', timeperiod=30)
 
     Inputs:
         real
@@ -4813,7 +4752,7 @@ def mama(
     slowlimit: float = 0.05,
 ) -> pl.Expr:
     """MESA Adaptive Moving Average (Overlap Studies)
-    pl.col("close").ta.mama(fastlimit=0.5, slowlimit=0.05)
+    ta.mama('close', fastlimit=0.5, slowlimit=0.05)
 
     Inputs:
         real
@@ -4834,7 +4773,7 @@ def mavp(
     matype: int = 0,
 ) -> pl.Expr:
     """Moving average with variable period (Overlap Studies)
-    pl.col("close").ta.mavp(pl.col("periods"), minperiod=2, maxperiod=30, matype=0)
+    ta.mavp('close', 'periods', minperiod=2, maxperiod=30, matype=0)
 
     Inputs:
         real
@@ -4854,7 +4793,7 @@ def midpoint(
     timeperiod: int = 14,
 ) -> pl.Expr:
     """MidPoint over period (Overlap Studies)
-    pl.col("close").ta.midpoint(timeperiod=14)
+    ta.midpoint('close', timeperiod=14)
 
     Inputs:
         real
@@ -4872,7 +4811,7 @@ def midprice(
     timeperiod: int = 14,
 ) -> pl.Expr:
     """Midpoint Price over period (Overlap Studies)
-    pl.col("high").ta.midprice("low", timeperiod=14)
+    ta.midprice('high', 'low', timeperiod=14)
 
     Inputs:
         prices: ['high', 'low']
@@ -4891,7 +4830,7 @@ def sar(
     maximum: float = 0.2,
 ) -> pl.Expr:
     """Parabolic SAR (Overlap Studies)
-    pl.col("high").ta.sar("low", acceleration=0.02, maximum=0.2)
+    ta.sar('high', 'low', acceleration=0.02, maximum=0.2)
 
     Inputs:
         prices: ['high', 'low']
@@ -4917,7 +4856,7 @@ def sarext(
     accelerationmaxshort: float = 0.2,
 ) -> pl.Expr:
     """Parabolic SAR - Extended (Overlap Studies)
-    pl.col("high").ta.sarext("low", startvalue=0, offsetonreverse=0, accelerationinitlong=0.02, accelerationlong=0.02, accelerationmaxlong=0.2, accelerationinitshort=0.02, accelerationshort=0.02, accelerationmaxshort=0.2)
+    ta.sarext('high', 'low', startvalue=0.0, offsetonreverse=0.0, accelerationinitlong=0.02, accelerationlong=0.02, accelerationmaxlong=0.2, accelerationinitshort=0.02, accelerationshort=0.02, accelerationmaxshort=0.2)
 
     Inputs:
         prices: ['high', 'low']
@@ -4948,7 +4887,7 @@ def sarext(
 
 def sma(real: IntoExpr = pl.col("close"), timeperiod: int = 30) -> pl.Expr:
     """Simple Moving Average (Overlap Studies)
-    pl.col("close").ta.sma(timeperiod=30)
+    ta.sma('close', timeperiod=30)
 
     Inputs:
         real
@@ -4966,7 +4905,7 @@ def ma(
     matype: int = 0,
 ) -> pl.Expr:
     """Moving average (Overlap Studies)
-    pl.col("close").ta.ma(timeperiod=30, matype=0)
+    ta.ma('close', timeperiod=30, matype=0)
 
     Inputs:
         real
@@ -4985,7 +4924,7 @@ def t3(
     vfactor: float = 0.7,
 ) -> pl.Expr:
     """Triple Exponential Moving Average (Overlap Studies)
-    pl.col("close").ta.t3(timeperiod=5, vfactor=0.7)
+    ta.t3('close', timeperiod=5, vfactor=0.7)
 
     Inputs:
         real
@@ -5003,7 +4942,7 @@ def tema(
     timeperiod: int = 30,
 ) -> pl.Expr:
     """Triple Exponential Moving Average (Overlap Studies)
-    pl.col("close").ta.tema(timeperiod=30)
+    ta.tema('close', timeperiod=30)
 
     Inputs:
         real
@@ -5020,7 +4959,7 @@ def trima(
     timeperiod: int = 30,
 ) -> pl.Expr:
     """Triangular Moving Average (Overlap Studies)
-    pl.col("close").ta.trima(timeperiod=30)
+    ta.trima('close', timeperiod=30)
 
     Inputs:
         real
@@ -5037,7 +4976,7 @@ def wma(
     timeperiod: int = 30,
 ) -> pl.Expr:
     """Weighted Moving Average (Overlap Studies)
-    pl.col("close").ta.wma(timeperiod=30)
+    ta.wma('close', timeperiod=30)
 
     Inputs:
         real
@@ -5056,13 +4995,12 @@ def cdl2crows(
     close: IntoExpr = pl.col("close"),
 ):
     """Two Crows (Pattern Recognition)
-    pl.col("open").ta.cdl2crows(pl.col("high"), pl.col("low"), pl.col("close"))
+    ta.cdl2crows('open', 'high', 'low', 'close')
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdl2crows(high, low, close)
 
@@ -5074,13 +5012,12 @@ def cdl3blackcrows(
     close: IntoExpr = pl.col("close"),
 ):
     """Three Black Crows (Pattern Recognition)
-    pl.col("open").ta.cdl3blackcrows(pl.col("high"), pl.col("low"), pl.col("close"))
+    ta.cdl3blackcrows('open', 'high', 'low', 'close')
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdl3blackcrows(high, low, close)
 
@@ -5092,13 +5029,12 @@ def cdl3inside(
     close: IntoExpr = pl.col("close"),
 ):
     """Three Inside Up/Down (Pattern Recognition)
-    pl.col("open").ta.cdl3inside(pl.col("high"), pl.col("low"), pl.col("close"))
+    ta.cdl3inside('open', 'high', 'low', 'close')
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdl3inside(high, low, close)
 
@@ -5110,13 +5046,12 @@ def cdl3linestrike(
     close: IntoExpr = pl.col("close"),
 ):
     """Three-Line Strike  (Pattern Recognition)
-    pl.col("open").ta.cdl3linestrike(pl.col("high"), pl.col("low"), pl.col("close"))
+    ta.cdl3linestrike('open', 'high', 'low', 'close')
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdl3linestrike(high, low, close)
 
@@ -5128,13 +5063,12 @@ def cdl3outside(
     close: IntoExpr = pl.col("close"),
 ):
     """Three Outside Up/Down (Pattern Recognition)
-    pl.col("open").ta.cdl3outside(pl.col("high"), pl.col("low"), pl.col("close"))
+    ta.cdl3outside('open', 'high', 'low', 'close')
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdl3outside(high, low, close)
 
@@ -5146,13 +5080,12 @@ def cdl3starsinsouth(
     close: IntoExpr = pl.col("close"),
 ):
     """Three Stars In The South (Pattern Recognition)
-    pl.col("open").ta.cdl3starsinsouth(pl.col("high"), pl.col("low"), pl.col("close"))
+    ta.cdl3starsinsouth('open', 'high', 'low', 'close')
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdl3starsinsouth(high, low, close)
 
@@ -5164,13 +5097,12 @@ def cdl3whitesoldiers(
     close: IntoExpr = pl.col("close"),
 ):
     """Three Advancing White Soldiers (Pattern Recognition)
-    pl.col("open").ta.cdl3whitesoldiers(pl.col("high"), pl.col("low"), pl.col("close"))
+    ta.cdl3whitesoldiers('open', 'high', 'low', 'close')
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdl3whitesoldiers(high, low, close)
 
@@ -5183,7 +5115,7 @@ def cdlabandonedbaby(
     penetration: float = 0.3,
 ):
     """Abandoned Baby (Pattern Recognition)
-    pl.col("open").ta.cdlabandonedbaby(pl.col("high"), pl.col("low"), pl.col("close"), penetration=0.3)
+    ta.cdlabandonedbaby('open', 'high', 'low', 'close', penetration=0.3)
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
@@ -5191,7 +5123,6 @@ def cdlabandonedbaby(
         penetration: 0.3
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdlabandonedbaby(high, low, close, penetration=penetration)
 
@@ -5203,13 +5134,12 @@ def cdladvanceblock(
     close: IntoExpr = pl.col("close"),
 ):
     """Advance Block (Pattern Recognition)
-    pl.col("open").ta.cdladvanceblock(pl.col("high"), pl.col("low"), pl.col("close"))
+    ta.cdladvanceblock('open', 'high', 'low', 'close')
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdladvanceblock(high, low, close)
 
@@ -5221,13 +5151,12 @@ def cdlbelthold(
     close: IntoExpr = pl.col("close"),
 ):
     """Belt-hold (Pattern Recognition)
-    pl.col("open").ta.cdlbelthold(pl.col("high"), pl.col("low"), pl.col("close"))
+    ta.cdlbelthold('open', 'high', 'low', 'close')
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdlbelthold(high, low, close)
 
@@ -5239,13 +5168,12 @@ def cdlbreakaway(
     close: IntoExpr = pl.col("close"),
 ):
     """Breakaway (Pattern Recognition)
-    pl.col("open").ta.cdlbreakaway(pl.col("high"), pl.col("low"), pl.col("close"))
+    ta.cdlbreakaway('open', 'high', 'low', 'close')
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdlbreakaway(high, low, close)
 
@@ -5257,13 +5185,12 @@ def cdlclosingmarubozu(
     close: IntoExpr = pl.col("close"),
 ):
     """Closing Marubozu (Pattern Recognition)
-    pl.col("open").ta.cdlclosingmarubozu(pl.col("high"), pl.col("low"), pl.col("close"))
+    ta.cdlclosingmarubozu('open', 'high', 'low', 'close')
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdlclosingmarubozu(high, low, close)
 
@@ -5275,13 +5202,12 @@ def cdlconcealbabyswall(
     close: IntoExpr = pl.col("close"),
 ):
     """Concealing Baby Swallow (Pattern Recognition)
-    pl.col("open").ta.cdlconcealbabyswall(pl.col("high"), pl.col("low"), pl.col("close"))
+    ta.cdlconcealbabyswall('open', 'high', 'low', 'close')
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdlconcealbabyswall(high, low, close)
 
@@ -5293,13 +5219,12 @@ def cdlcounterattack(
     close: IntoExpr = pl.col("close"),
 ):
     """Counterattack (Pattern Recognition)
-    pl.col("open").ta.cdlcounterattack(pl.col("high"), pl.col("low"), pl.col("close"))
+    ta.cdlcounterattack('open', 'high', 'low', 'close')
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdlcounterattack(high, low, close)
 
@@ -5312,7 +5237,7 @@ def cdldarkcloudcover(
     penetration: float = 0.5,
 ):
     """Dark Cloud Cover (Pattern Recognition)
-    pl.col("open").ta.cdldarkcloudcover(pl.col("high"), pl.col("low"), pl.col("close"), penetration=0.3)
+    ta.cdldarkcloudcover('open', 'high', 'low', 'close', penetration=0.5)
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
@@ -5320,7 +5245,6 @@ def cdldarkcloudcover(
         penetration: 0.5
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdldarkcloudcover(high, low, close, penetration=penetration)
 
@@ -5332,13 +5256,12 @@ def cdldoji(
     close: IntoExpr = pl.col("close"),
 ):
     """Doji (Pattern Recognition)
-    pl.col("open").ta.cdldoji(pl.col("high"), pl.col("low"), pl.col("close"))
+    ta.cdldoji('open', 'high', 'low', 'close')
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdldoji(high, low, close)
 
@@ -5350,13 +5273,12 @@ def cdldojistar(
     close: IntoExpr = pl.col("close"),
 ):
     """Doji Star (Pattern Recognition)
-    pl.col("open").ta.cdldojistar(pl.col("high"), pl.col("low"), pl.col("close"))
+    ta.cdldojistar('open', 'high', 'low', 'close')
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdldojistar(high, low, close)
 
@@ -5368,13 +5290,12 @@ def cdldragonflydoji(
     close: IntoExpr = pl.col("close"),
 ):
     """Dragonfly Doji (Pattern Recognition)
-    pl.col("open").ta.cdldragonflydoji(pl.col("high"), pl.col("low"), pl.col("close"))
+    ta.cdldragonflydoji('open', 'high', 'low', 'close')
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdldragonflydoji(high, low, close)
 
@@ -5386,13 +5307,12 @@ def cdlengulfing(
     close: IntoExpr = pl.col("close"),
 ):
     """Engulfing Pattern (Pattern Recognition)
-    pl.col("open").ta.cdlengulfing(pl.col("high"), pl.col("low"), pl.col("close"))
+    ta.cdlengulfing('open', 'high', 'low', 'close')
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdlengulfing(high, low, close)
 
@@ -5405,7 +5325,7 @@ def cdleveningdojistar(
     penetration: float = 0.3,
 ):
     """Evening Doji Star (Pattern Recognition)
-    pl.col("open").ta.cdleveningdojistar(pl.col("high"), pl.col("low"), pl.col("close"), penetration=0.3)
+    ta.cdleveningdojistar('open', 'high', 'low', 'close', penetration=0.3)
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
@@ -5413,7 +5333,6 @@ def cdleveningdojistar(
         penetration: 0.3
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdleveningdojistar(high, low, close, penetration=penetration)
 
@@ -5426,7 +5345,7 @@ def cdleveningstar(
     penetration: float = 0.3,
 ):
     """Evening Star (Pattern Recognition)
-    pl.col("open").ta.cdleveningstar(pl.col("high"), pl.col("low"), pl.col("close"), penetration=0.3)
+    ta.cdleveningstar('open', 'high', 'low', 'close', penetration=0.3)
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
@@ -5434,7 +5353,6 @@ def cdleveningstar(
         penetration: 0.3
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdleveningstar(high, low, close, penetration=penetration)
 
@@ -5446,13 +5364,12 @@ def cdlgapsidesidewhite(
     close: IntoExpr = pl.col("close"),
 ):
     """Up/Down-gap side-by-side white lines (Pattern Recognition)
-    pl.col("open").ta.cdlgapsidesidewhite(pl.col("high"), pl.col("low"), pl.col("close"))
+    ta.cdlgapsidesidewhite('open', 'high', 'low', 'close')
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdlgapsidesidewhite(high, low, close)
 
@@ -5464,13 +5381,12 @@ def cdlgravestonedoji(
     close: IntoExpr = pl.col("close"),
 ):
     """Gravestone Doji (Pattern Recognition)
-    pl.col("open").ta.cdlgravestonedoji(pl.col("high"), pl.col("low"), pl.col("close"))
+    ta.cdlgravestonedoji('open', 'high', 'low', 'close')
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdlgravestonedoji(high, low, close)
 
@@ -5482,13 +5398,12 @@ def cdlhammer(
     close: IntoExpr = pl.col("close"),
 ):
     """Hammer (Pattern Recognition)
-    pl.col("open").ta.cdlhammer(pl.col("high"), pl.col("low"), pl.col("close"))
+    ta.cdlhammer('open', 'high', 'low', 'close')
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdlhammer(high, low, close)
 
@@ -5500,13 +5415,12 @@ def cdlhangingman(
     close: IntoExpr = pl.col("close"),
 ):
     """Hanging Man (Pattern Recognition)
-    pl.col("open").ta.cdlhangingman(pl.col("high"), pl.col("low"), pl.col("close"))
+    ta.cdlhangingman('open', 'high', 'low', 'close')
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdlhangingman(high, low, close)
 
@@ -5518,13 +5432,12 @@ def cdlharami(
     close: IntoExpr = pl.col("close"),
 ):
     """Harami Pattern (Pattern Recognition)
-    pl.col("open").ta.cdlharami(pl.col("high"), pl.col("low"), pl.col("close"))
+    ta.cdlharami('open', 'high', 'low', 'close')
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdlharami(high, low, close)
 
@@ -5536,13 +5449,12 @@ def cdlharamicross(
     close: IntoExpr = pl.col("close"),
 ):
     """Harami Cross Pattern (Pattern Recognition)
-    pl.col("open").ta.cdlharamicross(pl.col("high"), pl.col("low"), pl.col("close"))
+    ta.cdlharamicross('open', 'high', 'low', 'close')
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdlharamicross(high, low, close)
 
@@ -5554,13 +5466,12 @@ def cdlhighwave(
     close: IntoExpr = pl.col("close"),
 ):
     """High-Wave Candle (Pattern Recognition)
-    pl.col("open").ta.cdlhighwave(pl.col("high"), pl.col("low"), pl.col("close"))
+    ta.cdlhighwave('open', 'high', 'low', 'close')
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdlhighwave(high, low, close)
 
@@ -5572,13 +5483,12 @@ def cdlhikkake(
     close: IntoExpr = pl.col("close"),
 ):
     """Hikkake Pattern (Pattern Recognition)
-    pl.col("open").ta.cdlhikkake(pl.col("high"), pl.col("low"), pl.col("close"))
+    ta.cdlhikkake('open', 'high', 'low', 'close')
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdlhikkake(high, low, close)
 
@@ -5590,13 +5500,12 @@ def cdlhikkakemod(
     close: IntoExpr = pl.col("close"),
 ):
     """Modified Hikkake Pattern (Pattern Recognition)
-    pl.col("open").ta.cdlhikkakemod(pl.col("high"), pl.col("low"), pl.col("close"))
+    ta.cdlhikkakemod('open', 'high', 'low', 'close')
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdlhikkakemod(high, low, close)
 
@@ -5608,13 +5517,12 @@ def cdlhomingpigeon(
     close: IntoExpr = pl.col("close"),
 ):
     """Homing Pigeon (Pattern Recognition)
-    pl.col("open").ta.cdlhomingpigeon(pl.col("high"), pl.col("low"), pl.col("close"))
+    ta.cdlhomingpigeon('open', 'high', 'low', 'close')
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdlhomingpigeon(high, low, close)
 
@@ -5626,13 +5534,12 @@ def cdlidentical3crows(
     close: IntoExpr = pl.col("close"),
 ):
     """Identical Three Crows (Pattern Recognition)
-    pl.col("open").ta.cdlidentical3crows(pl.col("high"), pl.col("low"), pl.col("close"))
+    ta.cdlidentical3crows('open', 'high', 'low', 'close')
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdlidentical3crows(high, low, close)
 
@@ -5644,13 +5551,12 @@ def cdlinneck(
     close: IntoExpr = pl.col("close"),
 ):
     """In-Neck Pattern (Pattern Recognition)
-    pl.col("open").ta.cdlinneck(pl.col("high"), pl.col("low"), pl.col("close"))
+    ta.cdlinneck('open', 'high', 'low', 'close')
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdlinneck(high, low, close)
 
@@ -5662,13 +5568,12 @@ def cdlinvertedhammer(
     close: IntoExpr = pl.col("close"),
 ):
     """Inverted Hammer (Pattern Recognition)
-    pl.col("open").ta.cdlinvertedhammer(pl.col("high"), pl.col("low"), pl.col("close"))
+    ta.cdlinvertedhammer('open', 'high', 'low', 'close')
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdlinvertedhammer(high, low, close)
 
@@ -5680,13 +5585,12 @@ def cdlkicking(
     close: IntoExpr = pl.col("close"),
 ):
     """Kicking (Pattern Recognition)
-    pl.col("open").ta.cdlkicking(pl.col("high"), pl.col("low"), pl.col("close"))
+    ta.cdlkicking('open', 'high', 'low', 'close')
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdlkicking(high, low, close)
 
@@ -5698,13 +5602,12 @@ def cdlkickingbylength(
     close: IntoExpr = pl.col("close"),
 ):
     """Kicking - bull/bear determined by the longer marubozu (Pattern Recognition)
-    pl.col("open").ta.cdlkickingbylength(pl.col("high"), pl.col("low"), pl.col("close"))
+    ta.cdlkickingbylength('open', 'high', 'low', 'close')
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdlkickingbylength(high, low, close)
 
@@ -5716,13 +5619,12 @@ def cdlladderbottom(
     close: IntoExpr = pl.col("close"),
 ):
     """Ladder Bottom (Pattern Recognition)
-    pl.col("open").ta.cdlladderbottom(pl.col("high"), pl.col("low"), pl.col("close"))
+    ta.cdlladderbottom('open', 'high', 'low', 'close')
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdlladderbottom(high, low, close)
 
@@ -5734,13 +5636,12 @@ def cdllongleggeddoji(
     close: IntoExpr = pl.col("close"),
 ):
     """Long Legged Doji (Pattern Recognition)
-    pl.col("open").ta.cdllongleggeddoji(pl.col("high"), pl.col("low"), pl.col("close"))
+    ta.cdllongleggeddoji('open', 'high', 'low', 'close')
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdllongleggeddoji(high, low, close)
 
@@ -5752,13 +5653,12 @@ def cdllongline(
     close: IntoExpr = pl.col("close"),
 ):
     """Long Line Candle (Pattern Recognition)
-    pl.col("open").ta.cdllongline(pl.col("high"), pl.col("low"), pl.col("close"))
+    ta.cdllongline('open', 'high', 'low', 'close')
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdllongline(high, low, close)
 
@@ -5770,13 +5670,12 @@ def cdlmarubozu(
     close: IntoExpr = pl.col("close"),
 ):
     """Marubozu (Pattern Recognition)
-    pl.col("open").ta.cdlmarubozu(pl.col("high"), pl.col("low"), pl.col("close"))
+    ta.cdlmarubozu('open', 'high', 'low', 'close')
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdlmarubozu(high, low, close)
 
@@ -5788,13 +5687,12 @@ def cdlmatchinglow(
     close: IntoExpr = pl.col("close"),
 ):
     """Matching Low (Pattern Recognition)
-    pl.col("open").ta.cdlmatchinglow(pl.col("high"), pl.col("low"), pl.col("close"))
+    ta.cdlmatchinglow('open', 'high', 'low', 'close')
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdlmatchinglow(high, low, close)
 
@@ -5807,7 +5705,7 @@ def cdlmathold(
     penetration: float = 0.5,
 ):
     """Mat Hold (Pattern Recognition)
-    pl.col("open").ta.cdlmathold(pl.col("high"), pl.col("low"), pl.col("close"), penetration=0.3)
+    ta.cdlmathold('open', 'high', 'low', 'close', penetration=0.5)
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
@@ -5815,7 +5713,6 @@ def cdlmathold(
         penetration: 0.5
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdlmathold(high, low, close, penetration=penetration)
 
@@ -5828,7 +5725,7 @@ def cdlmorningdojistar(
     penetration: float = 0.3,
 ):
     """Morning Doji Star (Pattern Recognition)
-    pl.col("open").ta.cdlmorningdojistar(pl.col("high"), pl.col("low"), pl.col("close"), penetration=0.3)
+    ta.cdlmorningdojistar('open', 'high', 'low', 'close', penetration=0.3)
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
@@ -5836,7 +5733,6 @@ def cdlmorningdojistar(
         penetration: 0.3
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdlmorningdojistar(high, low, close, penetration=penetration)
 
@@ -5849,7 +5745,7 @@ def cdlmorningstar(
     penetration: float = 0.3,
 ):
     """Morning Star (Pattern Recognition)
-    pl.col("open").ta.cdlmorningstar(pl.col("high"), pl.col("low"), pl.col("close"), penetration=0.3)
+    ta.cdlmorningstar('open', 'high', 'low', 'close', penetration=0.3)
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
@@ -5857,7 +5753,6 @@ def cdlmorningstar(
         penetration: 0.3
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdlmorningstar(high, low, close, penetration=penetration)
 
@@ -5869,13 +5764,12 @@ def cdlonneck(
     close: IntoExpr = pl.col("close"),
 ):
     """On-Neck Pattern (Pattern Recognition)
-    pl.col("open").ta.cdlonneck(pl.col("high"), pl.col("low"), pl.col("close"))
+    ta.cdlonneck('open', 'high', 'low', 'close')
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdlonneck(high, low, close)
 
@@ -5887,13 +5781,12 @@ def cdlpiercing(
     close: IntoExpr = pl.col("close"),
 ):
     """Piercing Pattern (Pattern Recognition)
-    pl.col("open").ta.cdlpiercing(pl.col("high"), pl.col("low"), pl.col("close"))
+    ta.cdlpiercing('open', 'high', 'low', 'close')
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdlpiercing(high, low, close)
 
@@ -5905,13 +5798,12 @@ def cdlrickshawman(
     close: IntoExpr = pl.col("close"),
 ):
     """Rickshaw Man (Pattern Recognition)
-    pl.col("open").ta.cdlrickshawman(pl.col("high"), pl.col("low"), pl.col("close"))
+    ta.cdlrickshawman('open', 'high', 'low', 'close')
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdlrickshawman(high, low, close)
 
@@ -5923,13 +5815,12 @@ def cdlrisefall3methods(
     close: IntoExpr = pl.col("close"),
 ):
     """Rising/Falling Three Methods (Pattern Recognition)
-    pl.col("open").ta.cdlrisefall3methods(pl.col("high"), pl.col("low"), pl.col("close"))
+    ta.cdlrisefall3methods('open', 'high', 'low', 'close')
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdlrisefall3methods(high, low, close)
 
@@ -5941,13 +5832,12 @@ def cdlseparatinglines(
     close: IntoExpr = pl.col("close"),
 ):
     """Separating Lines (Pattern Recognition)
-    pl.col("open").ta.cdlseparatinglines(pl.col("high"), pl.col("low"), pl.col("close"))
+    ta.cdlseparatinglines('open', 'high', 'low', 'close')
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdlseparatinglines(high, low, close)
 
@@ -5959,13 +5849,12 @@ def cdlshootingstar(
     close: IntoExpr = pl.col("close"),
 ):
     """Shooting Star (Pattern Recognition)
-    pl.col("open").ta.cdlshootingstar(pl.col("high"), pl.col("low"), pl.col("close"))
+    ta.cdlshootingstar('open', 'high', 'low', 'close')
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdlshootingstar(high, low, close)
 
@@ -5977,13 +5866,12 @@ def cdlshortline(
     close: IntoExpr = pl.col("close"),
 ):
     """Short Line Candle (Pattern Recognition)
-    pl.col("open").ta.cdlshortline(pl.col("high"), pl.col("low"), pl.col("close"))
+    ta.cdlshortline('open', 'high', 'low', 'close')
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdlshortline(high, low, close)
 
@@ -5995,13 +5883,12 @@ def cdlspinningtop(
     close: IntoExpr = pl.col("close"),
 ):
     """Spinning Top (Pattern Recognition)
-    pl.col("open").ta.cdlspinningtop(pl.col("high"), pl.col("low"), pl.col("close"))
+    ta.cdlspinningtop('open', 'high', 'low', 'close')
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdlspinningtop(high, low, close)
 
@@ -6013,13 +5900,12 @@ def cdlstalledpattern(
     close: IntoExpr = pl.col("close"),
 ):
     """Stalled Pattern (Pattern Recognition)
-    pl.col("open").ta.cdlstalledpattern(pl.col("high"), pl.col("low"), pl.col("close"))
+    ta.cdlstalledpattern('open', 'high', 'low', 'close')
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdlstalledpattern(high, low, close)
 
@@ -6031,13 +5917,12 @@ def cdlsticksandwich(
     close: IntoExpr = pl.col("close"),
 ):
     """Stick Sandwich (Pattern Recognition)
-    pl.col("open").ta.cdlsticksandwich(pl.col("high"), pl.col("low"), pl.col("close"))
+    ta.cdlsticksandwich('open', 'high', 'low', 'close')
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdlsticksandwich(high, low, close)
 
@@ -6049,13 +5934,12 @@ def cdltakuri(
     close: IntoExpr = pl.col("close"),
 ):
     """Takuri (Dragonfly Doji with very long lower shadow) (Pattern Recognition)
-    pl.col("open").ta.cdltakuri(pl.col("high"), pl.col("low"), pl.col("close"))
+    ta.cdltakuri('open', 'high', 'low', 'close')
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdltakuri(high, low, close)
 
@@ -6067,13 +5951,12 @@ def cdltasukigap(
     close: IntoExpr = pl.col("close"),
 ):
     """Tasuki Gap (Pattern Recognition)
-    pl.col("open").ta.cdltasukigap(pl.col("high"), pl.col("low"), pl.col("close"))
+    ta.cdltasukigap('open', 'high', 'low', 'close')
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdltasukigap(high, low, close)
 
@@ -6085,13 +5968,12 @@ def cdlthrusting(
     close: IntoExpr = pl.col("close"),
 ):
     """Thrusting Pattern (Pattern Recognition)
-    pl.col("open").ta.cdlthrusting(pl.col("high"), pl.col("low"), pl.col("close"))
+    ta.cdlthrusting('open', 'high', 'low', 'close')
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdlthrusting(high, low, close)
 
@@ -6103,13 +5985,12 @@ def cdltristar(
     close: IntoExpr = pl.col("close"),
 ):
     """Tristar Pattern (Pattern Recognition)
-    pl.col("open").ta.cdltristar(pl.col("high"), pl.col("low"), pl.col("close"))
+    ta.cdltristar('open', 'high', 'low', 'close')
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdltristar(high, low, close)
 
@@ -6121,13 +6002,12 @@ def cdlunique3river(
     close: IntoExpr = pl.col("close"),
 ):
     """Unique 3 River (Pattern Recognition)
-    pl.col("open").ta.cdlunique3river(pl.col("high"), pl.col("low"), pl.col("close"))
+    ta.cdlunique3river('open', 'high', 'low', 'close')
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdlunique3river(high, low, close)
 
@@ -6139,13 +6019,12 @@ def cdlupsidegap2crows(
     close: IntoExpr = pl.col("close"),
 ):
     """Upside Gap Two Crows (Pattern Recognition)
-    pl.col("open").ta.cdlupsidegap2crows(pl.col("high"), pl.col("low"), pl.col("close"))
+    ta.cdlupsidegap2crows('open', 'high', 'low', 'close')
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdlupsidegap2crows(high, low, close)
 
@@ -6157,13 +6036,12 @@ def cdlxsidegap3methods(
     close: IntoExpr = pl.col("close"),
 ):
     """Upside/Downside Gap Three Methods (Pattern Recognition)
-    pl.col("open").ta.cdlxsidegap3methods(pl.col("high"), pl.col("low"), pl.col("close"))
+    ta.cdlxsidegap3methods('open', 'high', 'low', 'close')
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
     Outputs:
         integer (values are -100, 0 or 100)
-
     """
     return parse_into_expr(open).ta.cdlxsidegap3methods(high, low, close)
 
@@ -6175,13 +6053,12 @@ def avgprice(
     close: IntoExpr = pl.col("close"),
 ):
     """Average Price
-    pl.col("open").ta.avgprice(pl.col("high"), pl.col("low"), pl.col("close"))
+    ta.avgprice('open', 'high', 'low', 'close')
 
     Inputs:
         prices: ['open', 'high', 'low', 'close']
     Outputs:
         avgprice
-
     """
     return parse_into_expr(open).ta.avgprice(high, low, close)
 
@@ -6191,13 +6068,12 @@ def medprice(
     low: IntoExpr = pl.col("low"),
 ):
     """Median Price
-    pl.col("high").ta.medprice(pl.col("low"))
+    ta.medprice('high', 'low')
 
     Inputs:
         prices: ['high', 'low']
     Outputs:
         medprice
-
     """
     return parse_into_expr(high).ta.medprice(low)
 
@@ -6208,13 +6084,12 @@ def typprice(
     close: IntoExpr = pl.col("close"),
 ):
     """Typical Price
-    pl.col("high").ta.typprice(pl.col("low"), pl.col("close"))
+    ta.typprice('high', 'low', 'close')
 
     Inputs:
         prices: ['high', 'low', 'close']
     Outputs:
         typprice
-
     """
     return parse_into_expr(high).ta.typprice(low, close)
 
@@ -6225,13 +6100,12 @@ def wclprice(
     close: IntoExpr = pl.col("close"),
 ):
     """Weighted Close Price
-    pl.col("high").ta.wclprice(pl.col("low"), pl.col("close"))
+    ta.wclprice('high', 'low', 'close')
 
     Inputs:
         prices: ['high', 'low', 'close']
     Outputs:
         wclprice
-
     """
     return parse_into_expr(close).ta.wclprice(high, low)
 
@@ -6242,7 +6116,7 @@ def beta(
     timeperiod: int = 5,
 ):
     """Beta
-    pl.col("high").ta.beta(pl.col("low"), timeperiod=5)
+    ta.beta('high', 'low', timeperiod=5)
 
     Inputs:
         prices: ['high', 'low']
@@ -6260,7 +6134,7 @@ def correl(
     timeperiod: int = 30,
 ):
     """Pearson's Correlation Coefficient (r)
-    pl.col("high").ta.correl(pl.col("low"), timeperiod=30)
+    ta.correl('high', 'low', timeperiod=30)
 
     Inputs:
         prices: ['high', 'low']
@@ -6277,7 +6151,7 @@ def linearreg(
     timeperiod: int = 14,
 ):
     """Linear Regression
-    pl.col("close").ta.linearreg(timeperiod=14)
+    ta.linearreg('close', timeperiod=14)
 
     Inputs:
         prices: ['close']
@@ -6294,7 +6168,7 @@ def linearreg_angle(
     timeperiod: int = 14,
 ):
     """Linear Regression Angle
-    pl.col("close").ta.linearreg_angle(timeperiod=14)
+    ta.linearreg_angle('close', timeperiod=14)
 
     Inputs:
         prices: ['close']
@@ -6311,7 +6185,7 @@ def linearreg_intercept(
     timeperiod: int = 14,
 ):
     """Linear Regression Intercept
-    pl.col("close").ta.linearreg_intercept(timeperiod=14)
+    ta.linearreg_intercept('close', timeperiod=14)
 
     Inputs:
         prices: ['close']
@@ -6328,7 +6202,7 @@ def linearreg_slope(
     timeperiod: int = 14,
 ):
     """Linear Regression Slope
-    pl.col("close").ta.linearreg_slope(timeperiod=14)
+    ta.linearreg_slope('close', timeperiod=14)
 
     Inputs:
         prices: ['close']
@@ -6346,7 +6220,7 @@ def stddev(
     nbdev: float = 1,
 ):
     """Standard Deviation
-    pl.col("close").ta.stddev(timeperiod=5, nbdev=1)
+    ta.stddev('close', timeperiod=5, nbdev=1.0)
 
     Inputs:
         prices: ['close']
@@ -6364,7 +6238,7 @@ def tsf(
     timeperiod: int = 14,
 ):
     """Time Series Forecast
-    pl.col("close").ta.tsf(timeperiod=14)
+    ta.tsf('close', timeperiod=14)
 
     Inputs:
         prices: ['close']
@@ -6382,7 +6256,7 @@ def var(
     nbdev: float = 1,
 ):
     """Variance
-    pl.col("close").ta.var(timeperiod=5, nbdev=1)
+    ta.var('close', timeperiod=5, nbdev=1.0)
 
     Inputs:
         prices: ['close']
@@ -6402,7 +6276,7 @@ def atr(
     timeperiod: int = 14,
 ):
     """Average True Range (Volatility Indicators)
-    pl.col("close").ta.atr(pl.col("high"), pl.col("low"), timeperiod=14)
+    ta.atr('high', 'low', 'close', timeperiod=14)
 
     Inputs:
         prices: ['high', 'low', 'close']
@@ -6421,7 +6295,7 @@ def natr(
     timeperiod: int = 14,
 ):
     """Normalized Average True Range (Volatility Indicators)
-    pl.col("close").ta.natr(pl.col("high"), pl.col("low"), timeperiod=14)
+    ta.natr('high', 'low', 'close', timeperiod=14)
 
     Inputs:
         prices: ['high', 'low', 'close']
@@ -6439,7 +6313,7 @@ def trange(
     close: IntoExpr = pl.col("close"),
 ):
     """True Range (Volatility Indicators)
-    pl.col("close").ta.trange(pl.col("high"), pl.col("low"))
+    ta.trange('high', 'low', 'close')
 
     Inputs:
         prices: ['high', 'low', 'close']
@@ -6456,7 +6330,7 @@ def ad(
     volume: IntoExpr = pl.col("volume"),
 ):
     """Chaikin A/D Line (Volume Indicators)
-    pl.col("close").ta.ad(pl.col("high"), pl.col("low"), pl.col("volume"))
+    ta.ad('high', 'low', 'close', 'volume')
 
     Inputs:
         prices: ['high', 'low', 'close', 'volume']
@@ -6475,7 +6349,7 @@ def adosc(
     slowperiod: int = 10,
 ):
     """Chaikin A/D Oscillator (Volume Indicators)
-    pl.col("close").ta.adosc(pl.col("high"), pl.col("low"), pl.col("volume"), fastperiod=3, slowperiod=10)
+    ta.adosc('high', 'low', 'close', 'volume', fastperiod=3, slowperiod=10)
 
     Inputs:
         prices: ['high', 'low', 'close', 'volume']
@@ -6493,7 +6367,7 @@ def obv(
     volume: IntoExpr = pl.col("volume"),
 ):
     """On Balance Volume (Volume Indicators)
-    pl.col("close").ta.obv(pl.col("volume"))
+    ta.obv('close', 'volume')
 
     Inputs:
         prices: ['close', 'volume']
