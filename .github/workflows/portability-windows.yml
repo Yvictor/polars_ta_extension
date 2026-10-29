@@ -1,0 +1,75 @@
+name: Windows portability regression
+
+on:
+  push:
+    branches: [codex/ci-portability]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  PYO3_USE_ABI3_FORWARD_COMPATIBILITY: '1'
+  CARGO_BUILD_JOBS: '4'
+  POLARS_MAX_THREADS: '4'
+
+jobs:
+  wheels:
+    name: Wheel / ${{ matrix.name }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {name: windows-x64, runner: windows-2025, target: x86_64-pc-windows-msvc, manylinux: 'off', python-arch: x64}
+          - {name: windows-arm64, runner: windows-11-arm, target: aarch64-pc-windows-msvc, manylinux: 'off', python-arch: arm64}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+          architecture: ${{ matrix.python-arch }}
+      - name: Verify frozen real-option fixture bytes
+        shell: python
+        run: |
+          import gzip, hashlib, json
+          from pathlib import Path
+          data = Path('tests/data')
+          reference = json.loads(gzip.decompress((data/'real-option-reference.json.gz').read_bytes()))
+          for name, key in [('real-option-manifest.json', 'manifest_sha256'), ('real-option-inputs.npz', 'input_sha256')]:
+              raw = (data/name).read_bytes()
+              actual = hashlib.sha256(raw).hexdigest()
+              assert actual == reference[key], (name, actual, reference[key])
+              print(name, actual, len(raw))
+          assert b'\r\n' not in (data/'real-option-manifest.json').read_bytes()
+      - uses: dtolnay/rust-toolchain@1.90.0
+        with:
+          components: rustfmt
+      - uses: astral-sh/setup-uv@v8.2.0
+      - name: Build self-contained release wheel
+        uses: PyO3/maturin-action@v1.46.0
+        with:
+          target: ${{ matrix.target }}
+          manylinux: ${{ matrix.manylinux }}
+          args: --release --locked --out dist
+          sccache: 'true'
+          rust-toolchain: '1.90.0'
+          # maturin-action installs sccache with python3; the container's
+          # system Python has no pip, unlike the manylinux interpreter.
+          before-script-linux: |
+            if test -x /opt/python/cp312-cp312/bin/python; then
+              export PATH=/opt/python/cp312-cp312/bin:$PATH
+            fi
+      - name: Test installed wheel (native)
+        if: ${{ !startsWith(matrix.name, 'musl-') }}
+        shell: bash
+        run: |
+          uv venv .wheel-test
+          uv pip install --python .wheel-test dist/*.whl 'polars==1.44.2' 'TA-Lib==0.8.1' numpy pytest pytest-benchmark
+          uv run --no-project --python .wheel-test python -m pytest tests --ignore=tests/test_bench.py -q
+          uv run --no-project --python .wheel-test python scripts/install_skill.py --agent codex --project .skill-test
+      - uses: actions/upload-artifact@v7
+        with:
+          name: wheels-${{ matrix.name }}
+          path: dist/*.whl
+          if-no-files-found: error
