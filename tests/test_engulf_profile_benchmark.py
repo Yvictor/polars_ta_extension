@@ -159,3 +159,21 @@ def test_real_measure_orchestration_runs_all_modes_orders_and_preserves_proof_be
         assert len(report['results'][f'{fixture}/{n}']['comparisons'])==6
     assert len(list((tmp_path/'children').glob('*-proof.json')))==432
     assert not list((tmp_path/'children').glob('*.bin'))
+
+
+def test_real_symlinked_venv_launcher_keeps_its_prefix_and_private_modules(tmp_path):
+    env=tmp_path/'isolated-venv'
+    subprocess.run([sys.executable,'-m','venv','--without-pip','--symlinks',str(env)],check=True)
+    python=env/'bin/python';assert python.is_symlink()
+    report='import json,sys,sysconfig;print(json.dumps({"prefix":sys.prefix,"purelib":sysconfig.get_path("purelib")}))'
+    initial=json.loads(subprocess.check_output([str(python),'-c',report],text=True))
+    assert Path(initial['prefix'])==env
+    Path(initial['purelib'],'engulf_venv_marker.py').write_text('MARKER = "venv-only"\n')
+    args=m.normalize_paths(SimpleNamespace(native_python=python,original_python=python,native_source=env/'bin/..'))
+    assert args.native_python==args.original_python==python.absolute() and args.native_source==env.resolve()
+    query='import json,sys,engulf_venv_marker;print(json.dumps({"prefix":sys.prefix,"marker":engulf_venv_marker.MARKER}))'
+    actual=json.loads(subprocess.check_output([str(args.native_python),'-c',query],text=True))
+    assert Path(actual['prefix'])==env and actual['marker']=='venv-only'
+    # The exact old normalization reproduces the missing-dependency failure.
+    broken=subprocess.run([str(python.resolve()),'-c',query],capture_output=True,text=True)
+    assert broken.returncode!=0 and 'ModuleNotFoundError' in broken.stderr

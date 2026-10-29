@@ -263,6 +263,15 @@ def measure(args,p,validation,env):
     (args.output/'summary.json').write_text(json.dumps(report,indent=2)+'\n')
 
 
+def normalize_paths(args):
+    for key,value in vars(args).copy().items():
+        if isinstance(value,Path):
+            # A venv is selected by its launcher path; following this symlink
+            # executes the base Python without the installed product/dependencies.
+            setattr(args,key,value.absolute() if key.endswith('_python') else value.resolve())
+    return args
+
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     for side in ('native','original'):
@@ -270,8 +279,7 @@ def main():
     for key in ('output','target-dir','wheel-dir'):parser.add_argument('--'+key,type=Path,required=True)
     mode=parser.add_mutually_exclusive_group(required=True);mode.add_argument('--snapshot-native',action='store_true');mode.add_argument('--build',action='store_true');mode.add_argument('--run',action='store_true')
     args=parser.parse_args()
-    for key,value in vars(args).copy().items():
-        if isinstance(value,Path):setattr(args,key,value.resolve())
+    normalize_paths(args)
     args.output.mkdir(parents=True,exist_ok=True)
     if args.snapshot_native:snapshot(args)
     elif args.build:build(args)
