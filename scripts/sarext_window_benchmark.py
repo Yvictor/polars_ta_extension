@@ -17,7 +17,7 @@ import tarfile
 import time
 
 BASELINE = 'ccd3172940ed1d9daa4e7197f2265810852e8910'
-CANDIDATE = 'UNSET_REVIEWED_SAREXT_CANDIDATE'
+CANDIDATE = 'da9dd99bc1780f569dfc24f35c09d4a25063162c'
 ORIGINAL = '62021c1d14ef5499505af5547384cab509adf3fc'
 ARMS = ('original', 'baseline', 'candidate')
 MODES = ('typed',)
