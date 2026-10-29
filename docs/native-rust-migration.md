@@ -184,7 +184,7 @@ golden query references are retained. One- and four-thread settings run sequenti
 same CPU affinity within each setting. There is no cross-runner comparison or
 reuse of local timing as a CI result.
 
-`migration_benchmark.py` covers twenty families plus the eight-function query:
+`migration_benchmark.py` covers twenty families plus a fixed-bound MAVP variant and the eight-function query:
 dense1k/1m rows; ordinary `.over()` with100×10k,1000×1000,10k×100 and interleaved
 2k×100 layouts. VAR/CORREL/CMOU are included to check the removed redundant scans.
 The one-thread diagnostic adds EMA/ATR at50k×20,10×100k and1×1m plus Polars-only
@@ -254,3 +254,20 @@ effect of this Rust1.90 Polars backport; the final three-build query CI measures
 that separately. Local exact checks cover period2703/2704,100000, IEEE values,
 output guards and ordinary native windows. The public API and missing-value
 contract are unchanged.
+
+## Normalized fixed-bound MAVP
+
+After the existing compatibility guard and validation, equal normalized minimum
+and maximum periods delegate directly to the official `Core::ma`. This is the
+scoped consumer form of [upstream563](https://github.com/TA-Lib/ta-lib/pull/563).
+All fourteen public MA modes keep their original lookback/start alignment and
+seeding; other MA compositions still use the pinned crate. Default sentinels
+are resolved before the equality check. The existing period-input alignment,
+null dependence, guarded large/nonfinite routes and initialized output padding
+remain in place. The shortcut removes internal period-vector preparation, not
+Polars casts, broadcasting or input classification.
+
+Seventy exact Core-oracle combinations include mixed default sentinels;84 public
+regressions cover all MA modes, direct/eager/lazy and native windows. Six explicit
+fixed-SMA workloads join the final query comparison; no consumer speedup is
+inferred from the separate upstream kernel experiment.

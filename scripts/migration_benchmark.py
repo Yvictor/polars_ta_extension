@@ -26,9 +26,11 @@ import polars_talib as ta
 
 
 FUNCTIONS = ('ema','rsi','macd','atr','adx','cci','stddev','ppo')
-FAMILY_FUNCTIONS = (*FUNCTIONS, 'add', 'minmaxindex', 'cdldoji', 'hma', 'supertrend', 'vwma', 'mavp', 'bbands', 'sarext', 'var', 'correl', 'cmou')
+FAMILY_CASES = (*FUNCTIONS, 'add', 'minmaxindex', 'cdldoji', 'hma', 'supertrend', 'vwma', 'mavp', 'bbands', 'sarext', 'var', 'correl', 'cmou', 'mavp_fixed')
 
 def indicator(name):
+    if name == 'mavp_fixed':
+        return ta.mavp(pl.col('close'), pl.col('periods'), minperiod=14, maxperiod=14)
     if name == 'mavp':
         return ta.mavp(pl.col('close'), pl.col('periods'))
     return getattr(ta, name)()
@@ -44,7 +46,7 @@ def frame(rows,bars):
 def case_specs(diagnostic=False):
     """Describe layouts without constructing frames or expressions."""
     for n in (1000, 1_000_000):
-        for f in FAMILY_FUNCTIONS:
+        for f in FAMILY_CASES:
             yield f'{f}/{n}', n, 1000, False, False, (f,)
         yield f'mix8/{n}', n, 1000, False, False, FUNCTIONS
         yield f'control_cumsum_dense/{n}', n, 1000, False, False, ()
@@ -52,7 +54,7 @@ def case_specs(diagnostic=False):
     if diagnostic:
         layouts += [(50000,20,False),(10,100000,False),(1,1000000,False)]
     for groups, bars, interleaved in layouts:
-        choices = tuple((f,) for f in FAMILY_FUNCTIONS)+(FUNCTIONS,) if bars in (100,1000,10000) else (('ema',),('atr',))
+        choices = tuple((f,) for f in FAMILY_CASES)+(FUNCTIONS,) if bars in (100,1000,10000) else (('ema',),('atr',))
         suffix = '_interleaved' if interleaved else ''
         for functions in choices:
             label = functions[0] if len(functions)==1 else 'mix8'

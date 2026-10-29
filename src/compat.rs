@@ -119,6 +119,30 @@ pub fn call(
             restore_native_prefix: false,
         });
     }
+    if id == MAVP {
+        let min = int(p, "minperiod", 2);
+        let max = int(p, "maxperiod", 30);
+        if min == max && (1..=10000).contains(&min) {
+            if let [Output::Real(out)] = outputs {
+                // Upstream fixed-bound shortcut (7f395b820): after the guard,
+                // normalized periods cannot affect this ordinary MA call.
+                let result = MAType::try_from(int(p, "matype", 0)).and_then(|ma| {
+                    crate::native::core().ma(
+                        0,
+                        input[0].len() - 1,
+                        input[0],
+                        min,
+                        ma,
+                        &mut out[offset..],
+                    )
+                });
+                return Some(CompatCall {
+                    result,
+                    restore_native_prefix: false,
+                });
+            }
+        }
+    }
     if id == MAVP
         && int(p, "matype", 0) == 0
         && (1..=10000).contains(&int(p, "minperiod", 2))
@@ -297,4 +321,71 @@ pub fn native_prefix(id: FuncId, input: &[&[f64]], p: &Params) -> Option<usize> 
             .iter()
             .any(|s| !s[row].is_finite() || (guarded && s[row].abs() > 1024.))
     })
+}
+
+#[cfg(test)]
+mod fixed_mavp_tests {
+    use super::*;
+    #[test]
+    fn ordinary_fixed_mavp_is_exact_for_every_public_ma_and_retains_tails() {
+        for mode in 0..=13 {
+            for (minimum, maximum, period) in [
+                (2, 2, 2),
+                (i32::MIN, 2, 2),
+                (30, i32::MIN, 30),
+                (14, 14, 14),
+                (128, 128, 128),
+            ] {
+                let price: Vec<_> = (0..2048).map(|i| 100. + (i % 19) as f64 / 100.).collect();
+                let periods: Vec<_> = (0..2048)
+                    .map(|i| [-100., -0., 3.75, 1024.][i % 4])
+                    .collect();
+                let mut params = Params::new();
+                params.insert("minperiod".into(), Param::Int(minimum));
+                params.insert("maxperiod".into(), Param::Int(maximum));
+                params.insert("matype".into(), Param::Int(mode));
+                let mut expected = vec![f64::NAN; 2048];
+                let range = crate::native::core()
+                    .mavp(
+                        0,
+                        2047,
+                        &price,
+                        &periods,
+                        minimum,
+                        maximum,
+                        MAType::try_from(mode).unwrap(),
+                        &mut expected,
+                    )
+                    .unwrap();
+                let mut output = [Output::Real(vec![f64::NAN; 2048])];
+                let call = super::call(
+                    FuncId::MAVP,
+                    &[&price, &periods],
+                    &params,
+                    &mut output,
+                    range.beg_idx,
+                )
+                .unwrap();
+                assert!(!call.restore_native_prefix);
+                let actual = call.result.unwrap();
+                assert_eq!((actual.beg_idx, actual.count), (range.beg_idx, range.count));
+                let Output::Real(values) = &output[0] else {
+                    unreachable!()
+                };
+                assert!(values[..range.beg_idx].iter().all(|x| x.is_nan()));
+                for (a, b) in values[range.beg_idx..range.beg_idx + range.count]
+                    .iter()
+                    .zip(&expected[..range.count])
+                {
+                    assert!(
+                        a.to_bits() == b.to_bits() || (a.is_nan() && b.is_nan()),
+                        "mode{mode}/p{period}"
+                    );
+                }
+                assert!(values[range.beg_idx + range.count..]
+                    .iter()
+                    .all(|x| x.is_nan()));
+            }
+        }
+    }
 }

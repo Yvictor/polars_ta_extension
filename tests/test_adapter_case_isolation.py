@@ -35,8 +35,8 @@ def test_workload_inventory_keeps_all_families_and_thread_diagnostics(modules):
     _, benchmark = modules
     standard = [row[0] for row in benchmark.case_specs(False)]
     diagnostic = [row[0] for row in benchmark.case_specs(True)]
-    assert len(standard) == len(set(standard)) == 132
-    assert len(diagnostic) == len(set(diagnostic)) == 141
+    assert len(standard) == len(set(standard)) == 138
+    assert len(diagnostic) == len(set(diagnostic)) == 147
     assert set(standard) < set(diagnostic)
     controller, _ = modules
     assert controller.requested_inventory(False, []) == standard

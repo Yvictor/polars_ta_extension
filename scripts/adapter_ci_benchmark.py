@@ -81,7 +81,7 @@ def analyze(runs, repeats, threads):
 def requested_inventory(diagnostic, filters):
     manifest = json.loads(Path(__file__).with_name('adapter_benchmark_cases.json').read_text())
     names = manifest['diagnostic' if diagnostic else 'standard']
-    if len(names) != (141 if diagnostic else 132) or len(set(names)) != len(names):
+    if len(names) != (147 if diagnostic else 138) or len(set(names)) != len(names):
         raise ValueError('reviewed workload manifest is incomplete or duplicated')
     return [name for name in names if not filters or any(fnmatch.fnmatchcase(name, p) for p in filters)]
 
