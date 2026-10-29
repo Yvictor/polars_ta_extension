@@ -1,0 +1,117 @@
+name: Paired output windows evidence
+
+on:
+  push:
+    branches: [codex/paired-windows-ci]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: paired-windows-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  RUSTUP_TOOLCHAIN: '1.97.0'
+  CARGO_BUILD_JOBS: '4'
+  RUSTFLAGS: ''
+  CARGO_ENCODED_RUSTFLAGS: ''
+  CARGO_PROFILE_RELEASE_DEBUG: 'false'
+  CARGO_PROFILE_RELEASE_LTO: thin
+  CARGO_PROFILE_RELEASE_CODEGEN_UNITS: '1'
+  OMP_NUM_THREADS: '1'
+  OPENBLAS_NUM_THREADS: '1'
+  MKL_NUM_THREADS: '1'
+
+jobs:
+  paired-windows:
+    name: Before / common stores / paired policy on one runner
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          path: control-source
+      - uses: actions/checkout@v6
+        with:
+          repository: Yvictor/ta-lib-native
+          ref: 5bb1c74b25248f37a0764bc6d07dd673b4749cc6
+          path: before
+      - uses: actions/checkout@v6
+        with:
+          repository: Yvictor/ta-lib-native
+          ref: 8fa1647ed03f253c0396c2951c6053c9c796c153
+          path: common
+      - uses: actions/checkout@v6
+        with:
+          repository: Yvictor/ta-lib-native
+          ref: ad75b44b97566594de7f37dcf28e0ee727e31f6c
+          path: paired
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - uses: dtolnay/rust-toolchain@1.97.0
+        with:
+          components: clippy,rustfmt
+      - name: Initialize immutable evidence and test the standalone controller
+        run: |
+          mkdir -p paired-windows-results
+          git -C control-source rev-parse HEAD > paired-windows-results/controller-commit.txt
+          cp control-source/scripts/paired_windows_benchmark.py control-source/scripts/bench_paired_windows.rs paired-windows-results/
+          cp control-source/.github/workflows/paired-windows.yml paired-windows-results/workflow.yml
+          python -m pip install cmake==4.4.4 numpy==2.5.3 pytest==8.4.2
+          python -m pip freeze > paired-windows-results/python-dependencies.txt
+          python -m pytest --noconftest control-source/tests/test_paired_windows_benchmark.py -q
+      - name: All three source arms pass full gates before any timing
+        run: |
+          set -euo pipefail
+          for side in before common paired; do
+            (
+              cd "$side"
+              python scripts/quiet.py noisy paired-ci --defer=60 -- python scripts/build.py regen-check
+              python scripts/quiet.py noisy paired-ci --defer=60 -- cargo test --locked --manifest-path ta_codegen/generator/Cargo.toml
+              python scripts/quiet.py noisy paired-ci --defer=60 -- cargo clippy --locked --all-targets --manifest-path ta_codegen/generator/Cargo.toml -- -D warnings
+              python scripts/quiet.py noisy paired-ci --defer=60 -- cargo test --locked -p ta-lib --manifest-path ta_codegen/output/rust/Cargo.toml
+              python scripts/quiet.py noisy paired-ci --defer=60 -- cargo clippy --locked -p ta-lib --all-targets --manifest-path ta_codegen/output/rust/Cargo.toml -- -D warnings
+              python scripts/quiet.py noisy paired-ci --defer=60 -- python scripts/build.py servers --language=c,rust --jobs 4
+              (cd bin && python ../scripts/quiet.py noisy paired-ci --defer=60 -- ./ta_regtest --codegen --language=c,rust)
+              git diff --exit-code
+            ) > "paired-windows-results/$side-source-gates.log" 2>&1
+            git -C "$side" archive --format=tar HEAD | gzip -n > "paired-windows-results/$side-source.tar.gz"
+          done
+      - name: Build all three portable release libraries and identical selected-case harnesses
+        run: |
+          python paired/scripts/quiet.py noisy paired-ci --defer=60 -- python control-source/scripts/paired_windows_benchmark.py \
+            --before-source before --common-source common --paired-source paired \
+            --output paired-windows-results --build-only
+          lscpu > paired-windows-results/lscpu.txt
+          cat /proc/meminfo > paired-windows-results/meminfo.txt
+      - name: Exact full captures first then 1008 isolated selected-case children
+        run: |
+          python paired/scripts/quiet.py measure paired-ci 900 --queue=300 -- python control-source/scripts/paired_windows_benchmark.py \
+            --before-source before --common-source common --paired-source paired --output paired-windows-results
+          cat paired-windows-results/comparison.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Compress raw goldens and full captures after timing
+        if: always()
+        run: |
+          python - <<'PY'
+          import gzip
+          import shutil
+          from pathlib import Path
+          for directory in ('captures', 'goldens'):
+              for path in Path('paired-windows-results', directory).glob('*.bin'):
+                  with path.open('rb') as source, gzip.open(str(path) + '.gz', 'wb') as target:
+                      shutil.copyfileobj(source, target)
+                  path.unlink()
+          PY
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: paired-output-window-evidence
+          path: |
+            paired-windows-results/
+            !paired-windows-results/target-before/**
+            !paired-windows-results/target-common/**
+            !paired-windows-results/target-paired/**
+          if-no-files-found: error
