@@ -106,9 +106,9 @@ class IEEEProtocol(unittest.TestCase):
   text=self.log();line=next(l for l in text.splitlines()if l.startswith('IEEE_NAN_DIFF'))
   for bad in (text+line+'\n',text.replace('shape=2 start=0 end=63 index=16','shape=1 start=0 end=63 index=16'),text.replace('nan_bit_differences=1\n','nan_bit_differences=0\n')):
    with self.assertRaises(AssertionError):s.parse_ieee(bad)
- def test_option_observation_c_success_and_raw_bits_preserved(self):
+ def test_unexpected_option_c_success_fails_before_timing(self):
   text=self.log();line=next(l for l in text.splitlines()if l.startswith('OPTION_C_RESULT'));new=line.replace('code=2 beg=0 count=0','code=0 beg=1 count=63');new=new[:new.index('raw_bits=')+9]+json.dumps([0]*63+[s.CANARY]*9)
-  p=s.parse_ieee(text.replace(line,new));self.assertEqual(sum(r['c_code']==0 for r in p['nonfinite_options']),1)
+  with self.assertRaises(AssertionError):s.parse_ieee(text.replace(line,new))
  def test_option_inventory_duplicates_and_canary_payload_rejected(self):
   text=self.log();line=next(l for l in text.splitlines()if l.startswith('OPTION_C_RESULT'))
   for bad in (text+line+'\n',text.replace(line+'\n','',1),text.replace(str(s.CANARY),str(0x7ff8000000000000),1)):
@@ -132,5 +132,22 @@ class RuntimeBinding(unittest.TestCase):
    with self.assertRaises(AssertionError):s.by_fingerprint(t,'talib',123)
    p.with_suffix('').write_text('7b')
    with self.assertRaises(AssertionError):s.by_fingerprint(t,'talib',123)
+
+
+
+class TimeoutEvidence(unittest.TestCase):
+ def test_timeout_preserves_partial_stdout_stderr_before_raising(self):
+  from unittest.mock import patch
+  for stdout,stderr in ((b'partial stdout\xff',b'partial stderr'),('text stdout','text stderr'),(None,None)):
+   with tempfile.TemporaryDirectory()as d:
+    stem=Path(d)/'child';error=s.subprocess.TimeoutExpired(['probe','selected'],1,output=stdout,stderr=stderr)
+    with patch.object(s.subprocess,'run',side_effect=error):
+     with self.assertRaises(s.subprocess.TimeoutExpired):s.execute(['probe','selected'],stem,{},timeout=1)
+    def decoded(value):return value.decode(errors='replace')if isinstance(value,bytes)else(value or '')
+    self.assertEqual(Path(str(stem)+'.stdout').read_text(),decoded(stdout));self.assertEqual(Path(str(stem)+'.stderr').read_text(),decoded(stderr));self.assertTrue(json.loads(Path(str(stem)+'-failure.json').read_text())['timed_out'])
+ def test_other_option_status_or_shape_fails(self):
+  text=IEEEProtocol().log()
+  for bad in (text.replace('code=2 beg=0 count=0','code=3 beg=0 count=0',1),text.replace('code=2 beg=0 count=0','code=2 beg=1 count=0',1),text.replace('code=2 beg=0 count=0','code=2 beg=0 count=1',1)):
+   with self.assertRaises(AssertionError):s.parse_ieee(bad)
 
 if __name__=='__main__':unittest.main()

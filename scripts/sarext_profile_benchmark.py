@@ -179,7 +179,7 @@ def parse_ieee(text):
     for profile,opt,value,code,beg,count,bits in options:
         opt,code,beg,count=map(int,(opt,code,beg,count));key=(profile,opt,value);assert key in expected_options and key not in option_rows
         raw=json.loads(bits);assert len(raw)==72 and all(type(v)is int and 0<=v<2**64 for v in raw)
-        assert (beg,count)==((1,63)if code==0 else(0,0));assert raw[count:]==[CANARY]*(72-count)
+        assert (code,beg,count)==(2,0,0);assert raw==[CANARY]*72
         option_rows[key]={'pstart_bits':profile,'option_index':opt,'option_name':KEYS[opt],'value_bits':value,'c_code':code,'beg':beg,'count':count,'core_code':'BadParam','raw_output_bits':raw}
     assert set(option_rows)==expected_options
     return {'policy':'NaN positions equal; finite/signed-zero/infinity bits exact; both physical tails raw canary; Core-to-full all bits exact','comparisons':list(rows.values()),'full_raw_exact':20,'invalid_no_writes':68,'nan_bit_differences':records,'nonfinite_options':list(option_rows.values())}
@@ -303,7 +303,9 @@ def execute(cmd,stem,env,timeout=30):
     Path(str(stem)+'-command.json').write_text(json.dumps(cmd,indent=2)+'\n');before=resource.getrusage(resource.RUSAGE_CHILDREN)
     try:r=subprocess.run(cmd,env=env,capture_output=True,text=True,timeout=timeout)
     except subprocess.TimeoutExpired as e:
-        Path(str(stem)+'-failure.json').write_text(json.dumps({'timeout':timeout,'command':cmd}));raise
+        def decoded(value):return value.decode(errors='replace') if isinstance(value,bytes) else (value or '')
+        Path(str(stem)+'.stdout').write_text(decoded(e.stdout));Path(str(stem)+'.stderr').write_text(decoded(e.stderr))
+        Path(str(stem)+'-failure.json').write_text(json.dumps({'timed_out':True,'timeout':timeout,'command':cmd},indent=2)+'\n');raise
     after=resource.getrusage(resource.RUSAGE_CHILDREN);Path(str(stem)+'.stdout').write_text(r.stdout);Path(str(stem)+'.stderr').write_text(r.stderr);r.check_returncode()
     return r.stdout,{'minor':after.ru_minflt-before.ru_minflt,'major':after.ru_majflt-before.ru_majflt}
 

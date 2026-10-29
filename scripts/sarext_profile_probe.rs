@@ -721,6 +721,7 @@ fn ieee_contracts() {
     metadata();
     let mut comparisons = 0;
     let mut nan_differences = 0;
+    let mut c_option_failures = 0;
     let mut full_checks = 0;
     let mut errors = 0;
     for p in [
@@ -791,14 +792,11 @@ fn ieee_contracts() {
                 assert!(out.iter().all(|v| v.to_bits() == CANARY));
                 let mut c_out = vec![f64::from_bits(CANARY); 72];
                 let (code, beg, count) = c_raw(&[101.; 64], &[99.; 64], &bad, 0, 63, &mut c_out);
-                if code == 0 {
-                    assert_eq!((beg, count), (1, 63));
-                } else {
-                    assert_eq!((beg, count), (0, 0));
-                }
-                assert!(c_out[count..].iter().all(|v| v.to_bits() == CANARY));
                 let bits = c_out.iter().map(|v| v.to_bits()).collect::<Vec<_>>();
                 println!("OPTION_C_RESULT pstart={:016x} option={i} value_bits={:016x} code={code} beg={beg} count={count} core=BadParam raw_bits={bits:?}",p[0].to_bits(),value.to_bits());
+                if (code, beg, count) != (2, 0, 0) || !c_out.iter().all(|v| v.to_bits() == CANARY) {
+                    c_option_failures += 1;
+                }
                 errors += 1;
             }
         }
@@ -820,6 +818,7 @@ fn ieee_contracts() {
         }
     }
     assert_eq!((comparisons, full_checks, errors), (100, 20, 68));
+    assert_eq!(c_option_failures,0,"pinned C081 nonfinite-option status/no-write mismatch; all48 raw C observations retained above");
     println!("IEEE_CONTRACTS comparisons={comparisons} full={full_checks} invalid_no_writes={errors} nan_bit_differences={nan_differences} policy=nan_positions_other_bits_exact nonfinite_options_observed=48");
 }
 
