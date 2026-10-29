@@ -315,6 +315,16 @@ def test_managed_library_and_source_gates_precede_every_timer():
     proof=m.managed_runtime_proof(log)
     assert proof['matrix_minimum_checks']==1345 and proof['java_batch_checks']==1494
     assert proof['csharp_net10_suite_executed']
+    # Observed adjacent order in CI84c managed-libraries.log lines37-38.
+    archived_java = ('BatchApiTest: ALL PASS (183 checks)\n'
+                     '  Running Java BatchApiTest (on the jar)... OK\n')
+    csharp = log[log.index('Running C# tests'):]
+    with pytest.raises(ValueError):m.managed_runtime_proof(archived_java+csharp)
+    raised_matrix = archived_java.replace('(183 checks)','(1494 checks)')
+    assert m.managed_runtime_proof(raised_matrix+csharp)['java_batch_checks']==1494
+    for bad in [raised_matrix+raised_matrix+csharp,
+                raised_matrix.replace('\n  Running','\nUnrelated suite output\n  Running')+csharp]:
+        with pytest.raises(ValueError):m.managed_runtime_proof(bad)
     for bad in [log.replace('1494','149'),log.replace('BatchApiTest: ALL PASS','BatchApiTest compiled'),
                 log.replace('net10.0','net9.0'),log.replace('Running Java BatchApiTest','Built Java BatchApiTest'),
                 log.replace('All 11 C# suite(s) passed.','SKIPPED no runtime')]:

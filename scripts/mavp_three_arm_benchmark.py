@@ -50,17 +50,20 @@ FLAGS = {'RUSTFLAGS':'', 'CARGO_ENCODED_RUSTFLAGS':'', 'CARGO_PROFILE_RELEASE_LT
 
 
 def managed_runtime_proof(text):
-    java = re.search(r'Running Java BatchApiTest \(on the jar\)\.\.\.\s*BatchApiTest: ALL PASS \((\d+) checks\)\s*OK', text)
+    java_marker = r'Running Java BatchApiTest \(on the jar\)\.\.\.'
+    java_success = r'BatchApiTest: ALL PASS \((\d+) checks\)'
+    java_counts = (re.findall(java_marker + r'\s*' + java_success + r'\s*OK', text)
+                   + re.findall(java_success + r'\s*' + java_marker + r'\s*OK', text))
     csharp = re.search(r'Running C# tests \(net10\.0\)\.\.\.\s*TALib C# tests on \.NET 10[^\n]*\n(.*?)All \d+ C# suite\(s\) passed\.', text, re.S)
-    if java is None or csharp is None or 'SKIPPED' in csharp.group(0):
+    if len(re.findall(java_marker, text)) != 1 or len(java_counts) != 1 or csharp is None or 'SKIPPED' in csharp.group(0):
         raise ValueError('actual Java and net10.0 C# BatchApiTest execution is required')
     cs_counts = re.findall(r'BatchApiTest: ALL PASS \((\d+) checks\)', csharp.group(1))
     if len(cs_counts) != 1:
         raise ValueError('exactly one successful C# BatchApiTest runtime result required')
     # The immutable candidate calls the guard matrix before either success line:
-    # three checks each for352 rejected and96 defaulted calls, plus reach.
+    # three checks each for 352 rejected and 96 defaulted calls, plus reach.
     matrix_floor = 3 * (352 + 96) + 1
-    counts = {'java_batch_checks': int(java.group(1)), 'csharp_batch_checks': int(cs_counts[0])}
+    counts = {'java_batch_checks': int(java_counts[0]), 'csharp_batch_checks': int(cs_counts[0])}
     if any(value < matrix_floor for value in counts.values()):
         raise ValueError('BatchApiTest did not reach the MAVP guard-matrix check floor')
     return {**counts, 'matrix_minimum_checks': matrix_floor,
