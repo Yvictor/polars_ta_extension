@@ -5,6 +5,7 @@
 use ta_lib::{Core, MAType, OutRange, RetCode};
 mod cmou;
 mod correl;
+mod engulf;
 mod hma;
 mod mavp;
 mod mavp_sma;
@@ -106,6 +107,22 @@ pub fn call(
             result,
             restore_native_prefix: true,
         });
+    }
+    if let (CDLENGULFING, [Output::Integer(out)]) = (id, &mut *outputs) {
+        if let [open, high, low, close] = input {
+            if let Some(range) = engulf::try_call(
+                0,
+                open.len().checked_sub(1)?,
+                [open, high, low, close],
+                out.get_mut(offset..)?,
+            ) {
+                return Some(CompatCall {
+                    result: Ok(range),
+                    restore_native_prefix: false,
+                });
+            }
+        }
+        return None;
     }
     if let (HMA, [Output::Real(out)]) = (id, &mut *outputs) {
         return Some(CompatCall {
