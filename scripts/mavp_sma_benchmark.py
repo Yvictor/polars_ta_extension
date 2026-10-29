@@ -30,7 +30,7 @@ LABELS = {'original':'Original C', 'prior':'Native56 control', 'candidate':'MAVP
 MANIFEST = Path(__file__).with_name('mavp_sma_cases.json')
 CASES = tuple(json.loads(MANIFEST.read_text())['cases'])
 CHECKED_VALUES = 23_200_000
-CANDIDATE_COMMIT = "UNSET_CANDIDATE_MAVP_ZIP"
+CANDIDATE_COMMIT = "5bb6c66498794221804a76a1fd84af9501157a3f"
 CHILD_TIMEOUT_SECONDS = 120
 MEASUREMENT_BUDGET_SECONDS = 5400
 from mavp_sma_provenance import sha256, source_record, identity, wheel_record, flags_record, validate_identities, elf_record
