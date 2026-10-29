@@ -1,0 +1,13 @@
+{
+  "candidate_commit": "98d933f2e027458e1f87d6847d199f59e13c041c",
+  "initialization_commit": "1cf188bf417bc842a9c6227bb833542b7914d24e",
+  "initialization_parent": "98d933f2e027458e1f87d6847d199f59e13c041c",
+  "changed_paths": [
+    "src/compat/guarded.rs"
+  ],
+  "candidate_guard_sha256": "c97050fd79fcf0a64864730f0f7a28a63c987ca03f24156461ca82d827bf8039",
+  "initialization_guard_sha256": "bc928ae6063da862ae33e77c1a1b739f2df2098d9016b0c4dccbdbcc967fc910",
+  "patch_sha256": "58a5ad65c152bc79224011fa61be7cbccb59e1f7ca1a82be243d2fa5fed3c5fe",
+  "git_diff_sha256": "2bccb2f10a4689cbad0fa2207577830871ae648c4bfe23f95ea9c1404a6327da",
+  "description": "Immutable init-only commit derived from fused; exact same eligibility/token/capacity and constant NaN fill THEN has_trigger once. CI checks source/diff; no patch is applied during CI."
+}
