@@ -1,0 +1,66 @@
+{
+  "description": "SAREXT typed/zero compatibility four-arm A/B comparison. All 14 timed cases retain strict C-target zero signs; known baseline short-zero correction is an explicit separate untimed regression.",
+  "cases": [
+    "sarext/1000000",
+    "grouped_sarext/100x10000",
+    "grouped_sarext/10000x100",
+    "grouped_sarext/2000x100_interleaved",
+    "sarext_reversal/1000000",
+    "grouped_sarext_reversal/100x10000",
+    "grouped_sarext_reversal/10000x100",
+    "grouped_sarext_reversal/2000x100_interleaved",
+    "sarext_longzero/1000000",
+    "grouped_sarext_longzero/10000x100",
+    "sar/1000000",
+    "grouped_sar/10000x100",
+    "control_cumsum_dense/1000000",
+    "control_cumsum/10000x100"
+  ],
+  "integer_families": [],
+  "checked_values": 12400000,
+  "timed_children": 1344,
+  "timed_samples": 41664,
+  "physical_fixture_layouts": 10,
+  "profiles": {
+    "default": {},
+    "reversal": {
+      "startvalue": -101.0,
+      "offsetonreverse": 0.05,
+      "accelerationinitlong": 0.03,
+      "accelerationlong": 0.04,
+      "accelerationmaxlong": 0.3,
+      "accelerationinitshort": 0.025,
+      "accelerationshort": 0.035,
+      "accelerationmaxshort": 0.25
+    },
+    "longzero": {}
+  },
+  "case_roles": {
+    "sarext/1000000": "ordinary_sarext_no_negative_zero",
+    "grouped_sarext/100x10000": "ordinary_sarext_no_negative_zero",
+    "grouped_sarext/10000x100": "ordinary_sarext_no_negative_zero",
+    "grouped_sarext/2000x100_interleaved": "ordinary_sarext_no_negative_zero",
+    "sarext_reversal/1000000": "ordinary_sarext_no_negative_zero",
+    "grouped_sarext_reversal/100x10000": "ordinary_sarext_no_negative_zero",
+    "grouped_sarext_reversal/10000x100": "ordinary_sarext_no_negative_zero",
+    "grouped_sarext_reversal/2000x100_interleaved": "ordinary_sarext_no_negative_zero",
+    "sarext_longzero/1000000": "legitimate_long_zero_replay_stress",
+    "grouped_sarext_longzero/10000x100": "legitimate_long_zero_replay_stress",
+    "sar/1000000": "shared_generic_preparation_control",
+    "grouped_sar/10000x100": "shared_generic_preparation_control",
+    "control_cumsum_dense/1000000": "pure_polars_drift_control",
+    "control_cumsum/10000x100": "pure_polars_drift_control"
+  },
+  "fixtures": {
+    "default": "Seed260126 finite market high=close+1 low=close-1.",
+    "reversal": "Per-chronological-group cycle [100,110,90,115,85,120,80,100], high=center+1 low=center-1; reset BEFORE interleaving. Audited diagnostic nondefault eight-option profile.",
+    "longzero": "Per-chronological-group high=within+2; low=within with row0 bitwise -0. Reset BEFORE any interleaving; assert written -0 in every group.",
+    "sar": "Generic SAR on same physical market frames, shares preparation refactor but not typed SAREXT route.",
+    "cumsum": "Pure Polars cum_sum and ordinary .over, no TA call."
+  },
+  "policy": {
+    "C": "finite rtol=atol=1e-10; strict zeros/signs/null/NaN/Inf positions; raw bit deltas diagnostic",
+    "native": "exact finite and signed zero; NaN payload deltas retained separately",
+    "untimed_short_zero": "C and A/B must agree, original56 has recorded known sign difference; never a timing/corpus waiver"
+  }
+}

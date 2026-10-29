@@ -1,0 +1,160 @@
+name: SAREXT typed dispatch and C zero compatibility
+
+on:
+  push:
+    branches: [codex/sarext-typed-ci]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sarext-typed-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  PYO3_USE_ABI3_FORWARD_COMPATIBILITY: '1'
+  RUSTUP_TOOLCHAIN: '1.90.0'
+  CARGO_BUILD_JOBS: '4'
+  CARGO_TERM_COLOR: 'never'
+  CARGO_PROFILE_RELEASE_DEBUG: 'false'
+  CARGO_PROFILE_RELEASE_OPT_LEVEL: '3'
+  CARGO_PROFILE_RELEASE_LTO: 'false'
+  CARGO_PROFILE_RELEASE_CODEGEN_UNITS: '16'
+  CARGO_TARGET_DIR: ${{ github.workspace }}/sarext-target
+  CARGO_BUILD_BUILD_DIR: ${{ github.workspace }}/sarext-target
+  CFLAGS: ''
+  CXXFLAGS: ''
+  RUSTFLAGS: ''
+  CARGO_ENCODED_RUSTFLAGS: ''
+  CMAKE: ${{ github.workspace }}/envs/prior/bin/cmake
+  POLARS_MAX_THREADS: '4'
+  PRIOR_COMMIT: 56f6d5fb139031c20d86d7e818e7d267eb834295
+  ALTERNATIVE_COMMIT: f7d800398ecd6dc79c5b346e7e151cf917272327
+  CANDIDATE_COMMIT: 8a4fc7feacc45b28929b2e7e6d1ae9919623bd2b
+  ORIGINAL_COMMIT: b2bbc26d41ec80823c8bffb0cc436a97f29911cc
+
+jobs:
+  focused-sarext-typed:
+    name: Original C / Frozen56 / A typed Core / B compatibility dispatch
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          path: control-source
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12.15'
+      - name: Preserve controller and require immutable product pins
+        run: |
+          mkdir -p sarext-results/controller
+          cp control-source/scripts/sarext_typed* control-source/scripts/migration_probe.py control-source/scripts/migration_ci_benchmark.py control-source/scripts/api.json sarext-results/controller/
+          cp control-source/.github/workflows/sarext-typed.yml sarext-results/workflow.yml
+          git -C control-source rev-parse HEAD > sarext-results/controller-commit.txt
+          python - <<'PY'
+          import os,re
+          for key in ('ORIGINAL_COMMIT','PRIOR_COMMIT','ALTERNATIVE_COMMIT','CANDIDATE_COMMIT'):
+              if not re.fullmatch('[0-9a-f]{40}',os.environ[key]):
+                  raise SystemExit(key+' must be frozen before this workflow can run')
+          if len({os.environ[k] for k in ('ORIGINAL_COMMIT','PRIOR_COMMIT','ALTERNATIVE_COMMIT','CANDIDATE_COMMIT')}) != 4:
+              raise SystemExit('four distinct immutable source pins are required')
+          PY
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ env.PRIOR_COMMIT }}
+          path: sources/prior
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ env.CANDIDATE_COMMIT }}
+          path: sources/candidate
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ env.ORIGINAL_COMMIT }}
+          path: sources/original
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ env.ALTERNATIVE_COMMIT }}
+          path: sources/alternative
+          fetch-depth: 2
+      - uses: dtolnay/rust-toolchain@1.90.0
+      - uses: astral-sh/setup-uv@v8.2.0
+      - name: Build four portable wheels and preserve actual wheel-time Cargo fingerprints
+        run: |
+          mkdir -p wheels
+          for side in prior alternative candidate original; do
+            uv venv --python 3.12.15 "envs/$side"
+            uv pip install --python "envs/$side" 'maturin==1.15.0' 'cmake==4.4.4' 'polars==1.44.2' 'numpy==2.5.3' pytest
+            mkdir -p "wheels/$side"
+            python -c 'import json,sys; print(json.dumps({"side":sys.argv[1],"command":sys.argv[2:]}))' "$side" "$PWD/envs/$side/bin/python" -m maturin build --release --locked --interpreter "$PWD/envs/$side/bin/python" --out "$PWD/wheels/$side" >> sarext-results/build-commands.jsonl
+            # Force the product crate to recompile even if a shared Cargo cache saw newer source mtimes.
+            # Only mtime changes; immutable source bytes and Git cleanliness are checked later.
+            touch "sources/$side/src/lib.rs"
+            (cd "sources/$side" && "$GITHUB_WORKSPACE/envs/$side/bin/python" -m maturin build --release --locked --interpreter "$GITHUB_WORKSPACE/envs/$side/bin/python" --out "$GITHUB_WORKSPACE/wheels/$side") > "sarext-results/$side-build.log" 2>&1
+            python control-source/scripts/sarext_typed_provenance.py \
+              --compile-log "sarext-results/$side-build.log" --source "sources/$side" >> sarext-results/product-compile-proof.jsonl
+            uv pip install --python "envs/$side" --no-deps "wheels/$side/"*.whl
+            uv pip freeze --python "envs/$side" > "sarext-results/$side-dependencies.txt"
+            mkdir -p "sarext-results/product-fingerprints/$side"
+            cp -a "$CARGO_TARGET_DIR/release/.fingerprint/." "sarext-results/product-fingerprints/$side/"
+          done
+          rustc --version --verbose > sarext-results/toolchain.txt
+          cc --version >> sarext-results/toolchain.txt
+          "$CMAKE" --version >> sarext-results/toolchain.txt
+          lscpu > sarext-results/lscpu.txt
+          cat /proc/meminfo > sarext-results/meminfo.txt
+          df -h > sarext-results/disk-after-build.txt
+          du -sh "$CARGO_TARGET_DIR" wheels >> sarext-results/disk-after-build.txt
+      - name: Define fixed campaign arguments
+        run: |
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          args=[]
+          for side in ('original','prior','candidate','alternative'):
+              args += ['--'+side+'-python','envs/'+side+'/bin/python','--'+side+'-source','sources/'+side]
+          args += ['--alternative-commit',os.environ['ALTERNATIVE_COMMIT'],'--candidate-commit',os.environ['CANDIDATE_COMMIT'],'--wheel-dir','wheels','--output','sarext-results']
+          Path('sarext-results/arguments.json').write_text(json.dumps(args))
+          PY
+          cat > run-sarext-campaign.py <<'PY'
+          import json,subprocess,sys
+          args=json.load(open('sarext-results/arguments.json'))
+          subprocess.run(['envs/prior/bin/python','control-source/scripts/'+sys.argv[1],*args,*sys.argv[2:]],check=True)
+          PY
+      - name: Controller protocol gates and native contracts
+        run: |
+          envs/prior/bin/python -m pytest --noconftest control-source/tests/test_sarext_typed_*.py -q
+          python run-sarext-campaign.py sarext_typed_benchmark.py --record-build
+          PYO3_PYTHON="$GITHUB_WORKSPACE/envs/alternative/bin/python" cargo test --release --locked --lib --manifest-path sources/alternative/Cargo.toml -- --list > sarext-results/B-test-inventory.log 2>&1
+          python - <<'PYCODE'
+          from pathlib import Path
+          name='sarext_legacy::tests::cold_parallel_dispatch_matches_portable_scalar_without_shared_mutable_inputs'
+          if name+': test' not in Path('sarext-results/B-test-inventory.log').read_text().splitlines():
+              raise SystemExit('published B is missing the exact cold resolver test')
+          PYCODE
+          PYO3_PYTHON="$GITHUB_WORKSPACE/envs/alternative/bin/python" cargo test --release --locked --lib --manifest-path sources/alternative/Cargo.toml sarext_legacy::tests::cold_parallel_dispatch_matches_portable_scalar_without_shared_mutable_inputs -- --exact --nocapture --test-threads=1 > sarext-results/B-cold-dispatch-first.log 2>&1
+          python control-source/scripts/sarext_typed_provenance.py --cold-log sarext-results/B-cold-dispatch-first.log --cold-list sarext-results/B-test-inventory.log > sarext-results/B-cold-dispatch-proof.json
+          for side in prior alternative candidate; do
+            PYO3_PYTHON="$GITHUB_WORKSPACE/envs/$side/bin/python" cargo test --release --lib --locked --manifest-path "sources/$side/Cargo.toml" > "sarext-results/$side-rust-tests.log" 2>&1
+          done
+      - name: Full 10624-case corpus and both thread-setting exact56 goldens before timers
+        run: python run-sarext-campaign.py sarext_typed_benchmark.py --validate-only
+      - name: Actual normal-product SAREXT FMA clone, portable fallback and resolver evidence
+        run: envs/prior/bin/python control-source/scripts/sarext_typed_elf.py --output sarext-results
+      - name: Twelve balanced Williams fresh-single-case rounds at one and four threads
+        run: |
+          python run-sarext-campaign.py sarext_typed_benchmark.py
+          cat sarext-results/comparison.md >> "$GITHUB_STEP_SUMMARY"
+          cat sarext-results/negative-cases.md >> "$GITHUB_STEP_SUMMARY"
+          cat sarext-results/replay-stress.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: sarext-typed-zero-compatibility-evidence
+          include-hidden-files: true
+          path: |
+            sarext-results/
+            wheels/
+            sarext-target/release/build/talib-sys-*/out/lib/libta-lib.a
+            sarext-target/release/build/jemalloc-sys-*/out/lib/*.a
+          if-no-files-found: error
