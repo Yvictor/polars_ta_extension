@@ -109,8 +109,10 @@ pub fn call(
             30
         },
     );
-    let needs_nonfinite = matches!(id, CMOU | PERCENTILE | VAR | STDDEV | CORREL);
-    let nonfinite = needs_nonfinite && input.iter().any(|s| s.iter().any(|v| !v.is_finite()));
+    // Guarded dispatch above already handles every nonfinite VAR/STDDEV/
+    // CORREL call with the generated output arity. CMOU always uses the legacy
+    // path below. Only PERCENTILE needs another nonfinite classification.
+    let nonfinite = id == PERCENTILE && input.iter().any(|s| s.iter().any(|v| !v.is_finite()));
     Some(match (id, outputs) {
         (RSI, [Output::Real(out)]) => LEGACY.rsi(0, end, input[0], period, &mut out[offset..]),
         (STOCHRSI, [Output::Real(k), Output::Real(d)]) => LEGACY.stochrsi(
@@ -152,26 +154,6 @@ pub fn call(
         ),
         (PERCENTRANK, [Output::Real(out)]) if period > 10000 => {
             LEGACY.percentrank(0, end, input[0], period, &mut out[offset..])
-        }
-        (VAR, [Output::Real(out)]) if nonfinite => LEGACY.var(
-            0,
-            end,
-            input[0],
-            period,
-            real(p, "nbdev", 1.),
-            &mut out[offset..],
-        ),
-        (STDDEV, [Output::Real(out)]) if nonfinite => LEGACY
-            .var(0, end, input[0], period, 1., &mut out[offset..])
-            .map(|range| {
-                let scale = real(p, "nbdev", 1.);
-                for v in &mut out[offset..offset + range.count] {
-                    *v = v.sqrt() * scale;
-                }
-                range
-            }),
-        (CORREL, [Output::Real(out)]) if nonfinite => {
-            LEGACY.correl(0, end, input[0], input[1], period, &mut out[offset..])
         }
         (MAVP, [Output::Real(out)])
             if int(p, "maxperiod", 30) > 10000 || int(p, "minperiod", 2) > 10000 =>
