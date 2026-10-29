@@ -8,6 +8,8 @@ use ta_lib::{
     Core, RetCode,
 };
 
+mod add_output;
+
 static CORE: OnceLock<Core> = OnceLock::new();
 pub fn core() -> &'static Core {
     CORE.get_or_init(Core::new)
@@ -112,6 +114,15 @@ pub fn compute<const INPUTS: usize, const OUTPUTS: usize>(
         .find(|&row| slices.iter().all(|s| !s[row].is_nan()))
         .unwrap_or(len);
     let offset = begin.saturating_add(lookback).min(len);
+    // ADD writes each produced value once. Build that initialized Vec directly
+    // after the same metadata/parameter/input checks, keeping the skipped prefix.
+    if id == FuncId::ADD && lookback == 0 && OUTPUTS == 1 {
+        if let [left, right] = slices.as_slice() {
+            if let Some(values) = add_output::try_build(left, right, begin) {
+                return Ok(Series::from_vec(names.first().copied().unwrap_or(""), values));
+            }
+        }
+    }
     let mut outputs: [Output; OUTPUTS] = std::array::from_fn(|i| match id.info().outputs[i].kind {
         // Use initialized NaNs rather than the allocator's zeroed/calloc path.
         // Zeroed allocations can have different page-fault costs in grouped calls.
