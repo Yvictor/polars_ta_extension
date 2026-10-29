@@ -1,0 +1,131 @@
+name: Upstream HMA weights evidence
+
+on:
+  push:
+    branches: [codex/hma-weights-ci]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: hma-weights-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  RUSTUP_TOOLCHAIN: '1.97.0'
+  CARGO_BUILD_JOBS: '4'
+  RUSTFLAGS: ''
+  CARGO_ENCODED_RUSTFLAGS: ''
+  CARGO_PROFILE_RELEASE_DEBUG: 'false'
+  CARGO_PROFILE_RELEASE_LTO: thin
+  CARGO_PROFILE_RELEASE_CODEGEN_UNITS: '1'
+  OMP_NUM_THREADS: '1'
+  OPENBLAS_NUM_THREADS: '1'
+  MKL_NUM_THREADS: '1'
+
+jobs:
+  hma-weights:
+    name: Pinned HMA weights / exact primary and four-backend evidence
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          path: control-source
+      - uses: actions/checkout@v6
+        with:
+          repository: TA-Lib/ta-lib
+          ref: 4334163d3a1f5019aa9051342316b936a4dfb994
+          path: baseline
+      - uses: actions/checkout@v6
+        with:
+          repository: Yvictor/ta-lib-native
+          ref: 5da9e8d43333c13b5f46f30efe8460de12b1f68b
+          path: candidate
+      - uses: actions/checkout@v6
+        with:
+          ref: b2bbc26d41ec80823c8bffb0cc436a97f29911cc
+          path: original-c
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - uses: dtolnay/rust-toolchain@1.97.0
+        with:
+          components: clippy,rustfmt
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: actions/setup-dotnet@v5
+        with:
+          global-json-file: candidate/global.json
+      - name: Initialize evidence before controller gates
+        run: |
+          mkdir -p hma-weights-results
+          git -C control-source rev-parse HEAD > hma-weights-results/controller-commit.txt
+          cp control-source/scripts/hma_weights_benchmark.py control-source/scripts/bench_hma_weights.rs hma-weights-results/
+          cp control-source/.github/workflows/hma-weights.yml hma-weights-results/workflow.yml
+      - name: Install pinned evidence dependencies and test standalone controller gates
+        run: |
+          python -m pip install cmake==4.4.4 numpy==2.5.3 pytest==8.4.2
+          python -m pip freeze > hma-weights-results/python-dependencies.txt
+          python -m pytest --noconftest control-source/tests/test_hma_weights_benchmark.py -q
+      - name: Regenerate and validate Rust plus all C/Rust regression functions before timing
+        working-directory: candidate
+        run: |
+          set -o pipefail
+          python scripts/build.py regen-check 2>&1 | tee ../hma-weights-results/regenerate.log
+          cargo test --locked --manifest-path ta_codegen/generator/Cargo.toml 2>&1 | tee ../hma-weights-results/generator-tests.log
+          cargo test --locked -p ta-lib --manifest-path ta_codegen/output/rust/Cargo.toml 2>&1 | tee ../hma-weights-results/rust-tests.log
+          cargo test --locked -p ta-lib --doc --manifest-path ta_codegen/output/rust/Cargo.toml 2>&1 | tee ../hma-weights-results/rust-doc-tests.log
+          cargo clippy --locked --all-targets --manifest-path ta_codegen/generator/Cargo.toml -- -D warnings 2>&1 | tee ../hma-weights-results/generator-clippy.log
+          cargo clippy --locked -p ta-lib --all-targets --manifest-path ta_codegen/output/rust/Cargo.toml -- -D warnings 2>&1 | tee ../hma-weights-results/rust-clippy.log
+          python scripts/build.py servers --language=c,rust 2>&1 | tee ../hma-weights-results/regression-build.log
+          (cd bin && ./ta_regtest --codegen --language=c,rust) 2>&1 | tee ../hma-weights-results/full-c-rust-regression.log
+          git diff --exit-code
+      - name: Compile Java/CSharp libraries and run upstream main suites before timing
+        working-directory: candidate
+        run: |
+          set -o pipefail
+          python scripts/build.py libraries --language=java,csharp 2>&1 | tee ../hma-weights-results/managed-libraries.log
+          dotnet build-server shutdown
+          git diff --exit-code
+      - name: Build identical primary harnesses with pinned registry and original C references
+        run: |
+          python control-source/scripts/hma_weights_benchmark.py \
+            --baseline-source baseline --candidate-source candidate --c-source original-c \
+            --output hma-weights-results --build-only
+          lscpu > hma-weights-results/lscpu.txt
+          cat /proc/meminfo > hma-weights-results/meminfo.txt
+      - name: Check full captures then measure twelve alternating fresh-process pairs
+        run: |
+          python control-source/scripts/hma_weights_benchmark.py \
+            --baseline-source baseline --candidate-source candidate --c-source original-c \
+            --output hma-weights-results --pairs 12 --repeats 31
+          cat hma-weights-results/comparison.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: upstream-hma-weights-evidence
+          if-no-files-found: error
+          path: |
+            hma-weights-results/*.json
+            hma-weights-results/*.jsonl
+            hma-weights-results/*.md
+            hma-weights-results/*.log
+            hma-weights-results/*.txt
+            hma-weights-results/*.yml
+            hma-weights-results/*.rs
+            hma-weights-results/*.py
+            hma-weights-results/*.gz
+            hma-weights-results/*.bin
+            hma-weights-results/bin/*
+            hma-weights-results/archives/*
+            hma-weights-results/registry-helper/Cargo.*
+            hma-weights-results/registry-helper/lib.rs
+            hma-weights-results/target-baseline/release/libta_lib.rlib
+            hma-weights-results/target-candidate/release/libta_lib.rlib
+            hma-weights-results/target-registry/release/deps/*.rlib
+            hma-weights-results/target-registry/release/deps/*.so
+            hma-weights-results/old-c-install/lib/libta-lib.a
