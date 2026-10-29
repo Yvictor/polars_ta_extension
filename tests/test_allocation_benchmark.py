@@ -48,7 +48,8 @@ def test_exact_corpus_mode_catches_tiny_changes_and_signed_zero(tmp_path, change
     probe = importlib.util.module_from_spec(spec); spec.loader.exec_module(probe)
     before = tmp_path/'before.npz'; after = tmp_path/'after.npz'; report = tmp_path/'report.json'
     capture(before, [1., 0., float('nan')]); capture(after, changed)
-    assert not probe.compare(before, after, report)
+    # Tiny finite rounding is tolerated; opposite signed zeros are not.
+    assert probe.compare(before, after, report) == bool(np.signbit(changed[1]))
     assert probe.compare(before, after, report, require_exact=True)
     import json
     assert json.loads(report.read_text())['fields_with_bit_differences'] == 1
@@ -112,3 +113,25 @@ def test_regression_inventory_keeps_noisy_and_consistent_slower_cases():
     assert found['grouped_atr/10000x100']['category'] == 'slow median, process ranges overlap'
     assert found['ema/1000']['category'] == 'not slower by median'
     assert found['grouped_ema/10000x100']['matching_polars_control'] == 'control_cumsum/10000x100'
+
+
+@pytest.mark.parametrize('actual,expected', [(0., -0.), (-0., 0.)])
+def test_workload_tolerant_reference_rejects_opposite_signed_zero(tmp_path, monkeypatch, actual, expected):
+    import sys
+    import polars as pl
+    spec = importlib.util.spec_from_file_location('signed_zero_workload', ROOT/'scripts/migration_benchmark.py')
+    workload = importlib.util.module_from_spec(spec); spec.loader.exec_module(workload)
+    data = pl.DataFrame({'close': [actual]})
+    expressions = [pl.col('close').alias('out')]
+    reference = tmp_path/'reference.npz'
+    np.savez(reference, zero_schema=np.array(str(data.select(expressions).schema)),
+             zero_0=np.array([expected]), zero_0_null=np.array([False]))
+    monkeypatch.setattr(workload, 'cases', lambda *_: iter([('zero', data, expressions)]))
+    monkeypatch.setattr(sys, 'argv', ['migration_benchmark.py', '--output', str(tmp_path/'result.json'),
+                        '--source-root', str(ROOT), '--label', 'signed-zero',
+                        '--reference', str(reference)])
+    def forbidden_timer():
+        raise RuntimeError('measurement started before signed-zero validation')
+    monkeypatch.setattr(workload.time, 'perf_counter_ns', forbidden_timer)
+    with pytest.raises(AssertionError, match='signed zero differs'):
+        workload.main()

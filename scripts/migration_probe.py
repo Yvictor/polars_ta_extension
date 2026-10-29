@@ -189,6 +189,8 @@ def compare(baseline,candidate,report,require_exact=False):
                     equal=((av==bv)&(np.signbit(av)==np.signbit(bv))) | (np.isnan(av)&np.isnan(bv))
                 else:
                     equal=np.isclose(av,bv,rtol=1e-10,atol=atol,equal_nan=True)
+                    # Signed zero is a semantic boundary, independent of finite tolerance.
+                    equal &= ~((av==0)&(bv==0)&(np.signbit(av)!=np.signbit(bv)))
                 if not equal.all():
                     reason.append('values differ')
                     indices=np.flatnonzero(~equal)[:5]

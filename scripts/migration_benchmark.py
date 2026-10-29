@@ -124,6 +124,8 @@ def main():
                     np.testing.assert_array_equal(np.signbit(numeric[~np.isnan(numeric)]),np.signbit(reference[slot][~np.isnan(numeric)]),err_msg=name)
                 else:
                     np.testing.assert_allclose(numeric,reference[slot],rtol=1e-10,atol=1e-10,equal_nan=True,err_msg=name)
+                    both_zero=(numeric==0)&(reference[slot]==0)
+                    np.testing.assert_array_equal(np.signbit(numeric[both_zero]),np.signbit(reference[slot][both_zero]),err_msg=name+": signed zero differs")
                 checked_values+=len(numeric)
             if args.write_reference:
                 values[slot]=numeric;values[slot+'_null']=nulls

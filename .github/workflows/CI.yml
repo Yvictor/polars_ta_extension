@@ -217,7 +217,7 @@ jobs:
           path: original-source
       - uses: actions/checkout@v6
         with:
-          ref: c71cd6ecb4b48601ff409926fdb0a281505e9fec
+          ref: 56f6d5fb139031c20d86d7e818e7d267eb834295
           path: prior-source
       - uses: actions/setup-python@v6
         with:

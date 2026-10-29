@@ -22,7 +22,7 @@ from migration_ci_benchmark import percentile, summarize
 
 SIDES = ('original', 'prior', 'candidate')
 ORIGINAL_COMMIT = 'b2bbc26d41ec80823c8bffb0cc436a97f29911cc'
-PRIOR_COMMIT = 'c71cd6ecb4b48601ff409926fdb0a281505e9fec'
+PRIOR_COMMIT = '56f6d5fb139031c20d86d7e818e7d267eb834295'
 ORDERS = (
     ('original', 'prior', 'candidate'),
     ('prior', 'candidate', 'original'),
