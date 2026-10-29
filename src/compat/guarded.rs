@@ -33,13 +33,10 @@ pub(crate) fn initialized_first<'a>(
     if first.first().is_some_and(|v| !v.is_finite() || v.abs() > 1024.) {
         return None;
     }
-    let mut trigger = false;
     let mut output = Vec::with_capacity(input.len());
     output.resize(begin, f64::NAN);
-    output.extend(first.iter().map(|value| {
-        trigger |= !(value.abs() <= 1024.);
-        f64::NAN
-    }));
+    output.extend(first.iter().map(|_| f64::NAN));
+    let trigger = has_trigger(first);
     Some((output, FirstInputClass { id, input: first, trigger }))
 }
 
