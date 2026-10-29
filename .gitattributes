@@ -1,1 +1,2 @@
 examples/* linguist-documentation
+tests/data/real-option-manifest.json text eol=lf
