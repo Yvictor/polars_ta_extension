@@ -183,7 +183,7 @@ def test_every_arm_round_must_keep_the_same_case_inventory():
 
 
 def test_workflow_pins_reviewed_candidate_and_preserves_three_sources():
-    text=(Path(__file__).parents[1]/'.github/workflows/mavp-mama-controls.yml').read_text()
+    text=(Path(__file__).parents[1]/'.github/workflows/mavp-no-floor-nan.yml').read_text()
     assert "MAVP_CANDIDATE_COMMIT: '"+m.CANDIDATE+"'" in text
     assert '--control-source control' in text and '--candidate-commit "$MAVP_CANDIDATE_COMMIT"' in text
     assert 'ref: '+m.BASELINE in text and 'ref: '+m.CONTROL in text
@@ -272,9 +272,9 @@ def test_shared_period_preparation_keeps_ema_wma_as_affected_workloads():
         assert rows[keys[2]]['is_unchanged_control'] and not rows[keys[2]]['is_other_ma_workload']
         assert all(rows[key]['is_reference_backend'] for key in keys[3:])
 
-def test_canonical_floor_pin_is_selected_and_placeholder_still_blocks(tmp_path,monkeypatch):
+def test_conditional_nan_pin_is_selected_and_placeholder_still_blocks(tmp_path,monkeypatch):
     from types import SimpleNamespace
-    assert m.CANDIDATE == '08ae6a75ad32c91e7ffe8c10d00460d73589819a'
+    assert m.CANDIDATE == '066d65e48588f8b998df5d7dc85080cee385964a'
     assert m.arm_pins(SimpleNamespace(candidate_commit=m.CANDIDATE))['candidate'] == m.CANDIDATE
     monkeypatch.setattr(m,'CANDIDATE','UNSELECTED_SOURCE_PIN_DO_NOT_RUN')
     for pin in [m.CANDIDATE, "a"*40, "9f66a5b075f6f2b578118f9b913a5f5ca5540a69"]:
@@ -300,11 +300,11 @@ def test_exactly_two_direct_mama_controls_extend_the_original_inventory():
             assert len(m.parse_records(encoded(records(True,selected)),False,selected)['cases']) == 1
 
 def test_managed_library_and_source_gates_precede_every_timer():
-    text=(Path(__file__).parents[1]/'.github/workflows/mavp-mama-controls.yml').read_text()
+    text=(Path(__file__).parents[1]/'.github/workflows/mavp-no-floor-nan.yml').read_text()
     assert "java-version: '21'" in text
     assert 'global-json-file: candidate/global.json' in text
     assert '10.0.112' in text and text.index('Verify pinned managed SDK contract') < text.index('actions/setup-dotnet')
-    assert text.index('Verify canonical floor-elision') < text.index('actions/checkout')
+    assert text.index('Verify conditional NaN-scratch') < text.index('actions/checkout')
     assert text.index('libraries --language=java,csharp') < text.index('Build identical primary')
     assert text.index('full-c-rust-regression.log') < text.index('measure 4104')
     assert 'measure 3888' not in text

@@ -1,0 +1,154 @@
+name: MAVP NaN scratch conditional on no-floor with MAMA controls
+
+on:
+  push:
+    branches: [codex/mavp-no-floor-nan-ci]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mavp-no-floor-nan-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  MAVP_CANDIDATE_COMMIT: '066d65e48588f8b998df5d7dc85080cee385964a'
+  RUSTUP_TOOLCHAIN: '1.97.0'
+  CARGO_BUILD_JOBS: '4'
+  RUSTFLAGS: ''
+  CARGO_ENCODED_RUSTFLAGS: ''
+  CARGO_PROFILE_RELEASE_DEBUG: 'false'
+  CARGO_PROFILE_RELEASE_LTO: thin
+  CARGO_PROFILE_RELEASE_CODEGEN_UNITS: '1'
+  OMP_NUM_THREADS: '1'
+  OPENBLAS_NUM_THREADS: '1'
+  MKL_NUM_THREADS: '1'
+
+jobs:
+  variable-mavp:
+    name: Isolated MAVP / three primary builds and three runtime backends
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - name: Verify conditional NaN-scratch source pin before checkout
+        run: |
+          [[ "$MAVP_CANDIDATE_COMMIT" =~ ^[0-9a-f]{40}$ ]] || { echo "Conditional NaN-scratch candidate must have an immutable full pin."; exit 1; }
+      - uses: actions/checkout@v6
+        with:
+          path: control-source
+      - uses: actions/checkout@v6
+        with:
+          repository: TA-Lib/ta-lib
+          ref: 4334163d3a1f5019aa9051342316b936a4dfb994
+          path: baseline
+      - uses: actions/checkout@v6
+        with:
+          repository: Yvictor/ta-lib-native
+          ref: 08ae6a75ad32c91e7ffe8c10d00460d73589819a
+          path: control
+      - uses: actions/checkout@v6
+        with:
+          repository: Yvictor/ta-lib-native
+          ref: ${{ env.MAVP_CANDIDATE_COMMIT }}
+          path: candidate
+      - uses: actions/checkout@v6
+        with:
+          ref: b2bbc26d41ec80823c8bffb0cc436a97f29911cc
+          path: original-c
+      - name: Verify pinned managed SDK contract
+        run: |
+          python3 -c 'import json; assert json.load(open("candidate/global.json"))["sdk"]["version"] == "10.0.112"'
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - uses: dtolnay/rust-toolchain@1.97.0
+        with:
+          components: clippy,rustfmt
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: actions/setup-dotnet@v5
+        with:
+          global-json-file: candidate/global.json
+      - name: Install pinned evidence dependencies and test controller gates
+        run: |
+          python -m pip install cmake==4.4.4 numpy==2.5.3 pytest==8.4.2
+          mkdir -p mavp-three-arm-results
+          git -C control-source rev-parse HEAD > mavp-three-arm-results/controller-commit.txt
+          cp control-source/scripts/mavp_three_arm_benchmark.py control-source/scripts/bench_mavp_variable.rs mavp-three-arm-results/
+          cp control-source/.github/workflows/mavp-no-floor-nan.yml mavp-three-arm-results/workflow.yml
+          python -m pip freeze > mavp-three-arm-results/python-dependencies.txt
+          python -m pytest --noconftest control-source/tests/test_mavp_three_arm_benchmark.py -q
+      - name: Regenerate and validate Rust plus all C/Rust regression functions before timing
+        working-directory: candidate
+        run: |
+          set -o pipefail
+          python scripts/build.py regen-check 2>&1 | tee ../mavp-three-arm-results/regenerate.log
+          cargo test --locked --manifest-path ta_codegen/generator/Cargo.toml 2>&1 | tee ../mavp-three-arm-results/generator-tests.log
+          cargo test --locked -p ta-lib --manifest-path ta_codegen/output/rust/Cargo.toml 2>&1 | tee ../mavp-three-arm-results/rust-tests.log
+          cargo test --locked -p ta-lib --doc --manifest-path ta_codegen/output/rust/Cargo.toml 2>&1 | tee ../mavp-three-arm-results/rust-doc-tests.log
+          cargo clippy --locked --all-targets --manifest-path ta_codegen/generator/Cargo.toml -- -D warnings 2>&1 | tee ../mavp-three-arm-results/generator-clippy.log
+          cargo clippy --locked -p ta-lib --all-targets --manifest-path ta_codegen/output/rust/Cargo.toml -- -D warnings 2>&1 | tee ../mavp-three-arm-results/rust-clippy.log
+          python scripts/build.py servers --language=c,rust 2>&1 | tee ../mavp-three-arm-results/regression-build.log
+          (cd bin && ./ta_regtest --codegen --language=c,rust) 2>&1 | tee ../mavp-three-arm-results/full-c-rust-regression.log
+          git diff --exit-code
+      - name: Compile Java/CSharp libraries and run upstream main suites before timing
+        working-directory: candidate
+        run: |
+          set -o pipefail
+          python scripts/build.py libraries --language=java,csharp 2>&1 | tee ../mavp-three-arm-results/managed-libraries.log
+          python - <<'PY'
+          import json, sys
+          from pathlib import Path
+          sys.path.insert(0, "../control-source/scripts")
+          from mavp_three_arm_benchmark import managed_runtime_proof
+          proof = managed_runtime_proof(Path("../mavp-three-arm-results/managed-libraries.log").read_text())
+          Path("../mavp-three-arm-results/managed-runtime-proof.json").write_text(json.dumps(proof, indent=2) + "\n")
+          PY
+          dotnet build-server shutdown
+          git diff --exit-code
+      - name: Build identical primary harnesses with pinned registry and original C references
+        run: |
+          python control-source/scripts/mavp_three_arm_benchmark.py \
+            --baseline-source baseline --control-source control --candidate-source candidate \
+            --candidate-commit "$MAVP_CANDIDATE_COMMIT" --c-source original-c \
+            --output mavp-three-arm-results --build-only
+          lscpu > mavp-three-arm-results/lscpu.txt
+          cat /proc/meminfo > mavp-three-arm-results/meminfo.txt
+      - name: Check full captures then measure 4104 case/backend-isolated timed processes
+        run: |
+          python control-source/scripts/mavp_three_arm_benchmark.py \
+            --baseline-source baseline --control-source control --candidate-source candidate \
+            --candidate-commit "$MAVP_CANDIDATE_COMMIT" --c-source original-c \
+            --output mavp-three-arm-results --pairs 12 --repeats 31
+          cat mavp-three-arm-results/comparison.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: upstream-mavp-no-floor-nan-evidence
+          if-no-files-found: error
+          path: |
+            mavp-three-arm-results/*.json
+            mavp-three-arm-results/*.jsonl
+            mavp-three-arm-results/*.md
+            mavp-three-arm-results/*.log
+            mavp-three-arm-results/*.txt
+            mavp-three-arm-results/*.yml
+            mavp-three-arm-results/*.rs
+            mavp-three-arm-results/*.py
+            mavp-three-arm-results/*.gz
+            mavp-three-arm-results/*.bin
+            mavp-three-arm-results/bin/*
+            mavp-three-arm-results/goldens/*
+            mavp-three-arm-results/children/*
+            mavp-three-arm-results/archives/*
+            mavp-three-arm-results/registry-helper/Cargo.*
+            mavp-three-arm-results/registry-helper/lib.rs
+            mavp-three-arm-results/target-baseline/release/libta_lib.rlib
+            mavp-three-arm-results/target-control/release/libta_lib.rlib
+            mavp-three-arm-results/target-candidate/release/libta_lib.rlib
+            mavp-three-arm-results/target-registry/release/deps/*.rlib
+            mavp-three-arm-results/target-registry/release/deps/*.so
+            mavp-three-arm-results/old-c-install/lib/libta-lib.a

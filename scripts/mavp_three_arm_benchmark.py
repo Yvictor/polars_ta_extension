@@ -1,4 +1,4 @@
-"""Canonical MAVP floor-elision probe; full captures precede isolated timing."""
+"""MAVP NaN-scratch conditional on no-floor; full captures precede isolated timing."""
 import argparse
 import gzip
 import hashlib
@@ -18,8 +18,8 @@ import tarfile
 import time
 
 BASELINE = '4334163d3a1f5019aa9051342316b936a4dfb994'
-CONTROL = 'b3f0fa17d0e3485c39ed042d86fff7116c0430a4'
-CANDIDATE = '08ae6a75ad32c91e7ffe8c10d00460d73589819a'
+CONTROL = '08ae6a75ad32c91e7ffe8c10d00460d73589819a'
+CANDIDATE = '066d65e48588f8b998df5d7dc85080cee385964a'
 C_COMMIT = 'b2bbc26d41ec80823c8bffb0cc436a97f29911cc'
 C_ARCHIVE = 'talib-sys/vendor/ta-lib-0.8.1-src.tar.gz'
 C_SHA = 'ec59ccd88c0c77f618587d858787c8f9d06c40460a09d66751926f6fd670f985'
