@@ -117,7 +117,12 @@ pub fn compute<const INPUTS: usize, const OUTPUTS: usize>(
         // Zeroed allocations can have different page-fault costs in grouped calls.
         // Keep explicit range padding below; integer warmups remain zero.
         OutputType::Real => Output::Real(vec![f64::NAN; len]),
-        OutputType::Integer => Output::Integer(vec![0; len]),
+        OutputType::Integer => {
+            // Upstream receives a fully initialized slice, including warm-up padding.
+            let mut values = Vec::with_capacity(len);
+            values.resize(len, 0);
+            Output::Integer(values)
+        }
     });
     let mut written = 0;
     if offset < len {
@@ -217,4 +222,118 @@ fn native_range<'a>(
     }
     let range = holder.call(0, end).map_err(error)?;
     Ok(range)
+}
+
+#[cfg(test)]
+mod integer_output_tests {
+    use super::*;
+
+    #[test]
+    fn empty_and_warmup_only_integer_results_keep_zero_padding() {
+        for len in [0, 1, 10] {
+            let inputs = [
+                Series::from_vec("open", vec![99.9; len]),
+                Series::from_vec("high", vec![101.; len]),
+                Series::from_vec("low", vec![99.; len]),
+                Series::from_vec("close", vec![100.; len]),
+            ];
+            let output =
+                compute::<4, 1>(FuncId::CDLDOJI, &inputs, &Params::new(), &[0, 1, 2, 3], &[])
+                    .unwrap();
+            assert_eq!(output.i32().unwrap().cont_slice().unwrap(), vec![0; len]);
+        }
+        for len in [0, 1, 20, 63] {
+            let close = Series::from_vec("close", vec![100.; len]);
+            let output =
+                compute::<1, 1>(FuncId::HT_TRENDMODE, &[close], &Params::new(), &[0], &[]).unwrap();
+            assert_eq!(output.i32().unwrap().cont_slice().unwrap(), vec![0; len]);
+        }
+    }
+
+    #[test]
+    fn sliced_nullable_prices_keep_integer_warmup_and_written_values() {
+        let price = |name: &str, shift: f64| {
+            let values: Vec<Option<f64>> = (0..22)
+                .map(|i| {
+                    if i < 2 {
+                        Some(-999.)
+                    } else if i < 5 {
+                        None
+                    } else {
+                        Some(100. + (i - 5) as f64 + shift)
+                    }
+                })
+                .collect();
+            Series::new(name, values).slice(2, 20)
+        };
+        let inputs = [
+            price("open", -0.1),
+            price("high", 1.),
+            price("low", -1.),
+            price("close", 0.),
+        ];
+        let output =
+            compute::<4, 1>(FuncId::CDLDOJI, &inputs, &Params::new(), &[0, 1, 2, 3], &[]).unwrap();
+        let result = output.i32().unwrap().cont_slice().unwrap();
+        assert_eq!(&result[..13], &[0; 13]);
+        assert_eq!(&result[13..], &[100; 7]);
+        assert_eq!(output.null_count(), 0);
+    }
+
+    #[test]
+    fn two_integer_outputs_preserve_leading_padding_and_legacy_index_ties() {
+        let close = Series::from_vec(
+            "close",
+            vec![f64::NAN, f64::NAN, 0., 5., 5., 1., 1., 1., 7., 7., 0.],
+        );
+        let params = Params::from([("timeperiod".into(), Param::Int(3))]);
+        let output = compute::<1, 2>(
+            FuncId::MINMAXINDEX,
+            &[close],
+            &params,
+            &[0],
+            &["minidx", "maxidx"],
+        )
+        .unwrap();
+        let fields = output.struct_().unwrap().fields();
+        assert_eq!(fields[0].name(), "minidx");
+        assert_eq!(fields[1].name(), "maxidx");
+        assert_eq!(
+            fields[0].i32().unwrap().cont_slice().unwrap(),
+            &[0, 0, 0, 0, 0, 3, 4, 5, 5, 5, 8]
+        );
+        assert_eq!(
+            fields[1].i32().unwrap().cont_slice().unwrap(),
+            &[0, 0, 0, 0, 1, 1, 2, 3, 6, 7, 7]
+        );
+    }
+
+    #[test]
+    fn mixed_real_and_integer_outputs_keep_distinct_warmup_values() {
+        let close: Vec<f64> = (0..64)
+            .map(|i| if i < 2 { f64::NAN } else { 100. + i as f64 })
+            .collect();
+        let inputs = [
+            Series::from_vec("high", close.iter().map(|v| v + 1.).collect::<Vec<_>>()),
+            Series::from_vec("low", close.iter().map(|v| v - 1.).collect::<Vec<_>>()),
+            Series::from_vec("close", close),
+        ];
+        let lookback = FuncId::SUPERTREND.new_call(core()).lookback().unwrap();
+        let offset = 2 + lookback;
+        let output = compute::<3, 2>(
+            FuncId::SUPERTREND,
+            &inputs,
+            &Params::new(),
+            &[0, 1, 2],
+            &["supertrend", "trend"],
+        )
+        .unwrap();
+        let fields = output.struct_().unwrap().fields();
+        let real = fields[0].f64().unwrap().cont_slice().unwrap();
+        let integer = fields[1].i32().unwrap().cont_slice().unwrap();
+        assert!(real[..offset].iter().all(|v| v.is_nan()));
+        assert_eq!(&integer[..offset], vec![0; offset]);
+        assert!(real[offset..].iter().all(|v| v.is_finite()));
+        assert!(integer[offset..].iter().all(|v| matches!(v, -1 | 1)));
+    }
 }
