@@ -1,0 +1,37 @@
+{
+  "description": "Frozen consumer Engulf backport query scope; grouped layouts use ordinary native Polars .over(symbol).",
+  "cases": [
+    "cdlengulfing/1000000",
+    "grouped_cdlengulfing/100x10000",
+    "grouped_cdlengulfing/10000x100",
+    "grouped_cdlengulfing/100x10000_interleaved",
+    "grouped_cdlengulfing/10000x100_interleaved",
+    "cdldoji/1000000",
+    "grouped_cdldoji/100x10000",
+    "grouped_cdldoji/10000x100",
+    "grouped_cdldoji/100x10000_interleaved",
+    "grouped_cdldoji/10000x100_interleaved",
+    "add/1000000",
+    "grouped_add/100x10000",
+    "grouped_add/10000x100",
+    "grouped_add/100x10000_interleaved",
+    "grouped_add/10000x100_interleaved",
+    "cdlengulfing_mixed/1000000",
+    "grouped_cdlengulfing_mixed/100x10000",
+    "grouped_cdlengulfing_mixed/10000x100",
+    "grouped_cdlengulfing_mixed/100x10000_interleaved",
+    "grouped_cdlengulfing_mixed/10000x100_interleaved"
+  ],
+  "integer_families": [
+    "cdlengulfing",
+    "cdldoji",
+    "cdlengulfing_mixed"
+  ],
+  "checked_values": 20000000,
+  "timed_children": 1440,
+  "timed_samples": 44640,
+  "fixtures": {
+    "legacy": "Historical seed260126 all-bullish market fixture: Engulf early reject/all-zero result.",
+    "mixed": "Deterministic finite valid OHLC, two-bar bullish/bearish full/equal-edge engulf hits; pattern resets on each chronological group, before row interleaving. Every group must produce -100,-80,0,80,100."
+  }
+}

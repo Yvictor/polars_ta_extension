@@ -1,0 +1,142 @@
+name: Focused consumer Engulf window backport
+
+on:
+  push:
+    branches: [codex/engulf-consumer-ci]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: engulf-consumer-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  PYO3_USE_ABI3_FORWARD_COMPATIBILITY: '1'
+  RUSTUP_TOOLCHAIN: '1.90.0'
+  CARGO_BUILD_JOBS: '4'
+  CARGO_TERM_COLOR: 'never'
+  CARGO_PROFILE_RELEASE_DEBUG: 'false'
+  CARGO_PROFILE_RELEASE_OPT_LEVEL: '3'
+  CARGO_PROFILE_RELEASE_LTO: 'false'
+  CARGO_PROFILE_RELEASE_CODEGEN_UNITS: '16'
+  CARGO_TARGET_DIR: ${{ github.workspace }}/engulf-target
+  CARGO_BUILD_BUILD_DIR: ${{ github.workspace }}/engulf-target
+  CFLAGS: ''
+  CXXFLAGS: ''
+  RUSTFLAGS: ''
+  CARGO_ENCODED_RUSTFLAGS: ''
+  CMAKE: ${{ github.workspace }}/envs/prior/bin/cmake
+  POLARS_MAX_THREADS: '4'
+  PRIOR_COMMIT: 56f6d5fb139031c20d86d7e818e7d267eb834295
+  CANDIDATE_COMMIT: 46db222092c4f8f391377420e441f12a403f8fce
+  ORIGINAL_COMMIT: b2bbc26d41ec80823c8bffb0cc436a97f29911cc
+
+jobs:
+  focused-engulf-consumer:
+    name: Original C / delivered56 / Engulf window candidate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          path: control-source
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12.15'
+      - name: Preserve controller and require immutable product pins
+        run: |
+          mkdir -p engulf-results/controller
+          cp control-source/scripts/engulf_consumer* control-source/scripts/migration_probe.py control-source/scripts/migration_ci_benchmark.py control-source/scripts/api.json engulf-results/controller/
+          cp control-source/.github/workflows/engulf-consumer.yml engulf-results/workflow.yml
+          git -C control-source rev-parse HEAD > engulf-results/controller-commit.txt
+          python - <<'PY'
+          import os,re
+          for key in ('ORIGINAL_COMMIT','PRIOR_COMMIT','CANDIDATE_COMMIT'):
+              if not re.fullmatch('[0-9a-f]{40}',os.environ[key]):
+                  raise SystemExit(key+' must be frozen before this workflow can run')
+          if len({os.environ[k] for k in ('ORIGINAL_COMMIT','PRIOR_COMMIT','CANDIDATE_COMMIT')}) != 3:
+              raise SystemExit('three distinct immutable source pins are required')
+          PY
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ env.PRIOR_COMMIT }}
+          path: sources/prior
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ env.CANDIDATE_COMMIT }}
+          path: sources/candidate
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ env.ORIGINAL_COMMIT }}
+          path: sources/original
+      - uses: dtolnay/rust-toolchain@1.90.0
+      - uses: astral-sh/setup-uv@v8.2.0
+      - name: Build three portable wheels and preserve actual wheel-time Cargo fingerprints
+        run: |
+          mkdir -p wheels
+          for side in prior candidate original; do
+            uv venv --python 3.12.15 "envs/$side"
+            uv pip install --python "envs/$side" 'maturin==1.15.0' 'cmake==4.4.4' 'polars==1.44.2' 'numpy==2.5.3' pytest
+            mkdir -p "wheels/$side"
+            python -c 'import json,sys; print(json.dumps({"side":sys.argv[1],"command":sys.argv[2:]}))' "$side" "$PWD/envs/$side/bin/python" -m maturin build --release --locked --interpreter "$PWD/envs/$side/bin/python" --out "$PWD/wheels/$side" >> engulf-results/build-commands.jsonl
+            # Force the product crate to recompile even if a shared Cargo cache saw newer source mtimes.
+            # Only mtime changes; immutable source bytes and Git cleanliness are checked later.
+            touch "sources/$side/src/lib.rs"
+            (cd "sources/$side" && "$GITHUB_WORKSPACE/envs/$side/bin/python" -m maturin build --release --locked --interpreter "$GITHUB_WORKSPACE/envs/$side/bin/python" --out "$GITHUB_WORKSPACE/wheels/$side") > "engulf-results/$side-build.log" 2>&1
+            python control-source/scripts/engulf_consumer_provenance.py \
+              --compile-log "engulf-results/$side-build.log" --source "sources/$side" >> engulf-results/product-compile-proof.jsonl
+            uv pip install --python "envs/$side" --no-deps "wheels/$side/"*.whl
+            uv pip freeze --python "envs/$side" > "engulf-results/$side-dependencies.txt"
+            mkdir -p "engulf-results/product-fingerprints/$side"
+            cp -a "$CARGO_TARGET_DIR/release/.fingerprint/." "engulf-results/product-fingerprints/$side/"
+          done
+          rustc --version --verbose > engulf-results/toolchain.txt
+          cc --version >> engulf-results/toolchain.txt
+          "$CMAKE" --version >> engulf-results/toolchain.txt
+          lscpu > engulf-results/lscpu.txt
+          cat /proc/meminfo > engulf-results/meminfo.txt
+          df -h > engulf-results/disk-after-build.txt
+          du -sh "$CARGO_TARGET_DIR" wheels >> engulf-results/disk-after-build.txt
+      - name: Define fixed campaign arguments
+        run: |
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          args=[]
+          for side in ('original','prior','candidate'):
+              args += ['--'+side+'-python','envs/'+side+'/bin/python','--'+side+'-source','sources/'+side]
+          args += ['--candidate-commit',os.environ['CANDIDATE_COMMIT'],'--wheel-dir','wheels','--output','engulf-results']
+          Path('engulf-results/arguments.json').write_text(json.dumps(args))
+          PY
+          cat > run-engulf-campaign.py <<'PY'
+          import json,subprocess,sys
+          args=json.load(open('engulf-results/arguments.json'))
+          subprocess.run(['envs/prior/bin/python','control-source/scripts/'+sys.argv[1],*args,*sys.argv[2:]],check=True)
+          PY
+      - name: Controller protocol gates and native contracts
+        run: |
+          envs/prior/bin/python -m pytest --noconftest control-source/tests/test_engulf_consumer_benchmark.py -q
+          python run-engulf-campaign.py engulf_consumer_benchmark.py --record-build
+          for side in prior candidate; do
+            PYO3_PYTHON="$GITHUB_WORKSPACE/envs/$side/bin/python" cargo test --release --lib --locked --manifest-path "sources/$side/Cargo.toml" > "engulf-results/$side-rust-tests.log" 2>&1
+          done
+      - name: Full 10624-case corpus and both thread-setting exact56 goldens before timers
+        run: python run-engulf-campaign.py engulf_consumer_benchmark.py --validate-only
+      - name: Twelve balanced fresh-single-case rounds at one and four threads
+        run: |
+          python run-engulf-campaign.py engulf_consumer_benchmark.py
+          cat engulf-results/comparison.md >> "$GITHUB_STEP_SUMMARY"
+          cat engulf-results/negative-cases.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: consumer-engulf-window-evidence
+          include-hidden-files: true
+          path: |
+            engulf-results/
+            wheels/
+            engulf-target/release/build/talib-sys-*/out/lib/libta-lib.a
+            engulf-target/release/build/jemalloc-sys-*/out/lib/*.a
+          if-no-files-found: error
