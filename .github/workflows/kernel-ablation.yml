@@ -1,0 +1,147 @@
+name: Focused kernel and allocation ablation
+
+on:
+  push:
+    branches: [codex/kernel-allocation-ci]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kernel-ablation-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  PYO3_USE_ABI3_FORWARD_COMPATIBILITY: '1'
+  RUSTUP_TOOLCHAIN: '1.90.0'
+  CARGO_BUILD_JOBS: '4'
+  CARGO_PROFILE_RELEASE_DEBUG: 'false'
+  CARGO_PROFILE_RELEASE_LTO: 'false'
+  CARGO_PROFILE_RELEASE_CODEGEN_UNITS: '16'
+  CARGO_TARGET_DIR: ${{ github.workspace }}/ablation-target
+  RUSTFLAGS: ''
+  CARGO_ENCODED_RUSTFLAGS: ''
+  POLARS_MAX_THREADS: '4'
+  BASE_COMMIT: 8d14d0dc8eebe28d48536a36bb8c3586b8a7390f
+  UTILS_COMMIT: 891780b38dbfa16323a381f1764f38e20a36ff69
+  MMI_COMMIT: a4f3cd6b6a69929b240175daa5ec91ea50c510b0
+  COMPOSED_COMMIT: 78c3a1be1d3eeba24970ee20f66a33c10c74c327
+  ORIGINAL_COMMIT: b2bbc26d41ec80823c8bffb0cc436a97f29911cc
+
+jobs:
+  focused-kernel-allocation:
+    name: Four native builds / 12 queries / C0.8.1 kernel controls
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          path: control-source
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ env.BASE_COMMIT }}
+          path: sources/base
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ env.UTILS_COMMIT }}
+          path: sources/utils
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ env.MMI_COMMIT }}
+          path: sources/mmi
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ env.COMPOSED_COMMIT }}
+          path: sources/composed
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ env.ORIGINAL_COMMIT }}
+          path: sources/original
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - uses: dtolnay/rust-toolchain@1.90.0
+      - uses: astral-sh/setup-uv@v8.2.0
+      - name: Build five portable release wheels sequentially in one shared target
+        run: |
+          mkdir -p ablation-results wheels
+          for side in base utils mmi composed original; do
+            uv venv --python 3.12 "envs/$side"
+            uv pip install --python "envs/$side" 'maturin==1.15.0' 'cmake==4.4.4' 'polars==1.44.2' 'numpy==2.5.3' pytest
+            mkdir -p "wheels/$side"
+            python -c 'import json,sys; print(json.dumps({"side":sys.argv[1],"command":sys.argv[2:]}))' "$side" "$PWD/envs/$side/bin/python" -m maturin build --release --locked --interpreter "$PWD/envs/$side/bin/python" --out "$PWD/wheels/$side" >> ablation-results/build-commands.jsonl
+            (cd "sources/$side" && "$GITHUB_WORKSPACE/envs/$side/bin/python" -m maturin build --release --locked --interpreter "$GITHUB_WORKSPACE/envs/$side/bin/python" --out "$GITHUB_WORKSPACE/wheels/$side") > "ablation-results/$side-build.log" 2>&1
+            uv pip install --python "envs/$side" --no-deps "wheels/$side/"*.whl
+            uv pip freeze --python "envs/$side" > "ablation-results/$side-dependencies.txt"
+          done
+          git -C control-source rev-parse HEAD > ablation-results/controller-commit.txt
+          cp control-source/.github/workflows/kernel-ablation.yml ablation-results/workflow.yml
+          rustc --version --verbose > ablation-results/toolchain.txt
+          cc --version >> ablation-results/toolchain.txt
+          lscpu > ablation-results/lscpu.txt
+          cat /proc/meminfo > ablation-results/meminfo.txt
+          df -h > ablation-results/disk-after-build.txt
+          du -sh "$CARGO_TARGET_DIR" wheels >> ablation-results/disk-after-build.txt
+      - name: Define immutable campaign arguments
+        run: |
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          args=[]
+          for side in ('base','utils','mmi','composed','original'):
+              args += ['--'+side+'-python','envs/'+side+'/bin/python', '--'+side+'-source','sources/'+side,
+                       '--'+side+'-commit',os.environ[side.upper()+'_COMMIT']]
+          args += ['--wheel-dir','wheels','--output','ablation-results']
+          Path('ablation-results/arguments.json').write_text(json.dumps(args))
+          PY
+          cat > run-campaign.py <<'PY'
+          import json,subprocess,sys
+          args=json.load(open('ablation-results/arguments.json'))
+          subprocess.run(['envs/base/bin/python','control-source/scripts/'+sys.argv[1],*args,*sys.argv[2:]],check=True)
+          PY
+      - name: Test controller gates and native contracts before recording builds
+        run: |
+          envs/base/bin/python -m pytest control-source/tests/test_kernel_ablation_benchmark.py control-source/tests/test_kernel_stage_benchmark.py -q
+          for side in base utils mmi composed; do
+            PYO3_PYTHON="$GITHUB_WORKSPACE/envs/$side/bin/python" cargo test --release --lib --locked --manifest-path "sources/$side/Cargo.toml" > "ablation-results/$side-rust-tests.log" 2>&1
+          done
+          python run-campaign.py kernel_ablation_benchmark.py --record-build
+      - name: Build stage probes against the same Rust dependencies and original C archive
+        run: python run-campaign.py kernel_stage_benchmark.py --target-dir "$CARGO_TARGET_DIR" --build
+      - name: Full exact native API corpus plus original C tolerance and untimed raw query references
+        run: python run-campaign.py kernel_ablation_benchmark.py --validate-only
+      - name: Exact C0.8.1 and Rust kernel and adapter outputs at all three lengths
+        run: python run-campaign.py kernel_stage_benchmark.py --target-dir "$CARGO_TARGET_DIR" --validate-only
+      - name: Eight balanced fresh-process rounds at one and four threads
+        run: |
+          python run-campaign.py kernel_ablation_benchmark.py
+          cat ablation-results/comparison.md >> "$GITHUB_STEP_SUMMARY"
+          cat ablation-results/negative-cases.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Bounded 90second kernel adapter and initialization stage diagnostics
+        timeout-minutes: 3
+        run: python run-campaign.py kernel_stage_benchmark.py --target-dir "$CARGO_TARGET_DIR" --measure
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: focused-kernel-allocation-evidence
+          path: |
+            ablation-results/
+            wheels/
+            ablation-target/release/build/talib-sys-*/out/lib/libta-lib.a
+            ablation-target/release/build/jemalloc-sys-*/out/lib/*.a
+            ablation-target/release/.fingerprint/*/lib-_polars_talib*
+            ablation-target/release/.fingerprint/*/lib-polars*
+            ablation-target/release/.fingerprint/*/lib-serde*
+            ablation-target/release/.fingerprint/*/lib-ta_lib*
+            ablation-target/release/.fingerprint/*/lib-jemallocator*
+            ablation-target/release/deps/libpolars-*.rlib
+            ablation-target/release/deps/libserde-*.rlib
+            ablation-target/release/deps/libta_lib-*.rlib
+            ablation-target/release/deps/libjemallocator-*.rlib
+            control-source/scripts/kernel_ablation_benchmark.py
+            control-source/scripts/kernel_stage_benchmark.py
+            control-source/scripts/kernel_stage_probe.rs
+            control-source/scripts/migration_benchmark.py
+            control-source/scripts/migration_probe.py
+          if-no-files-found: error
