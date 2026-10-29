@@ -496,3 +496,52 @@ def test_B_actual_product_role_gate_requires_real_plain_wrapper_clone_and_resolv
     if missing is None:assert elf.symbol_roles(functions)['portable_dispatch_wrapper']==names['wrapper']
     else:
         with pytest.raises(ValueError):elf.symbol_roles(functions)
+
+
+@pytest.mark.parametrize('opcode',['call','jmp'])
+def test_actual_linux_relative_GOT_fma_shim_is_resolved_by_exact_text_symbol(opcode):
+    import sarext_typed_elf as elf
+    # CI40962602117 actual wheel: the portable wrapper calls this local
+    # compiler_builtins fma shim. Symbol names are absent in objdump's GOT
+    # annotation because the ELF relocation is RELATIVE rather than GLOB_DAT.
+    instruction='  54ba0d: '+opcode+' *0xc44f95(%rip) # 11909a8 <_DYNAMIC+0x5b0>\n'
+    reloc='00000000011909a8 0000000000000008 R_X86_64_RELATIVE 1127290\n'
+    symbols='0000000001127290 t fma\n'
+    result=elf.analyze(instruction,reloc,symbols)
+    assert result['libm_fma_control_transfer_lines']==[instruction.rstrip('\n')]
+    assert result['resolved_fma_control_transfers']==[{
+        'instruction':instruction.rstrip('\n'),'kind':'exact_relative_text_symbol',
+        'slot':'0x11909a8','target':'0x1127290','symbol':'fma','relocation':reloc.rstrip('\n')}]
+    assert len(result['named_libm_fma_call_lines'])==(opcode=='call')
+
+
+@pytest.mark.parametrize('change',['missing_symbols','wrong_address','nearby_address','wrong_name','nontext',
+                                   'wrong_slot','wrong_relocation','invalid_addend','extra_addend'])
+def test_relative_GOT_fma_resolution_refuses_ambiguous_or_unrelated_evidence(change):
+    import sarext_typed_elf as elf
+    instruction='54ba0d: call *0xc44f95(%rip) # 11909a8 <_DYNAMIC+0x5b0>\n'
+    reloc='00000000011909a8 0000000000000008 R_X86_64_RELATIVE 1127290\n'
+    symbols='0000000001127290 t fma\n'
+    if change=='missing_symbols':symbols=''
+    elif change=='wrong_address':symbols=symbols.replace('1127290','2127290')
+    elif change=='nearby_address':symbols=symbols.replace('1127290','112728f')
+    elif change=='wrong_name':symbols=symbols.replace('fma','not_fma')
+    elif change=='nontext':symbols=symbols.replace(' t ',' d ')
+    elif change=='wrong_slot':reloc=reloc.replace('11909a8','11909a0')
+    elif change=='wrong_relocation':reloc=reloc.replace('R_X86_64_RELATIVE','R_X86_64_IRELATIVE')
+    elif change=='invalid_addend':reloc=reloc.replace('1127290','-1127290')
+    else:reloc=reloc.rstrip('\n')+' + 8\n'
+    result=elf.analyze(instruction,reloc,symbols)
+    assert result['libm_fma_control_transfer_lines']==[]
+    assert result['resolved_fma_control_transfers']==[]
+
+
+def test_relative_GOT_fma_transfer_in_hardware_clone_is_not_hidden_by_inline_updates():
+    import sarext_typed_elf as elf
+    text='\n'.join(str(i*10)+': vfmadd132sd %xmm0,%xmm1,%xmm2' for i in range(1,5))
+    text+='\n54ba0d: jmp *0xc44f95(%rip) # 11909a8 <_DYNAMIC+0x5b0>\n'
+    result=elf.analyze(text,'00000000011909a8 0000000000000008 R_X86_64_RELATIVE 1127290\n',
+                       '0000000001127290 t fma\n')
+    assert len(result['inline_fma_instruction_lines'])==4
+    # collect() must reject this clone despite its four fused instructions.
+    assert len(result['libm_fma_control_transfer_lines'])==1

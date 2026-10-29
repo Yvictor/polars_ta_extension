@@ -1,7 +1,8 @@
 """Actual normal-product ELF evidence for SAREXT's public multiversion route.
 
 Only the selected B compatibility FMA clone is checked for inline FMA evidence.
-Other functions and the portable fallback legitimately retain libm fma calls.
+Other functions and the portable fallback legitimately retain out-of-line fma
+calls, including a locally linked compiler_builtins shim.
 The generated resolver requires the complete feature closure, not FMA alone.
 This is a focused source-bound preflight, not universal machine verification.
 """
@@ -16,22 +17,48 @@ SIDES=('original','prior','candidate','alternative')
 FMA_TAG='dispatched_scalar_avx_fma_sse_sse2_sse3_sse41_ssse3_version'
 
 
-def analyze(text,relocations=""):
-    got={}
+def analyze(text,relocations="",symbols=""):
+    # A final cdylib can resolve LLVM's portable fma intrinsic to a local
+    # compiler_builtins shim. Its GOT slot then has an R_X86_64_RELATIVE
+    # addend, not a named dynamic relocation. Resolve only the exact addend
+    # address to an exact defined text symbol; never use a nearest symbol or
+    # treat arbitrary relative calls as fma.
+    text_symbols={}
+    for line in symbols.splitlines():
+        fields=line.split()
+        if len(fields)==3 and fields[1] in ('t','T') and re.fullmatch('[0-9a-fA-F]+',fields[0]):
+            text_symbols.setdefault(int(fields[0],16),set()).add(fields[2])
+    got={};resolutions={}
     for line in relocations.splitlines():
         fields=line.split()
-        if len(fields)>=5 and re.fullmatch("[0-9a-fA-F]+",fields[0]):got[int(fields[0],16)]=fields[4]
+        if len(fields)<4 or not re.fullmatch('[0-9a-fA-F]+',fields[0]):continue
+        slot=int(fields[0],16)
+        if fields[2]=='R_X86_64_RELATIVE':
+            if len(fields)!=4 or not re.fullmatch('[0-9a-fA-F]+',fields[3]):continue
+            target=int(fields[3],16)
+            if 'fma' in text_symbols.get(target,set()):
+                got[slot]='fma'
+                resolutions[slot]={'kind':'exact_relative_text_symbol','slot':hex(slot),
+                                   'target':hex(target),'symbol':'fma','relocation':line}
+        elif len(fields)>=5:
+            got[slot]=fields[4]
+            resolutions[slot]={'kind':'named_dynamic_symbol','slot':hex(slot),
+                               'symbol':fields[4],'relocation':line}
     lines=text.splitlines()
     calls=[s for s in lines if re.search(r'^\s*[0-9a-f]+:\s+call\w*\s',s)]
     transfers=[s for s in lines if re.search(r'^\s*[0-9a-f]+:\s+(?:call\w*|j\w*)\s',s)]
     fma=[s for s in lines if re.search(r'^\s*[0-9a-f]+:\s+vf(?:madd|msub|nmadd|nmsub)',s)]
-    named=[]
+    named=[];resolved_fma=[]
     for line in transfers:
         ref=re.search(r'#\s*(?:0x)?([0-9a-f]+)',line)
         resolved=got.get(int(ref[1],16),'') if ref else ''
-        if re.search(r'(?<![A-Za-z_])fma(?:@|\b)',line) or re.match(r'^fma(?:@|$)',resolved):named.append(line)
+        if re.search(r'(?<![A-Za-z_])fma(?:@|\b)',line) or re.match(r'^fma(?:@|$)',resolved):
+            named.append(line)
+            if ref and int(ref[1],16) in resolutions:
+                resolved_fma.append({'instruction':line,**resolutions[int(ref[1],16)]})
     return {'inline_fma_instruction_lines':fma,'all_call_lines':calls,'named_libm_fma_call_lines':[line for line in named if line in calls],
             'libm_fma_control_transfer_lines':named,'all_control_transfer_lines':transfers,
+            'resolved_fma_control_transfers':resolved_fma,
             'limit':'Unnamed indirect calls/jumps are retained for relocation inspection; counts are per function, never a whole-library fma-absence claim.'}
 
 
@@ -71,7 +98,7 @@ def collect(output):
                 cmd=['objdump','-drw','--no-show-raw-insn','--disassemble='+symbol,str(path)];product['commands'].append(cmd)
                 with dest.open('w') as stream:subprocess.run(cmd,stdout=stream,stderr=subprocess.STDOUT,check=True)
                 product['files'][str(dest)]=sha256(dest)
-                product['functions'][symbol]={'file':str(dest),**analyze(dest.read_text(),(folder/'relocations.txt').read_text())}
+                product['functions'][symbol]={'file':str(dest),**analyze(dest.read_text(),(folder/'relocations.txt').read_text(),nm)}
             if side=='alternative':
                 roles=symbol_roles(product['functions']);product['role_symbols']=roles
                 clone=product['functions'][roles['fma_clone']]
