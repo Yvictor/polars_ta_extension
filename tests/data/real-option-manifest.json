@@ -1,0 +1,2761 @@
+{
+  "surface_count": 201,
+  "real_option_count": 27,
+  "real_option_function_count": 17,
+  "all_functions": [
+    {
+      "name": "ac",
+      "real_option_count": 0
+    },
+    {
+      "name": "accbands",
+      "real_option_count": 0
+    },
+    {
+      "name": "acos",
+      "real_option_count": 0
+    },
+    {
+      "name": "ad",
+      "real_option_count": 0
+    },
+    {
+      "name": "add",
+      "real_option_count": 0
+    },
+    {
+      "name": "adosc",
+      "real_option_count": 0
+    },
+    {
+      "name": "adr",
+      "real_option_count": 0
+    },
+    {
+      "name": "adx",
+      "real_option_count": 0
+    },
+    {
+      "name": "adxr",
+      "real_option_count": 0
+    },
+    {
+      "name": "ao",
+      "real_option_count": 0
+    },
+    {
+      "name": "apo",
+      "real_option_count": 0
+    },
+    {
+      "name": "aroon",
+      "real_option_count": 0
+    },
+    {
+      "name": "aroonosc",
+      "real_option_count": 0
+    },
+    {
+      "name": "asin",
+      "real_option_count": 0
+    },
+    {
+      "name": "atan",
+      "real_option_count": 0
+    },
+    {
+      "name": "atr",
+      "real_option_count": 0
+    },
+    {
+      "name": "avgdev",
+      "real_option_count": 0
+    },
+    {
+      "name": "avgprice",
+      "real_option_count": 0
+    },
+    {
+      "name": "bbands",
+      "real_option_count": 2
+    },
+    {
+      "name": "beta",
+      "real_option_count": 0
+    },
+    {
+      "name": "bop",
+      "real_option_count": 0
+    },
+    {
+      "name": "cci",
+      "real_option_count": 0
+    },
+    {
+      "name": "cdl2crows",
+      "real_option_count": 0
+    },
+    {
+      "name": "cdl3blackcrows",
+      "real_option_count": 0
+    },
+    {
+      "name": "cdl3inside",
+      "real_option_count": 0
+    },
+    {
+      "name": "cdl3linestrike",
+      "real_option_count": 0
+    },
+    {
+      "name": "cdl3outside",
+      "real_option_count": 0
+    },
+    {
+      "name": "cdl3starsinsouth",
+      "real_option_count": 0
+    },
+    {
+      "name": "cdl3whitesoldiers",
+      "real_option_count": 0
+    },
+    {
+      "name": "cdlabandonedbaby",
+      "real_option_count": 1
+    },
+    {
+      "name": "cdladvanceblock",
+      "real_option_count": 0
+    },
+    {
+      "name": "cdlbelthold",
+      "real_option_count": 0
+    },
+    {
+      "name": "cdlbreakaway",
+      "real_option_count": 0
+    },
+    {
+      "name": "cdlclosingmarubozu",
+      "real_option_count": 0
+    },
+    {
+      "name": "cdlconcealbabyswall",
+      "real_option_count": 0
+    },
+    {
+      "name": "cdlcounterattack",
+      "real_option_count": 0
+    },
+    {
+      "name": "cdldarkcloudcover",
+      "real_option_count": 1
+    },
+    {
+      "name": "cdldoji",
+      "real_option_count": 0
+    },
+    {
+      "name": "cdldojistar",
+      "real_option_count": 0
+    },
+    {
+      "name": "cdldragonflydoji",
+      "real_option_count": 0
+    },
+    {
+      "name": "cdlengulfing",
+      "real_option_count": 0
+    },
+    {
+      "name": "cdleveningdojistar",
+      "real_option_count": 1
+    },
+    {
+      "name": "cdleveningstar",
+      "real_option_count": 1
+    },
+    {
+      "name": "cdlgapsidesidewhite",
+      "real_option_count": 0
+    },
+    {
+      "name": "cdlgravestonedoji",
+      "real_option_count": 0
+    },
+    {
+      "name": "cdlhammer",
+      "real_option_count": 0
+    },
+    {
+      "name": "cdlhangingman",
+      "real_option_count": 0
+    },
+    {
+      "name": "cdlharami",
+      "real_option_count": 0
+    },
+    {
+      "name": "cdlharamicross",
+      "real_option_count": 0
+    },
+    {
+      "name": "cdlhighwave",
+      "real_option_count": 0
+    },
+    {
+      "name": "cdlhikkake",
+      "real_option_count": 0
+    },
+    {
+      "name": "cdlhikkakemod",
+      "real_option_count": 0
+    },
+    {
+      "name": "cdlhomingpigeon",
+      "real_option_count": 0
+    },
+    {
+      "name": "cdlidentical3crows",
+      "real_option_count": 0
+    },
+    {
+      "name": "cdlinneck",
+      "real_option_count": 0
+    },
+    {
+      "name": "cdlinvertedhammer",
+      "real_option_count": 0
+    },
+    {
+      "name": "cdlkicking",
+      "real_option_count": 0
+    },
+    {
+      "name": "cdlkickingbylength",
+      "real_option_count": 0
+    },
+    {
+      "name": "cdlladderbottom",
+      "real_option_count": 0
+    },
+    {
+      "name": "cdllongleggeddoji",
+      "real_option_count": 0
+    },
+    {
+      "name": "cdllongline",
+      "real_option_count": 0
+    },
+    {
+      "name": "cdlmarubozu",
+      "real_option_count": 0
+    },
+    {
+      "name": "cdlmatchinglow",
+      "real_option_count": 0
+    },
+    {
+      "name": "cdlmathold",
+      "real_option_count": 1
+    },
+    {
+      "name": "cdlmorningdojistar",
+      "real_option_count": 1
+    },
+    {
+      "name": "cdlmorningstar",
+      "real_option_count": 1
+    },
+    {
+      "name": "cdlonneck",
+      "real_option_count": 0
+    },
+    {
+      "name": "cdlpiercing",
+      "real_option_count": 0
+    },
+    {
+      "name": "cdlrickshawman",
+      "real_option_count": 0
+    },
+    {
+      "name": "cdlrisefall3methods",
+      "real_option_count": 0
+    },
+    {
+      "name": "cdlseparatinglines",
+      "real_option_count": 0
+    },
+    {
+      "name": "cdlshootingstar",
+      "real_option_count": 0
+    },
+    {
+      "name": "cdlshortline",
+      "real_option_count": 0
+    },
+    {
+      "name": "cdlspinningtop",
+      "real_option_count": 0
+    },
+    {
+      "name": "cdlstalledpattern",
+      "real_option_count": 0
+    },
+    {
+      "name": "cdlsticksandwich",
+      "real_option_count": 0
+    },
+    {
+      "name": "cdltakuri",
+      "real_option_count": 0
+    },
+    {
+      "name": "cdltasukigap",
+      "real_option_count": 0
+    },
+    {
+      "name": "cdlthrusting",
+      "real_option_count": 0
+    },
+    {
+      "name": "cdltristar",
+      "real_option_count": 0
+    },
+    {
+      "name": "cdlunique3river",
+      "real_option_count": 0
+    },
+    {
+      "name": "cdlupsidegap2crows",
+      "real_option_count": 0
+    },
+    {
+      "name": "cdlxsidegap3methods",
+      "real_option_count": 0
+    },
+    {
+      "name": "ceil",
+      "real_option_count": 0
+    },
+    {
+      "name": "cmf",
+      "real_option_count": 0
+    },
+    {
+      "name": "cmo",
+      "real_option_count": 0
+    },
+    {
+      "name": "cmou",
+      "real_option_count": 0
+    },
+    {
+      "name": "coppock",
+      "real_option_count": 0
+    },
+    {
+      "name": "correl",
+      "real_option_count": 0
+    },
+    {
+      "name": "cos",
+      "real_option_count": 0
+    },
+    {
+      "name": "cosh",
+      "real_option_count": 0
+    },
+    {
+      "name": "cumsum",
+      "real_option_count": 0
+    },
+    {
+      "name": "cvi",
+      "real_option_count": 0
+    },
+    {
+      "name": "dema",
+      "real_option_count": 0
+    },
+    {
+      "name": "div",
+      "real_option_count": 0
+    },
+    {
+      "name": "donchian",
+      "real_option_count": 0
+    },
+    {
+      "name": "dpo",
+      "real_option_count": 0
+    },
+    {
+      "name": "dx",
+      "real_option_count": 0
+    },
+    {
+      "name": "efi",
+      "real_option_count": 0
+    },
+    {
+      "name": "ema",
+      "real_option_count": 0
+    },
+    {
+      "name": "er",
+      "real_option_count": 0
+    },
+    {
+      "name": "eri",
+      "real_option_count": 0
+    },
+    {
+      "name": "exp",
+      "real_option_count": 0
+    },
+    {
+      "name": "floor",
+      "real_option_count": 0
+    },
+    {
+      "name": "fosc",
+      "real_option_count": 0
+    },
+    {
+      "name": "fractal",
+      "real_option_count": 0
+    },
+    {
+      "name": "ha",
+      "real_option_count": 0
+    },
+    {
+      "name": "hma",
+      "real_option_count": 0
+    },
+    {
+      "name": "ht_dcperiod",
+      "real_option_count": 0
+    },
+    {
+      "name": "ht_dcphase",
+      "real_option_count": 0
+    },
+    {
+      "name": "ht_phasor",
+      "real_option_count": 0
+    },
+    {
+      "name": "ht_sine",
+      "real_option_count": 0
+    },
+    {
+      "name": "ht_trendline",
+      "real_option_count": 0
+    },
+    {
+      "name": "ht_trendmode",
+      "real_option_count": 0
+    },
+    {
+      "name": "imi",
+      "real_option_count": 0
+    },
+    {
+      "name": "kama",
+      "real_option_count": 0
+    },
+    {
+      "name": "kc",
+      "real_option_count": 1
+    },
+    {
+      "name": "kdj",
+      "real_option_count": 0
+    },
+    {
+      "name": "linearreg",
+      "real_option_count": 0
+    },
+    {
+      "name": "linearreg_angle",
+      "real_option_count": 0
+    },
+    {
+      "name": "linearreg_intercept",
+      "real_option_count": 0
+    },
+    {
+      "name": "linearreg_slope",
+      "real_option_count": 0
+    },
+    {
+      "name": "ln",
+      "real_option_count": 0
+    },
+    {
+      "name": "log10",
+      "real_option_count": 0
+    },
+    {
+      "name": "ma",
+      "real_option_count": 0
+    },
+    {
+      "name": "macd",
+      "real_option_count": 0
+    },
+    {
+      "name": "macdext",
+      "real_option_count": 0
+    },
+    {
+      "name": "macdfix",
+      "real_option_count": 0
+    },
+    {
+      "name": "mama",
+      "real_option_count": 2
+    },
+    {
+      "name": "marketfi",
+      "real_option_count": 0
+    },
+    {
+      "name": "massi",
+      "real_option_count": 0
+    },
+    {
+      "name": "mavp",
+      "real_option_count": 0
+    },
+    {
+      "name": "max",
+      "real_option_count": 0
+    },
+    {
+      "name": "maxindex",
+      "real_option_count": 0
+    },
+    {
+      "name": "medprice",
+      "real_option_count": 0
+    },
+    {
+      "name": "mfi",
+      "real_option_count": 0
+    },
+    {
+      "name": "midpoint",
+      "real_option_count": 0
+    },
+    {
+      "name": "midprice",
+      "real_option_count": 0
+    },
+    {
+      "name": "min",
+      "real_option_count": 0
+    },
+    {
+      "name": "minindex",
+      "real_option_count": 0
+    },
+    {
+      "name": "minmax",
+      "real_option_count": 0
+    },
+    {
+      "name": "minmaxindex",
+      "real_option_count": 0
+    },
+    {
+      "name": "minus_di",
+      "real_option_count": 0
+    },
+    {
+      "name": "minus_dm",
+      "real_option_count": 0
+    },
+    {
+      "name": "mom",
+      "real_option_count": 0
+    },
+    {
+      "name": "mult",
+      "real_option_count": 0
+    },
+    {
+      "name": "natr",
+      "real_option_count": 0
+    },
+    {
+      "name": "nvi",
+      "real_option_count": 0
+    },
+    {
+      "name": "obv",
+      "real_option_count": 0
+    },
+    {
+      "name": "percentile",
+      "real_option_count": 1
+    },
+    {
+      "name": "percentrank",
+      "real_option_count": 0
+    },
+    {
+      "name": "plus_di",
+      "real_option_count": 0
+    },
+    {
+      "name": "plus_dm",
+      "real_option_count": 0
+    },
+    {
+      "name": "ppo",
+      "real_option_count": 0
+    },
+    {
+      "name": "pvi",
+      "real_option_count": 0
+    },
+    {
+      "name": "pvo",
+      "real_option_count": 0
+    },
+    {
+      "name": "pvt",
+      "real_option_count": 0
+    },
+    {
+      "name": "qstick",
+      "real_option_count": 0
+    },
+    {
+      "name": "rma",
+      "real_option_count": 0
+    },
+    {
+      "name": "roc",
+      "real_option_count": 0
+    },
+    {
+      "name": "rocp",
+      "real_option_count": 0
+    },
+    {
+      "name": "rocr",
+      "real_option_count": 0
+    },
+    {
+      "name": "rocr100",
+      "real_option_count": 0
+    },
+    {
+      "name": "rsi",
+      "real_option_count": 0
+    },
+    {
+      "name": "rvi",
+      "real_option_count": 0
+    },
+    {
+      "name": "rvol",
+      "real_option_count": 0
+    },
+    {
+      "name": "sar",
+      "real_option_count": 2
+    },
+    {
+      "name": "sarext",
+      "real_option_count": 8
+    },
+    {
+      "name": "sin",
+      "real_option_count": 0
+    },
+    {
+      "name": "sinh",
+      "real_option_count": 0
+    },
+    {
+      "name": "sma",
+      "real_option_count": 0
+    },
+    {
+      "name": "smi",
+      "real_option_count": 0
+    },
+    {
+      "name": "sqrt",
+      "real_option_count": 0
+    },
+    {
+      "name": "stddev",
+      "real_option_count": 1
+    },
+    {
+      "name": "stoch",
+      "real_option_count": 0
+    },
+    {
+      "name": "stochf",
+      "real_option_count": 0
+    },
+    {
+      "name": "stochrsi",
+      "real_option_count": 0
+    },
+    {
+      "name": "sub",
+      "real_option_count": 0
+    },
+    {
+      "name": "sum",
+      "real_option_count": 0
+    },
+    {
+      "name": "supertrend",
+      "real_option_count": 1
+    },
+    {
+      "name": "t3",
+      "real_option_count": 1
+    },
+    {
+      "name": "tan",
+      "real_option_count": 0
+    },
+    {
+      "name": "tanh",
+      "real_option_count": 0
+    },
+    {
+      "name": "tema",
+      "real_option_count": 0
+    },
+    {
+      "name": "trange",
+      "real_option_count": 0
+    },
+    {
+      "name": "trima",
+      "real_option_count": 0
+    },
+    {
+      "name": "trix",
+      "real_option_count": 0
+    },
+    {
+      "name": "tsf",
+      "real_option_count": 0
+    },
+    {
+      "name": "tsi",
+      "real_option_count": 0
+    },
+    {
+      "name": "typprice",
+      "real_option_count": 0
+    },
+    {
+      "name": "ultosc",
+      "real_option_count": 0
+    },
+    {
+      "name": "var",
+      "real_option_count": 1
+    },
+    {
+      "name": "vhf",
+      "real_option_count": 0
+    },
+    {
+      "name": "vortex",
+      "real_option_count": 0
+    },
+    {
+      "name": "vwap",
+      "real_option_count": 0
+    },
+    {
+      "name": "vwma",
+      "real_option_count": 0
+    },
+    {
+      "name": "wad",
+      "real_option_count": 0
+    },
+    {
+      "name": "wclprice",
+      "real_option_count": 0
+    },
+    {
+      "name": "willr",
+      "real_option_count": 0
+    },
+    {
+      "name": "wma",
+      "real_option_count": 0
+    },
+    {
+      "name": "zlema",
+      "real_option_count": 0
+    }
+  ],
+  "options": [
+    {
+      "function": "bbands",
+      "option": "nbdevup",
+      "c_name": "optInNbDevUp",
+      "metadata": {
+        "index": 1,
+        "name": "optInNbDevUp",
+        "kind": "RealRange",
+        "default": 2,
+        "minimum": -3e+37,
+        "maximum": 3e+37
+      },
+      "variants": [
+        {
+          "name": "omitted_default",
+          "bits": null
+        },
+        {
+          "name": "explicit_default",
+          "bits": "4000000000000000"
+        },
+        {
+          "name": "nan",
+          "bits": "7ff8000000000000"
+        },
+        {
+          "name": "positive_infinity",
+          "bits": "7ff0000000000000"
+        },
+        {
+          "name": "negative_infinity",
+          "bits": "fff0000000000000"
+        },
+        {
+          "name": "default_sentinel",
+          "bits": "c7be17b84357691b"
+        },
+        {
+          "name": "finite_below_minimum",
+          "bits": "c7b691ca32818ed6"
+        },
+        {
+          "name": "finite_above_maximum",
+          "bits": "47b691ca32818ed6"
+        },
+        {
+          "name": "finite_far_low",
+          "bits": "fe37e43c8800759c"
+        },
+        {
+          "name": "finite_far_high",
+          "bits": "7e37e43c8800759c"
+        },
+        {
+          "name": "positive_zero",
+          "bits": "0000000000000000"
+        },
+        {
+          "name": "negative_zero",
+          "bits": "8000000000000000"
+        },
+        {
+          "name": "minimum",
+          "bits": "c7b691ca32818ed5"
+        },
+        {
+          "name": "maximum",
+          "bits": "47b691ca32818ed5"
+        }
+      ]
+    },
+    {
+      "function": "bbands",
+      "option": "nbdevdn",
+      "c_name": "optInNbDevDn",
+      "metadata": {
+        "index": 2,
+        "name": "optInNbDevDn",
+        "kind": "RealRange",
+        "default": 2,
+        "minimum": -3e+37,
+        "maximum": 3e+37
+      },
+      "variants": [
+        {
+          "name": "omitted_default",
+          "bits": null
+        },
+        {
+          "name": "explicit_default",
+          "bits": "4000000000000000"
+        },
+        {
+          "name": "nan",
+          "bits": "7ff8000000000000"
+        },
+        {
+          "name": "positive_infinity",
+          "bits": "7ff0000000000000"
+        },
+        {
+          "name": "negative_infinity",
+          "bits": "fff0000000000000"
+        },
+        {
+          "name": "default_sentinel",
+          "bits": "c7be17b84357691b"
+        },
+        {
+          "name": "finite_below_minimum",
+          "bits": "c7b691ca32818ed6"
+        },
+        {
+          "name": "finite_above_maximum",
+          "bits": "47b691ca32818ed6"
+        },
+        {
+          "name": "finite_far_low",
+          "bits": "fe37e43c8800759c"
+        },
+        {
+          "name": "finite_far_high",
+          "bits": "7e37e43c8800759c"
+        },
+        {
+          "name": "positive_zero",
+          "bits": "0000000000000000"
+        },
+        {
+          "name": "negative_zero",
+          "bits": "8000000000000000"
+        },
+        {
+          "name": "minimum",
+          "bits": "c7b691ca32818ed5"
+        },
+        {
+          "name": "maximum",
+          "bits": "47b691ca32818ed5"
+        }
+      ]
+    },
+    {
+      "function": "cdlabandonedbaby",
+      "option": "penetration",
+      "c_name": "optInPenetration",
+      "metadata": {
+        "index": 0,
+        "name": "optInPenetration",
+        "kind": "RealRange",
+        "default": 0.3,
+        "minimum": 0,
+        "maximum": 3e+37
+      },
+      "variants": [
+        {
+          "name": "omitted_default",
+          "bits": null
+        },
+        {
+          "name": "explicit_default",
+          "bits": "3fd3333333333333"
+        },
+        {
+          "name": "nan",
+          "bits": "7ff8000000000000"
+        },
+        {
+          "name": "positive_infinity",
+          "bits": "7ff0000000000000"
+        },
+        {
+          "name": "negative_infinity",
+          "bits": "fff0000000000000"
+        },
+        {
+          "name": "default_sentinel",
+          "bits": "c7be17b84357691b"
+        },
+        {
+          "name": "finite_below_minimum",
+          "bits": "8000000000000001"
+        },
+        {
+          "name": "finite_above_maximum",
+          "bits": "47b691ca32818ed6"
+        },
+        {
+          "name": "finite_far_low",
+          "bits": "fe37e43c8800759c"
+        },
+        {
+          "name": "finite_far_high",
+          "bits": "7e37e43c8800759c"
+        },
+        {
+          "name": "positive_zero",
+          "bits": "0000000000000000"
+        },
+        {
+          "name": "negative_zero",
+          "bits": "8000000000000000"
+        },
+        {
+          "name": "minimum",
+          "bits": "0000000000000000"
+        },
+        {
+          "name": "maximum",
+          "bits": "47b691ca32818ed5"
+        }
+      ]
+    },
+    {
+      "function": "cdldarkcloudcover",
+      "option": "penetration",
+      "c_name": "optInPenetration",
+      "metadata": {
+        "index": 0,
+        "name": "optInPenetration",
+        "kind": "RealRange",
+        "default": 0.5,
+        "minimum": 0,
+        "maximum": 3e+37
+      },
+      "variants": [
+        {
+          "name": "omitted_default",
+          "bits": null
+        },
+        {
+          "name": "explicit_default",
+          "bits": "3fe0000000000000"
+        },
+        {
+          "name": "nan",
+          "bits": "7ff8000000000000"
+        },
+        {
+          "name": "positive_infinity",
+          "bits": "7ff0000000000000"
+        },
+        {
+          "name": "negative_infinity",
+          "bits": "fff0000000000000"
+        },
+        {
+          "name": "default_sentinel",
+          "bits": "c7be17b84357691b"
+        },
+        {
+          "name": "finite_below_minimum",
+          "bits": "8000000000000001"
+        },
+        {
+          "name": "finite_above_maximum",
+          "bits": "47b691ca32818ed6"
+        },
+        {
+          "name": "finite_far_low",
+          "bits": "fe37e43c8800759c"
+        },
+        {
+          "name": "finite_far_high",
+          "bits": "7e37e43c8800759c"
+        },
+        {
+          "name": "positive_zero",
+          "bits": "0000000000000000"
+        },
+        {
+          "name": "negative_zero",
+          "bits": "8000000000000000"
+        },
+        {
+          "name": "minimum",
+          "bits": "0000000000000000"
+        },
+        {
+          "name": "maximum",
+          "bits": "47b691ca32818ed5"
+        }
+      ]
+    },
+    {
+      "function": "cdleveningdojistar",
+      "option": "penetration",
+      "c_name": "optInPenetration",
+      "metadata": {
+        "index": 0,
+        "name": "optInPenetration",
+        "kind": "RealRange",
+        "default": 0.3,
+        "minimum": 0,
+        "maximum": 3e+37
+      },
+      "variants": [
+        {
+          "name": "omitted_default",
+          "bits": null
+        },
+        {
+          "name": "explicit_default",
+          "bits": "3fd3333333333333"
+        },
+        {
+          "name": "nan",
+          "bits": "7ff8000000000000"
+        },
+        {
+          "name": "positive_infinity",
+          "bits": "7ff0000000000000"
+        },
+        {
+          "name": "negative_infinity",
+          "bits": "fff0000000000000"
+        },
+        {
+          "name": "default_sentinel",
+          "bits": "c7be17b84357691b"
+        },
+        {
+          "name": "finite_below_minimum",
+          "bits": "8000000000000001"
+        },
+        {
+          "name": "finite_above_maximum",
+          "bits": "47b691ca32818ed6"
+        },
+        {
+          "name": "finite_far_low",
+          "bits": "fe37e43c8800759c"
+        },
+        {
+          "name": "finite_far_high",
+          "bits": "7e37e43c8800759c"
+        },
+        {
+          "name": "positive_zero",
+          "bits": "0000000000000000"
+        },
+        {
+          "name": "negative_zero",
+          "bits": "8000000000000000"
+        },
+        {
+          "name": "minimum",
+          "bits": "0000000000000000"
+        },
+        {
+          "name": "maximum",
+          "bits": "47b691ca32818ed5"
+        }
+      ]
+    },
+    {
+      "function": "cdleveningstar",
+      "option": "penetration",
+      "c_name": "optInPenetration",
+      "metadata": {
+        "index": 0,
+        "name": "optInPenetration",
+        "kind": "RealRange",
+        "default": 0.3,
+        "minimum": 0,
+        "maximum": 3e+37
+      },
+      "variants": [
+        {
+          "name": "omitted_default",
+          "bits": null
+        },
+        {
+          "name": "explicit_default",
+          "bits": "3fd3333333333333"
+        },
+        {
+          "name": "nan",
+          "bits": "7ff8000000000000"
+        },
+        {
+          "name": "positive_infinity",
+          "bits": "7ff0000000000000"
+        },
+        {
+          "name": "negative_infinity",
+          "bits": "fff0000000000000"
+        },
+        {
+          "name": "default_sentinel",
+          "bits": "c7be17b84357691b"
+        },
+        {
+          "name": "finite_below_minimum",
+          "bits": "8000000000000001"
+        },
+        {
+          "name": "finite_above_maximum",
+          "bits": "47b691ca32818ed6"
+        },
+        {
+          "name": "finite_far_low",
+          "bits": "fe37e43c8800759c"
+        },
+        {
+          "name": "finite_far_high",
+          "bits": "7e37e43c8800759c"
+        },
+        {
+          "name": "positive_zero",
+          "bits": "0000000000000000"
+        },
+        {
+          "name": "negative_zero",
+          "bits": "8000000000000000"
+        },
+        {
+          "name": "minimum",
+          "bits": "0000000000000000"
+        },
+        {
+          "name": "maximum",
+          "bits": "47b691ca32818ed5"
+        }
+      ]
+    },
+    {
+      "function": "cdlmathold",
+      "option": "penetration",
+      "c_name": "optInPenetration",
+      "metadata": {
+        "index": 0,
+        "name": "optInPenetration",
+        "kind": "RealRange",
+        "default": 0.5,
+        "minimum": 0,
+        "maximum": 3e+37
+      },
+      "variants": [
+        {
+          "name": "omitted_default",
+          "bits": null
+        },
+        {
+          "name": "explicit_default",
+          "bits": "3fe0000000000000"
+        },
+        {
+          "name": "nan",
+          "bits": "7ff8000000000000"
+        },
+        {
+          "name": "positive_infinity",
+          "bits": "7ff0000000000000"
+        },
+        {
+          "name": "negative_infinity",
+          "bits": "fff0000000000000"
+        },
+        {
+          "name": "default_sentinel",
+          "bits": "c7be17b84357691b"
+        },
+        {
+          "name": "finite_below_minimum",
+          "bits": "8000000000000001"
+        },
+        {
+          "name": "finite_above_maximum",
+          "bits": "47b691ca32818ed6"
+        },
+        {
+          "name": "finite_far_low",
+          "bits": "fe37e43c8800759c"
+        },
+        {
+          "name": "finite_far_high",
+          "bits": "7e37e43c8800759c"
+        },
+        {
+          "name": "positive_zero",
+          "bits": "0000000000000000"
+        },
+        {
+          "name": "negative_zero",
+          "bits": "8000000000000000"
+        },
+        {
+          "name": "minimum",
+          "bits": "0000000000000000"
+        },
+        {
+          "name": "maximum",
+          "bits": "47b691ca32818ed5"
+        }
+      ]
+    },
+    {
+      "function": "cdlmorningdojistar",
+      "option": "penetration",
+      "c_name": "optInPenetration",
+      "metadata": {
+        "index": 0,
+        "name": "optInPenetration",
+        "kind": "RealRange",
+        "default": 0.3,
+        "minimum": 0,
+        "maximum": 3e+37
+      },
+      "variants": [
+        {
+          "name": "omitted_default",
+          "bits": null
+        },
+        {
+          "name": "explicit_default",
+          "bits": "3fd3333333333333"
+        },
+        {
+          "name": "nan",
+          "bits": "7ff8000000000000"
+        },
+        {
+          "name": "positive_infinity",
+          "bits": "7ff0000000000000"
+        },
+        {
+          "name": "negative_infinity",
+          "bits": "fff0000000000000"
+        },
+        {
+          "name": "default_sentinel",
+          "bits": "c7be17b84357691b"
+        },
+        {
+          "name": "finite_below_minimum",
+          "bits": "8000000000000001"
+        },
+        {
+          "name": "finite_above_maximum",
+          "bits": "47b691ca32818ed6"
+        },
+        {
+          "name": "finite_far_low",
+          "bits": "fe37e43c8800759c"
+        },
+        {
+          "name": "finite_far_high",
+          "bits": "7e37e43c8800759c"
+        },
+        {
+          "name": "positive_zero",
+          "bits": "0000000000000000"
+        },
+        {
+          "name": "negative_zero",
+          "bits": "8000000000000000"
+        },
+        {
+          "name": "minimum",
+          "bits": "0000000000000000"
+        },
+        {
+          "name": "maximum",
+          "bits": "47b691ca32818ed5"
+        }
+      ]
+    },
+    {
+      "function": "cdlmorningstar",
+      "option": "penetration",
+      "c_name": "optInPenetration",
+      "metadata": {
+        "index": 0,
+        "name": "optInPenetration",
+        "kind": "RealRange",
+        "default": 0.3,
+        "minimum": 0,
+        "maximum": 3e+37
+      },
+      "variants": [
+        {
+          "name": "omitted_default",
+          "bits": null
+        },
+        {
+          "name": "explicit_default",
+          "bits": "3fd3333333333333"
+        },
+        {
+          "name": "nan",
+          "bits": "7ff8000000000000"
+        },
+        {
+          "name": "positive_infinity",
+          "bits": "7ff0000000000000"
+        },
+        {
+          "name": "negative_infinity",
+          "bits": "fff0000000000000"
+        },
+        {
+          "name": "default_sentinel",
+          "bits": "c7be17b84357691b"
+        },
+        {
+          "name": "finite_below_minimum",
+          "bits": "8000000000000001"
+        },
+        {
+          "name": "finite_above_maximum",
+          "bits": "47b691ca32818ed6"
+        },
+        {
+          "name": "finite_far_low",
+          "bits": "fe37e43c8800759c"
+        },
+        {
+          "name": "finite_far_high",
+          "bits": "7e37e43c8800759c"
+        },
+        {
+          "name": "positive_zero",
+          "bits": "0000000000000000"
+        },
+        {
+          "name": "negative_zero",
+          "bits": "8000000000000000"
+        },
+        {
+          "name": "minimum",
+          "bits": "0000000000000000"
+        },
+        {
+          "name": "maximum",
+          "bits": "47b691ca32818ed5"
+        }
+      ]
+    },
+    {
+      "function": "kc",
+      "option": "nbdev",
+      "c_name": "optInNbDev",
+      "metadata": {
+        "index": 2,
+        "name": "optInNbDev",
+        "kind": "RealRange",
+        "default": 2,
+        "minimum": -3e+37,
+        "maximum": 3e+37
+      },
+      "variants": [
+        {
+          "name": "omitted_default",
+          "bits": null
+        },
+        {
+          "name": "explicit_default",
+          "bits": "4000000000000000"
+        },
+        {
+          "name": "nan",
+          "bits": "7ff8000000000000"
+        },
+        {
+          "name": "positive_infinity",
+          "bits": "7ff0000000000000"
+        },
+        {
+          "name": "negative_infinity",
+          "bits": "fff0000000000000"
+        },
+        {
+          "name": "default_sentinel",
+          "bits": "c7be17b84357691b"
+        },
+        {
+          "name": "finite_below_minimum",
+          "bits": "c7b691ca32818ed6"
+        },
+        {
+          "name": "finite_above_maximum",
+          "bits": "47b691ca32818ed6"
+        },
+        {
+          "name": "finite_far_low",
+          "bits": "fe37e43c8800759c"
+        },
+        {
+          "name": "finite_far_high",
+          "bits": "7e37e43c8800759c"
+        },
+        {
+          "name": "positive_zero",
+          "bits": "0000000000000000"
+        },
+        {
+          "name": "negative_zero",
+          "bits": "8000000000000000"
+        },
+        {
+          "name": "minimum",
+          "bits": "c7b691ca32818ed5"
+        },
+        {
+          "name": "maximum",
+          "bits": "47b691ca32818ed5"
+        }
+      ]
+    },
+    {
+      "function": "mama",
+      "option": "fastlimit",
+      "c_name": "optInFastLimit",
+      "metadata": {
+        "index": 0,
+        "name": "optInFastLimit",
+        "kind": "RealRange",
+        "default": 0.5,
+        "minimum": 0.01,
+        "maximum": 0.99
+      },
+      "variants": [
+        {
+          "name": "omitted_default",
+          "bits": null
+        },
+        {
+          "name": "explicit_default",
+          "bits": "3fe0000000000000"
+        },
+        {
+          "name": "nan",
+          "bits": "7ff8000000000000"
+        },
+        {
+          "name": "positive_infinity",
+          "bits": "7ff0000000000000"
+        },
+        {
+          "name": "negative_infinity",
+          "bits": "fff0000000000000"
+        },
+        {
+          "name": "default_sentinel",
+          "bits": "c7be17b84357691b"
+        },
+        {
+          "name": "finite_below_minimum",
+          "bits": "3f847ae147ae147a"
+        },
+        {
+          "name": "finite_above_maximum",
+          "bits": "3fefae147ae147af"
+        },
+        {
+          "name": "finite_far_low",
+          "bits": "fe37e43c8800759c"
+        },
+        {
+          "name": "finite_far_high",
+          "bits": "7e37e43c8800759c"
+        },
+        {
+          "name": "positive_zero",
+          "bits": "0000000000000000"
+        },
+        {
+          "name": "negative_zero",
+          "bits": "8000000000000000"
+        },
+        {
+          "name": "minimum",
+          "bits": "3f847ae147ae147b"
+        },
+        {
+          "name": "maximum",
+          "bits": "3fefae147ae147ae"
+        }
+      ]
+    },
+    {
+      "function": "mama",
+      "option": "slowlimit",
+      "c_name": "optInSlowLimit",
+      "metadata": {
+        "index": 1,
+        "name": "optInSlowLimit",
+        "kind": "RealRange",
+        "default": 0.05,
+        "minimum": 0.01,
+        "maximum": 0.99
+      },
+      "variants": [
+        {
+          "name": "omitted_default",
+          "bits": null
+        },
+        {
+          "name": "explicit_default",
+          "bits": "3fa999999999999a"
+        },
+        {
+          "name": "nan",
+          "bits": "7ff8000000000000"
+        },
+        {
+          "name": "positive_infinity",
+          "bits": "7ff0000000000000"
+        },
+        {
+          "name": "negative_infinity",
+          "bits": "fff0000000000000"
+        },
+        {
+          "name": "default_sentinel",
+          "bits": "c7be17b84357691b"
+        },
+        {
+          "name": "finite_below_minimum",
+          "bits": "3f847ae147ae147a"
+        },
+        {
+          "name": "finite_above_maximum",
+          "bits": "3fefae147ae147af"
+        },
+        {
+          "name": "finite_far_low",
+          "bits": "fe37e43c8800759c"
+        },
+        {
+          "name": "finite_far_high",
+          "bits": "7e37e43c8800759c"
+        },
+        {
+          "name": "positive_zero",
+          "bits": "0000000000000000"
+        },
+        {
+          "name": "negative_zero",
+          "bits": "8000000000000000"
+        },
+        {
+          "name": "minimum",
+          "bits": "3f847ae147ae147b"
+        },
+        {
+          "name": "maximum",
+          "bits": "3fefae147ae147ae"
+        }
+      ]
+    },
+    {
+      "function": "percentile",
+      "option": "percentile",
+      "c_name": "optInPercentile",
+      "metadata": {
+        "index": 1,
+        "name": "optInPercentile",
+        "kind": "RealRange",
+        "default": 50,
+        "minimum": 0,
+        "maximum": 100
+      },
+      "variants": [
+        {
+          "name": "omitted_default",
+          "bits": null
+        },
+        {
+          "name": "explicit_default",
+          "bits": "4049000000000000"
+        },
+        {
+          "name": "nan",
+          "bits": "7ff8000000000000"
+        },
+        {
+          "name": "positive_infinity",
+          "bits": "7ff0000000000000"
+        },
+        {
+          "name": "negative_infinity",
+          "bits": "fff0000000000000"
+        },
+        {
+          "name": "default_sentinel",
+          "bits": "c7be17b84357691b"
+        },
+        {
+          "name": "finite_below_minimum",
+          "bits": "8000000000000001"
+        },
+        {
+          "name": "finite_above_maximum",
+          "bits": "4059000000000001"
+        },
+        {
+          "name": "finite_far_low",
+          "bits": "fe37e43c8800759c"
+        },
+        {
+          "name": "finite_far_high",
+          "bits": "7e37e43c8800759c"
+        },
+        {
+          "name": "positive_zero",
+          "bits": "0000000000000000"
+        },
+        {
+          "name": "negative_zero",
+          "bits": "8000000000000000"
+        },
+        {
+          "name": "minimum",
+          "bits": "0000000000000000"
+        },
+        {
+          "name": "maximum",
+          "bits": "4059000000000000"
+        }
+      ]
+    },
+    {
+      "function": "sar",
+      "option": "acceleration",
+      "c_name": "optInAcceleration",
+      "metadata": {
+        "index": 0,
+        "name": "optInAcceleration",
+        "kind": "RealRange",
+        "default": 0.02,
+        "minimum": 0,
+        "maximum": 3e+37
+      },
+      "variants": [
+        {
+          "name": "omitted_default",
+          "bits": null
+        },
+        {
+          "name": "explicit_default",
+          "bits": "3f947ae147ae147b"
+        },
+        {
+          "name": "nan",
+          "bits": "7ff8000000000000"
+        },
+        {
+          "name": "positive_infinity",
+          "bits": "7ff0000000000000"
+        },
+        {
+          "name": "negative_infinity",
+          "bits": "fff0000000000000"
+        },
+        {
+          "name": "default_sentinel",
+          "bits": "c7be17b84357691b"
+        },
+        {
+          "name": "finite_below_minimum",
+          "bits": "8000000000000001"
+        },
+        {
+          "name": "finite_above_maximum",
+          "bits": "47b691ca32818ed6"
+        },
+        {
+          "name": "finite_far_low",
+          "bits": "fe37e43c8800759c"
+        },
+        {
+          "name": "finite_far_high",
+          "bits": "7e37e43c8800759c"
+        },
+        {
+          "name": "positive_zero",
+          "bits": "0000000000000000"
+        },
+        {
+          "name": "negative_zero",
+          "bits": "8000000000000000"
+        },
+        {
+          "name": "minimum",
+          "bits": "0000000000000000"
+        },
+        {
+          "name": "maximum",
+          "bits": "47b691ca32818ed5"
+        }
+      ]
+    },
+    {
+      "function": "sar",
+      "option": "maximum",
+      "c_name": "optInMaximum",
+      "metadata": {
+        "index": 1,
+        "name": "optInMaximum",
+        "kind": "RealRange",
+        "default": 0.2,
+        "minimum": 0,
+        "maximum": 3e+37
+      },
+      "variants": [
+        {
+          "name": "omitted_default",
+          "bits": null
+        },
+        {
+          "name": "explicit_default",
+          "bits": "3fc999999999999a"
+        },
+        {
+          "name": "nan",
+          "bits": "7ff8000000000000"
+        },
+        {
+          "name": "positive_infinity",
+          "bits": "7ff0000000000000"
+        },
+        {
+          "name": "negative_infinity",
+          "bits": "fff0000000000000"
+        },
+        {
+          "name": "default_sentinel",
+          "bits": "c7be17b84357691b"
+        },
+        {
+          "name": "finite_below_minimum",
+          "bits": "8000000000000001"
+        },
+        {
+          "name": "finite_above_maximum",
+          "bits": "47b691ca32818ed6"
+        },
+        {
+          "name": "finite_far_low",
+          "bits": "fe37e43c8800759c"
+        },
+        {
+          "name": "finite_far_high",
+          "bits": "7e37e43c8800759c"
+        },
+        {
+          "name": "positive_zero",
+          "bits": "0000000000000000"
+        },
+        {
+          "name": "negative_zero",
+          "bits": "8000000000000000"
+        },
+        {
+          "name": "minimum",
+          "bits": "0000000000000000"
+        },
+        {
+          "name": "maximum",
+          "bits": "47b691ca32818ed5"
+        }
+      ]
+    },
+    {
+      "function": "sarext",
+      "option": "startvalue",
+      "c_name": "optInStartValue",
+      "metadata": {
+        "index": 0,
+        "name": "optInStartValue",
+        "kind": "RealRange",
+        "default": 0,
+        "minimum": -3e+37,
+        "maximum": 3e+37
+      },
+      "variants": [
+        {
+          "name": "omitted_default",
+          "bits": null
+        },
+        {
+          "name": "explicit_default",
+          "bits": "0000000000000000"
+        },
+        {
+          "name": "nan",
+          "bits": "7ff8000000000000"
+        },
+        {
+          "name": "positive_infinity",
+          "bits": "7ff0000000000000"
+        },
+        {
+          "name": "negative_infinity",
+          "bits": "fff0000000000000"
+        },
+        {
+          "name": "default_sentinel",
+          "bits": "c7be17b84357691b"
+        },
+        {
+          "name": "finite_below_minimum",
+          "bits": "c7b691ca32818ed6"
+        },
+        {
+          "name": "finite_above_maximum",
+          "bits": "47b691ca32818ed6"
+        },
+        {
+          "name": "finite_far_low",
+          "bits": "fe37e43c8800759c"
+        },
+        {
+          "name": "finite_far_high",
+          "bits": "7e37e43c8800759c"
+        },
+        {
+          "name": "positive_zero",
+          "bits": "0000000000000000"
+        },
+        {
+          "name": "negative_zero",
+          "bits": "8000000000000000"
+        },
+        {
+          "name": "minimum",
+          "bits": "c7b691ca32818ed5"
+        },
+        {
+          "name": "maximum",
+          "bits": "47b691ca32818ed5"
+        }
+      ]
+    },
+    {
+      "function": "sarext",
+      "option": "offsetonreverse",
+      "c_name": "optInOffsetOnReverse",
+      "metadata": {
+        "index": 1,
+        "name": "optInOffsetOnReverse",
+        "kind": "RealRange",
+        "default": 0,
+        "minimum": 0,
+        "maximum": 3e+37
+      },
+      "variants": [
+        {
+          "name": "omitted_default",
+          "bits": null
+        },
+        {
+          "name": "explicit_default",
+          "bits": "0000000000000000"
+        },
+        {
+          "name": "nan",
+          "bits": "7ff8000000000000"
+        },
+        {
+          "name": "positive_infinity",
+          "bits": "7ff0000000000000"
+        },
+        {
+          "name": "negative_infinity",
+          "bits": "fff0000000000000"
+        },
+        {
+          "name": "default_sentinel",
+          "bits": "c7be17b84357691b"
+        },
+        {
+          "name": "finite_below_minimum",
+          "bits": "8000000000000001"
+        },
+        {
+          "name": "finite_above_maximum",
+          "bits": "47b691ca32818ed6"
+        },
+        {
+          "name": "finite_far_low",
+          "bits": "fe37e43c8800759c"
+        },
+        {
+          "name": "finite_far_high",
+          "bits": "7e37e43c8800759c"
+        },
+        {
+          "name": "positive_zero",
+          "bits": "0000000000000000"
+        },
+        {
+          "name": "negative_zero",
+          "bits": "8000000000000000"
+        },
+        {
+          "name": "minimum",
+          "bits": "0000000000000000"
+        },
+        {
+          "name": "maximum",
+          "bits": "47b691ca32818ed5"
+        }
+      ]
+    },
+    {
+      "function": "sarext",
+      "option": "accelerationinitlong",
+      "c_name": "optInAccelerationInitLong",
+      "metadata": {
+        "index": 2,
+        "name": "optInAccelerationInitLong",
+        "kind": "RealRange",
+        "default": 0.02,
+        "minimum": 0,
+        "maximum": 3e+37
+      },
+      "variants": [
+        {
+          "name": "omitted_default",
+          "bits": null
+        },
+        {
+          "name": "explicit_default",
+          "bits": "3f947ae147ae147b"
+        },
+        {
+          "name": "nan",
+          "bits": "7ff8000000000000"
+        },
+        {
+          "name": "positive_infinity",
+          "bits": "7ff0000000000000"
+        },
+        {
+          "name": "negative_infinity",
+          "bits": "fff0000000000000"
+        },
+        {
+          "name": "default_sentinel",
+          "bits": "c7be17b84357691b"
+        },
+        {
+          "name": "finite_below_minimum",
+          "bits": "8000000000000001"
+        },
+        {
+          "name": "finite_above_maximum",
+          "bits": "47b691ca32818ed6"
+        },
+        {
+          "name": "finite_far_low",
+          "bits": "fe37e43c8800759c"
+        },
+        {
+          "name": "finite_far_high",
+          "bits": "7e37e43c8800759c"
+        },
+        {
+          "name": "positive_zero",
+          "bits": "0000000000000000"
+        },
+        {
+          "name": "negative_zero",
+          "bits": "8000000000000000"
+        },
+        {
+          "name": "minimum",
+          "bits": "0000000000000000"
+        },
+        {
+          "name": "maximum",
+          "bits": "47b691ca32818ed5"
+        }
+      ]
+    },
+    {
+      "function": "sarext",
+      "option": "accelerationlong",
+      "c_name": "optInAccelerationLong",
+      "metadata": {
+        "index": 3,
+        "name": "optInAccelerationLong",
+        "kind": "RealRange",
+        "default": 0.02,
+        "minimum": 0,
+        "maximum": 3e+37
+      },
+      "variants": [
+        {
+          "name": "omitted_default",
+          "bits": null
+        },
+        {
+          "name": "explicit_default",
+          "bits": "3f947ae147ae147b"
+        },
+        {
+          "name": "nan",
+          "bits": "7ff8000000000000"
+        },
+        {
+          "name": "positive_infinity",
+          "bits": "7ff0000000000000"
+        },
+        {
+          "name": "negative_infinity",
+          "bits": "fff0000000000000"
+        },
+        {
+          "name": "default_sentinel",
+          "bits": "c7be17b84357691b"
+        },
+        {
+          "name": "finite_below_minimum",
+          "bits": "8000000000000001"
+        },
+        {
+          "name": "finite_above_maximum",
+          "bits": "47b691ca32818ed6"
+        },
+        {
+          "name": "finite_far_low",
+          "bits": "fe37e43c8800759c"
+        },
+        {
+          "name": "finite_far_high",
+          "bits": "7e37e43c8800759c"
+        },
+        {
+          "name": "positive_zero",
+          "bits": "0000000000000000"
+        },
+        {
+          "name": "negative_zero",
+          "bits": "8000000000000000"
+        },
+        {
+          "name": "minimum",
+          "bits": "0000000000000000"
+        },
+        {
+          "name": "maximum",
+          "bits": "47b691ca32818ed5"
+        }
+      ]
+    },
+    {
+      "function": "sarext",
+      "option": "accelerationmaxlong",
+      "c_name": "optInAccelerationMaxLong",
+      "metadata": {
+        "index": 4,
+        "name": "optInAccelerationMaxLong",
+        "kind": "RealRange",
+        "default": 0.2,
+        "minimum": 0,
+        "maximum": 3e+37
+      },
+      "variants": [
+        {
+          "name": "omitted_default",
+          "bits": null
+        },
+        {
+          "name": "explicit_default",
+          "bits": "3fc999999999999a"
+        },
+        {
+          "name": "nan",
+          "bits": "7ff8000000000000"
+        },
+        {
+          "name": "positive_infinity",
+          "bits": "7ff0000000000000"
+        },
+        {
+          "name": "negative_infinity",
+          "bits": "fff0000000000000"
+        },
+        {
+          "name": "default_sentinel",
+          "bits": "c7be17b84357691b"
+        },
+        {
+          "name": "finite_below_minimum",
+          "bits": "8000000000000001"
+        },
+        {
+          "name": "finite_above_maximum",
+          "bits": "47b691ca32818ed6"
+        },
+        {
+          "name": "finite_far_low",
+          "bits": "fe37e43c8800759c"
+        },
+        {
+          "name": "finite_far_high",
+          "bits": "7e37e43c8800759c"
+        },
+        {
+          "name": "positive_zero",
+          "bits": "0000000000000000"
+        },
+        {
+          "name": "negative_zero",
+          "bits": "8000000000000000"
+        },
+        {
+          "name": "minimum",
+          "bits": "0000000000000000"
+        },
+        {
+          "name": "maximum",
+          "bits": "47b691ca32818ed5"
+        }
+      ]
+    },
+    {
+      "function": "sarext",
+      "option": "accelerationinitshort",
+      "c_name": "optInAccelerationInitShort",
+      "metadata": {
+        "index": 5,
+        "name": "optInAccelerationInitShort",
+        "kind": "RealRange",
+        "default": 0.02,
+        "minimum": 0,
+        "maximum": 3e+37
+      },
+      "variants": [
+        {
+          "name": "omitted_default",
+          "bits": null
+        },
+        {
+          "name": "explicit_default",
+          "bits": "3f947ae147ae147b"
+        },
+        {
+          "name": "nan",
+          "bits": "7ff8000000000000"
+        },
+        {
+          "name": "positive_infinity",
+          "bits": "7ff0000000000000"
+        },
+        {
+          "name": "negative_infinity",
+          "bits": "fff0000000000000"
+        },
+        {
+          "name": "default_sentinel",
+          "bits": "c7be17b84357691b"
+        },
+        {
+          "name": "finite_below_minimum",
+          "bits": "8000000000000001"
+        },
+        {
+          "name": "finite_above_maximum",
+          "bits": "47b691ca32818ed6"
+        },
+        {
+          "name": "finite_far_low",
+          "bits": "fe37e43c8800759c"
+        },
+        {
+          "name": "finite_far_high",
+          "bits": "7e37e43c8800759c"
+        },
+        {
+          "name": "positive_zero",
+          "bits": "0000000000000000"
+        },
+        {
+          "name": "negative_zero",
+          "bits": "8000000000000000"
+        },
+        {
+          "name": "minimum",
+          "bits": "0000000000000000"
+        },
+        {
+          "name": "maximum",
+          "bits": "47b691ca32818ed5"
+        }
+      ]
+    },
+    {
+      "function": "sarext",
+      "option": "accelerationshort",
+      "c_name": "optInAccelerationShort",
+      "metadata": {
+        "index": 6,
+        "name": "optInAccelerationShort",
+        "kind": "RealRange",
+        "default": 0.02,
+        "minimum": 0,
+        "maximum": 3e+37
+      },
+      "variants": [
+        {
+          "name": "omitted_default",
+          "bits": null
+        },
+        {
+          "name": "explicit_default",
+          "bits": "3f947ae147ae147b"
+        },
+        {
+          "name": "nan",
+          "bits": "7ff8000000000000"
+        },
+        {
+          "name": "positive_infinity",
+          "bits": "7ff0000000000000"
+        },
+        {
+          "name": "negative_infinity",
+          "bits": "fff0000000000000"
+        },
+        {
+          "name": "default_sentinel",
+          "bits": "c7be17b84357691b"
+        },
+        {
+          "name": "finite_below_minimum",
+          "bits": "8000000000000001"
+        },
+        {
+          "name": "finite_above_maximum",
+          "bits": "47b691ca32818ed6"
+        },
+        {
+          "name": "finite_far_low",
+          "bits": "fe37e43c8800759c"
+        },
+        {
+          "name": "finite_far_high",
+          "bits": "7e37e43c8800759c"
+        },
+        {
+          "name": "positive_zero",
+          "bits": "0000000000000000"
+        },
+        {
+          "name": "negative_zero",
+          "bits": "8000000000000000"
+        },
+        {
+          "name": "minimum",
+          "bits": "0000000000000000"
+        },
+        {
+          "name": "maximum",
+          "bits": "47b691ca32818ed5"
+        }
+      ]
+    },
+    {
+      "function": "sarext",
+      "option": "accelerationmaxshort",
+      "c_name": "optInAccelerationMaxShort",
+      "metadata": {
+        "index": 7,
+        "name": "optInAccelerationMaxShort",
+        "kind": "RealRange",
+        "default": 0.2,
+        "minimum": 0,
+        "maximum": 3e+37
+      },
+      "variants": [
+        {
+          "name": "omitted_default",
+          "bits": null
+        },
+        {
+          "name": "explicit_default",
+          "bits": "3fc999999999999a"
+        },
+        {
+          "name": "nan",
+          "bits": "7ff8000000000000"
+        },
+        {
+          "name": "positive_infinity",
+          "bits": "7ff0000000000000"
+        },
+        {
+          "name": "negative_infinity",
+          "bits": "fff0000000000000"
+        },
+        {
+          "name": "default_sentinel",
+          "bits": "c7be17b84357691b"
+        },
+        {
+          "name": "finite_below_minimum",
+          "bits": "8000000000000001"
+        },
+        {
+          "name": "finite_above_maximum",
+          "bits": "47b691ca32818ed6"
+        },
+        {
+          "name": "finite_far_low",
+          "bits": "fe37e43c8800759c"
+        },
+        {
+          "name": "finite_far_high",
+          "bits": "7e37e43c8800759c"
+        },
+        {
+          "name": "positive_zero",
+          "bits": "0000000000000000"
+        },
+        {
+          "name": "negative_zero",
+          "bits": "8000000000000000"
+        },
+        {
+          "name": "minimum",
+          "bits": "0000000000000000"
+        },
+        {
+          "name": "maximum",
+          "bits": "47b691ca32818ed5"
+        }
+      ]
+    },
+    {
+      "function": "stddev",
+      "option": "nbdev",
+      "c_name": "optInNbDev",
+      "metadata": {
+        "index": 1,
+        "name": "optInNbDev",
+        "kind": "RealRange",
+        "default": 1,
+        "minimum": -3e+37,
+        "maximum": 3e+37
+      },
+      "variants": [
+        {
+          "name": "omitted_default",
+          "bits": null
+        },
+        {
+          "name": "explicit_default",
+          "bits": "3ff0000000000000"
+        },
+        {
+          "name": "nan",
+          "bits": "7ff8000000000000"
+        },
+        {
+          "name": "positive_infinity",
+          "bits": "7ff0000000000000"
+        },
+        {
+          "name": "negative_infinity",
+          "bits": "fff0000000000000"
+        },
+        {
+          "name": "default_sentinel",
+          "bits": "c7be17b84357691b"
+        },
+        {
+          "name": "finite_below_minimum",
+          "bits": "c7b691ca32818ed6"
+        },
+        {
+          "name": "finite_above_maximum",
+          "bits": "47b691ca32818ed6"
+        },
+        {
+          "name": "finite_far_low",
+          "bits": "fe37e43c8800759c"
+        },
+        {
+          "name": "finite_far_high",
+          "bits": "7e37e43c8800759c"
+        },
+        {
+          "name": "positive_zero",
+          "bits": "0000000000000000"
+        },
+        {
+          "name": "negative_zero",
+          "bits": "8000000000000000"
+        },
+        {
+          "name": "minimum",
+          "bits": "c7b691ca32818ed5"
+        },
+        {
+          "name": "maximum",
+          "bits": "47b691ca32818ed5"
+        }
+      ]
+    },
+    {
+      "function": "supertrend",
+      "option": "multiplier",
+      "c_name": "optInMultiplier",
+      "metadata": {
+        "index": 1,
+        "name": "optInMultiplier",
+        "kind": "RealRange",
+        "default": 3,
+        "minimum": 0,
+        "maximum": 3e+37
+      },
+      "variants": [
+        {
+          "name": "omitted_default",
+          "bits": null
+        },
+        {
+          "name": "explicit_default",
+          "bits": "4008000000000000"
+        },
+        {
+          "name": "nan",
+          "bits": "7ff8000000000000"
+        },
+        {
+          "name": "positive_infinity",
+          "bits": "7ff0000000000000"
+        },
+        {
+          "name": "negative_infinity",
+          "bits": "fff0000000000000"
+        },
+        {
+          "name": "default_sentinel",
+          "bits": "c7be17b84357691b"
+        },
+        {
+          "name": "finite_below_minimum",
+          "bits": "8000000000000001"
+        },
+        {
+          "name": "finite_above_maximum",
+          "bits": "47b691ca32818ed6"
+        },
+        {
+          "name": "finite_far_low",
+          "bits": "fe37e43c8800759c"
+        },
+        {
+          "name": "finite_far_high",
+          "bits": "7e37e43c8800759c"
+        },
+        {
+          "name": "positive_zero",
+          "bits": "0000000000000000"
+        },
+        {
+          "name": "negative_zero",
+          "bits": "8000000000000000"
+        },
+        {
+          "name": "minimum",
+          "bits": "0000000000000000"
+        },
+        {
+          "name": "maximum",
+          "bits": "47b691ca32818ed5"
+        }
+      ]
+    },
+    {
+      "function": "t3",
+      "option": "vfactor",
+      "c_name": "optInVFactor",
+      "metadata": {
+        "index": 1,
+        "name": "optInVFactor",
+        "kind": "RealRange",
+        "default": 0.7,
+        "minimum": 0,
+        "maximum": 1
+      },
+      "variants": [
+        {
+          "name": "omitted_default",
+          "bits": null
+        },
+        {
+          "name": "explicit_default",
+          "bits": "3fe6666666666666"
+        },
+        {
+          "name": "nan",
+          "bits": "7ff8000000000000"
+        },
+        {
+          "name": "positive_infinity",
+          "bits": "7ff0000000000000"
+        },
+        {
+          "name": "negative_infinity",
+          "bits": "fff0000000000000"
+        },
+        {
+          "name": "default_sentinel",
+          "bits": "c7be17b84357691b"
+        },
+        {
+          "name": "finite_below_minimum",
+          "bits": "8000000000000001"
+        },
+        {
+          "name": "finite_above_maximum",
+          "bits": "3ff0000000000001"
+        },
+        {
+          "name": "finite_far_low",
+          "bits": "fe37e43c8800759c"
+        },
+        {
+          "name": "finite_far_high",
+          "bits": "7e37e43c8800759c"
+        },
+        {
+          "name": "positive_zero",
+          "bits": "0000000000000000"
+        },
+        {
+          "name": "negative_zero",
+          "bits": "8000000000000000"
+        },
+        {
+          "name": "minimum",
+          "bits": "0000000000000000"
+        },
+        {
+          "name": "maximum",
+          "bits": "3ff0000000000000"
+        }
+      ]
+    },
+    {
+      "function": "var",
+      "option": "nbdev",
+      "c_name": "optInNbDev",
+      "metadata": {
+        "index": 1,
+        "name": "optInNbDev",
+        "kind": "RealRange",
+        "default": 1,
+        "minimum": -3e+37,
+        "maximum": 3e+37
+      },
+      "variants": [
+        {
+          "name": "omitted_default",
+          "bits": null
+        },
+        {
+          "name": "explicit_default",
+          "bits": "3ff0000000000000"
+        },
+        {
+          "name": "nan",
+          "bits": "7ff8000000000000"
+        },
+        {
+          "name": "positive_infinity",
+          "bits": "7ff0000000000000"
+        },
+        {
+          "name": "negative_infinity",
+          "bits": "fff0000000000000"
+        },
+        {
+          "name": "default_sentinel",
+          "bits": "c7be17b84357691b"
+        },
+        {
+          "name": "finite_below_minimum",
+          "bits": "c7b691ca32818ed6"
+        },
+        {
+          "name": "finite_above_maximum",
+          "bits": "47b691ca32818ed6"
+        },
+        {
+          "name": "finite_far_low",
+          "bits": "fe37e43c8800759c"
+        },
+        {
+          "name": "finite_far_high",
+          "bits": "7e37e43c8800759c"
+        },
+        {
+          "name": "positive_zero",
+          "bits": "0000000000000000"
+        },
+        {
+          "name": "negative_zero",
+          "bits": "8000000000000000"
+        },
+        {
+          "name": "minimum",
+          "bits": "c7b691ca32818ed5"
+        },
+        {
+          "name": "maximum",
+          "bits": "47b691ca32818ed5"
+        }
+      ]
+    }
+  ],
+  "fixtures": [
+    "empty",
+    "one",
+    "finite",
+    "null_chunked_offset",
+    "interleaved_over"
+  ],
+  "forms": [
+    "namespace",
+    "expression_method"
+  ],
+  "expected_public_cases_per_side": 3780,
+  "api_sha256": "4cecc1369547816e15da3a19fd393d35f76b2c7ce530603de0d0231f750160df",
+  "c081_metadata_sha256": "13c03bc27f5bc76c2eb282af6529c18f470affaf7be13b54cf4d68b7c15c08d8",
+  "reference": {
+    "original_commit": "b2bbc26d41ec80823c8bffb0cc436a97f29911cc",
+    "c_version": "0.8.1",
+    "c_source_archive_sha256": "ec59ccd88c0c77f618587d858787c8f9d06c40460a09d66751926f6fd670f985",
+    "wheel_sha256": "df2e642dfe7262e3cce84f686ec4bcfe2af1417612e958d44c17784561b84c12",
+    "native_sha256": "247d46ab4d9e860b8bd15ec277a4a41afae3f380941195624909609c33ecf1b9",
+    "provenance": "Original b2 Mac arm64 product build; public expectation comparisons use declared cross-platform finite tolerance1e-10"
+  },
+  "forms_description": {
+    "namespace": "module function with explicit expression inputs",
+    "expression_method": "expression namespace with receiver/keyword bindings from public_api_coverage.json"
+  },
+  "exclusions": [
+    "184 functions without real-valued options are inventoried, not replayed here",
+    "String-input parsing and implicit default-column forms belong to test_public_usage.py",
+    "No performance, serialization of NumPy option scalars, or new parameter policy"
+  ]
+}
