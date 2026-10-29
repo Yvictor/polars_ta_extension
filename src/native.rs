@@ -155,15 +155,14 @@ pub fn compute<const INPUTS: usize, const OUTPUTS: usize>(
             written,
         ));
     }
-    let fields = outputs
-        .into_iter()
-        .enumerate()
-        .map(|(i, out)| output_series(out, names.get(i).copied().unwrap_or(""), offset, written))
-        .collect::<Vec<_>>();
+    // StructChunked borrows this slice while constructing its owned fields.
+    // The frozen output arity lets us avoid a descriptor Vec per partition.
+    let mut names = names.iter().copied();
+    let fields = outputs.map(|out| output_series(out, names.next().unwrap_or(""), offset, written));
     Ok(StructChunked::new("", &fields)?.into_series())
 }
 
-fn output_series(out: Output, name: &str, offset: usize, written: usize) -> Series {
+pub(crate) fn output_series(out: Output, name: &str, offset: usize, written: usize) -> Series {
     match out {
         Output::Real(mut v) => {
             v[..offset].fill(f64::NAN);
