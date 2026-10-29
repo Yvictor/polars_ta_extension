@@ -1,0 +1,98 @@
+{
+  "base": "4334163d3a1f5019aa9051342316b936a4dfb994",
+  "current_official_main_checked": "ccd3172940ed1d9daa4e7197f2265810852e8910",
+  "current_main_relevant_paths_identical": true,
+  "source_files": {
+    "ta_codegen/generator/src/backends/rust_lang.rs": "40174a5b5b127b43b61db8d406431a0bff1a9bac3fe998889be19d84814450ce",
+    "ta_codegen/generator/src/backends/rust_window.rs": "f3cbac1187b318233594d0463af3ca54ec21d7de2669630c9baa11e4a0fc9c63",
+    "ta_codegen/output/rust/library/src/ta_func/cdlengulfing.rs": "788f557ffbf7564ac009109926ac8444461cb5490d978adde4d23f3a09adc782",
+    "ta_codegen/output/rust/library/tests/cdlengulfing_window.rs": "c6bc2cd7ab802cdb4f624d5113935439a810f8484fa32885de950db29c172a58"
+  },
+  "gates": {
+    "generator": {
+      "unit_pass": 517,
+      "integration_pass": 624,
+      "doc_ignored": 1,
+      "log": "generator-all-tests.log"
+    },
+    "window_planner": {
+      "pass": 29,
+      "log": "window-tests.log"
+    },
+    "library": {
+      "pass": 105,
+      "final_focused_contracts_pass": 3,
+      "logs": [
+        "library-all-tests.log",
+        "focused-contracts.log"
+      ]
+    },
+    "clippy": {
+      "generator_all_targets": true,
+      "library_all_targets": true,
+      "logs": [
+        "generator-clippy.log",
+        "library-clippy.log"
+      ]
+    },
+    "codegen": {
+      "C_pass": 237,
+      "Rust_pass": 237,
+      "log": "full-codegen-parity.log"
+    },
+    "engulf_bit_hash": {
+      "Rust_cases": 294,
+      "ride_verdicts": 285,
+      "mismatches": 0,
+      "log": "engulf-xlang-hash.log"
+    },
+    "full_regen": {
+      "command": [
+        "python3",
+        "/tmp/polars-recovery/upstream-engulf/scripts/quiet.py",
+        "noisy",
+        "engulf-recovery-final-regen",
+        "--defer=60",
+        "--",
+        "/Users/ec666/.rustup/toolchains/1.97.0-aarch64-apple-darwin/bin/cargo",
+        "run",
+        "--manifest-path",
+        "/tmp/polars-recovery/upstream-engulf/ta_codegen/generator/Cargo.toml",
+        "--release",
+        "--",
+        "generate"
+      ],
+      "returncode": 0,
+      "tracked_files": 2641,
+      "changed_after_second_full_generate": [],
+      "generated_engulf_sha256": "788f557ffbf7564ac009109926ac8444461cb5490d978adde4d23f3a09adc782"
+    }
+  },
+  "static": {
+    "compiler": "Rust1.97.0 LLVM22.1.6",
+    "target": "x86_64-unknown-linux-gnu",
+    "profile": "release portable ThinLTO codegen-units1",
+    "actual_post_lto_saved_objects": true,
+    "target_execution": false,
+    "private_bytes_baseline": 750,
+    "private_bytes_candidate": 1097,
+    "public_wrapper_bytes_both": 324,
+    "window_hot_region": [
+      "0x16f",
+      "0x229"
+    ],
+    "remaining_function_panic_references": "original fallback; per-call entry assertions remain",
+    "proofs": [
+      "fastpath-proof.json",
+      "expanded-cfg-proof.json"
+    ]
+  },
+  "limits": [
+    "No local performance measurements or speed claim",
+    "Old missing-volume artifacts remain unavailable; matched baseline/candidate rebuilt independently in tmp",
+    "Current C reference is main433 0.8.4; CI C0.8.1 remains separate comparator",
+    "Actual postLTO saved ELF objects use no-op final host linker, no x86 execution",
+    "Candidate entry cost and larger function may regress short calls; same-runner CI required",
+    "No consumer56/stable6d/source pin changes or push"
+  ]
+}

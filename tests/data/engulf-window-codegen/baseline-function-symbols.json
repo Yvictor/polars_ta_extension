@@ -1,0 +1,16 @@
+[
+  {
+    "object": "/tmp/polars-recovery/engulf-evidence/baseline/harness.ta_lib-51fa72f709535b83.ta_lib.b5d8fdef4152009c-cgu.0.rcgu.o.rcgu.o",
+    "object_sha256": "d3f5e85754b5cc4ead77272cb3588f2707fe7c160fba17a4f51e8b8e0702a5de",
+    "symbol": "_RNvMNtNtCsfBYb8xZ4HAC_6ta_lib7ta_func12cdlengulfingNtNtB4_5types4Core12cdlengulfing",
+    "size": 324,
+    "assembly": "/tmp/polars-recovery/engulf-evidence/baseline/0-engulf-postlto.asm"
+  },
+  {
+    "object": "/tmp/polars-recovery/engulf-evidence/baseline/harness.ta_lib-51fa72f709535b83.ta_lib.b5d8fdef4152009c-cgu.0.rcgu.o.rcgu.o",
+    "object_sha256": "d3f5e85754b5cc4ead77272cb3588f2707fe7c160fba17a4f51e8b8e0702a5de",
+    "symbol": "_RNvMNtNtCsfBYb8xZ4HAC_6ta_lib7ta_func12cdlengulfingNtNtB4_5types4Core17cdlengulfing_impl.llvm.5944653387456274579",
+    "size": 750,
+    "assembly": "/tmp/polars-recovery/engulf-evidence/baseline/1-engulf-postlto.asm"
+  }
+]

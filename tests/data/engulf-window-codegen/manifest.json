@@ -1,0 +1,22 @@
+{
+  "baseline_commit": "4334163d3a1f5019aa9051342316b936a4dfb994",
+  "candidate_commit": "2ea9da4c800244d3e09a8b7ef30b340913e03b38",
+  "scope": "Pre-CI static x86_64 proof, not timing or a proof of CI machine code. Entry checks and panic fallback retained; hot region only.",
+  "files": {
+    "expanded-cfg-proof.md": "66d415fd23d57926e7e1b55809ad28a1b2962955a3a632abc7d7855806081b9f",
+    "fastpath-proof.json": "f9ca81edb6a798ad007fd9dbedec0d58709f9cb259d2307ab0bc5b0820a810ba",
+    "candidate-function-symbols.json": "91062fa71e8d2b408ae92aadb52d4c7f5ed7a879e88cc7cef6d753157c7876b9",
+    "candidate-0-engulf-postlto.asm": "d0680a566dfdf4c664de12cc619b716aa3b2326e797a96408b20d06e5f6b2097",
+    "baseline-1-engulf-postlto.asm": "ca155608be1848aef3498a1dd687b76e94186d10d2f4c5cad3185dd3e306b524",
+    "regen-check.json": "7fd83caa0b6178981c58dc3a8f9a41551d44c009f570564e04bc036b3c2f6f50",
+    "fastpath-proof.md": "fb6ce7a935e99e48a0b96115c69cdabaaec37635482c330e883c8762999234e8",
+    "baseline-compile-commands.json": "298d04975a155a669356aa0b5534572064568713bd330633cc1af250756b154a",
+    "source-gates.json": "cb5a08a6adac1375681c21a623079f6c2387e3fefd98335204f49bdaa0a46fb1",
+    "candidate-compile-commands.json": "7f3cd32e27a78325f03a2e9f00831849cb2e1d8a9ed8cd6184801b090d876178",
+    "baseline-0-engulf-postlto.asm": "1eff9b8bad3fcb73bfc91c21cbcffd6d34a5db73f89b10d54a825d98f22634b7",
+    "baseline-function-symbols.json": "3004b34b6a6dc5c0f54836b37242cb2de6bddfba253d3d944b53882a68cfaba0",
+    "candidate-1-engulf-postlto.asm": "6be653b1469079faca4d22ca3057a4c51f5119fa6352e67018706299c89a0e0b",
+    "source-gates.md": "9773dd3646c9bde0e9f96e30b766ea1445b902987a79ad93e6b7594ff2428728",
+    "expanded-cfg-proof.json": "1948ac80da2048c67397b8f296028915b453524f0090544b8f7ed5ff03fbf768"
+  }
+}

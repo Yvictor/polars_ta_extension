@@ -1,0 +1,79 @@
+[
+  {
+    "command": [
+      "python3",
+      "/tmp/polars-recovery/upstream-engulf/scripts/quiet.py",
+      "noisy",
+      "engulf-recovery-candidate-0",
+      "--defer=60",
+      "--",
+      "/Users/ec666/.rustup/toolchains/1.97.0-aarch64-apple-darwin/bin/cargo",
+      "build",
+      "--release",
+      "--locked",
+      "-p",
+      "ta-lib",
+      "--target",
+      "x86_64-unknown-linux-gnu",
+      "--manifest-path",
+      "/tmp/polars-recovery/upstream-engulf/ta_codegen/output/rust/Cargo.toml"
+    ],
+    "returncode": 0,
+    "environment": {
+      "CARGO_BUILD_BUILD_DIR": "/tmp/polars-recovery/engulf-evidence/candidate/build",
+      "RUSTC": "/Users/ec666/.rustup/toolchains/1.97.0-aarch64-apple-darwin/bin/rustc",
+      "CARGO_HOME": "/tmp/polars-recovery/engulf-evidence/cargo-home",
+      "CARGO_TARGET_DIR": "/tmp/polars-recovery/engulf-evidence/candidate/target",
+      "CARGO_BUILD_JOBS": "4",
+      "CARGO_PROFILE_RELEASE_LTO": "thin",
+      "CARGO_PROFILE_RELEASE_CODEGEN_UNITS": "1",
+      "CARGO_PROFILE_RELEASE_DEBUG": "false",
+      "CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUSTFLAGS": "--sysroot /tmp/polars-recovery/engulf-evidence/profile-sysroot"
+    },
+    "static_only": true,
+    "target_execution": false
+  },
+  {
+    "command": [
+      "python3",
+      "/tmp/polars-recovery/upstream-engulf/scripts/quiet.py",
+      "noisy",
+      "engulf-recovery-candidate-1",
+      "--defer=60",
+      "--",
+      "/Users/ec666/.rustup/toolchains/1.97.0-aarch64-apple-darwin/bin/rustc",
+      "--edition=2021",
+      "--sysroot",
+      "/tmp/polars-recovery/engulf-evidence/profile-sysroot",
+      "--target",
+      "x86_64-unknown-linux-gnu",
+      "-O",
+      "-Clto=thin",
+      "-Ccodegen-units=1",
+      "--emit=link",
+      "/tmp/polars-recovery/engulf-evidence/baseline/probe.rs",
+      "-Ldependency=/tmp/polars-recovery/engulf-evidence/candidate/build/x86_64-unknown-linux-gnu/release/deps",
+      "-Ldependency=/tmp/polars-recovery/engulf-evidence/candidate/target/release/deps",
+      "--extern",
+      "ta_lib=/tmp/polars-recovery/engulf-evidence/candidate/target/x86_64-unknown-linux-gnu/release/libta_lib.rlib",
+      "-o",
+      "/tmp/polars-recovery/engulf-evidence/candidate/harness",
+      "-Csave-temps",
+      "-Clinker=/usr/bin/true"
+    ],
+    "returncode": 0,
+    "environment": {
+      "CARGO_BUILD_BUILD_DIR": "/tmp/polars-recovery/engulf-evidence/candidate/build",
+      "RUSTC": "/Users/ec666/.rustup/toolchains/1.97.0-aarch64-apple-darwin/bin/rustc",
+      "CARGO_HOME": "/tmp/polars-recovery/engulf-evidence/cargo-home",
+      "CARGO_TARGET_DIR": "/tmp/polars-recovery/engulf-evidence/candidate/target",
+      "CARGO_BUILD_JOBS": "4",
+      "CARGO_PROFILE_RELEASE_LTO": "thin",
+      "CARGO_PROFILE_RELEASE_CODEGEN_UNITS": "1",
+      "CARGO_PROFILE_RELEASE_DEBUG": "false",
+      "CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUSTFLAGS": "--sysroot /tmp/polars-recovery/engulf-evidence/profile-sysroot"
+    },
+    "static_only": true,
+    "target_execution": false
+  }
+]

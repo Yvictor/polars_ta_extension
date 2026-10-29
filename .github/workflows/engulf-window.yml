@@ -1,0 +1,128 @@
+name: Selected Engulf window evidence
+on:
+  push:
+    branches: [codex/engulf-window-ci]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: engulf-window-${{ github.ref }}
+  cancel-in-progress: false
+env:
+  CANDIDATE_COMMIT: 2ea9da4c800244d3e09a8b7ef30b340913e03b38
+  BASELINE_COMMIT: 4334163d3a1f5019aa9051342316b936a4dfb994
+  ORIGINAL_COMMIT: b2bbc26d41ec80823c8bffb0cc436a97f29911cc
+  RUSTUP_TOOLCHAIN: '1.97.0'
+  CARGO_BUILD_JOBS: '4'
+  CARGO_TERM_COLOR: never
+  CARGO_PROFILE_RELEASE_LTO: thin
+  CARGO_PROFILE_RELEASE_CODEGEN_UNITS: '1'
+  CARGO_PROFILE_RELEASE_DEBUG: 'false'
+  RUSTFLAGS: ''
+  CARGO_ENCODED_RUSTFLAGS: ''
+  CFLAGS: ''
+  CXXFLAGS: ''
+  OMP_NUM_THREADS: '1'
+  OPENBLAS_NUM_THREADS: '1'
+  MKL_NUM_THREADS: '1'
+jobs:
+  engulf-window:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 150
+    steps:
+      - name: Require reviewed immutable candidate before checkout
+        run: |
+          python3 - <<'PY'
+          import os,re
+          p=os.environ['CANDIDATE_COMMIT']
+          assert re.fullmatch('[0-9a-f]{40}',p), 'Candidate is unset; no checkout, build or timing is permitted'
+          assert p=='2ea9da4c800244d3e09a8b7ef30b340913e03b38'
+          assert p!=os.environ['BASELINE_COMMIT']
+          PY
+      - uses: actions/checkout@v6
+        with:
+          path: control-source
+      - uses: actions/checkout@v6
+        with:
+          repository: Yvictor/ta-lib-native
+          ref: ${{ env.BASELINE_COMMIT }}
+          path: sources/baseline
+      - uses: actions/checkout@v6
+        with:
+          repository: Yvictor/ta-lib-native
+          ref: ${{ env.CANDIDATE_COMMIT }}
+          fetch-depth: 0
+          path: sources/candidate
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ env.ORIGINAL_COMMIT }}
+          path: sources/original
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - uses: dtolnay/rust-toolchain@1.97.0
+        with:
+          components: clippy,rustfmt
+      - name: Fixed Python tooling and raw controller provenance
+        run: |
+          python -m venv evidence-env
+          evidence-env/bin/python -m pip install 'numpy==2.5.3' 'cmake==4.4.4'
+          echo "$PWD/evidence-env/bin" >> "$GITHUB_PATH"
+          echo "CMAKE=$PWD/evidence-env/bin/cmake" >> "$GITHUB_ENV"
+          mkdir -p engulf-window-results/controller
+          cp control-source/scripts/engulf_window_benchmark.py control-source/scripts/bench_engulf_window.rs engulf-window-results/controller/
+          cp control-source/tests/test_engulf_window_benchmark.py engulf-window-results/controller/
+          cp control-source/.github/workflows/engulf-window.yml engulf-window-results/workflow.yml
+          git -C control-source rev-parse HEAD > engulf-window-results/controller-commit.txt
+          evidence-env/bin/python -m pip freeze > engulf-window-results/python-dependencies.txt
+          rustc --version --verbose > engulf-window-results/rustc.txt
+          cc --version > engulf-window-results/cc.txt
+          lscpu > engulf-window-results/lscpu.txt
+          cat /proc/meminfo > engulf-window-results/meminfo.txt
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          args=[]
+          for side in ('original','baseline','candidate'):args+=['--'+side+'-source','sources/'+side]
+          args+=['--candidate-commit',os.environ['CANDIDATE_COMMIT'],'--output','engulf-window-results','--codegen-proof','control-source/tests/data/engulf-window-codegen']
+          Path('engulf-window-results/arguments.json').write_text(json.dumps(args,indent=2))
+          PY
+          cat > engulf-window-results/run-controller.py <<'PY'
+          import json,subprocess,sys
+          command=[sys.executable,'control-source/scripts/engulf_window_benchmark.py',*json.load(open('engulf-window-results/arguments.json')),*sys.argv[1:]]
+          subprocess.run(command,check=True)
+          PY
+      - name: Protocol rejection and actual orchestration tests without timers
+        run: evidence-env/bin/python -m unittest discover -s control-source/tests -p test_engulf_window_benchmark.py -v > engulf-window-results/protocol-tests.log 2>&1
+      - name: Fresh generator and library tests and strict Clippy before any timing
+        run: |
+          set -euo pipefail
+          cargo test --locked --manifest-path sources/candidate/ta_codegen/generator/Cargo.toml > engulf-window-results/generator-tests.log 2>&1
+          cargo clippy --locked --all-targets --manifest-path sources/candidate/ta_codegen/generator/Cargo.toml -- -D warnings > engulf-window-results/generator-clippy.log 2>&1
+          cargo test --release --locked -p ta-lib --manifest-path sources/candidate/ta_codegen/output/rust/Cargo.toml > engulf-window-results/library-tests-and-docs.log 2>&1
+          cargo clippy --release --locked --all-targets -p ta-lib --manifest-path sources/candidate/ta_codegen/output/rust/Cargo.toml -- -D warnings > engulf-window-results/library-clippy.log 2>&1
+      - name: Full regeneration and all C and Rust indicator gates before timing
+        run: |
+          set -euo pipefail
+          (cd sources/candidate && python scripts/build.py regen-check) > engulf-window-results/regen-check.log 2>&1
+          (cd sources/candidate && python scripts/build.py servers) > engulf-window-results/server-build.log 2>&1
+          (cd sources/candidate/bin && ./ta_regtest --codegen --language=c,rust) > engulf-window-results/all-indicator-regtests.log 2>&1
+          git -C sources/candidate diff --exit-code
+          git -C sources/candidate status --porcelain > engulf-window-results/candidate-status.txt
+          test ! -s engulf-window-results/candidate-status.txt
+      - name: Three identical release profiles and actual CLI test executables
+        run: evidence-env/bin/python engulf-window-results/run-controller.py --build-only
+      - name: All108 complete exact edge and main captures before1296 fresh selected children
+        run: evidence-env/bin/python engulf-window-results/run-controller.py
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: engulf-window-three-arm-evidence
+          include-hidden-files: true
+          if-no-files-found: error
+          path: |
+            engulf-window-results/
+          # The two standalone Rust target directories are only build caches;
+          # exact linked rlibs, all harness binaries, C archive/static library,
+          # source fingerprints and complete commands are retained in results.
+          compression-level: 6

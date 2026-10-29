@@ -1,0 +1,21 @@
+{
+  "command": [
+    "python3",
+    "/tmp/polars-recovery/upstream-engulf/scripts/quiet.py",
+    "noisy",
+    "engulf-recovery-final-regen",
+    "--defer=60",
+    "--",
+    "/Users/ec666/.rustup/toolchains/1.97.0-aarch64-apple-darwin/bin/cargo",
+    "run",
+    "--manifest-path",
+    "/tmp/polars-recovery/upstream-engulf/ta_codegen/generator/Cargo.toml",
+    "--release",
+    "--",
+    "generate"
+  ],
+  "returncode": 0,
+  "tracked_files": 2641,
+  "changed_after_second_full_generate": [],
+  "generated_engulf_sha256": "788f557ffbf7564ac009109926ac8444461cb5490d978adde4d23f3a09adc782"
+}

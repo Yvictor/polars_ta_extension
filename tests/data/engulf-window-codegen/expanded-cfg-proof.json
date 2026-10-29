@@ -1,0 +1,462 @@
+{
+  "original_source_sha256": "ad7b27eb2318e6434f46988b449c33f3b4d31447af89cb7da000008d6fe8ca9b",
+  "candidate_source_sha256": "788f557ffbf7564ac009109926ac8444461cb5490d978adde4d23f3a09adc782",
+  "fallback_whitespace_normalized_sha256": "374bd3e9fa16a9ea4ab5ef56ebd9f8c68915a3eefbc2e2f0446cde560e949099",
+  "candidate_fallback_count": 2,
+  "both_fallbacks_identical_to_original": true,
+  "panic_relocation_offsets": [
+    "0x415",
+    "0x425",
+    "0x435",
+    "0x445"
+  ],
+  "panic_blocks": [
+    "0x406",
+    "0x419",
+    "0x429",
+    "0x439"
+  ],
+  "all_branches": [
+    {
+      "from": "0x12",
+      "op": "jb",
+      "to": "0x332",
+      "source_region": "entry",
+      "target_region": "other_entry_or_assert"
+    },
+    {
+      "from": "0x37",
+      "op": "je",
+      "to": "0x341",
+      "source_region": "entry",
+      "target_region": "other_entry_or_assert"
+    },
+    {
+      "from": "0x4e",
+      "op": "je",
+      "to": "0x35a",
+      "source_region": "entry",
+      "target_region": "other_entry_or_assert"
+    },
+    {
+      "from": "0x65",
+      "op": "je",
+      "to": "0x373",
+      "source_region": "entry",
+      "target_region": "other_entry_or_assert"
+    },
+    {
+      "from": "0x81",
+      "op": "je",
+      "to": "0x38c",
+      "source_region": "entry",
+      "target_region": "other_entry_or_assert"
+    },
+    {
+      "from": "0xa0",
+      "op": "jae",
+      "to": "0x3a5",
+      "source_region": "entry",
+      "target_region": "other_entry_or_assert"
+    },
+    {
+      "from": "0xa9",
+      "op": "je",
+      "to": "0x3b1",
+      "source_region": "entry",
+      "target_region": "other_entry_or_assert"
+    },
+    {
+      "from": "0xbd",
+      "op": "jae",
+      "to": "0xd2",
+      "source_region": "entry",
+      "target_region": "other_entry_or_assert"
+    },
+    {
+      "from": "0xcd",
+      "op": "jmp",
+      "to": "0x330",
+      "source_region": "entry",
+      "target_region": "other_entry_or_assert"
+    },
+    {
+      "from": "0xd5",
+      "op": "jae",
+      "to": "0x3ca",
+      "source_region": "entry",
+      "target_region": "other_entry_or_assert"
+    },
+    {
+      "from": "0xde",
+      "op": "jae",
+      "to": "0x3df",
+      "source_region": "entry",
+      "target_region": "other_entry_or_assert"
+    },
+    {
+      "from": "0xfb",
+      "op": "jae",
+      "to": "0x112",
+      "source_region": "entry",
+      "target_region": "other_entry_or_assert"
+    },
+    {
+      "from": "0x10b",
+      "op": "jbe",
+      "to": "0x139",
+      "source_region": "entry",
+      "target_region": "other_entry_or_assert"
+    },
+    {
+      "from": "0x10d",
+      "op": "jmp",
+      "to": "0x229",
+      "source_region": "entry",
+      "target_region": "fallback"
+    },
+    {
+      "from": "0x133",
+      "op": "ja",
+      "to": "0x229",
+      "source_region": "entry",
+      "target_region": "fallback"
+    },
+    {
+      "from": "0x13c",
+      "op": "je",
+      "to": "0x229",
+      "source_region": "entry",
+      "target_region": "fallback"
+    },
+    {
+      "from": "0x145",
+      "op": "je",
+      "to": "0x229",
+      "source_region": "entry",
+      "target_region": "fallback"
+    },
+    {
+      "from": "0x152",
+      "op": "ja",
+      "to": "0x3f1",
+      "source_region": "entry",
+      "target_region": "other_entry_or_assert"
+    },
+    {
+      "from": "0x15b",
+      "op": "je",
+      "to": "0x328",
+      "source_region": "entry",
+      "target_region": "other_entry_or_assert"
+    },
+    {
+      "from": "0x16d",
+      "op": "jmp",
+      "to": "0x190",
+      "source_region": "entry",
+      "target_region": "window_hot"
+    },
+    {
+      "from": "0x18a",
+      "op": "je",
+      "to": "0x32a",
+      "source_region": "window_hot",
+      "target_region": "range_write_exit"
+    },
+    {
+      "from": "0x1b1",
+      "op": "jae",
+      "to": "0x1e0",
+      "source_region": "window_hot",
+      "target_region": "window_hot"
+    },
+    {
+      "from": "0x1b7",
+      "op": "jb",
+      "to": "0x180",
+      "source_region": "window_hot",
+      "target_region": "window_hot"
+    },
+    {
+      "from": "0x1bd",
+      "op": "jb",
+      "to": "0x1c5",
+      "source_region": "window_hot",
+      "target_region": "window_hot"
+    },
+    {
+      "from": "0x1c3",
+      "op": "ja",
+      "to": "0x200",
+      "source_region": "window_hot",
+      "target_region": "window_hot"
+    },
+    {
+      "from": "0x1c9",
+      "op": "jbe",
+      "to": "0x180",
+      "source_region": "window_hot",
+      "target_region": "window_hot"
+    },
+    {
+      "from": "0x1cf",
+      "op": "jae",
+      "to": "0x200",
+      "source_region": "window_hot",
+      "target_region": "window_hot"
+    },
+    {
+      "from": "0x1d1",
+      "op": "jmp",
+      "to": "0x180",
+      "source_region": "window_hot",
+      "target_region": "window_hot"
+    },
+    {
+      "from": "0x1e4",
+      "op": "jae",
+      "to": "0x180",
+      "source_region": "window_hot",
+      "target_region": "window_hot"
+    },
+    {
+      "from": "0x1ea",
+      "op": "jbe",
+      "to": "0x1f2",
+      "source_region": "window_hot",
+      "target_region": "window_hot"
+    },
+    {
+      "from": "0x1f0",
+      "op": "jae",
+      "to": "0x200",
+      "source_region": "window_hot",
+      "target_region": "window_hot"
+    },
+    {
+      "from": "0x1f6",
+      "op": "jb",
+      "to": "0x180",
+      "source_region": "window_hot",
+      "target_region": "window_hot"
+    },
+    {
+      "from": "0x1fc",
+      "op": "jbe",
+      "to": "0x180",
+      "source_region": "window_hot",
+      "target_region": "window_hot"
+    },
+    {
+      "from": "0x204",
+      "op": "jne",
+      "to": "0x20c",
+      "source_region": "window_hot",
+      "target_region": "window_hot"
+    },
+    {
+      "from": "0x206",
+      "op": "jnp",
+      "to": "0x16f",
+      "source_region": "window_hot",
+      "target_region": "window_hot"
+    },
+    {
+      "from": "0x210",
+      "op": "jne",
+      "to": "0x218",
+      "source_region": "window_hot",
+      "target_region": "window_hot"
+    },
+    {
+      "from": "0x212",
+      "op": "jnp",
+      "to": "0x16f",
+      "source_region": "window_hot",
+      "target_region": "window_hot"
+    },
+    {
+      "from": "0x224",
+      "op": "jmp",
+      "to": "0x180",
+      "source_region": "window_hot",
+      "target_region": "window_hot"
+    },
+    {
+      "from": "0x239",
+      "op": "jmp",
+      "to": "0x260",
+      "source_region": "fallback",
+      "target_region": "fallback"
+    },
+    {
+      "from": "0x246",
+      "op": "jae",
+      "to": "0x419",
+      "source_region": "fallback",
+      "target_region": "panic_bounds"
+    },
+    {
+      "from": "0x25a",
+      "op": "jae",
+      "to": "0x32a",
+      "source_region": "fallback",
+      "target_region": "range_write_exit"
+    },
+    {
+      "from": "0x263",
+      "op": "ja",
+      "to": "0x406",
+      "source_region": "fallback",
+      "target_region": "panic_bounds"
+    },
+    {
+      "from": "0x287",
+      "op": "jae",
+      "to": "0x2b0",
+      "source_region": "fallback",
+      "target_region": "fallback"
+    },
+    {
+      "from": "0x28d",
+      "op": "jb",
+      "to": "0x240",
+      "source_region": "fallback",
+      "target_region": "fallback"
+    },
+    {
+      "from": "0x293",
+      "op": "jb",
+      "to": "0x29b",
+      "source_region": "fallback",
+      "target_region": "fallback"
+    },
+    {
+      "from": "0x299",
+      "op": "ja",
+      "to": "0x2e0",
+      "source_region": "fallback",
+      "target_region": "fallback"
+    },
+    {
+      "from": "0x29f",
+      "op": "jbe",
+      "to": "0x240",
+      "source_region": "fallback",
+      "target_region": "fallback"
+    },
+    {
+      "from": "0x2a5",
+      "op": "jae",
+      "to": "0x2e0",
+      "source_region": "fallback",
+      "target_region": "fallback"
+    },
+    {
+      "from": "0x2a7",
+      "op": "jmp",
+      "to": "0x240",
+      "source_region": "fallback",
+      "target_region": "fallback"
+    },
+    {
+      "from": "0x2b4",
+      "op": "jae",
+      "to": "0x240",
+      "source_region": "fallback",
+      "target_region": "fallback"
+    },
+    {
+      "from": "0x2ba",
+      "op": "jbe",
+      "to": "0x2c2",
+      "source_region": "fallback",
+      "target_region": "fallback"
+    },
+    {
+      "from": "0x2c0",
+      "op": "jae",
+      "to": "0x2e0",
+      "source_region": "fallback",
+      "target_region": "fallback"
+    },
+    {
+      "from": "0x2c6",
+      "op": "jb",
+      "to": "0x240",
+      "source_region": "fallback",
+      "target_region": "fallback"
+    },
+    {
+      "from": "0x2d0",
+      "op": "jbe",
+      "to": "0x240",
+      "source_region": "fallback",
+      "target_region": "fallback"
+    },
+    {
+      "from": "0x2e4",
+      "op": "jne",
+      "to": "0x2e8",
+      "source_region": "fallback",
+      "target_region": "fallback"
+    },
+    {
+      "from": "0x2e6",
+      "op": "jnp",
+      "to": "0x30c",
+      "source_region": "fallback",
+      "target_region": "fallback"
+    },
+    {
+      "from": "0x2ec",
+      "op": "jne",
+      "to": "0x2f0",
+      "source_region": "fallback",
+      "target_region": "fallback"
+    },
+    {
+      "from": "0x2ee",
+      "op": "jnp",
+      "to": "0x30c",
+      "source_region": "fallback",
+      "target_region": "fallback"
+    },
+    {
+      "from": "0x2f3",
+      "op": "jae",
+      "to": "0x439",
+      "source_region": "fallback",
+      "target_region": "panic_bounds"
+    },
+    {
+      "from": "0x307",
+      "op": "jmp",
+      "to": "0x24c",
+      "source_region": "fallback",
+      "target_region": "fallback"
+    },
+    {
+      "from": "0x30f",
+      "op": "jae",
+      "to": "0x429",
+      "source_region": "fallback",
+      "target_region": "panic_bounds"
+    },
+    {
+      "from": "0x323",
+      "op": "jmp",
+      "to": "0x24c",
+      "source_region": "fallback",
+      "target_region": "fallback"
+    },
+    {
+      "from": "0x3ab",
+      "op": "jne",
+      "to": "0xaf",
+      "source_region": "exit_or_panic",
+      "target_region": "other_entry_or_assert"
+    }
+  ]
+}
