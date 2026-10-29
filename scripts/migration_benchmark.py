@@ -42,7 +42,7 @@ def frame(rows,bars):
 
 
 def case_specs(diagnostic=False):
-    """Describe layouts without constructing frames or touching the allocator."""
+    """Describe layouts without constructing frames or expressions."""
     for n in (1000, 1_000_000):
         for f in FAMILY_FUNCTIONS:
             yield f'{f}/{n}', n, 1000, False, False, (f,)

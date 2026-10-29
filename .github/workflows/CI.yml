@@ -229,7 +229,7 @@ jobs:
       - name: Build all three release wheels sequentially
         run: |
           mkdir -p benchmark-results/controller
-          cp candidate-source/scripts/adapter_ci_benchmark.py candidate-source/scripts/migration_benchmark.py candidate-source/scripts/regression_inventory.py benchmark-results/controller/
+          cp candidate-source/scripts/adapter_ci_benchmark.py candidate-source/scripts/migration_benchmark.py candidate-source/scripts/regression_inventory.py candidate-source/scripts/adapter_benchmark_cases.json benchmark-results/controller/
           cp candidate-source/.github/workflows/CI.yml benchmark-results/controller/workflow.yml
           for side in original prior candidate; do
             uv venv --python 3.12 "$side-env"

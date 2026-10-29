@@ -38,6 +38,9 @@ def test_workload_inventory_keeps_all_families_and_thread_diagnostics(modules):
     assert len(standard) == len(set(standard)) == 132
     assert len(diagnostic) == len(set(diagnostic)) == 141
     assert set(standard) < set(diagnostic)
+    controller, _ = modules
+    assert controller.requested_inventory(False, []) == standard
+    assert controller.requested_inventory(True, []) == diagnostic
     for family in ('var', 'correl', 'cmou'):
         assert f'{family}/1000000' in standard
         assert f'grouped_{family}/2000x100_interleaved' in standard
@@ -58,7 +61,8 @@ def test_selected_case_does_not_construct_other_frames(modules, monkeypatch):
     assert selected[0][1].select(selected[0][2]).height == 1000
 
 
-def test_controller_uses_fresh_single_case_children_and_keeps_goldens(modules, monkeypatch, tmp_path):
+@pytest.mark.parametrize('omit', [False, True])
+def test_controller_uses_fresh_single_case_children_and_keeps_goldens(modules, monkeypatch, tmp_path, omit):
     import argparse
     import json
     controller, _ = modules
@@ -66,7 +70,7 @@ def test_controller_uses_fresh_single_case_children_and_keeps_goldens(modules, m
     for side in controller.SIDES:
         setattr(args, side+'_python', tmp_path/side/'bin/python')
         setattr(args, side+'_source', tmp_path/side/'source')
-    inv = ['ema/1000', 'ema/1000000']
+    inv = ['ema/1000'] if omit else ['ema/1000', 'ema/1000000']
     timed_commands = []
     def fake_child(command, **kwargs):
         side = next(side for side in controller.SIDES if str(getattr(args, side+'_python')) == command[0])
@@ -92,6 +96,13 @@ def test_controller_uses_fresh_single_case_children_and_keeps_goldens(modules, m
                     results={selected: entry} if timed else {})
         Path(command[command.index('--output')+1]).write_text(json.dumps(data))
     monkeypatch.setattr(controller.subprocess, 'run', fake_child)
+    if omit:
+        with pytest.raises(ValueError, match='omitted or changed'):
+            controller.run_setting(args, 1, None, prepare_only=True)
+        assert timed_commands == []
+        return
+    prepared = controller.run_setting(args, 1, None, prepare_only=True)
+    assert timed_commands == []
     report, _ = controller.run_setting(args, 1, None)
     assert len(timed_commands) == 2*3*6
     assert report['process_isolation'] == 'one case per fresh process'
@@ -100,3 +111,16 @@ def test_controller_uses_fresh_single_case_children_and_keeps_goldens(modules, m
     assert set(report['comparisons']['original_vs_candidate']) == set(inv)
     assert (tmp_path/'threads-1/reference.npz').read_bytes() == b'preserved golden'
     assert (tmp_path/'threads-1/prior-reference.npz').is_file()
+
+
+def test_all_thread_references_precede_any_timing(modules, monkeypatch):
+    import argparse
+    controller, _ = modules
+    calls = []
+    def run(args, threads, affinity, *, prepare_only=False):
+        calls.append((threads, prepare_only))
+        return {} if prepare_only else ({'threads': threads}, [])
+    monkeypatch.setattr(controller, 'run_setting', run)
+    reports, _ = controller.run_all_settings(argparse.Namespace(thread_counts=[1,4]), None)
+    assert calls == [(1, True), (4, True), (1, False), (4, False)]
+    assert set(reports) == {'1', '4'}

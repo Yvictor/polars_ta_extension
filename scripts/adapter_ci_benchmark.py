@@ -7,6 +7,7 @@ correctness checks, raw samples and descriptive process-noise ranges.
 from __future__ import annotations
 
 import argparse
+import fnmatch
 import hashlib
 import json
 import math
@@ -77,6 +78,14 @@ def analyze(runs, repeats, threads):
     return comparisons, faults
 
 
+def requested_inventory(diagnostic, filters):
+    manifest = json.loads(Path(__file__).with_name('adapter_benchmark_cases.json').read_text())
+    names = manifest['diagnostic' if diagnostic else 'standard']
+    if len(names) != (141 if diagnostic else 132) or len(set(names)) != len(names):
+        raise ValueError('reviewed workload manifest is incomplete or duplicated')
+    return [name for name in names if not filters or any(fnmatch.fnmatchcase(name, p) for p in filters)]
+
+
 def selected_inventory(report, expected):
     if report.get('case_inventory') != expected:
         raise ValueError('child case inventory differs from the requested selection')
@@ -90,7 +99,7 @@ def selected_inventory(report, expected):
         raise ValueError('timed child did not validate its selected workload')
 
 
-def run_setting(args, threads, affinity):
+def run_setting(args, threads, affinity, *, prepare_only=False):
     out = args.output.resolve() / f'threads-{threads}'
     out.mkdir(parents=True, exist_ok=True)
     if affinity is not None:
@@ -124,31 +133,54 @@ def run_setting(args, threads, affinity):
             selected_inventory(result, [selected])
         return result
 
-    reference_run = run('original', 'reference', '--check-only', '--write-reference', reference)
-    validations = {side: run(side, f'validation-{side}', '--check-only', '--reference', reference)
-                   for side in ('prior', 'candidate')}
-    if reference_run['commit'] != ORIGINAL_COMMIT or validations['prior']['commit'] != PRIOR_COMMIT:
-        raise ValueError('original or delivered source commit differs from its immutable pin')
-    if not reference_run['talib'].startswith('0.8.1'):
-        raise ValueError('original runtime is not the pinned C0.8.1')
-    for validation in validations.values():
-        if validation['talib'] != '0.8.3 (native Rust; polars-talib compatibility)':
-            raise ValueError('native runtime is not the pinned compatibility adapter')
-    inventory = reference_run['case_inventory']
-    if not inventory or len(set(inventory)) != len(inventory):
-        raise ValueError('empty or duplicate reference inventory')
-    for validation in validations.values():
-        if validation['case_inventory'] != inventory or validation['checked_values'] <= 0:
-            raise ValueError('reference validation omitted workloads')
-    prior_reference = out / 'prior-reference.npz'
-    run('prior', 'reference-prior', '--check-only', '--write-reference', prior_reference)
-    exact_validation = run('candidate', 'validation-exact-prior', '--check-only',
-                           '--reference', prior_reference, '--exact-reference')
-    if (not exact_validation['exact_reference'] or exact_validation['checked_values'] <= 0
-            or exact_validation['case_inventory'] != inventory):
-        raise ValueError('delivered vs optimized workload validation did not run exactly')
-    # Retain both golden references. A failed later child must remain auditable.
-    source_validations = {'original': reference_run, **validations}
+    prepared_path = out / 'prepared-validation.json'
+    if prepare_only:
+        reference_run = run('original', 'reference', '--check-only', '--write-reference', reference)
+        validations = {side: run(side, f'validation-{side}', '--check-only', '--reference', reference)
+                       for side in ('prior', 'candidate')}
+        if reference_run['commit'] != ORIGINAL_COMMIT or validations['prior']['commit'] != PRIOR_COMMIT:
+            raise ValueError('original or delivered source commit differs from its immutable pin')
+        if not reference_run['talib'].startswith('0.8.1'):
+            raise ValueError('original runtime is not the pinned C0.8.1')
+        for validation in validations.values():
+            if validation['talib'] != '0.8.3 (native Rust; polars-talib compatibility)':
+                raise ValueError('native runtime is not the pinned compatibility adapter')
+        inventory = reference_run['case_inventory']
+        if inventory != requested_inventory(threads == 1, args.case_filter):
+            raise ValueError('reference omitted or changed a reviewed workload')
+        if not inventory or len(set(inventory)) != len(inventory):
+            raise ValueError('empty or duplicate reference inventory')
+        for validation in validations.values():
+            if validation['case_inventory'] != inventory or validation['checked_values'] <= 0:
+                raise ValueError('reference validation omitted workloads')
+        prior_reference = out / 'prior-reference.npz'
+        run('prior', 'reference-prior', '--check-only', '--write-reference', prior_reference)
+        exact_validation = run('candidate', 'validation-exact-prior', '--check-only',
+                               '--reference', prior_reference, '--exact-reference')
+        if (not exact_validation['exact_reference'] or exact_validation['checked_values'] <= 0
+                or exact_validation['case_inventory'] != inventory):
+            raise ValueError('delivered vs optimized workload validation did not run exactly')
+        # Retain both golden references. A failed later child must remain auditable.
+        source_validations = {'original': reference_run, **validations}
+        prepared = {'source_validations': source_validations, 'inventory': inventory,
+                    'exact_validation': exact_validation, 'commands': commands,
+                    'threads': threads, 'reference_sha256': hashlib.sha256(reference.read_bytes()).hexdigest(),
+                    'prior_reference_sha256': hashlib.sha256(prior_reference.read_bytes()).hexdigest()}
+        prepared_path.write_text(json.dumps(prepared, indent=2)+'\n')
+        return prepared
+    if not prepared_path.is_file():
+        raise ValueError('all thread-setting references must be prepared before timing')
+    prepared = json.loads(prepared_path.read_text())
+    if (prepared['threads'] != threads
+            or prepared['reference_sha256'] != hashlib.sha256(reference.read_bytes()).hexdigest()
+            or prepared['prior_reference_sha256'] != hashlib.sha256((out/'prior-reference.npz').read_bytes()).hexdigest()):
+        raise ValueError('prepared reference or thread setting changed')
+    commands.extend(prepared['commands'])
+    source_validations = prepared['source_validations']
+    validations = {side: source_validations[side] for side in ('prior', 'candidate')}
+    inventory = prepared['inventory']
+    exact_validation = prepared['exact_validation']
+    prior_reference = out/'prior-reference.npz'
     comparisons = {key: {} for key in ('original_vs_prior', 'prior_vs_candidate', 'original_vs_candidate')}
     faults = {}
     order = []
@@ -207,6 +239,18 @@ def run_setting(args, threads, affinity):
     return metadata, lines
 
 
+def run_all_settings(args, affinity):
+    # Complete BOTH thread-setting query references before the first timer.
+    for threads in args.thread_counts:
+        run_setting(args, threads, affinity, prepare_only=True)
+    reports = {}
+    sections = []
+    for threads in args.thread_counts:
+        reports[str(threads)], lines = run_setting(args, threads, affinity)
+        sections.extend(lines+[''])
+    return reports, sections
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     for side in SIDES:
@@ -224,11 +268,8 @@ def main():
         parser.error('thread settings must be unique')
     args.output.mkdir(parents=True, exist_ok=True)
     affinity = set(os.sched_getaffinity(0)) if hasattr(os, 'sched_getaffinity') else None
-    reports = {}; sections = []
     try:
-        for threads in args.thread_counts:
-            reports[str(threads)], lines = run_setting(args, threads, affinity)
-            sections.extend(lines+[''])
+        reports, sections = run_all_settings(args, affinity)
     finally:
         if affinity is not None:
             os.sched_setaffinity(0, affinity)
