@@ -2,7 +2,7 @@
 use crate::generated::option_key;
 use crate::utils::{broadcast_inputs, cast_series_to_f64};
 use polars::prelude::*;
-use std::{collections::BTreeMap, sync::OnceLock};
+use std::sync::OnceLock;
 use ta_lib::{
     abstract_api::{FuncId, InputType, OptInputType, OutputType, ParamHolder},
     Core, RetCode,
@@ -13,8 +13,7 @@ pub fn core() -> &'static Core {
     CORE.get_or_init(Core::new)
 }
 
-pub use crate::params::Param;
-pub type Params = BTreeMap<String, Param>;
+pub use crate::params::{Param, Params};
 
 pub fn bind_params(holder: &mut ParamHolder<'_>, params: &Params) -> Result<(), RetCode> {
     for (i, opt) in holder.info().opt_inputs.iter().enumerate() {

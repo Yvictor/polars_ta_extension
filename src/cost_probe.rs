@@ -215,7 +215,9 @@ fn kwargs_cost_probe() {
         ),
     ] {
         let old = samples::<BTreeMap<String, legacy::Param>>(bytes);
+        let tree = samples::<BTreeMap<String, crate::params::Param>>(bytes);
         let current = samples::<Params>(bytes);
+        println!("COST_PROBE {name}/kwargs_pickle_tree iterations=10000 ns_per_call={tree:?}");
         println!("COST_PROBE {name}/kwargs_pickle_old iterations=10000 ns_per_call={old:?}");
         println!(
             "COST_PROBE {name}/kwargs_pickle_current iterations=10000 ns_per_call={current:?}"

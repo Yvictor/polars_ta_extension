@@ -6,6 +6,100 @@ pub enum Param {
     Int(i32),
     Real(f64),
 }
+// Most exposed functions have at most eight options. Keep those descriptors
+// inline; retain an uncapped tree spill for larger metadata/unknown-key maps.
+// Pickle's own dictionary, memo and key-string allocations remain unchanged.
+#[derive(Debug)]
+pub struct Params {
+    inline: [Option<(String, Param)>; 8],
+    spill: std::collections::BTreeMap<String, Param>,
+}
+
+impl Default for Params {
+    fn default() -> Self {
+        Self {
+            inline: std::array::from_fn(|_| None),
+            spill: std::collections::BTreeMap::new(),
+        }
+    }
+}
+
+impl Params {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn get(&self, key: &str) -> Option<&Param> {
+        self.inline
+            .iter()
+            .flatten()
+            .find_map(|(k, value)| (k == key).then_some(value))
+            .or_else(|| self.spill.get(key))
+    }
+
+    pub fn iter(&self) -> impl Iterator<Item = (&String, &Param)> {
+        self.inline
+            .iter()
+            .flatten()
+            .map(|(key, value)| (key, value))
+            .chain(self.spill.iter())
+    }
+
+    pub fn insert(&mut self, key: String, value: Param) -> Option<Param> {
+        for (k, current) in self.inline.iter_mut().flatten() {
+            if *k == key {
+                return Some(std::mem::replace(current, value));
+            }
+        }
+        if let Some(current) = self.spill.get_mut(&key) {
+            return Some(std::mem::replace(current, value));
+        }
+        if let Some(slot) = self.inline.iter_mut().find(|slot| slot.is_none()) {
+            *slot = Some((key, value));
+            None
+        } else {
+            self.spill.insert(key, value)
+        }
+    }
+
+    #[cfg(test)]
+    fn len(&self) -> usize {
+        self.inline.iter().flatten().count() + self.spill.len()
+    }
+}
+
+impl<const N: usize> From<[(String, Param); N]> for Params {
+    fn from(values: [(String, Param); N]) -> Self {
+        let mut params = Self::new();
+        for (key, value) in values {
+            params.insert(key, value);
+        }
+        params
+    }
+}
+
+impl<'de> Deserialize<'de> for Params {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        struct Map;
+        impl<'de> de::Visitor<'de> for Map {
+            type Value = Params;
+            fn expecting(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+                f.write_str("a map")
+            }
+            fn visit_map<A: de::MapAccess<'de>>(self, mut values: A) -> Result<Params, A::Error> {
+                let mut params = Params::new();
+                // Decode every key/value in wire order before replacing a prior
+                // key, preserving errors even for overwritten/unknown values.
+                while let Some((key, value)) = values.next_entry::<String, Param>()? {
+                    params.insert(key, value);
+                }
+                Ok(params)
+            }
+        }
+        deserializer.deserialize_map(Map)
+    }
+}
+
 // The prior untagged derive tried i32 before f64, allocating a Serde error for
 // every real parameter. Pickle already reports the numeric kind; preserve that
 // distinction directly, including the old fallback of large integers to Real.
@@ -129,24 +223,145 @@ mod tests {
             &include_bytes!("../tests/data/kwargs-macdext-protocol5.pkl")[..],
             &include_bytes!("../tests/data/kwargs-sarext-protocol5.pkl")[..],
         ] {
-            let actual: Masked<BTreeMap<String, Param>> =
+            let actual: Masked<Params> =
                 serde_pickle::from_slice(bytes, Default::default()).unwrap();
-            let expected: Masked<BTreeMap<String, legacy::Param>> =
+            let expected: Masked<BTreeMap<String, Param>> =
                 serde_pickle::from_slice(bytes, Default::default()).unwrap();
             assert_eq!(
                 (actual.lookback, actual.recursive),
                 (expected.lookback, expected.recursive)
             );
             assert_eq!(actual.params.len(), expected.params.len());
-            for ((ak, a), (bk, b)) in actual.params.iter().zip(&expected.params) {
-                assert_eq!(ak, bk);
+            for (ak, b) in &expected.params {
+                let a = actual.params.get(ak).unwrap();
                 match (a, b) {
-                    (Param::Int(a), legacy::Param::Int(b)) => assert_eq!(a, b),
-                    (Param::Real(a), legacy::Param::Real(b)) => {
+                    (Param::Int(a), Param::Int(b)) => assert_eq!(a, b),
+                    (Param::Real(a), Param::Real(b)) => {
                         assert_eq!(a.to_bits(), b.to_bits())
                     }
                     _ => panic!("numeric kind changed for {ak}"),
                 }
+            }
+        }
+    }
+
+    #[test]
+    fn map_container_preserves_tree_values_and_wire_order_errors() {
+        for line in include_str!("../tests/data/param-maps-pickle.hex")
+            .lines()
+            .filter(|line| !line.starts_with('#'))
+        {
+            let (label, hex) = line.split_once('\t').unwrap();
+            let bytes: Vec<_> = (0..hex.len())
+                .step_by(2)
+                .map(|i| u8::from_str_radix(&hex[i..i + 2], 16).unwrap())
+                .collect();
+            let actual = serde_pickle::from_slice::<Params>(&bytes, Default::default());
+            let expected =
+                serde_pickle::from_slice::<BTreeMap<String, Param>>(&bytes, Default::default());
+            match (actual, expected) {
+                (Ok(actual), Ok(expected)) => {
+                    assert_eq!(actual.len(), expected.len(), "{label}");
+                    for (key, expected) in expected {
+                        match (actual.get(&key), expected) {
+                            (Some(Param::Int(a)), Param::Int(b)) => {
+                                assert_eq!(*a, b, "{label}/{key}")
+                            }
+                            (Some(Param::Real(a)), Param::Real(b)) => {
+                                assert_eq!(a.to_bits(), b.to_bits(), "{label}/{key}")
+                            }
+                            value => panic!("{label}/{key}: {value:?}"),
+                        }
+                    }
+                }
+                (Err(a), Err(b)) => assert_eq!(a.to_string(), b.to_string(), "{label}"),
+                result => panic!("{label}: {result:?}"),
+            }
+        }
+    }
+
+    #[test]
+    fn inline_map_keeps_spill_duplicates_and_full_metadata_lookback() {
+        let mut values = Params::new();
+        for i in 0..64 {
+            assert!(values.insert(format!("key{i}"), Param::Int(i)).is_none());
+        }
+        for i in [0, 7, 8, 63] {
+            assert!(
+                matches!(values.insert(format!("key{i}"), Param::Real(-0.0)), Some(Param::Int(v)) if v == i)
+            );
+            assert!(
+                matches!(values.get(&format!("key{i}")), Some(Param::Real(v)) if v.to_bits() == (-0.0_f64).to_bits())
+            );
+        }
+        assert_eq!(values.len(), 64);
+        let id = ta_lib::abstract_api::FuncId::KSTEXT;
+        assert_eq!(id.info().opt_inputs.len(), 11);
+        let mut values = Params::new();
+        for option in id.info().opt_inputs {
+            use ta_lib::abstract_api::OptInputType;
+            let value = match option.kind {
+                OptInputType::IntegerRange { default, .. } => Param::Int(default),
+                OptInputType::IntegerList { default, .. } => {
+                    Param::Int(default.try_into().unwrap())
+                }
+                OptInputType::RealRange { default, .. }
+                | OptInputType::RealList { default, .. } => Param::Real(default),
+            };
+            values.insert(
+                crate::generated::option_key(option.param_name).into_owned(),
+                value,
+            );
+        }
+        let mut call = id.new_call(crate::native::core());
+        crate::native::bind_params(&mut call, &values).unwrap();
+        assert_eq!(
+            call.lookback(),
+            id.new_call(crate::native::core()).lookback()
+        );
+    }
+
+    #[test]
+    fn inline_map_preserves_plugin_envelope_errors_and_unknown_fields() {
+        for line in include_str!("../tests/data/param-map-envelopes-pickle.hex")
+            .lines()
+            .filter(|line| !line.starts_with('#'))
+        {
+            let (label, hex) = line.split_once('\t').unwrap();
+            let bytes: Vec<_> = (0..hex.len())
+                .step_by(2)
+                .map(|i| u8::from_str_radix(&hex[i..i + 2], 16).unwrap())
+                .collect();
+            let actual = serde_pickle::from_slice::<Masked<Params>>(&bytes, Default::default());
+            let expected = serde_pickle::from_slice::<Masked<BTreeMap<String, Param>>>(
+                &bytes,
+                Default::default(),
+            );
+            match (actual, expected) {
+                (Ok(actual), Ok(expected)) => {
+                    assert_eq!(
+                        (actual.lookback, actual.recursive),
+                        (expected.lookback, expected.recursive),
+                        "{label}"
+                    );
+                    assert_eq!(actual.params.len(), expected.params.len(), "{label}");
+                    for (key, expected) in expected.params {
+                        match (actual.params.get(&key), expected) {
+                            (Some(Param::Int(a)), Param::Int(b)) => {
+                                assert_eq!(*a, b, "{label}/{key}")
+                            }
+                            (Some(Param::Real(a)), Param::Real(b)) => {
+                                assert_eq!(a.to_bits(), b.to_bits(), "{label}/{key}")
+                            }
+                            value => panic!("{label}/{key}: {value:?}"),
+                        }
+                    }
+                }
+                (Err(a), Err(b)) => assert_eq!(a.to_string(), b.to_string(), "{label}"),
+                result => panic!(
+                    "container/envelope outcome differs: {label}, ok states {:?}",
+                    (result.0.is_ok(), result.1.is_ok())
+                ),
             }
         }
     }
