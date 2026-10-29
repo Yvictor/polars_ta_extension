@@ -1,0 +1,79 @@
+name: MACD-only upstream experiment
+on:
+  push:
+    branches: [codex/upstream-macd-ci]
+  workflow_dispatch:
+permissions:
+  contents: read
+env:
+  PYO3_USE_ABI3_FORWARD_COMPATIBILITY: '1'
+  CARGO_BUILD_JOBS: '4'
+  POLARS_MAX_THREADS: '4'
+jobs:
+  upstream-loop-evidence:
+    name: MACD-only Rust windows / correctness and performance
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          path: control-source
+      - uses: actions/checkout@v7
+        with:
+          repository: Yvictor/ta-lib-native
+          ref: 5bb1c74b25248f37a0764bc6d07dd673b4749cc6
+          path: candidate
+      - uses: actions/checkout@v7
+        with:
+          repository: TA-Lib/ta-lib
+          ref: 4334163d3a1f5019aa9051342316b936a4dfb994
+          path: baseline
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - uses: dtolnay/rust-toolchain@1.97.0
+        with:
+          components: clippy,rustfmt
+      - name: Verify regeneration, generator proofs and Rust contracts
+        working-directory: candidate
+        run: |
+          python -m pip install cmake==4.4.4
+          python scripts/quiet.py noisy loop-ci --defer=60 -- python scripts/build.py regen-check
+          python scripts/quiet.py noisy loop-ci --defer=60 -- cargo test --locked --manifest-path ta_codegen/generator/Cargo.toml
+          python scripts/quiet.py noisy loop-ci --defer=60 -- cargo test --locked -p ta-lib --manifest-path ta_codegen/output/rust/Cargo.toml
+          python scripts/quiet.py noisy loop-ci --defer=60 -- cargo clippy --locked --manifest-path ta_codegen/generator/Cargo.toml -- -D warnings
+          python scripts/quiet.py noisy loop-ci --defer=60 -- cargo clippy --locked -p ta-lib --all-targets --manifest-path ta_codegen/output/rust/Cargo.toml -- -D warnings
+          python scripts/quiet.py noisy loop-ci --defer=60 -- python scripts/build.py ta_regtest
+          bin/ta_regtest
+      - name: Build both immutable release libraries and identical harness
+        working-directory: candidate
+        run: |
+          python scripts/quiet.py noisy loop-ci --defer=60 -- python ../control-source/scripts/upstream_loop_benchmark.py \
+            --baseline-source ../baseline --candidate-source . --output ../loop-results --build-only \
+            --expected-baseline-commit 4334163d3a1f5019aa9051342316b936a4dfb994 \
+            --expected-candidate-commit 5bb1c74b25248f37a0764bc6d07dd673b4749cc6
+          lscpu > ../loop-results/lscpu.txt
+          cat /proc/meminfo > ../loop-results/meminfo.txt
+      - name: Verify full captures then alternate twelve fresh-process pairs
+        working-directory: candidate
+        run: |
+          python scripts/quiet.py measure loop-ci 900 --queue=300 -- python ../control-source/scripts/upstream_loop_benchmark.py \
+            --baseline-source ../baseline --candidate-source . --output ../loop-results --pairs 12 --repeats 31 \
+            --expected-baseline-commit 4334163d3a1f5019aa9051342316b936a4dfb994 \
+            --expected-candidate-commit 5bb1c74b25248f37a0764bc6d07dd673b4749cc6
+          cat ../loop-results/comparison.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: upstream-macd-only-evidence
+          path: |
+            loop-results/*.json
+            loop-results/*.jsonl
+            loop-results/*.md
+            loop-results/*.log
+            loop-results/*.txt
+            loop-results/*.gz
+            loop-results/bin/*
+            loop-results/target-baseline/release/libta_lib.rlib
+            loop-results/target-candidate/release/libta_lib.rlib
+
