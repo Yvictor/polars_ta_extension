@@ -1,0 +1,129 @@
+name: Upstream variable MAVP evidence
+
+on:
+  push:
+    branches: [codex/mavp-variable-ci]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mavp-variable-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  RUSTUP_TOOLCHAIN: '1.97.0'
+  CARGO_BUILD_JOBS: '4'
+  RUSTFLAGS: ''
+  CARGO_ENCODED_RUSTFLAGS: ''
+  CARGO_PROFILE_RELEASE_DEBUG: 'false'
+  CARGO_PROFILE_RELEASE_LTO: thin
+  CARGO_PROFILE_RELEASE_CODEGEN_UNITS: '1'
+  OMP_NUM_THREADS: '1'
+  OPENBLAS_NUM_THREADS: '1'
+  MKL_NUM_THREADS: '1'
+
+jobs:
+  variable-mavp:
+    name: Pinned variable MAVP / exact primary and four-backend evidence
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          path: control-source
+      - uses: actions/checkout@v6
+        with:
+          repository: TA-Lib/ta-lib
+          ref: 4334163d3a1f5019aa9051342316b936a4dfb994
+          path: baseline
+      - uses: actions/checkout@v6
+        with:
+          repository: Yvictor/ta-lib-native
+          ref: b3f0fa17d0e3485c39ed042d86fff7116c0430a4
+          path: candidate
+      - uses: actions/checkout@v6
+        with:
+          ref: b2bbc26d41ec80823c8bffb0cc436a97f29911cc
+          path: original-c
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - uses: dtolnay/rust-toolchain@1.97.0
+        with:
+          components: clippy,rustfmt
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: actions/setup-dotnet@v5
+        with:
+          global-json-file: candidate/global.json
+      - name: Install pinned evidence dependencies and test controller gates
+        run: |
+          python -m pip install cmake==4.4.4 numpy==2.5.3 pytest==8.4.2
+          python -m pytest control-source/tests/test_mavp_variable_benchmark.py -q
+          mkdir -p mavp-variable-results
+          git -C control-source rev-parse HEAD > mavp-variable-results/controller-commit.txt
+          cp control-source/scripts/mavp_variable_benchmark.py control-source/scripts/bench_mavp_variable.rs mavp-variable-results/
+          cp control-source/.github/workflows/mavp-variable.yml mavp-variable-results/workflow.yml
+          python -m pip freeze > mavp-variable-results/python-dependencies.txt
+      - name: Regenerate and validate Rust plus all C/Rust regression functions before timing
+        working-directory: candidate
+        run: |
+          set -o pipefail
+          python scripts/build.py regen-check 2>&1 | tee ../mavp-variable-results/regenerate.log
+          cargo test --locked --manifest-path ta_codegen/generator/Cargo.toml 2>&1 | tee ../mavp-variable-results/generator-tests.log
+          cargo test --locked -p ta-lib --manifest-path ta_codegen/output/rust/Cargo.toml 2>&1 | tee ../mavp-variable-results/rust-tests.log
+          cargo test --locked -p ta-lib --doc --manifest-path ta_codegen/output/rust/Cargo.toml 2>&1 | tee ../mavp-variable-results/rust-doc-tests.log
+          cargo clippy --locked --all-targets --manifest-path ta_codegen/generator/Cargo.toml -- -D warnings 2>&1 | tee ../mavp-variable-results/generator-clippy.log
+          cargo clippy --locked -p ta-lib --all-targets --manifest-path ta_codegen/output/rust/Cargo.toml -- -D warnings 2>&1 | tee ../mavp-variable-results/rust-clippy.log
+          python scripts/build.py servers --language=c,rust 2>&1 | tee ../mavp-variable-results/regression-build.log
+          (cd bin && ./ta_regtest --codegen --language=c,rust) 2>&1 | tee ../mavp-variable-results/full-c-rust-regression.log
+          git diff --exit-code
+      - name: Compile Java/CSharp libraries and run upstream main suites before timing
+        working-directory: candidate
+        run: |
+          set -o pipefail
+          python scripts/build.py libraries --language=java,csharp 2>&1 | tee ../mavp-variable-results/managed-libraries.log
+          dotnet build-server shutdown
+          git diff --exit-code
+      - name: Build identical primary harnesses with pinned registry and original C references
+        run: |
+          python control-source/scripts/mavp_variable_benchmark.py \
+            --baseline-source baseline --candidate-source candidate --c-source original-c \
+            --output mavp-variable-results --build-only
+          lscpu > mavp-variable-results/lscpu.txt
+          cat /proc/meminfo > mavp-variable-results/meminfo.txt
+      - name: Check full captures then measure twelve alternating fresh-process pairs
+        run: |
+          python control-source/scripts/mavp_variable_benchmark.py \
+            --baseline-source baseline --candidate-source candidate --c-source original-c \
+            --output mavp-variable-results --pairs 12 --repeats 31
+          cat mavp-variable-results/comparison.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: upstream-mavp-variable-evidence
+          if-no-files-found: error
+          path: |
+            mavp-variable-results/*.json
+            mavp-variable-results/*.jsonl
+            mavp-variable-results/*.md
+            mavp-variable-results/*.log
+            mavp-variable-results/*.txt
+            mavp-variable-results/*.yml
+            mavp-variable-results/*.rs
+            mavp-variable-results/*.py
+            mavp-variable-results/*.gz
+            mavp-variable-results/*.bin
+            mavp-variable-results/bin/*
+            mavp-variable-results/archives/*
+            mavp-variable-results/registry-helper/Cargo.*
+            mavp-variable-results/registry-helper/lib.rs
+            mavp-variable-results/target-baseline/release/libta_lib.rlib
+            mavp-variable-results/target-candidate/release/libta_lib.rlib
+            mavp-variable-results/target-registry/release/deps/*.rlib
+            mavp-variable-results/target-registry/release/deps/*.so
+            mavp-variable-results/old-c-install/lib/libta-lib.a
