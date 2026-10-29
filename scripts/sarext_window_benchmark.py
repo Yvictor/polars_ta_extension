@@ -121,6 +121,15 @@ def command_run(command, log, cwd=None):
     with Path(log).open('w') as f:subprocess.run(list(map(str,command)),cwd=cwd,stdout=f,stderr=subprocess.STDOUT,check=True)
 
 
+def retain_library(source,output,arm):
+    need(arm in ('baseline','candidate'),'only native arm libraries can be retained')
+    destination=Path(output)/'libraries'/arm/'libta_lib.rlib'
+    destination.parent.mkdir(parents=True,exist_ok=True)
+    shutil.copyfile(source,destination)
+    need(sha(source)==sha(destination),'rlib copy changed')
+    return destination
+
+
 def file_inventory(folder):
     need(folder.is_dir(),'retained provenance directory missing')
     result={str(p):sha(p) for p in folder.rglob('*') if p.is_file()}
@@ -178,7 +187,7 @@ def build(args):
         else:
             target=out.parent/('sarext-window-targets-'+args.rust_version)/a;cargo=['cargo','build','--release','--locked','-vv','-p','ta-lib','--manifest-path',str(getattr(args,a+'_source')/'ta_codegen/output/rust/Cargo.toml'),'--target-dir',str(target)]
             command_run(cargo,out/(a+'-cargo.log'));lib=target/'release/libta_lib.rlib'
-            retained=out/'libraries'/(a+'-libta_lib.rlib');retained.parent.mkdir(exist_ok=True);shutil.copyfile(lib,retained);need(sha(lib)==sha(retained),'rlib copy changed')
+            retained=retain_library(lib,out,a)
             command=common+['-L','dependency='+str(target/'release/deps'),'--extern','ta_lib='+str(retained),'-o',str(binary)]
         command_run(command,out/(a+'-harness-build.log'))
         test_binary=bins/(a+'-cli-tests');test_command=command[:-2]+['--test','-o',str(test_binary)]

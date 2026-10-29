@@ -30,6 +30,23 @@ class Protocol(unittest.TestCase):
                 b.main(['--rust-version','1.97.0','--original-source',d,'--baseline-source',d,'--candidate-source',d,'--candidate-commit','a'*40,'--output',str(target),'--codegen-proof',d,'--build-only'])
             self.assertFalse(target.exists());build.assert_not_called()
 
+    def test_preserved_library_is_accepted_by_real_extern_loader(self):
+        with tempfile.TemporaryDirectory()as d:
+            root=Path(d);source=root/'fixture.rs';source.write_text('pub fn probe() {}\n')
+            lib=root/'libfixture.rlib'
+            b.subprocess.run(['rustc','--crate-name','fixture','--crate-type','rlib',str(source),'-o',str(lib)],check=True,capture_output=True)
+            client=root/'client.rs';client.write_text('extern crate fixture; fn main(){fixture::probe();}\n')
+            for arm in ('baseline','candidate'):
+                retained=b.retain_library(lib,root/'retained',arm)
+                self.assertEqual(b.sha(retained),b.sha(lib))
+                command=['rustc','--edition=2021',str(client),'--extern','fixture='+str(retained),'--emit=metadata','-o',str(root/(arm+'.rmeta'))]
+                b.subprocess.run(command,check=True,capture_output=True)
+                wrong=retained.parent/'baseline-libfixture.rlib';wrong.write_bytes(retained.read_bytes())
+                bad_command=command.copy();bad_command[4]='fixture='+str(wrong)
+                bad=b.subprocess.run(bad_command,capture_output=True,text=True)
+                self.assertNotEqual(bad.returncode,0)
+                self.assertIn('file name should be lib*.rlib',bad.stderr)
+
     def test_inventory_and_balance(self):
         self.assertEqual(len(b.CASES),15);self.assertEqual(len(set(b.CASES)),15);self.assertEqual(b.MODES,('typed',))
         self.assertEqual(len(b.ORDERS),12);self.assertEqual(set(collections.Counter(b.ORDERS).values()),{2})
