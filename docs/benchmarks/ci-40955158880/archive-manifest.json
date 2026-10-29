@@ -1,0 +1,17 @@
+{
+  "run": 40955158880,
+  "artifact": 12935908467,
+  "artifact_sha256": "9506e14139c7314ca597d2fb5f92ef8b2f3f721cc488ee1db3cff9a24d78ad3e",
+  "source_report": "/tmp/polars-recovery/audit-mavp-sma",
+  "files": {
+    "REPORT.md": "8917b928570d4f8a247b25790b9b74c89d4b375aada5514ad1fc65cf507bd36f",
+    "all-comparisons.csv": "9ace80735ae5c6e8b8a293d96fc8212339d8bf8230e834715138b715938d37b4",
+    "all-negative-comparisons.json": "3e55a9a8c68ff63883f8c3755d30a9d824e725e54c862b9807c57d2738847c9f",
+    "comparison-inventory.json": "6477f83425a1402865bd3a3e76511d2bf167eb425cec411e67c9cb629e44d06f",
+    "report-provenance.json": "9319cf1428f80c0e3a68c79bde04061d1f4635ff715de3048e3dc33c94d9b79e",
+    "INPUT-ORACLE-PORTABILITY.md": "5c380d5ea6b3bd7f29e69f7d5a1662f8d7df2e70c69bc8837c3e79931cbf738b",
+    "audit-result.json": "b05f203aed191e11bfc7fb8c2c3f2fad57d3f096abdd310ef728cdeec6f9bb85",
+    "review-ready.json": "b82548bbb90b92df1a36ed172ce59ef682363a7dec6851ec6ca76f72301d9095"
+  },
+  "independent_review": "Source,pre-raw auditor and full144comparison conclusions reviewed by separate combined_review agent; approved14synthetic tests and exact16IPC physical replay."
+}
