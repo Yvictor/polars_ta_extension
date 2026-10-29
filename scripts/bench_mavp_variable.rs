@@ -29,6 +29,16 @@ extern "C" {
         count: *mut c_int,
         out: *mut f64,
     ) -> c_int;
+    fn TA_MA(
+        start: c_int,
+        end: c_int,
+        price: *const f64,
+        period: c_int,
+        kind: c_int,
+        beg: *mut c_int,
+        count: *mut c_int,
+        out: *mut f64,
+    ) -> c_int;
     fn TA_SMA(
         start: c_int,
         end: c_int,
@@ -66,6 +76,7 @@ enum Kind {
     Sma,
     Ema,
     Wma,
+    Mama,
 }
 impl Kind {
     fn code(self) -> i32 {
@@ -73,6 +84,7 @@ impl Kind {
             Self::Sma => 0,
             Self::Ema => 1,
             Self::Wma => 2,
+            Self::Mama => ta_lib::MAType::MAMA as i32,
         }
     }
 }
@@ -82,6 +94,7 @@ struct Case {
     min: i32,
     kind: Kind,
     sma_control: bool,
+    mama_control: bool,
     periods: Vec<f64>,
 }
 impl Case {
@@ -95,7 +108,13 @@ impl Case {
         }
     }
     fn range(&self) -> (usize, usize) {
-        let beg = if self.sma_control { 13 } else { 29 };
+        let beg = if self.mama_control {
+            32
+        } else if self.sma_control {
+            13
+        } else {
+            29
+        };
         (beg, self.n - beg)
     }
 }
@@ -110,6 +129,9 @@ fn case_spec(name: &str) -> (usize, &str, Kind, bool) {
         ["mavp", "four", "EMA", n] => ("four", Kind::Ema, *n, false),
         ["mavp", "four", "WMA", n] => ("four", Kind::Wma, *n, false),
         ["sma_control", "SMA", n] => ("four", Kind::Sma, *n, true),
+        ["ma_control", "MAMA", n] if ["100", "1000000"].contains(n) => {
+            ("mama", Kind::Mama, *n, false)
+        }
         _ => panic!("unknown case: {name}"),
     };
     let n_text = n;
@@ -120,7 +142,8 @@ fn case_spec(name: &str) -> (usize, &str, Kind, bool) {
 }
 fn make_case(name: &str) -> Case {
     let (n, pattern, kind, sma_control) = case_spec(name);
-    let periods = (0..n)
+    let mama_control = matches!(kind, Kind::Mama);
+    let periods = (0..if mama_control { 0 } else { n })
         .map(|i| match pattern {
             "one" => 14.,
             "four" => [3., 5., 9., 14.][i % 4],
@@ -137,6 +160,7 @@ fn make_case(name: &str) -> Case {
         min: if pattern == "clamped" { 1 } else { 2 },
         kind,
         sma_control,
+        mama_control,
         periods,
     }
 }
@@ -150,7 +174,10 @@ fn cases() -> Vec<Case> {
         result.push(make_case(&format!("mavp/four/EMA/{n}")));
         result.push(make_case(&format!("mavp/four/WMA/{n}")));
     }
-    assert_eq!(result.len(), 36);
+    for n in [100, 1_000_000] {
+        result.push(make_case(&format!("ma_control/MAMA/{n}")));
+    }
+    assert_eq!(result.len(), 38);
     result
 }
 struct Engines {
@@ -175,12 +202,17 @@ fn call(
     out: &mut [f64],
 ) -> (usize, usize) {
     assert_eq!(price.len(), case.n);
-    assert_eq!(case.periods.len(), case.n);
+    assert_eq!(
+        case.periods.len(),
+        if case.mama_control { 0 } else { case.n }
+    );
     assert_eq!(out.len(), case.n + 8);
     match backend {
         0 => {
             let current = engines.current.as_ref().unwrap();
-            let r = if case.sma_control {
+            let r = if case.mama_control {
+                current.ma(0, case.n - 1, price, 20, ta_lib::MAType::MAMA, out)
+            } else if case.sma_control {
                 current.sma(0, case.n - 1, price, 14, out)
             } else {
                 current.mavp(
@@ -199,7 +231,9 @@ fn call(
         }
         1 => {
             let registry = engines.registry.as_ref().unwrap();
-            let r = if case.sma_control {
+            let r = if case.mama_control {
+                registry.ma(0, case.n - 1, price, 20, ta_lib_registry::MAType::MAMA, out)
+            } else if case.sma_control {
                 registry.sma(0, case.n - 1, price, 14, out)
             } else {
                 registry.mavp(
@@ -222,7 +256,18 @@ fn call(
             // All inputs cover 0..n, output capacity exceeds n, and arrays stay
             // alive and disjoint throughout this synchronous official C call.
             let rc = unsafe {
-                if case.sma_control {
+                if case.mama_control {
+                    TA_MA(
+                        0,
+                        (case.n - 1) as c_int,
+                        price.as_ptr(),
+                        20,
+                        case.kind.code(),
+                        &mut beg,
+                        &mut count,
+                        out.as_mut_ptr(),
+                    )
+                } else if case.sma_control {
                     TA_SMA(
                         0,
                         (case.n - 1) as c_int,
@@ -320,6 +365,9 @@ fn parity(case: &Case, backend: &str, actual: &[f64], expected: &[f64], input_sc
 }
 fn work_counts(case: &Case) -> (usize, Option<usize>, Option<usize>, usize, usize) {
     let (_, count) = case.range();
+    if case.mama_control {
+        return (1, None, None, 0, 0);
+    }
     if case.sma_control {
         return (1, Some(count), Some(count), 0, 0);
     }
@@ -438,7 +486,7 @@ fn metadata(options: &Options) {
     let (scope, count, records) = if isolated {
         ("isolated", 1, 1)
     } else {
-        ("full", 36, 108)
+        ("full", 38, 114)
     };
     let backends = options.backend.map_or_else(
         || "[\"current\",\"registry083\",\"originalc081\"]".to_owned(),
@@ -545,10 +593,38 @@ fn isolated(options: &Options) {
     check_tail(&case, &out, case.range());
     println!("{{\"kind\":\"case\",\"case\":{:?},\"backend\":{label:?},\"n\":{},\"beg\":{},\"count\":{},\"iterations\":{iterations},\"warmups\":{WARMUPS},\"samples_ns\":{samples:?},\"distinct_periods\":{distinct},\"main433_dense_divides\":{},\"selected_divides\":{},\"main433_temp_bytes\":{temp_bytes},\"main433_sorted_index_bytes\":{index_bytes}}}", case.name, case.n, range.0, range.1, optional(dense), optional(selected));
 }
+fn verify_mama_metadata() {
+    macro_rules! verify {
+        ($library:ident) => {{
+            use $library::abstract_api::{FuncId, OptInputType};
+            let input = FuncId::MA
+                .info()
+                .opt_inputs
+                .iter()
+                .find(|v| v.param_name == "optInMAType")
+                .unwrap();
+            let OptInputType::IntegerList { values, .. } = input.kind else {
+                panic!("MA type metadata");
+            };
+            let code = values.iter().find(|(_, name)| *name == "MAMA").unwrap().0;
+            assert_eq!(code, i64::from(ta_lib::MAType::MAMA as i32));
+            assert_eq!($library::MAType::MAMA as i32, 7);
+        }};
+    }
+    verify!(ta_lib);
+    verify!(ta_lib_registry);
+}
 fn main() {
     let options = parse_options(&env::args().collect::<Vec<_>>());
     assert_eq!(env!("MAVP_CURRENT_VERSION"), "0.8.4");
     assert_eq!(env!("MAVP_REGISTRY_VERSION"), "0.8.3");
+    if options
+        .case
+        .as_deref()
+        .is_none_or(|name| name.starts_with("ma_control/"))
+    {
+        verify_mama_metadata();
+    }
     metadata(&options);
     if options.case.is_some() {
         isolated(&options);
@@ -564,6 +640,25 @@ mod tests {
             .chain(tail.iter().copied())
             .map(str::to_owned)
             .collect()
+    }
+    #[test]
+    fn mama_controls_are_metadata_verified_direct_ma_without_period_tape() {
+        verify_mama_metadata();
+        for n in [100, 1_000_000] {
+            let case = make_case(&format!("ma_control/MAMA/{n}"));
+            assert!(case.mama_control && !case.sma_control && case.periods.is_empty());
+            assert_eq!(case.kind.code(), 7);
+            assert_eq!(case.range(), (32, n - 32));
+            assert_eq!(work_counts(&case), (1, None, None, 0, 0));
+        }
+        for name in [
+            "ma_control/MAMA/1000",
+            "ma_control/MAMA/10000",
+            "mavp/four/MAMA/100",
+            "ma_control/MAMA/0100",
+        ] {
+            assert!(std::panic::catch_unwind(|| case_spec(name)).is_err());
+        }
     }
     #[test]
     fn full_capture_remains_global_and_untimed() {
@@ -662,7 +757,7 @@ mod tests {
     #[test]
     fn selected_case_inventory_is_identical() {
         let all = cases();
-        assert_eq!(all.len(), 36);
+        assert_eq!(all.len(), 38);
         for case in all {
             let selected = make_case(&case.name);
             assert_eq!(selected.n, case.n);

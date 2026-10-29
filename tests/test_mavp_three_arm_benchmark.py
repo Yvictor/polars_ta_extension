@@ -8,7 +8,7 @@ CASE='mavp/four/SMA/100';BACKEND='current';SELECTION=(CASE,BACKEND)
 
 
 def metadata(capture_only=True,selection=None):
-    row={'kind':'metadata','format':2,'scope':'full','cases':36,'backends':list(m.BACKENDS),'capture_records':108,
+    row={'kind':'metadata','format':2,'scope':'full','cases':38,'backends':list(m.BACKENDS),'capture_records':114,
          'canary_bits':'7ff80000000055aa','warmups':5,'repeats':31,'capture_only':capture_only,'capture_written':True,
          'registry_version':'0.8.3','current_version':'0.8.4','c_version':'0.8.1 (reference)','os':'linux','arch':'x86_64','tolerance_relative':4e-15,'tolerance_floor':'max_abs_input'}
     if selection is not None:
@@ -33,8 +33,8 @@ def encoded(rows):return '\n'.join(json.dumps(row)for row in rows)
 
 
 def test_full_capture_and_single_child_inventories():
-    assert len(m.CASES)==36 and len(m.KEYS)==108 and 36*3*3*12==3888 and m.TIMED_CHILDREN==3888
-    assert len(m.parse_records(encoded(records()),True)['parity'])==108
+    assert len(m.CASES)==38 and len(m.KEYS)==114 and 38*3*3*12==4104 and m.TIMED_CHILDREN==4104
+    assert len(m.parse_records(encoded(records()),True)['parity'])==114
     assert len(m.parse_records(encoded(records(selection=SELECTION)),True,SELECTION)['validation'])==1
     assert len(m.parse_records(encoded(records(True,SELECTION)),False,SELECTION)['cases'])==1
 
@@ -166,12 +166,13 @@ def test_unselected_or_aliased_candidate_pin_is_rejected(pin):
     with pytest.raises(ValueError):m.arm_pins(SimpleNamespace(candidate_commit=pin))
 
 
-def test_exact_three_immutable_arms_are_separate_from_runtime_backends():
+def test_exact_three_immutable_arms_are_separate_from_runtime_backends(monkeypatch):
+    monkeypatch.setattr(m,"CANDIDATE","a"*40)
     from types import SimpleNamespace
     assert m.arm_pins(SimpleNamespace(candidate_commit=m.CANDIDATE))=={'baseline':m.BASELINE,'control':m.CONTROL,'candidate':m.CANDIDATE}
     assert m.SIDES==('baseline','control','candidate')
     assert m.BACKENDS==('current','registry083','originalc081')
-    assert m.TIMED_CHILDREN*31==120528
+    assert m.TIMED_CHILDREN*31==127224
 
 
 def test_every_arm_round_must_keep_the_same_case_inventory():
@@ -182,7 +183,7 @@ def test_every_arm_round_must_keep_the_same_case_inventory():
 
 
 def test_workflow_pins_reviewed_candidate_and_preserves_three_sources():
-    text=(Path(__file__).parents[1]/'.github/workflows/mavp-three-arm.yml').read_text()
+    text=(Path(__file__).parents[1]/'.github/workflows/mavp-mama-controls.yml').read_text()
     assert "MAVP_CANDIDATE_COMMIT: '"+m.CANDIDATE+"'" in text
     assert '--control-source control' in text and '--candidate-commit "$MAVP_CANDIDATE_COMMIT"' in text
     assert 'ref: '+m.BASELINE in text and 'ref: '+m.CONTROL in text
@@ -220,6 +221,7 @@ def test_all_three_full_capture_gates_precede_any_isolated_command(monkeypatch,t
 
 
 def test_actual_controller_runs_all_orders_with_each_case_backend_in_its_own_child(monkeypatch,tmp_path):
+    monkeypatch.setattr(m,"CANDIDATE","a"*40)
     from types import SimpleNamespace
     monkeypatch.setattr(m,'CASES',{CASE})
     monkeypatch.setattr(m,'KEYS',{(backend,CASE) for backend in m.BACKENDS})
@@ -269,3 +271,60 @@ def test_shared_period_preparation_keeps_ema_wma_as_affected_workloads():
             assert not rows[key]['is_unchanged_control'] and rows[key]['is_other_ma_workload']
         assert rows[keys[2]]['is_unchanged_control'] and not rows[keys[2]]['is_other_ma_workload']
         assert all(rows[key]['is_reference_backend'] for key in keys[3:])
+
+def test_candidate_placeholder_blocks_all_launch_paths(tmp_path):
+    from types import SimpleNamespace
+    assert m.CANDIDATE == 'UNSELECTED_SOURCE_PIN_DO_NOT_RUN'
+    for pin in [m.CANDIDATE, "a"*40, "9f66a5b075f6f2b578118f9b913a5f5ca5540a69"]:
+        with pytest.raises(ValueError, match="unselected"):
+            m.arm_pins(SimpleNamespace(candidate_commit=pin))
+    with pytest.raises(ValueError, match="unselected"):
+        m.main(['--candidate-commit',m.CANDIDATE,'--baseline-source',str(tmp_path),
+                '--control-source',str(tmp_path),'--candidate-source',str(tmp_path),
+                '--c-source',str(tmp_path),'--output',str(tmp_path),"--build-only"])
+
+def test_exactly_two_direct_mama_controls_extend_the_original_inventory():
+    previous = {f'mavp/{pattern}/SMA/{n}' for n in m.SIZES
+                for pattern in ('one','four','few','many','blocked','clamped')}
+    previous |= {f'{name}/{ma}/{n}' for n in m.SIZES
+                 for name,ma in (('sma_control','SMA'),('mavp/four','EMA'),('mavp/four','WMA'))}
+    assert len(previous) == 36 and previous < m.CASES
+    assert m.CASES - previous == {'ma_control/MAMA/100','ma_control/MAMA/1000000'}
+    for case in m.CASES - previous:
+        n,beg,count=m.expected_range(case)
+        assert beg == 32 and count == n-32
+        for backend in m.BACKENDS:
+            selected=(case,backend)
+            assert len(m.parse_records(encoded(records(True,selected)),False,selected)['cases']) == 1
+
+def test_managed_library_and_source_gates_precede_every_timer():
+    text=(Path(__file__).parents[1]/'.github/workflows/mavp-mama-controls.yml').read_text()
+    assert "java-version: '21'" in text
+    assert 'global-json-file: candidate/global.json' in text
+    assert '10.0.112' in text and text.index('Verify pinned managed SDK contract') < text.index('actions/setup-dotnet')
+    assert text.index('Reject unselected') < text.index('actions/checkout')
+    assert text.index('libraries --language=java,csharp') < text.index('Build identical primary')
+    assert text.index('full-c-rust-regression.log') < text.index('measure 4104')
+    assert 'measure 3888' not in text
+
+@pytest.mark.parametrize('case',['ma_control/MAMA/100','ma_control/MAMA/1000000'])
+@pytest.mark.parametrize('backend',m.BACKENDS)
+def test_mama_capture_range_prefix_and_canaries_are_independent(case,backend,tmp_path):
+    n,beg,count=m.expected_range(case);name=backend+'/'+case
+    header=b'MAVPVC01'+struct.pack('<I',len(name))+name.encode()
+    body=struct.pack('<d',100.)*count+struct.pack('<Q',m.CANARY)*(n+8-count)
+    path=tmp_path/'mama.bin'
+    path.write_bytes(header+struct.pack('<QQQQ',n,beg,count,n+8)+body)
+    assert m.capture_record(path,(case,backend))['written_values']==count
+    path.write_bytes(header+struct.pack('<QQQQ',n,29,count,n+8)+body)
+    with pytest.raises(ValueError,match='range'):m.capture_record(path,(case,backend))
+    path.write_bytes(header+struct.pack('<QQQQ',n,beg,count,n+8)+body[:-8]+struct.pack('<d',0.))
+    with pytest.raises(ValueError,match='padding'):m.capture_record(path,(case,backend))
+
+def test_mama_rows_are_zero_constructor_controls_not_mavp_preparation():
+    keys=['current/ma_control/MAMA/100','current/ma_control/MAMA/1000000']
+    runs={side:[{'cases':{key:{'samples_ns':[100.]*31}for key in keys}}for _ in m.ORDERS]for side in m.SIDES}
+    for rows in m.summarize(runs).values():
+        for row in rows.values():
+            assert not row['is_unchanged_control'] and row['is_shared_f64_zero_constructor_control']
+            assert not row['is_other_ma_workload']

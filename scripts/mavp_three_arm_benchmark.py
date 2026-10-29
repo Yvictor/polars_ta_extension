@@ -19,7 +19,7 @@ import time
 
 BASELINE = '4334163d3a1f5019aa9051342316b936a4dfb994'
 CONTROL = 'b3f0fa17d0e3485c39ed042d86fff7116c0430a4'
-CANDIDATE = '9f66a5b075f6f2b578118f9b913a5f5ca5540a69'
+CANDIDATE = 'UNSELECTED_SOURCE_PIN_DO_NOT_RUN'
 C_COMMIT = 'b2bbc26d41ec80823c8bffb0cc436a97f29911cc'
 C_ARCHIVE = 'talib-sys/vendor/ta-lib-0.8.1-src.tar.gz'
 C_SHA = 'ec59ccd88c0c77f618587d858787c8f9d06c40460a09d66751926f6fd670f985'
@@ -27,10 +27,12 @@ REGISTRY = {'ta-lib': ('0.8.3', '4da552ae932721218c73cf1124610b0ce3d5f27cc1a6234
             'ta-lib-dispatch': ('0.1.2', '726f5cc1f53b7994288221583f9fb7ca535bae2b349b738a01adc75c3bd9ee41')}
 SIDES = ('baseline', 'control', 'candidate')
 ORDERS = tuple(itertools.permutations(SIDES)) * 2
-TIMED_CHILDREN = 36 * 3 * 3 * 12
+TIMED_CHILDREN = 38 * 3 * 3 * 12
 
 def arm_pins(args):
     pin = args.candidate_commit
+    if not re.fullmatch('[0-9a-f]{40}', CANDIDATE):
+        raise ValueError('candidate source is unselected; launch is blocked pending source review')
     if not re.fullmatch('[0-9a-f]{40}', pin) or pin != CANDIDATE:
         raise ValueError('candidate must match the reviewed immutable full commit pin')
     return {'baseline': BASELINE, 'control': CONTROL, 'candidate': pin}
@@ -39,6 +41,7 @@ BACKENDS = ('current', 'registry083', 'originalc081')
 SIZES = (100, 1000, 10000, 1000000)
 CASES = {f'mavp/{pattern}/SMA/{n}' for n in SIZES for pattern in ('one','four','few','many','blocked','clamped')}
 CASES |= {f'{name}/{ma}/{n}' for n in SIZES for name,ma in (('sma_control','SMA'),('mavp/four','EMA'),('mavp/four','WMA'))}
+CASES |= {f'ma_control/MAMA/{n}' for n in (100,1000000)}
 KEYS = {(backend,name) for backend in BACKENDS for name in CASES}
 CANARY = 0x7ff80000000055aa
 ITERATIONS = {100:1000, 1000:100, 10000:10, 1000000:1}
@@ -212,7 +215,7 @@ def harness_command(binary,capture,case=None,backend=None,golden=None,capture_on
 
 
 def expected_range(name):
-    n=int(name.rsplit('/',1)[1]);beg=13 if name.startswith('sma_control/') else 29
+    n=int(name.rsplit('/',1)[1]);beg=32 if name.startswith('ma_control/MAMA/') else (13 if name.startswith('sma_control/') else 29)
     return n,beg,n-beg
 
 
@@ -260,14 +263,14 @@ def parse_records(content,capture_only,selection=None,expected_os="linux"):
             if not isinstance(samples,list) or len(samples)!=31 or any(type(x)not in (int,float) or not math.isfinite(x) or x<=0 for x in samples):raise ValueError('31 finite positive samples required')
             cases[key]=row
         else:raise ValueError('mixed/full/unknown execution mode')
-    expected_meta={'format':2,'scope':'isolated' if selected else 'full','cases':1 if selected else 36,'backends':[backend] if selected else list(BACKENDS),'capture_records':1 if selected else 108,'canary_bits':'7ff80000000055aa','warmups':5,'repeats':31,'capture_only':capture_only,'capture_written':True,'registry_version':'0.8.3','current_version':'0.8.4','tolerance_relative':4e-15,'tolerance_floor':'max_abs_input'}
+    expected_meta={'format':2,'scope':'isolated' if selected else 'full','cases':1 if selected else 38,'backends':[backend] if selected else list(BACKENDS),'capture_records':1 if selected else 114,'canary_bits':'7ff80000000055aa','warmups':5,'repeats':31,'capture_only':capture_only,'capture_written':True,'registry_version':'0.8.3','current_version':'0.8.4','tolerance_relative':4e-15,'tolerance_floor':'max_abs_input'}
     if selected:expected_meta.update(selected_case=case,selected_backend=backend)
     if metadata is None or any(type(metadata.get(k))is not type(v) or metadata[k]!=v for k,v in expected_meta.items()):raise ValueError('metadata/runtime/selection mismatch')
     if not selected and any(k in metadata for k in ('selected_case','selected_backend')):raise ValueError('global mode cannot carry selectors')
     if metadata.get('os')!=expected_os or type(metadata.get('arch'))is not str or not metadata['arch'] or type(metadata.get('c_version'))is not str or not(metadata['c_version']=='0.8.1' or metadata['c_version'].startswith('0.8.1 (')):raise ValueError('unexpected runtime')
     if selected:
         if set(validation)!={(backend,case)} or parity or set(cases)!=(set() if capture_only else {(backend,case)}):raise ValueError('exact single selected inventory required')
-    elif set(parity)!=KEYS or validation or cases:raise ValueError('global capture must contain all108 parity rows only')
+    elif set(parity)!=KEYS or validation or cases:raise ValueError('global capture must contain all114 parity rows only')
     return {'metadata':metadata,'parity':{b+'/'+c:v for (b,c),v in parity.items()},'validation':{b+'/'+c:v for (b,c),v in validation.items()},'cases':{b+'/'+c:v for (b,c),v in cases.items()}}
 
 
@@ -327,6 +330,7 @@ def summarize(runs):
                 'after_faster_rounds': sum(x > 1 for x in ratios),
                 'is_reference_backend': not key.startswith('current/'),
                 'is_unchanged_control': '/sma_control/' in key,
+                'is_shared_f64_zero_constructor_control': '/ma_control/MAMA/' in key,
                 'is_other_ma_workload': '/EMA/' in key or '/WMA/' in key}
         comparisons[before + '_vs_' + after] = rows
     return comparisons
@@ -404,7 +408,7 @@ def measure(args):
             if metadata is not None and current!=metadata:raise ValueError('global capture runtime drift')
             metadata=current;validations[side]={'records':row,'capture':capture_record(path),'command':command}
         before=validations['baseline']['capture']
-        if not before['bytes'] or any(validations[side]['capture']!=before for side in SIDES):raise ValueError('global full108 capture differs; no tolerance waiver')
+        if not before['bytes'] or any(validations[side]['capture']!=before for side in SIDES):raise ValueError('global full114 capture differs; no tolerance waiver')
         goldens=split_goldens(captures['baseline'],args.output)
         (args.output/'capture-validation.json').write_text(json.dumps({'completed_before_any_timing':True,'primary_exact':True,'validation':validations,'goldens':goldens},indent=2)+'\n')
         children=args.output/'children';children.mkdir(exist_ok=True)
@@ -424,7 +428,7 @@ def measure(args):
                         identity={'label':label,'side':side,'case':case,'backend':backend,'pair':pair+1,'command':command}
                         proof=finalize_child_capture(path,(case,backend),golden,identity,children/(label+'-proof.json'))
                         proofs.append(proof);runs[side][pair]['cases'][key]=row['cases'][key]
-        if len(proofs)!=TIMED_CHILDREN:raise ValueError('exact3888 isolated timed children required')
+        if len(proofs)!=TIMED_CHILDREN:raise ValueError('exact4104 isolated timed children required')
         verify(args,provenance)
     finally:os.sched_setaffinity(0,original)
     rows=summarize(runs);negatives={name:{k:v for k,v in values.items() if v['after_latency_percent']>0} for name,values in rows.items()};references,reference_negatives=reference_comparisons(runs)
