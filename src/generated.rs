@@ -1388,10 +1388,8 @@ fn sar(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     })
 }
 #[polars_expr(output_type=Float64)]
-fn sarext(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
-    kwargs.apply(inputs, |params| {
-        compute::<2, 1>(FuncId::SAREXT, inputs, &params, &[0, 1], &[])
-    })
+fn sarext(inputs: &[Series], kwargs: Masked<crate::sarext::SarExtParams>) -> PolarsResult<Series> {
+    kwargs.apply(inputs, |params| crate::sarext::compute(inputs, &params))
 }
 #[polars_expr(output_type=Float64)]
 fn sin(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {

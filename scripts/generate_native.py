@@ -31,7 +31,11 @@ def generate():
             lines += [f'#[polars_expr(output_type={types[0]})]']
         order = ', '.join(map(str, abi[name]['order']))
         names = ', '.join(f'"{n}"' for n in fields)
-        lines += [f'fn {name}(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {{',
+        if name == 'sarext':
+            lines += ['fn sarext(inputs: &[Series], kwargs: Masked<crate::sarext::SarExtParams>) -> PolarsResult<Series> {',
+                      'kwargs.apply(inputs, |params| crate::sarext::compute(inputs, &params))', '}']
+        else:
+            lines += [f'fn {name}(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {{',
                   f'kwargs.apply(inputs, |params| compute::<{len(f["inputs"])}, {len(f["outputs"])}>(FuncId::{name.upper()}, inputs, &params, &[{order}], &[{names}]))', '}']
     # Exact metadata-name mapping preserves the prior lowercase-key semantics.
     options = {p['c_name']: p['name'] for f in api for p in f['params']}

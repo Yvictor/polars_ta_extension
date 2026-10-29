@@ -3,6 +3,8 @@ mod generated;
 mod missing;
 mod native;
 mod params;
+mod sarext;
+mod sarext_legacy;
 mod utils;
 use pyo3::{pyfunction, pymodule, types::PyModule, wrap_pyfunction, PyResult, Python};
 

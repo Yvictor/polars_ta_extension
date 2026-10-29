@@ -1,0 +1,33 @@
+{
+  "crate": "ta-lib",
+  "version": "0.8.3",
+  "crate_checksum": "4da552ae932721218c73cf1124610b0ce3d5f27cc1a62342debd370cd161d922",
+  "official_commit": "62021c1d14ef5499505af5547384cab509adf3fc",
+  "official_path": "ta_codegen/output/rust/library/src/ta_func/sarext.rs",
+  "source_sha256": "8ea32e30df203a7ba05ca08e79f0feff0bbe353e60d189bb234b0ac59c75edba",
+  "scalar_sha256": "ebe155477967db8d571896982209b7472c0927dc23a6b1d52d758ef679ad1b90",
+  "public_wrapper_sha256": "924d5ad0ac7073e4779ec68c11c6d138929d0aff124521e18f2a4176e91415c7",
+  "c_math_sha256": "62029d7250233dca4720dbda232d9ae6dbce44964c2b5f36c4a67b00754c97f3",
+  "adaptations": [
+    "Methods become free functions with an explicit borrowed Core; Self constants and self method calls reference Core.",
+    "Public wrapper calls the copied scalar body rather than private CPU feature dispatch.",
+    "Private c_min is copied with its exact conditional semantics."
+  ],
+  "semantic_changes": [
+    {
+      "count": 2,
+      "before": "outReal[outIdx] = -sar;",
+      "after": "outReal[outIdx] = 0.0 - sar;",
+      "reason": "Preserve original TA-Lib C0.8.1 signed-zero short stores."
+    }
+  ],
+  "nonchanges": [
+    "Parameter guards, default sentinels, lookback, index ranges, checked input/output slices, recurrence comparisons/order and .mul_add expressions retained.",
+    "Full NaN output initialization retained.",
+    "Official Core .sarext_lookback and .minus_dm remain public API calls."
+  ],
+  "performance_boundary": "The copied safe scalar body cannot use the original private target_feature FMA dispatch. Portable code may call libm fma; same-runner final-code CI is required.",
+  "routing": "Official typed Core call first. Inspect only range.count written values for negative-zero bits. If present, replay the two-store compatibility scalar into the same initialized buffer and require identical OutRange; no blanket zero normalization.",
+  "scalar_source_token_sha256": "5dfe1e154121643a72448069e982f90a8b7f106b8737ec8ad9546799c19c77e8",
+  "scalar_source_token_count": 1409
+}
