@@ -142,3 +142,14 @@ host list composition is an alternative research path, not inherently required
 or inherently efficient. The migration keeps the safe local improvements
 (initialized output padding and reviewed compatibility scans) that already apply
 within normal `.over()` callbacks. No Polars upstream communication is included in this dispatch investigation.
+
+## Upstream draft since the original investigation
+
+TA-Lib's [Arrow API RFC](https://github.com/TA-Lib/ta-lib/blob/3394ffa4750b0bd56842f66393aeca9763d5ef0b/docs/RFC-Arrow-API.md)
+proposes borrowed partition offsets, validity buffers and a segmented Rust facade.
+It is a draft, not a released capability. It could supply the kernel-side piece
+of a future grouped interface; ordinary Polars plugin callbacks still lack the
+whole-query group positions. Its default gap restart and nonfinite-to-null rules
+also differ from this package's preserved behavior. Adoption would require
+explicit compatibility modes and host ABI support, not a transparent substitution
+of those defaults in the existing expressions.
