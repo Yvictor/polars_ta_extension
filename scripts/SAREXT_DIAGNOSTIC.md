@@ -1,6 +1,6 @@
 # SAREXT diagnostic protocol
 
-This CI-only experiment measures components; it does not change a product route or claim additive/exclusive C cost attribution. Source pins: original b2bbc26d41ec80823c8bffb0cc436a97f29911cc, native56f6d5fb139031c20d86d7e818e7d267eb834295. Native uses registry ta-lib0.8.3, original uses pinned C0.8.1. Rust1.90 portable O3/cgu16/noLTO aligns consumer builds; it is intentionally distinct from upstream Rust1.97 ThinLTO experiments.
+This CI-only experiment measures components; it does not change a product route or claim additive/exclusive C cost attribution. Source pins: original b2bbc26d41ec80823c8bffb0cc436a97f29911cc, native56f6d5fb139031c20d86d7e818e7d267eb834295. Native uses registry ta-lib0.8.3, original uses pinned C0.8.1. Rust1.90 uses portable O3, 16 codegen units, Cargo release `lto=false`, and empty `RUSTFLAGS`/`CARGO_ENCODED_RUSTFLAGS`, matching the consumer build settings. Cargo does not pass an explicit `-Clto=off` here: compiler-default local ThinLTO may operate across codegen units within a crate. This profile is distinct from the upstream Rust1.97 experiments with explicit cross-crate ThinLTO and one codegen unit.
 
 ## Fixed inventory
 
