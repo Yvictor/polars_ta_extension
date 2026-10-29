@@ -1,11 +1,12 @@
 //! Legacy semantics absent from ta-lib 0.8.3. All code uses checked slices.
-//! Batch-only kernels adapted from the official v0.8.1 tag; BSD notice in each file.
-//! Normal inputs use the 0.8.3 crate except RSI/STOCHRSI and index tie handling.
+//! Batch-only kernels cite pinned upstream sources and retain their BSD notices.
+//! Normal inputs use 0.8.3 except explicit compatibility and backported SMA routes.
 #![allow(non_snake_case)]
 use ta_lib::{Core, MAType, OutRange, RetCode};
 mod cmou;
 mod correl;
 mod mavp;
+mod mavp_sma;
 mod maxindex;
 mod minindex;
 mod minmaxindex;
@@ -85,6 +86,11 @@ pub fn lookback(id: FuncId, p: &Params) -> Option<Result<usize, RetCode>> {
     })
 }
 
+pub struct CompatCall {
+    pub result: Result<OutRange, RetCode>,
+    pub restore_native_prefix: bool,
+}
+
 /// Returns None when the released crate can preserve this call's semantics.
 pub fn call(
     id: FuncId,
@@ -92,10 +98,32 @@ pub fn call(
     p: &Params,
     outputs: &mut [Output],
     offset: usize,
-) -> Option<Result<OutRange, RetCode>> {
+) -> Option<CompatCall> {
     use FuncId::*;
     if let Some(result) = guarded::guarded_call(id, input, p, outputs, offset) {
-        return Some(result);
+        return Some(CompatCall {
+            result,
+            restore_native_prefix: true,
+        });
+    }
+    if id == MAVP
+        && int(p, "matype", 0) == 0
+        && (1..=10000).contains(&int(p, "minperiod", 2))
+        && (1..=10000).contains(&int(p, "maxperiod", 30))
+    {
+        if let [Output::Real(out)] = outputs {
+            // The existing guard has proved this input needs no legacy prefix.
+            return Some(CompatCall {
+                result: mavp_sma::call(
+                    input[0],
+                    input[1],
+                    int(p, "minperiod", 2),
+                    int(p, "maxperiod", 30),
+                    &mut out[offset..],
+                ),
+                restore_native_prefix: false,
+            });
+        }
     }
     let end = input[0].len() - 1;
     let period = int(
@@ -113,7 +141,7 @@ pub fn call(
     // CORREL call with the generated output arity. CMOU always uses the legacy
     // path below. Only PERCENTILE needs another nonfinite classification.
     let nonfinite = id == PERCENTILE && input.iter().any(|s| s.iter().any(|v| !v.is_finite()));
-    Some(match (id, outputs) {
+    let result = match (id, outputs) {
         (RSI, [Output::Real(out)]) => LEGACY.rsi(0, end, input[0], period, &mut out[offset..]),
         (STOCHRSI, [Output::Real(k), Output::Real(d)]) => LEGACY.stochrsi(
             0,
@@ -124,7 +152,12 @@ pub fn call(
             int(p, "fastd_period", 3),
             match MAType::try_from(int(p, "fastd_matype", 0)) {
                 Ok(v) => v,
-                Err(e) => return Some(Err(e)),
+                Err(e) => {
+                    return Some(CompatCall {
+                        result: Err(e),
+                        restore_native_prefix: true,
+                    })
+                }
             },
             &mut k[offset..],
             &mut d[offset..],
@@ -167,7 +200,12 @@ pub fn call(
                 int(p, "maxperiod", 30),
                 match MAType::try_from(int(p, "matype", 0)) {
                     Ok(v) => v,
-                    Err(e) => return Some(Err(e)),
+                    Err(e) => {
+                        return Some(CompatCall {
+                            result: Err(e),
+                            restore_native_prefix: true,
+                        })
+                    }
                 },
                 &mut out[offset..],
             )
@@ -185,6 +223,10 @@ pub fn call(
             }
         }
         _ => return None,
+    };
+    Some(CompatCall {
+        result,
+        restore_native_prefix: true,
     })
 }
 

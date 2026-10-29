@@ -126,13 +126,17 @@ pub fn compute<const INPUTS: usize, const OUTPUTS: usize>(
             *values = &values[begin..];
         }
         let shifted = &slices;
-        if let Some(result) = crate::compat::call(id, shifted, params, &mut outputs, offset) {
-            let range = result.map_err(error)?;
+        if let Some(call) = crate::compat::call(id, shifted, params, &mut outputs, offset) {
+            let range = call.result.map_err(error)?;
             polars_ensure!(range.beg_idx == lookback && range.count <= len-offset, ComputeError: "unexpected compatibility output range");
             written = range.count;
             // A later nonfinite value must not change any earlier row's
             // rounding path. Preserve the normal crate result on that prefix.
-            if let Some(prefix) = crate::compat::native_prefix(id, shifted, params) {
+            if let Some(prefix) = call
+                .restore_native_prefix
+                .then(|| crate::compat::native_prefix(id, shifted, params))
+                .flatten()
+            {
                 if prefix > lookback {
                     let prefix_values = shifted.iter().map(|s| &s[..prefix]).collect::<Vec<_>>();
                     let range =

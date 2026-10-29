@@ -103,6 +103,24 @@ Reproduce using separate installed-wheel environments:
 /path/to/new/python scripts/migration_probe.py --compare baseline.npz candidate.npz --report differential.json
 ```
 
+## SMA MAVP backport
+
+The explicit `matype=0` route uses the SMA-only algorithm from upstream
+[`b3f0fa17d`](https://github.com/Yvictor/ta-lib-native/commit/b3f0fa17d0e3485c39ed042d86fff7116c0430a4),
+`ta_codegen/input/mavp/mavp.c`, after existing parameter binding, lookback and
+input guards succeed. It retains SMA's start anchor and add/subtract order,
+copies period-one values, and stores only selected results. Single-period
+inputs delegate to the released `Core::ma`. The private helper preserves Core's
+parameter and buffer checks, including rejection of empty output buffers when
+the input is shorter than lookback.
+
+Existing guards continue to select legacy arithmetic for nonfinite inputs,
+absolute values above 1024, or supplied period parameters above 128. Those
+routes retain prefix restoration. The new normal SMA route reuses the guard's
+proof and skips that second scan. `DEFAULT`, other MA types and extended period
+ranges retain their previous routes. Padding, null masks and ordinary Polars
+`.over(...)` remain in the shared adapter.
+
 ## Independent review
 
 A separate reviewer found and reproduced high-offset/overflow/nonfinite and
