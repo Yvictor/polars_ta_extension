@@ -1,10 +1,11 @@
 //! Legacy semantics absent from ta-lib 0.8.3. All code uses checked slices.
 //! Batch-only kernels cite pinned upstream sources and retain their BSD notices.
-//! Normal inputs use 0.8.3 except explicit compatibility and backported SMA routes.
+//! Normal inputs use 0.8.3 except explicit compatibility and backported SMA/HMA routes.
 #![allow(non_snake_case)]
 use ta_lib::{Core, MAType, OutRange, RetCode};
 mod cmou;
 mod correl;
+mod hma;
 mod mavp;
 mod mavp_sma;
 mod maxindex;
@@ -104,6 +105,18 @@ pub fn call(
         return Some(CompatCall {
             result,
             restore_native_prefix: true,
+        });
+    }
+    if let (HMA, [Output::Real(out)]) = (id, &mut *outputs) {
+        return Some(CompatCall {
+            result: LEGACY.hma_weights(
+                0,
+                input[0].len() - 1,
+                input[0],
+                int(p, "timeperiod", 20),
+                &mut out[offset..],
+            ),
+            restore_native_prefix: false,
         });
     }
     if id == MAVP
