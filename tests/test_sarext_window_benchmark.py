@@ -47,6 +47,47 @@ class Protocol(unittest.TestCase):
                 self.assertNotEqual(bad.returncode,0)
                 self.assertIn('file name should be lib*.rlib',bad.stderr)
 
+    def test_tracked_c_sources_and_separate_generated_compile_binding(self):
+        with tempfile.TemporaryDirectory() as d:
+            root=Path(d).resolve()/'source';root.mkdir();(root/'src').mkdir();(root/'include').mkdir()
+            for name in ('src/a.c','include/a.h','include/ta_config.h.cmake','VERSION','CMakeLists.txt'):
+                (root/name).write_text('/* tracked */\n')
+            (root/'.gitignore').write_text('include/ta_config.h\ninclude/unexpected.h\n')
+            def git(*args):return b.subprocess.check_output(['git','-C',str(root),*args],text=True).strip()
+            git('init','-q');git('add','.');git('-c','user.name=CI test','-c','user.email=test@example.invalid','commit','-qm','fixture');pin=git('rev-parse','HEAD')
+            before=b.source_record(root,pin,True)
+            header=root/'include/ta_config.h';header.write_text('/* generated */\n')
+            self.assertEqual(before,b.source_record(root,pin,True))
+            build=Path(d).resolve()/'build';build.mkdir();out=Path(d).resolve()/'out';out.mkdir()
+            source=str(root/'src/a.c');dep=build/'a.c.o.d'
+            dep.write_text('a.c.o: '+source+' '+str(header)+' '+str(root/'include/a.h')+'\n')
+            command=build/'compile_commands.json';command.write_text(json.dumps([{'file':source,'directory':str(build),'command':'cc -o a.c.o -c '+source,'output':'a.c.o'}]))
+            original_command=command.read_text()
+            for output,cmd in [('a.c.o','cc -o wrong.o -c '+source),('../outside.o','cc -o ../outside.o -c '+source),('a.c.o','cc -c '+source),('a.c.o','cc -o a.c.o -o a.c.o -c '+source)]:
+                command.write_text(json.dumps([{'file':source,'directory':str(build),'command':cmd,'output':output}]))
+                with self.assertRaises(ValueError):b.c_generated_record(root,build,out,True if not(out/'c-generated').exists() else False)
+            command.write_text(original_command)
+            (out/'c-generated').rmdir()
+            record=b.c_generated_record(root,build,out,True)
+            self.assertEqual(record,b.c_generated_record(root,build,out));self.assertEqual(record['configured_header_consumers'],[source]);self.assertEqual(len(record['retained_files']),3)
+            for path in (header,dep,command,root/'include/a.h',Path(next(iter(record['retained_files'])))):
+                old=path.read_bytes();path.write_bytes(old+b'changed')
+                with self.subTest(path=path):
+                    try:changed=b.c_generated_record(root,build,out)
+                    except (ValueError,json.JSONDecodeError):pass
+                    else:self.assertNotEqual(record,changed)
+                path.write_bytes(old)
+            (root/'include/unexpected.h').write_text('bad')
+            with self.assertRaisesRegex(ValueError,'unexpected generated'):b.source_record(root,pin,True)
+            (root/'include/unexpected.h').unlink();dep.write_text('a.c.o: '+source+'\n')
+            # Configuration is still retained when the compiler does not use it.
+            import shutil
+            shutil.rmtree(out/'c-generated')
+            self.assertEqual(b.c_generated_record(root,build,out,True)['configured_header_consumers'],[])
+            for bad in ('other.o: '+source+'\n','a.c.o: '+str(header)+'\n','a.c.o: '+source+' '+str(root/'include/unexpected.h')+'\n'):
+                dep.write_text(bad)
+                with self.assertRaises(ValueError):b.c_generated_record(root,build,out)
+
     def test_inventory_and_balance(self):
         self.assertEqual(len(b.CASES),15);self.assertEqual(len(set(b.CASES)),15);self.assertEqual(b.MODES,('typed',))
         self.assertEqual(len(b.ORDERS),12);self.assertEqual(set(collections.Counter(b.ORDERS).values()),{2})
@@ -147,6 +188,42 @@ class CFG(unittest.TestCase):
         rows=[(0x100,'addsd','%xmm1, %xmm0'),(0x104,'movsd','%xmm0, 8(%rsp)'if stack else '%xmm0, (%rdi)'),(0x108,'call','*%rax'if unknown else '0x900 <fma@plt>'),(0x10c,'jne','0x100'),(0x110,'ret','')]
         if connected:rows.insert(3,(0x10a,'jae','0x120'))
         return rows+[(0x120,'call','*0x10(%rip) # 0x500'),(0x124,'ud2','')]
+
+    def register_rows(self,reg='r15'):
+        return [(0x80,'mov','0x12(%rip),%'+reg+' # 0x500'),(0x100,'addsd','%xmm1,%xmm0'),(0x104,'movsd','%xmm0,(%rdi)'),(0x108,'call','*%'+reg),(0x10c,'jne','0x100'),(0x110,'ret','')]
+
+    def register_proven(self,rows,names=None,gots=None):
+        return cg.cfg(rows,{0x900:'fma'} if names is None else names,{0x500:'fma'} if gots is None else gots)
+
+    def test_register_fma_exact_load_and_repeated_known_c_calls(self):
+        for reg in ('r12','r13','r14','r15'):
+            r=self.register_proven(self.register_rows(reg));self.assertEqual(r['unknown_sites'],[]);self.assertEqual(r['fma_register_proof']['calls'],{'0x108':reg})
+            rows=self.register_rows(reg);rows.insert(3,(0x106,'call','0x900 <fma>'))
+            self.assertEqual(self.register_proven(rows)['unknown_sites'],[])
+
+    def test_register_fma_missing_wrong_load_and_no_loop_bootstrap(self):
+        for rows in (self.register_rows()[1:],[(0x70,'jmp','0x100'),*self.register_rows()]):
+            self.assertIn('0x108',self.register_proven(rows)['unknown_sites'])
+        for names,gots in (({}, {0x500:'fma'}),({0x900:'fma'},{0x500:'other'}),({0x900:'fma'},{})):
+            self.assertIn('0x108',self.register_proven(self.register_rows(),names,gots)['unknown_sites'])
+        # An unreachable load cannot seed its own disconnected loop.
+        rows=[(0x70,'ret',''),*self.register_rows()]
+        self.assertIn('0x108',self.register_proven(rows)['unknown_sites'])
+        names=cg.function_names('1: 00000900 8 OBJECT LOCAL DEFAULT 1 fma\n2: 00000910 8 FUNC GLOBAL DEFAULT UND fma\n')
+        self.assertEqual(names,{})
+
+    def test_register_fma_overwrites_alias_reads_subregs_and_unknown_calls_kill(self):
+        for op,args in [('mov','%rax,%r15'),('mov','%r15,%r14'),('test','%r15,%r15'),('xor','%r15d,%r15d'),('mov','%ax,%r15w'),('mov','%al,%r15b'),('cmovne','%rax,%r15'),('pop','%r15'),('call','0x901 <private_rust>'),('notrack','call *%rax')]:
+            rows=self.register_rows();rows.insert(3,(0x106,op,args))
+            with self.subTest(op=op,args=args):self.assertIn('0x108',self.register_proven(rows)['unknown_sites'])
+
+    def test_register_fma_all_incoming_paths_must_be_known(self):
+        for prelude in ([(0x70,'jne','0x100')],[(0x70,'jne','0x90')]):
+            rows=[*prelude,*self.register_rows()[:1],(0x84,'jmp','0x100'),(0x90,'xor','%r15d,%r15d'),*self.register_rows()[1:]]
+            self.assertIn('0x108',self.register_proven(rows)['unknown_sites'])
+        # Both branches independently load the same resolved FMA pointer.
+        rows=[(0x70,'jne','0x90'),*self.register_rows()[:1],(0x84,'jmp','0x100'),(0x90,'mov','0x12(%rip),%r15 # 0x500'),*self.register_rows()[1:]]
+        self.assertEqual(self.register_proven(rows)['unknown_sites'],[])
 
     def test_output_cycle_and_disconnected_panic_not_whole_grep(self):
         r=cg.cfg(self.rows(),{}, {0x500:'core::panicking::panic_bounds_check'});loops=[g for g in r['cyclic_cfgs']if g['output_loop_candidate']];self.assertEqual(len(loops),1);self.assertFalse(loops[0]['bounds_panic_reachable']);self.assertFalse(loops[0]['unknown_exit_or_call_reachable'])

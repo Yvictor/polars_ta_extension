@@ -9,6 +9,7 @@ from pathlib import Path
 from sarext_window_codegen import inspect as inspect_normal_elf
 import platform
 import resource
+import shlex
 import shutil
 import statistics
 import struct
@@ -96,8 +97,11 @@ def source_record(root, pin, original=False):
     commit=subprocess.check_output(['git','-C',str(root),'rev-parse','HEAD'],text=True).strip()
     need(commit==pin and not subprocess.check_output(['git','-C',str(root),'status','--porcelain']),'wrong or dirty source')
     if original:
-        paths=[p for folder in ('src','include') for p in (root/folder).rglob('*') if p.is_file() and p.suffix in ('.c','.h')]
-        paths.extend(root/p for p in ['VERSION','CMakeLists.txt'])
+        tracked=set(subprocess.check_output(['git','-C',str(root),'ls-files','-z'],text=True).split('\0'))
+        selected={p.relative_to(root).as_posix() for folder in ('src','include') for p in (root/folder).rglob('*') if p.is_file() and p.suffix in ('.c','.h')}
+        need(selected-tracked <= {'include/ta_config.h'},'unexpected generated/untracked C input')
+        paths=[root/p for p in selected & tracked]
+        paths.extend(root/p for p in ['VERSION','CMakeLists.txt','include/ta_config.h.cmake'])
     else:
         paths=[]
         for folder in ['ta_codegen/output/rust','ta_codegen/generator/src','ta_codegen/input/sar','ta_codegen/input/sarext','ta_codegen/input/add']:
@@ -105,6 +109,58 @@ def source_record(root, pin, original=False):
         paths.extend(root/p for p in ['ta_codegen/generator/Cargo.toml','ta_codegen/generator/Cargo.lock','VERSION','rust-toolchain.toml'])
     files={p.relative_to(root).as_posix():sha(p) for p in sorted(set(paths))}
     return {'commit':commit,'clean':True,'source_files':files,'source_sha256':hashlib.sha256(json.dumps(files,sort_keys=True,separators=(',',':')).encode()).hexdigest()}
+
+
+
+def c_generated_record(root,cbuild,output,retain=False):
+    """Bind generated header separately and every compiler-emitted dependency.
+
+    ta_config.h is configured even when no C translation unit consumes it;
+    dependency records report that fact instead of inventing a consumption edge.
+    """
+    root=Path(root).resolve();cbuild=Path(cbuild).resolve();folder=Path(output)/'c-generated'
+    if retain:folder.mkdir()
+    tracked=set(subprocess.check_output(['git','-C',str(root),'ls-files','-z'],text=True).split('\0'))
+    header=root/'include/ta_config.h';need(header.is_file(),'configured C header missing')
+    commands=cbuild/'compile_commands.json';rows=read_json(commands.read_text());need(rows,'C compilation database empty')
+    live={str(header):sha(header),str(commands):sha(commands)};bindings=[];consumers=[]
+    for row in rows:
+        source=Path(row['file']).resolve();directory=Path(row['directory']).resolve()
+        need(source.is_relative_to(root) and source.relative_to(root).as_posix() in tracked,'untracked C translation unit')
+        need(directory==cbuild,'C compile directory differs')
+        tokens=shlex.split(row['command']);need(tokens.count('-c')==1 and tokens.index('-c')+1<len(tokens) and (directory/tokens[tokens.index('-c')+1]).resolve()==source,'C compilation source binding differs')
+        object_path=Path(row['output']);object_path=object_path if object_path.is_absolute() else directory/object_path
+        object_path=object_path.resolve();need(object_path.is_relative_to(cbuild),'C object outside build')
+        need(tokens.count('-o')==1 and tokens.index('-o')+1<len(tokens),'C compilation output missing/ambiguous')
+        command_output=Path(tokens[tokens.index('-o')+1]);command_output=command_output if command_output.is_absolute() else directory/command_output
+        need(command_output.resolve()==object_path,'C compilation object binding differs')
+        dep=Path(str(object_path)+'.d');text=dep.read_text();need(': ' in text,'compiler dependency record missing')
+        target,deps=text.replace('\\\n',' ').split(': ',1)
+        need((directory/target).resolve()==object_path.resolve(),'C dependency object binding differs')
+        inputs=shlex.split(deps);need(any((directory/p).resolve()==source for p in inputs),'C dependency translation unit missing')
+        local=[]
+        for name in inputs:
+            path=Path(name);path=path if path.is_absolute() else directory/path;path=path.resolve()
+            need(not path.is_relative_to(cbuild),'unexpected compiler generated build input')
+            if path.is_relative_to(root):
+                rel=path.relative_to(root).as_posix();need(rel in tracked or path==header,'unexpected compiler generated source input')
+                local.append(rel)
+            need(path.is_file(),'compiler dependency missing')
+            if str(path) not in live:live[str(path)]=sha(path)
+        if 'include/ta_config.h' in local:consumers.append(str(source))
+        live[str(dep)]=sha(dep);bindings.append({'source':str(source),'object':str(object_path),'dependency':str(dep),'source_inputs':sorted(local)})
+    retained={}
+    for i,(name,digest) in enumerate(sorted(live.items())):
+        # Retain commands, generated header and compiler dependencies. Tracked
+        # source bytes already belong to the immutable Git source archive.
+        path=Path(name)
+        if path==header or path==commands or name.endswith('.o.d'):
+            dest=folder/(f'{i}-'+path.name)
+            if retain:shutil.copyfile(path,dest)
+            need(dest.is_file() and sha(dest)==digest,'retained generated/dependency bytes changed')
+            retained[str(dest)]=digest
+    need({str(p) for p in folder.iterdir()}==set(retained),'generated evidence inventory changed')
+    return {'live_files':live,'retained_files':retained,'compile_bindings':bindings,'configured_header':str(header),'configured_header_consumers':consumers}
 
 
 def runtime(version):
@@ -177,6 +233,7 @@ def build(args):
     ccommands=[['cmake','-S',str(args.original_source),'-B',str(cbuild),'-DCMAKE_BUILD_TYPE=Release','-DBUILD_SHARED_LIBS=OFF','-DBUILD_STATIC_LIBS=ON','-DBUILD_DEV_TOOLS=OFF','-DCMAKE_POSITION_INDEPENDENT_CODE=ON','-DCMAKE_EXPORT_COMPILE_COMMANDS=ON','-DCMAKE_INSTALL_PREFIX='+str(install)],['cmake','--build',str(cbuild),'--target','install','--parallel','4']]
     for i,c in enumerate(ccommands):command_run(c,out/f'c-build-{i}.log')
     c_lib=install/'lib/libta-lib.a';need(c_lib.is_file(),'missing C static library')
+    c_generated=c_generated_record(args.original_source,cbuild,out,retain=True)
     bins=out/'bin';bins.mkdir(exist_ok=True); records={}
     common=['rustc','--edition=2021','-O','-C','lto=thin','-C','codegen-units=1','-Dwarnings','--check-cfg=cfg(c_reference,test)',str(args.harness),'-Csave-temps']
     for a in ARMS:
@@ -206,7 +263,7 @@ def build(args):
         dest=out/'archives'/(arm+'-source.tar.gz')
         subprocess.run(['git','-C',str(getattr(args,arm+'_source')),'archive','--format=tar.gz','-o',str(dest),'HEAD'],check=True)
         source_archives[str(dest)]=sha(dest)
-    p={'source_gates':source_gates,'source_archives':source_archives,'runtime':rt,'pins':expected,'arms':records,'inputs':inputs,'scripts':scripts,'normal_codegen_files':file_inventory(out/'normal-codegen'),'harness_sha256':sha(args.harness),'c_library':str(c_lib),'c_library_sha256':sha(c_lib),'c_commands':ccommands,'c_config_sha256':sha(cbuild/'CMakeCache.txt'),'codegen_proof':file_inventory(proof_dest)}
+    p={'c_generated':c_generated,'source_gates':source_gates,'source_archives':source_archives,'runtime':rt,'pins':expected,'arms':records,'inputs':inputs,'scripts':scripts,'normal_codegen_files':file_inventory(out/'normal-codegen'),'harness_sha256':sha(args.harness),'c_library':str(c_lib),'c_library_sha256':sha(c_lib),'c_commands':ccommands,'c_config_sha256':sha(cbuild/'CMakeCache.txt'),'codegen_proof':file_inventory(proof_dest)}
     (out/'build-provenance.json').write_text(json.dumps(p,indent=2)+'\n');verify(args,p)
 
 
@@ -225,6 +282,7 @@ def verify(args,p):
         if a!='original':need(r['product_fingerprints']==file_inventory(args.output/'product-fingerprints'/a),'wheel-time equivalent library fingerprints changed')
     for key in ['c_library']:need(sha(p[key])==p[key+'_sha256'],'C source/library changed')
     need(sha(args.output/'c-build/CMakeCache.txt')==p['c_config_sha256'],'C config changed')
+    need(c_generated_record(args.original_source,args.output/'c-build',args.output)==p['c_generated'],'C generated inputs/dependencies changed')
     for f,h in p['codegen_proof'].items():need(sha(f)==h,'static proof changed')
     for f,h in p['source_archives'].items():need(sha(f)==h,'source archive changed')
     for r in p['inputs'].values():need(sha(r['path'])==r['sha256'],'fixture changed')

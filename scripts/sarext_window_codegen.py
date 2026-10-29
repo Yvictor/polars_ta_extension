@@ -1,9 +1,8 @@
-"""Bounded x86 evidence for the frozen SAR/SAREXT batch source, not a decoder proof.
+"""Bounded x86 evidence for frozen SAR/SAREXT batch source, not a decoder proof.
 
-Only the scoped functions have one mutable f64 output and no local f64 arrays.
-A non-stack f64-store SCC is therefore an output-loop candidate under that source
-invariant. Public valid-prefix/dispatch proofs remain separate; SCCs do not prove
-which path a call takes. No register value provenance is propagated across calls.
+Only the batch-loop region writes the sole mutable f64 output. The prelude has
+an ep_temp stack buffer for MINUS_DM; no claim excludes all local arrays.
+Non-stack f64-store SCCs remain candidates, never a hot-path selection proof.
 """
 import argparse,hashlib,json,re,struct,subprocess
 from pathlib import Path
@@ -27,6 +26,16 @@ def symbols(text,segments):
         for a,b,_ in found:
             need(not(start<a+ b and a<start+size) or (start,size)==(a,b),'partial/contained overlapping function bounds')
     return sorted(selected)
+
+
+def function_names(syms):
+    names={}
+    for line in syms.splitlines():
+        m=re.match(r'\s*\d+:\s+([0-9a-f]+)\s+\d+\s+(?:FUNC|IFUNC)\s+\S+\s+\S+\s+(\S+)\s+(\S+)',line)
+        if m and m[2]!='UND':
+            address=int(m[1],16)
+            if address not in names or panic(m[3]):names[address]=m[3]
+    return names
 
 
 def relocs(text,names):
@@ -92,11 +101,47 @@ def sccs(graph):
     return out
 
 
+def fma_register_calls(rows,graph,calls,gots,names):
+    # SysV r12-r15 are preserved by the exact C-ABI fma target only. Unknown
+    # calls and every other register mention kill tags, including subregisters.
+    regs=('r12','r13','r14','r15');loads={};by={a:(op,args)for a,op,args in rows}
+    is_fma=lambda n:re.fullmatch(r'fma(?:@.*)?',n)is not None
+    for a,op,args in rows:
+        m=re.fullmatch(r'[-+]?(?:0x)?[0-9a-f]*\(%rip\),\s*%(r1[2-5])\s*#\s*(?:0x)?([0-9a-f]+).*',args)
+        if op in ('mov','movq')and m and is_fma(gots.get(int(m[2],16),'')) and gots[int(m[2],16)] in names.values():
+            loads[a]=(m[1],int(m[2],16),gots[int(m[2],16)])
+    # Empty is unreachable bottom, {False} unknown, {True} must-known FMA;
+    # a union containing False cannot certify. Start only at function entry.
+    states={a:[set()for _ in regs]for a in graph};entry=rows[0][0]
+    states[entry]=[{False}for _ in regs];todo=[entry]
+    while todo:
+        a=todo.pop();op,args=by[a];incoming=states[a];out=[set(v)for v in incoming]
+        if a in calls:
+            m=re.fullmatch(r'\*%(r1[2-5])',args)
+            known=is_fma(calls[a])or(m is not None and incoming[regs.index(m[1])]=={True})
+            if not known:out=[{False}for _ in regs]
+        else:
+            for i,reg in enumerate(regs):
+                if a in loads and loads[a][0]==reg:out[i]={True}
+                elif re.search('%'+reg+r'(?:d|w|b)?\b',args.split('#',1)[0]):out[i]={False}
+        for dest in graph[a]:
+            merged=[old|new for old,new in zip(states[dest],out)]
+            if merged!=states[dest]:states[dest]=merged;todo.append(dest)
+    proven={}
+    for a,name in calls.items():
+        m=re.fullmatch(r'\*%(r1[2-5])',by[a][1])
+        if m and states[a][regs.index(m[1])]=={True}:proven[a]=m[1]
+    return proven,{'loads':{hex(a):{'register':r,'GOT':hex(g),'symbol':n}for a,(r,g,n)in loads.items()},
+                   'calls':{hex(a):r for a,r in proven.items()},'unknown_calls_kill_all_tags':True,
+                   'contract':'Exact resolved C-ABI fma only preserves r12-r15; all other mentions/calls kill. Empty=unreachable; any unknown incoming path rejects.'}
+
+
 def cfg(rows,names,gots):
     by={a:(op,args) for a,op,args in rows};addresses=list(by);nexts=dict(zip(addresses,addresses[1:]));graph={a:[] for a in addresses};bad=set();unknown=set();calls={}
     for a,op,args in rows:
         nxt=nexts.get(a);dest=target(args)
-        if op.startswith('loop') or (op in ('bnd','notrack','rep','repz','repnz') and re.match(r'(?:j|ret)',args)):unknown.add(a)
+        if op.startswith('loop') or (op in ('bnd','notrack','rep','repz','repnz') and re.match(r'(?:j|ret|call)',args)):unknown.add(a)
+        if op in ('bnd','notrack','rep','repz','repnz')and re.match(r'call',args):calls[a]='UNKNOWN'
         if op.startswith('call'):
             named=names.get(dest,'') if dest is not None else ''
             if not named:
@@ -106,13 +151,15 @@ def cfg(rows,names,gots):
                 label=re.search(r'<([^>]+)>',args);named=label[1].split('+0x')[0] if label else ''
             calls[a]=named or 'UNKNOWN'
             if panic(named):bad.add(a)
-            elif not re.fullmatch(r'_?fma(?:@.*)?',named):unknown.add(a)
+            elif not re.fullmatch(r'fma(?:@.*)?',named):unknown.add(a)
         if op.startswith('j'):
             if dest in by:graph[a].append(dest)
             elif dest is not None and panic(names.get(dest,'')):bad.add(a)
             else:unknown.add(a)
             if op not in ('jmp','jmpq') and nxt is not None:graph[a].append(nxt)
         elif op not in ('ret','retq','ud2','int3') and nxt is not None and a not in bad:graph[a].append(nxt)
+    proven,fma_proof=fma_register_calls(rows,graph,calls,gots,names)
+    for a in proven:calls[a]='fma';unknown.discard(a)
     def reachable(v,goals):
         todo=[v];seen=set()
         while todo:
@@ -135,7 +182,7 @@ def cfg(rows,names,gots):
           'output_loop_candidate':bool(stores and arithmetic),'bounds_panic_reachable':any(reachable(a,bad) for a in group),
           'unknown_exit_or_call_reachable':any(reachable(a,unknown) for a in group),
           'instruction_sha256':hashlib.sha256(json.dumps([(a,*by[a]) for a in group]).encode()).hexdigest()})
-    return {'cyclic_cfgs':loops,'panic_sites':[hex(a) for a in sorted(bad)],'unknown_sites':[hex(a) for a in sorted(unknown)],'calls':{hex(a):n for a,n in calls.items()}}
+    return {'fma_register_proof':fma_proof,'cyclic_cfgs':loops,'panic_sites':[hex(a) for a in sorted(bad)],'unknown_sites':[hex(a) for a in sorted(unknown)],'calls':{hex(a):n for a,n in calls.items()}}
 
 
 def inspect(binary,output,version,candidate=False):
@@ -148,12 +195,7 @@ def inspect(binary,output,version,candidate=False):
     for line in ph.splitlines():
         fields=line.split()
         if fields and fields[0]=='LOAD' and 'E'in fields[6:-1]:segments.append((int(fields[2],16),int(fields[2],16)+int(fields[5],16)))
-    names={}
-    for line in syms.splitlines():
-        m=re.match(r'\s*\d+:\s+([0-9a-f]+)\s+\d+\s+\S+\s+\S+\s+\S+\s+(\S+)\s+(\S+)',line)
-        if m and m[2]!='UND':
-            address=int(m[1],16)
-            if address not in names or panic(m[3]):names[address]=m[3]
+    names=function_names(syms)
     functions=[];errors=[]
     try:selected=symbols(syms,segments)
     except ValueError as error:selected=[];errors.append(str(error))
