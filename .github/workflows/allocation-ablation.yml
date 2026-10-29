@@ -1,0 +1,118 @@
+name: Native allocation ablation
+
+on:
+  push:
+    branches: [codex/allocation-ablation-ci]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: allocation-ablation-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  PYO3_USE_ABI3_FORWARD_COMPATIBILITY: '1'
+  RUSTUP_TOOLCHAIN: '1.90.0'
+  CARGO_BUILD_JOBS: '4'
+  CARGO_PROFILE_RELEASE_DEBUG: 'false'
+  CARGO_TARGET_DIR: ${{ github.workspace }}/ablation-target
+  RUSTFLAGS: ''
+  CARGO_ENCODED_RUSTFLAGS: ''
+  POLARS_MAX_THREADS: '4'
+  BASE_COMMIT: 8d14d0dc8eebe28d48536a36bb8c3586b8a7390f
+  FIELDS_COMMIT: 0a3118b8118fb7e6b530f09f1d925dca61664fad
+  MAP_COMMIT: e354459bd18616dd7a64e4c10f45055f8ad5f65d
+  COMBINED_COMMIT: 992e12c7d1c6acd5e1b2ec0e9a343e126511937d
+
+jobs:
+  native-allocation-ablation:
+    name: Four native builds / fields and parameter-map allocations
+    runs-on: ubuntu-24.04
+    timeout-minutes: 80
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          path: control-source
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ env.BASE_COMMIT }}
+          path: sources/base
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ env.FIELDS_COMMIT }}
+          path: sources/fields
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ env.MAP_COMMIT }}
+          path: sources/map
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ env.COMBINED_COMMIT }}
+          path: sources/combined
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - uses: dtolnay/rust-toolchain@1.90.0
+      - uses: astral-sh/setup-uv@v8.2.0
+      - name: Verify committed pickle fixtures and build four release wheels sequentially
+        run: |
+          mkdir -p ablation-results wheels
+          python sources/map/scripts/generate_param_map_fixtures.py --check
+          python sources/combined/scripts/generate_param_map_fixtures.py --check
+          for side in base fields map combined; do
+            uv venv --python 3.12 "envs/$side"
+            uv pip install --python "envs/$side" 'maturin==1.15.0' 'cmake==4.4.4' 'polars==1.44.2' 'numpy==2.5.3' pytest
+            mkdir -p "wheels/$side"
+            python -c 'import json,sys; print(json.dumps({"side":sys.argv[1],"command":sys.argv[2:]}))' "$side" "$PWD/envs/$side/bin/python" -m maturin build --release --locked --interpreter "$PWD/envs/$side/bin/python" --out "$PWD/wheels/$side" >> ablation-results/build-commands.jsonl
+            (cd "sources/$side" && "$GITHUB_WORKSPACE/envs/$side/bin/python" -m maturin build --release --locked --interpreter "$GITHUB_WORKSPACE/envs/$side/bin/python" --out "$GITHUB_WORKSPACE/wheels/$side") > "ablation-results/$side-build.log" 2>&1
+            uv pip install --python "envs/$side" --no-deps "wheels/$side/"*.whl
+            uv pip freeze --python "envs/$side" > "ablation-results/$side-dependencies.txt"
+          done
+          git -C control-source rev-parse HEAD > ablation-results/controller-commit.txt
+          cp control-source/.github/workflows/allocation-ablation.yml ablation-results/workflow.yml
+          rustc --version --verbose > ablation-results/toolchain.txt
+          cc --version >> ablation-results/toolchain.txt
+          lscpu > ablation-results/lscpu.txt
+          cat /proc/meminfo > ablation-results/meminfo.txt
+      - name: Verify map compatibility contracts on Linux
+        run: |
+          for side in map combined; do
+            PYO3_PYTHON="$GITHUB_WORKSPACE/envs/$side/bin/python" cargo test --lib --locked --manifest-path "sources/$side/Cargo.toml"
+          done
+      - name: Test controller gates and record immutable builds
+        run: |
+          envs/base/bin/python -m pytest control-source/tests/test_allocation_ablation_benchmark.py -q
+          envs/base/bin/python control-source/scripts/allocation_ablation_benchmark.py \
+            --base-python envs/base/bin/python --base-source sources/base --base-commit "$BASE_COMMIT" \
+            --fields-python envs/fields/bin/python --fields-source sources/fields --fields-commit "$FIELDS_COMMIT" \
+            --map-python envs/map/bin/python --map-source sources/map --map-commit "$MAP_COMMIT" \
+            --combined-python envs/combined/bin/python --combined-source sources/combined --combined-commit "$COMBINED_COMMIT" \
+            --wheel-dir wheels --output ablation-results --record-build
+      - name: Exact full API corpus and both thread settings before timing
+        run: |
+          envs/base/bin/python control-source/scripts/allocation_ablation_benchmark.py \
+            --base-python envs/base/bin/python --base-source sources/base --base-commit "$BASE_COMMIT" \
+            --fields-python envs/fields/bin/python --fields-source sources/fields --fields-commit "$FIELDS_COMMIT" \
+            --map-python envs/map/bin/python --map-source sources/map --map-commit "$MAP_COMMIT" \
+            --combined-python envs/combined/bin/python --combined-source sources/combined --combined-commit "$COMBINED_COMMIT" \
+            --wheel-dir wheels --output ablation-results --validate-only
+      - name: Eight balanced fresh-process rounds at one and four threads
+        run: |
+          envs/base/bin/python control-source/scripts/allocation_ablation_benchmark.py \
+            --base-python envs/base/bin/python --base-source sources/base --base-commit "$BASE_COMMIT" \
+            --fields-python envs/fields/bin/python --fields-source sources/fields --fields-commit "$FIELDS_COMMIT" \
+            --map-python envs/map/bin/python --map-source sources/map --map-commit "$MAP_COMMIT" \
+            --combined-python envs/combined/bin/python --combined-source sources/combined --combined-commit "$COMBINED_COMMIT" \
+            --wheel-dir wheels --output ablation-results
+          cat ablation-results/comparison.md >> "$GITHUB_STEP_SUMMARY"
+          cat ablation-results/negative-cases.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: native-allocation-ablation-evidence
+          path: |
+            ablation-results/
+            wheels/
+          if-no-files-found: error
