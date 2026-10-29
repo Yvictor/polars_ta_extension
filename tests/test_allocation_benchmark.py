@@ -115,12 +115,17 @@ def test_regression_inventory_keeps_noisy_and_consistent_slower_cases():
     assert found['grouped_ema/10000x100']['matching_polars_control'] == 'control_cumsum/10000x100'
 
 
+@pytest.mark.parametrize('load_average_available', [True, False], ids=['loadavg-present', 'loadavg-absent'])
 @pytest.mark.parametrize('actual,expected', [(0., -0.), (-0., 0.)])
-def test_workload_tolerant_reference_rejects_opposite_signed_zero(tmp_path, monkeypatch, actual, expected):
+def test_workload_tolerant_reference_rejects_opposite_signed_zero(tmp_path, monkeypatch, actual, expected, load_average_available):
     import sys
     import polars as pl
     spec = importlib.util.spec_from_file_location('signed_zero_workload', ROOT/'scripts/migration_benchmark.py')
     workload = importlib.util.module_from_spec(spec); spec.loader.exec_module(workload)
+    if load_average_available:
+        monkeypatch.setattr(workload.os, 'getloadavg', lambda: (0., 0., 0.), raising=False)
+    else:
+        monkeypatch.delattr(workload.os, 'getloadavg', raising=False)
     data = pl.DataFrame({'close': [actual]})
     expressions = [pl.col('close').alias('out')]
     reference = tmp_path/'reference.npz'
@@ -135,3 +140,31 @@ def test_workload_tolerant_reference_rejects_opposite_signed_zero(tmp_path, monk
     monkeypatch.setattr(workload.time, 'perf_counter_ns', forbidden_timer)
     with pytest.raises(AssertionError, match='signed zero differs'):
         workload.main()
+
+
+def test_workload_optional_load_average_does_not_block_capture(tmp_path, monkeypatch):
+    import json
+    import sys
+    import polars as pl
+    spec = importlib.util.spec_from_file_location('optional_load_average_workload', ROOT/'scripts/migration_benchmark.py')
+    workload = importlib.util.module_from_spec(spec); spec.loader.exec_module(workload)
+    monkeypatch.delattr(workload.os, 'getloadavg', raising=False)
+    monkeypatch.setattr(workload.platform, 'system', lambda: 'Windows')
+    monkeypatch.setattr(workload.platform, 'processor', lambda: 'fixture-cpu')
+    monkeypatch.setattr(workload.platform, 'platform', lambda: 'fixture-platform')
+    data = pl.DataFrame({'close': [0.]})
+    monkeypatch.setattr(workload, 'cases', lambda *_: iter([('zero', data, [pl.col('close')])]))
+    output = tmp_path/'result.json'
+    monkeypatch.setattr(sys, 'argv', ['migration_benchmark.py', '--output', str(output),
+                        '--source-root', str(ROOT), '--label', 'optional-load-average', '--check-only'])
+    monkeypatch.setattr(workload.subprocess, 'check_output', lambda command, **_: (
+        'rustc 1.90.0 fixture' if command[0] == 'rustc' else 'fixture-commit'))
+    def forbidden_timer():
+        raise RuntimeError('check-only capture started measurement')
+    monkeypatch.setattr(workload.time, 'perf_counter_ns', forbidden_timer)
+    workload.main()
+    record = json.loads(output.read_text())
+    assert record['load_start'] is None
+    assert record['load_end'] is None
+    assert record['case_inventory'] == ['zero']
+    assert record['results'] == {}

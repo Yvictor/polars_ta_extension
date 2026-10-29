@@ -92,6 +92,14 @@ def flatten(result):
     return columns
 
 
+def load_average():
+    """Optional host telemetry; Windows does not provide os.getloadavg."""
+    try:
+        return os.getloadavg()
+    except (AttributeError, OSError):
+        return None
+
+
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('--output',type=Path,required=True);p.add_argument('--repeats',type=int,default=31)
@@ -104,7 +112,7 @@ def main():
     args=p.parse_args()
     if args.repeats<5:p.error('at least five repetitions required')
     reference=np.load(args.reference,allow_pickle=False) if args.reference else None
-    values={};results={};load_start=os.getloadavg();checked_values=0;case_inventory=[]
+    values={};results={};load_start=load_average();checked_values=0;case_inventory=[]
     for name,data,exprs in cases(args.diagnostic, args.case_filter):
         case_inventory.append(name)
         query=data.lazy().select(exprs)
@@ -176,7 +184,7 @@ def main():
              'profile':'release (maturin --release --locked), portable CPU target',
              'threads':pl.thread_pool_size(),'repeats':args.repeats,'warmups':5,'diagnostic':args.diagnostic,
              'fault_counter':'getrusage(RUSAGE_SELF), process counters across query threads including engine/Python/allocator activity between reads' if resource is not None else None,
-             'native_binary_sha256':native_sha256,'load_start':load_start,'load_end':os.getloadavg(),'source_sha256':source.hexdigest(),
+             'native_binary_sha256':native_sha256,'load_start':load_start,'load_end':load_average(),'source_sha256':source.hexdigest(),
              'correctness_reference':str(args.reference) if args.reference else None,'exact_reference':args.exact_reference,
              'case_filters':args.case_filter,'case_inventory':case_inventory,'checked_values':checked_values,'affinity':sorted(os.sched_getaffinity(0)) if hasattr(os,'sched_getaffinity') else None,
              'results':results}
