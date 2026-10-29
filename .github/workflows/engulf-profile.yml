@@ -1,0 +1,117 @@
+name: Focused Engulf kernel and adapter profiling
+
+on:
+  push:
+    branches: [codex/engulf-profile-ci]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: engulf-profile-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  PYO3_USE_ABI3_FORWARD_COMPATIBILITY: '1'
+  RUSTUP_TOOLCHAIN: '1.90.0'
+  CARGO_BUILD_JOBS: '4'
+  CARGO_TERM_COLOR: never
+  CARGO_PROFILE_RELEASE_DEBUG: 'false'
+  CARGO_PROFILE_RELEASE_LTO: 'false'
+  CARGO_PROFILE_RELEASE_CODEGEN_UNITS: '16'
+  CARGO_TARGET_DIR: ${{ github.workspace }}/engulf-target
+  CFLAGS: ''
+  CXXFLAGS: ''
+  RUSTFLAGS: ''
+  CARGO_ENCODED_RUSTFLAGS: ''
+  CMAKE: ${{ github.workspace }}/envs/native/bin/cmake
+  POLARS_MAX_THREADS: '1'
+  OMP_NUM_THREADS: '1'
+  OPENBLAS_NUM_THREADS: '1'
+  MKL_NUM_THREADS: '1'
+  NATIVE_COMMIT: 6c3fb5fb44496c5739ee9f1d8dfa11f7b46dd473
+  ORIGINAL_COMMIT: b2bbc26d41ec80823c8bffb0cc436a97f29911cc
+
+jobs:
+  engulf-profile:
+    name: C081 / Rust083 typed / abstract / native adapter diagnostics
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          path: control-source
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ env.NATIVE_COMMIT }}
+          path: sources/native
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ env.ORIGINAL_COMMIT }}
+          path: sources/original
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - uses: dtolnay/rust-toolchain@1.90.0
+      - uses: astral-sh/setup-uv@v8.2.0
+      - name: Preserve controller and fixed arguments
+        run: |
+          mkdir -p engulf-results/controller
+          cp control-source/scripts/engulf_profile* control-source/scripts/integer_init_provenance.py control-source/scripts/integer_init_stage_benchmark.py control-source/scripts/integer_init_benchmark.py control-source/scripts/integer_init_cases.json control-source/scripts/migration_ci_benchmark.py engulf-results/controller/
+          cp control-source/.github/workflows/engulf-profile.yml engulf-results/workflow.yml
+          git -C control-source rev-parse HEAD > engulf-results/controller-commit.txt
+          python - <<'PY'
+          import json,os,re
+          from pathlib import Path
+          for key in ('NATIVE_COMMIT','ORIGINAL_COMMIT'):
+              assert re.fullmatch('[0-9a-f]{40}',os.environ[key])
+          args=[]
+          for side in ('native','original'):
+              args+=['--'+side+'-source','sources/'+side,'--'+side+'-python',str(Path('envs')/side/'bin/python')]
+          args+=['--output','engulf-results','--target-dir',os.environ['CARGO_TARGET_DIR'],'--wheel-dir','wheels']
+          Path('engulf-results/arguments.json').write_text(json.dumps(args))
+          PY
+          cat > engulf-results/run-controller.py <<'PY'
+          import json,subprocess,sys
+          args=json.load(open('engulf-results/arguments.json'))
+          subprocess.run([sys.executable,'control-source/scripts/engulf_profile_benchmark.py',*args,*sys.argv[1:]],check=True)
+          PY
+      - name: Build two fixed product wheels and freeze native graph before C or test builds
+        run: |
+          for side in native original; do
+            uv venv --python 3.12 "envs/$side"
+            uv pip install --python "envs/$side" 'maturin==1.15.0' 'cmake==4.4.4' 'polars==1.44.2' 'numpy==2.5.3' 'pytest==8.4.2'
+            mkdir -p "wheels/$side"
+            python -c 'import json,sys; print(json.dumps({"side":sys.argv[1],"command":sys.argv[2:]}))' "$side" "$PWD/envs/$side/bin/python" -m maturin build --release --locked --interpreter "$PWD/envs/$side/bin/python" --out "$PWD/wheels/$side" >> engulf-results/build-commands.jsonl
+            touch "sources/$side/src/lib.rs"
+            (cd "sources/$side" && "$GITHUB_WORKSPACE/envs/$side/bin/python" -m maturin build --release --locked --interpreter "$GITHUB_WORKSPACE/envs/$side/bin/python" --out "$GITHUB_WORKSPACE/wheels/$side") > "engulf-results/$side-build.log" 2>&1
+            python control-source/scripts/integer_init_provenance.py --compile-log "engulf-results/$side-build.log" --source "sources/$side" >> engulf-results/product-compile-proof.jsonl
+            uv pip install --python "envs/$side" --no-deps "wheels/$side/"*.whl
+            uv pip freeze --python "envs/$side" > "engulf-results/$side-dependencies.txt"
+            if [[ "$side" == native ]]; then
+              envs/native/bin/python engulf-results/run-controller.py --snapshot-native
+            fi
+          done
+          rustc --version --verbose > engulf-results/toolchain.txt
+          lscpu > engulf-results/lscpu.txt
+          cat /proc/meminfo > engulf-results/meminfo.txt
+      - name: Protocol tests and unchanged native contracts before stage builds
+        run: |
+          envs/native/bin/python -m pytest --noconftest control-source/tests/test_engulf_profile_benchmark.py control-source/tests/test_integer_init_benchmark.py -q
+          PYO3_PYTHON="$GITHUB_WORKSPACE/envs/native/bin/python" cargo test --release --lib --locked --manifest-path sources/native/Cargo.toml > engulf-results/native-rust-tests.log 2>&1
+      - name: Build source-bound diagnostic with actual C and Jemalloc libraries
+        run: envs/native/bin/python engulf-results/run-controller.py --build
+      - name: All36 exact captures before432 balanced selected-mode children
+        run: envs/native/bin/python engulf-results/run-controller.py --run
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: engulf-kernel-adapter-evidence
+          include-hidden-files: true
+          if-no-files-found: error
+          path: |
+            engulf-results/
+            wheels/
+            engulf-target/release/build/talib-sys-*/out/lib/libta-lib.a
+            engulf-target/release/build/jemalloc-sys-*/out/lib/*.a
