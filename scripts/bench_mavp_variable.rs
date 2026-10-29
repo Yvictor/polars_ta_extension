@@ -3,7 +3,7 @@ use std::{
     ffi::{c_char, c_int, CStr},
     fs::{self, File},
     hint::black_box,
-    io::{BufWriter, Write},
+    io::{BufWriter, Read, Write},
     time::Instant,
 };
 
@@ -47,7 +47,7 @@ impl CReference {
         assert_eq!(unsafe { TA_Initialize() }, 0);
         Self
     }
-    fn version(&self) -> String {
+    fn version() -> String {
         // The official API returns a process-lifetime NUL-terminated string.
         unsafe { CStr::from_ptr(TA_GetVersionString()) }
             .to_str()
@@ -68,13 +68,6 @@ enum Kind {
     Wma,
 }
 impl Kind {
-    fn name(self) -> &'static str {
-        match self {
-            Self::Sma => "SMA",
-            Self::Ema => "EMA",
-            Self::Wma => "WMA",
-        }
-    }
     fn code(self) -> i32 {
         match self {
             Self::Sma => 0,
@@ -106,51 +99,76 @@ impl Case {
         (beg, self.n - beg)
     }
 }
+fn case_spec(name: &str) -> (usize, &str, Kind, bool) {
+    let parts: Vec<_> = name.split('/').collect();
+    let (pattern, kind, n, control) = match parts.as_slice() {
+        ["mavp", pattern, "SMA", n]
+            if ["one", "four", "few", "many", "blocked", "clamped"].contains(pattern) =>
+        {
+            (*pattern, Kind::Sma, *n, false)
+        }
+        ["mavp", "four", "EMA", n] => ("four", Kind::Ema, *n, false),
+        ["mavp", "four", "WMA", n] => ("four", Kind::Wma, *n, false),
+        ["sma_control", "SMA", n] => ("four", Kind::Sma, *n, true),
+        _ => panic!("unknown case: {name}"),
+    };
+    let n_text = n;
+    let n = n.parse::<usize>().unwrap();
+    assert_eq!(n.to_string(), n_text, "noncanonical case size");
+    assert!([100, 1000, 10_000, 1_000_000].contains(&n), "unknown size");
+    (n, pattern, kind, control)
+}
+fn make_case(name: &str) -> Case {
+    let (n, pattern, kind, sma_control) = case_spec(name);
+    let periods = (0..n)
+        .map(|i| match pattern {
+            "one" => 14.,
+            "four" => [3., 5., 9., 14.][i % 4],
+            "few" => [3., 14.][i % 2],
+            "many" => (2 + i % 29) as f64,
+            "blocked" => [3., 5., 9., 14.][(i * 4 / n).min(3)],
+            "clamped" => [f64::NAN, f64::NEG_INFINITY, 1., 3.75, 9., f64::INFINITY][i % 6],
+            _ => unreachable!(),
+        })
+        .collect();
+    Case {
+        name: name.to_owned(),
+        n,
+        min: if pattern == "clamped" { 1 } else { 2 },
+        kind,
+        sma_control,
+        periods,
+    }
+}
 fn cases() -> Vec<Case> {
-    let mut cases = Vec::new();
+    let mut result = Vec::new();
     for n in [100, 1000, 10_000, 1_000_000] {
         for pattern in ["one", "four", "few", "many", "blocked", "clamped"] {
-            let periods = (0..n)
-                .map(|i| match pattern {
-                    "one" => 14.,
-                    "four" => [3., 5., 9., 14.][i % 4],
-                    "few" => [3., 14.][i % 2],
-                    "many" => (2 + i % 29) as f64,
-                    "blocked" => [3., 5., 9., 14.][(i * 4 / n).min(3)],
-                    "clamped" => [f64::NAN, f64::NEG_INFINITY, 1., 3.75, 9., f64::INFINITY][i % 6],
-                    _ => unreachable!(),
-                })
-                .collect();
-            cases.push(Case {
-                name: format!("mavp/{pattern}/SMA/{n}"),
-                n,
-                min: if pattern == "clamped" { 1 } else { 2 },
-                kind: Kind::Sma,
-                sma_control: false,
-                periods,
-            });
+            result.push(make_case(&format!("mavp/{pattern}/SMA/{n}")));
         }
-        for (kind, sma_control) in [(Kind::Sma, true), (Kind::Ema, false), (Kind::Wma, false)] {
-            cases.push(Case {
-                name: if sma_control {
-                    format!("sma_control/SMA/{n}")
-                } else {
-                    format!("mavp/four/{}/{n}", kind.name())
-                },
-                n,
-                min: 2,
-                kind,
-                sma_control,
-                periods: (0..n).map(|i| [3., 5., 9., 14.][i % 4]).collect(),
-            });
+        result.push(make_case(&format!("sma_control/SMA/{n}")));
+        result.push(make_case(&format!("mavp/four/EMA/{n}")));
+        result.push(make_case(&format!("mavp/four/WMA/{n}")));
+    }
+    assert_eq!(result.len(), 36);
+    result
+}
+struct Engines {
+    current: Option<ta_lib::Core>,
+    registry: Option<ta_lib_registry::Core>,
+    _reference: Option<CReference>,
+}
+impl Engines {
+    fn new(backend: Option<usize>) -> Self {
+        Self {
+            current: (backend.is_none() || backend == Some(0)).then(ta_lib::Core::new),
+            registry: (backend.is_none() || backend == Some(1)).then(ta_lib_registry::Core::new),
+            _reference: (backend.is_none() || backend == Some(2)).then(CReference::new),
         }
     }
-    assert_eq!(cases.len(), 36);
-    cases
 }
 fn call(
-    current: &ta_lib::Core,
-    registry: &ta_lib_registry::Core,
+    engines: &Engines,
     case: &Case,
     backend: usize,
     price: &[f64],
@@ -161,6 +179,7 @@ fn call(
     assert_eq!(out.len(), case.n + 8);
     match backend {
         0 => {
+            let current = engines.current.as_ref().unwrap();
             let r = if case.sma_control {
                 current.sma(0, case.n - 1, price, 14, out)
             } else {
@@ -179,6 +198,7 @@ fn call(
             (r.beg_idx, r.count)
         }
         1 => {
+            let registry = engines.registry.as_ref().unwrap();
             let r = if case.sma_control {
                 registry.sma(0, case.n - 1, price, 14, out)
             } else {
@@ -336,77 +356,134 @@ fn optional(value: Option<usize>) -> String {
 }
 #[derive(Debug, PartialEq, Eq)]
 struct Options {
-    capture: Option<String>,
+    capture: String,
     capture_only: bool,
+    case: Option<String>,
+    backend: Option<usize>,
+    golden: Option<String>,
 }
 fn parse_options(args: &[String]) -> Options {
     assert!(
-        (2..=4).contains(&args.len()),
-        "REPEATS [CAPTURE_PATH [--capture-only]]"
+        args.len() >= 3,
+        "31 CAPTURE_PATH [--case CASE --backend BACKEND --golden PATH] [--capture-only]"
     );
     assert_eq!(args[1].parse::<usize>().unwrap(), REPEATS);
-    let capture = args.get(2).cloned();
-    if let Some(path) = &capture {
-        assert!(
-            !path.is_empty() && !path.starts_with("--"),
-            "capture path required before flag"
-        );
+    assert!(
+        !args[2].is_empty() && !args[2].starts_with("--"),
+        "capture path required"
+    );
+    let (mut capture_only, mut case, mut backend, mut golden) = (false, None, None, None);
+    let mut i = 3;
+    while i < args.len() {
+        match args[i].as_str() {
+            "--capture-only" => {
+                assert!(!capture_only, "duplicate flag");
+                capture_only = true;
+                i += 1;
+            }
+            "--case" => {
+                assert!(case.is_none(), "duplicate case");
+                let value = args.get(i + 1).expect("case value");
+                case_spec(value);
+                case = Some(value.clone());
+                i += 2;
+            }
+            "--backend" => {
+                assert!(backend.is_none(), "duplicate backend");
+                let value = args.get(i + 1).expect("backend value");
+                backend = Some(
+                    BACKENDS
+                        .iter()
+                        .position(|v| v == value)
+                        .expect("unknown backend"),
+                );
+                i += 2;
+            }
+            "--golden" => {
+                assert!(golden.is_none(), "duplicate golden");
+                let value = args.get(i + 1).expect("golden value");
+                assert!(!value.is_empty() && !value.starts_with("--"));
+                golden = Some(value.clone());
+                i += 2;
+            }
+            _ => panic!("unknown argument: {}", args[i]),
+        }
     }
-    let capture_only = args.len() == 4;
-    if capture_only {
-        assert_eq!(args[3], "--capture-only");
+    assert_eq!(
+        case.is_some(),
+        backend.is_some(),
+        "case and backend must be selected together"
+    );
+    if case.is_some() {
+        assert!(golden.is_some(), "selected children require golden");
+        assert_ne!(
+            golden.as_deref(),
+            Some(args[2].as_str()),
+            "capture must not overwrite golden"
+        );
+    } else {
+        assert!(capture_only, "global timing is forbidden");
+        assert!(golden.is_none(), "golden requires selectors");
     }
     Options {
-        capture,
+        capture: args[2].clone(),
         capture_only,
+        case,
+        backend,
+        golden,
     }
 }
-fn main() {
-    let options = parse_options(&env::args().collect::<Vec<_>>());
-    let repeats = REPEATS;
-    let capture_only = options.capture_only;
-    let capture_written = options.capture.is_some();
-    assert_eq!(env!("MAVP_CURRENT_VERSION"), "0.8.4");
-    assert_eq!(env!("MAVP_REGISTRY_VERSION"), "0.8.3");
-    let reference = CReference::new();
-    let version = reference.version();
-    assert!(
-        version.starts_with("0.8.1 "),
-        "wrong C reference: {version}"
+fn metadata(options: &Options) {
+    let isolated = options.case.is_some();
+    let (scope, count, records) = if isolated {
+        ("isolated", 1, 1)
+    } else {
+        ("full", 36, 108)
+    };
+    let backends = options.backend.map_or_else(
+        || "[\"current\",\"registry083\",\"originalc081\"]".to_owned(),
+        |b| format!("[{:?}]", BACKENDS[b]),
     );
-    let bytes = fs::read(env::var("MAVP_CLOSE_BIN").expect("MAVP_CLOSE_BIN")).unwrap();
-    assert_eq!(bytes.len(), 8_000_000);
-    let price: Vec<f64> = bytes
+    let selected = options.case.as_ref().map_or_else(String::new, |case| {
+        format!(
+            ",\"selected_case\":{case:?},\"selected_backend\":{:?}",
+            BACKENDS[options.backend.unwrap()]
+        )
+    });
+    let version = CReference::version();
+    assert!(version.starts_with("0.8.1 "));
+    println!("{{\"kind\":\"metadata\",\"format\":2,\"scope\":{scope:?},\"cases\":{count},\"backends\":{backends},\"canary_bits\":\"7ff80000000055aa\",\"warmups\":{WARMUPS},\"repeats\":{REPEATS},\"capture_only\":{},\"capture_written\":true,\"arch\":{:?},\"os\":{:?},\"registry_version\":\"0.8.3\",\"current_version\":\"0.8.4\",\"c_version\":{version:?},\"capture_records\":{records},\"tolerance_relative\":4e-15,\"tolerance_floor\":\"max_abs_input\"{selected}}}", options.capture_only, env::consts::ARCH, env::consts::OS);
+}
+fn price_prefix(n: usize) -> Vec<f64> {
+    let mut file = File::open(env::var("MAVP_CLOSE_BIN").expect("MAVP_CLOSE_BIN")).unwrap();
+    assert_eq!(file.metadata().unwrap().len(), 8_000_000);
+    let mut bytes = vec![0; n * 8];
+    file.read_exact(&mut bytes).unwrap();
+    let price: Vec<_> = bytes
         .chunks_exact(8)
         .map(|v| f64::from_le_bytes(v.try_into().unwrap()))
         .collect();
     assert!(price.iter().all(|v| v.is_finite()));
-    let current = ta_lib::Core::new();
-    let registry = ta_lib_registry::Core::new();
-    let cases = cases();
-    println!("{{\"kind\":\"metadata\",\"format\":1,\"cases\":36,\"backends\":[\"current\",\"registry083\",\"originalc081\"],\"canary_bits\":\"7ff80000000055aa\",\"warmups\":{WARMUPS},\"repeats\":{repeats},\"capture_only\":{capture_only},\"capture_written\":{capture_written},\"arch\":{:?},\"os\":{:?},\"registry_version\":\"0.8.3\",\"current_version\":\"0.8.4\",\"c_version\":{version:?},\"capture_records\":108,\"tolerance_relative\":4e-15,\"tolerance_floor\":\"max_abs_input\"}}", env::consts::ARCH, env::consts::OS);
-    let mut file = options
-        .capture
-        .as_ref()
-        .map(|path| BufWriter::new(File::create(path).unwrap()));
-    if let Some(file) = &mut file {
-        file.write_all(b"MAVPVC01").unwrap();
-    }
-    for case in &cases {
+    price
+}
+fn full_capture(options: &Options) {
+    let engines = Engines::new(None);
+    let price = price_prefix(1_000_000);
+    let mut file = BufWriter::new(File::create(&options.capture).unwrap());
+    file.write_all(b"MAVPVC01").unwrap();
+    for case in cases() {
         let price = &price[..case.n];
-        let scale = price.iter().fold(0.0_f64, |scale, v| scale.max(v.abs()));
+        let scale = price.iter().fold(0.0_f64, |a, v| a.max(v.abs()));
         let mut outputs: [Vec<f64>; 3] =
             std::array::from_fn(|_| vec![f64::from_bits(CANARY); case.n + 8]);
         for (backend, out) in outputs.iter_mut().enumerate() {
-            let range = call(&current, &registry, case, backend, price, out);
-            check_tail(case, out, range);
-            if let Some(file) = &mut file {
-                capture(file, case, BACKENDS[backend], out);
-            }
+            let range = call(&engines, &case, backend, price, out);
+            check_tail(&case, out, range);
+            capture(&mut file, &case, BACKENDS[backend], out);
         }
         for backend in 0..3 {
             parity(
-                case,
+                &case,
                 BACKENDS[backend],
                 &outputs[backend][..case.range().1],
                 &outputs[0][..case.range().1],
@@ -414,46 +491,74 @@ fn main() {
             );
         }
     }
-    if let Some(file) = &mut file {
+    file.flush().unwrap();
+}
+fn isolated(options: &Options) {
+    let case = make_case(options.case.as_ref().unwrap());
+    let backend = options.backend.unwrap();
+    let label = BACKENDS[backend];
+    let engines = Engines::new(Some(backend));
+    let price = price_prefix(case.n);
+    let mut out = vec![f64::from_bits(CANARY); case.n + 8];
+    let range = call(&engines, &case, backend, &price, &mut out);
+    check_tail(&case, &out, range);
+    {
+        let mut file = BufWriter::new(File::create(&options.capture).unwrap());
+        file.write_all(b"MAVPVC01").unwrap();
+        capture(&mut file, &case, label, &out);
         file.flush().unwrap();
     }
-    drop(file);
-    if capture_only {
+    // This process has called only the selected kernel. The global parent gate
+    // supplied this golden; compare full values/ranges/tails before any timer.
+    let golden_bytes = {
+        let actual = fs::read(&options.capture).unwrap();
+        let golden = fs::read(options.golden.as_ref().unwrap()).unwrap();
+        assert!(
+            actual == golden,
+            "selected capture differs from prevalidated golden"
+        );
+        golden.len()
+    };
+    println!("{{\"kind\":\"validation\",\"case\":{:?},\"backend\":{label:?},\"n\":{},\"beg\":{},\"count\":{},\"written_finite\":{},\"tail_canary\":{},\"golden_verified\":true,\"golden_bytes\":{golden_bytes}}}", case.name, case.n, range.0, range.1, range.1, out.len() - range.1);
+    if options.capture_only {
         return;
     }
-    for case in &cases {
-        let price = &price[..case.n];
-        let (distinct, dense, selected, temp_bytes, index_bytes) = work_counts(case);
-        for (backend, label) in BACKENDS.iter().enumerate() {
-            let mut out = vec![f64::from_bits(CANARY); case.n + 8];
-            for _ in 0..WARMUPS {
-                black_box(call(&current, &registry, case, backend, price, &mut out));
-            }
-            let iterations = case.iterations();
-            let mut samples = Vec::with_capacity(repeats);
-            for _ in 0..repeats {
-                let start = Instant::now();
-                for _ in 0..iterations {
-                    black_box(call(
-                        black_box(&current),
-                        black_box(&registry),
-                        black_box(case),
-                        black_box(backend),
-                        black_box(price),
-                        black_box(&mut out),
-                    ));
-                }
-                samples.push(start.elapsed().as_nanos() as f64 / iterations as f64);
-            }
-            check_tail(case, &out, case.range());
-            println!("{{\"kind\":\"case\",\"case\":{:?},\"backend\":{label:?},\"n\":{},\"beg\":{},\"count\":{},\"iterations\":{iterations},\"warmups\":{WARMUPS},\"samples_ns\":{samples:?},\"distinct_periods\":{distinct},\"main433_dense_divides\":{},\"selected_divides\":{},\"main433_temp_bytes\":{temp_bytes},\"main433_sorted_index_bytes\":{index_bytes}}}", case.name, case.n, case.range().0, case.range().1, optional(dense), optional(selected));
+    let (distinct, dense, selected, temp_bytes, index_bytes) = work_counts(&case);
+    for _ in 0..WARMUPS {
+        black_box(call(&engines, &case, backend, &price, &mut out));
+    }
+    let iterations = case.iterations();
+    let mut samples = Vec::with_capacity(REPEATS);
+    for _ in 0..REPEATS {
+        let start = Instant::now();
+        for _ in 0..iterations {
+            black_box(call(
+                black_box(&engines),
+                black_box(&case),
+                black_box(backend),
+                black_box(&price),
+                black_box(&mut out),
+            ));
         }
+        samples.push(start.elapsed().as_nanos() as f64 / iterations as f64);
+    }
+    check_tail(&case, &out, case.range());
+    println!("{{\"kind\":\"case\",\"case\":{:?},\"backend\":{label:?},\"n\":{},\"beg\":{},\"count\":{},\"iterations\":{iterations},\"warmups\":{WARMUPS},\"samples_ns\":{samples:?},\"distinct_periods\":{distinct},\"main433_dense_divides\":{},\"selected_divides\":{},\"main433_temp_bytes\":{temp_bytes},\"main433_sorted_index_bytes\":{index_bytes}}}", case.name, case.n, range.0, range.1, optional(dense), optional(selected));
+}
+fn main() {
+    let options = parse_options(&env::args().collect::<Vec<_>>());
+    assert_eq!(env!("MAVP_CURRENT_VERSION"), "0.8.4");
+    assert_eq!(env!("MAVP_REGISTRY_VERSION"), "0.8.3");
+    metadata(&options);
+    if options.case.is_some() {
+        isolated(&options);
+    } else {
+        full_capture(&options);
     }
 }
-
 #[cfg(test)]
 mod tests {
-    use super::{parse_options, Options};
+    use super::*;
     fn args(tail: &[&str]) -> Vec<String> {
         std::iter::once("benchmark")
             .chain(tail.iter().copied())
@@ -461,52 +566,112 @@ mod tests {
             .collect()
     }
     #[test]
-    fn timed_controller_command_requires_no_capture() {
-        assert_eq!(
-            parse_options(&args(&["31"])),
-            Options {
-                capture: None,
-                capture_only: false
-            }
-        );
+    fn full_capture_remains_global_and_untimed() {
+        let options = parse_options(&args(&["31", "capture.bin", "--capture-only"]));
+        assert!(options.capture_only && options.case.is_none() && options.backend.is_none());
     }
     #[test]
-    fn timed_capture_is_optional() {
-        assert_eq!(
-            parse_options(&args(&["31", "capture.bin"])),
-            Options {
-                capture: Some("capture.bin".to_owned()),
-                capture_only: false
+    fn selected_commands_require_both_selectors_and_golden() {
+        for mode in [false, true] {
+            let mut values = vec![
+                "31",
+                "capture.bin",
+                "--case",
+                "mavp/four/SMA/100",
+                "--backend",
+                "current",
+                "--golden",
+                "golden.bin",
+            ];
+            if mode {
+                values.push("--capture-only");
             }
-        );
+            let options = parse_options(&args(&values));
+            assert_eq!(options.capture_only, mode);
+            assert_eq!(options.backend, Some(0));
+            assert_eq!(options.case.as_deref(), Some("mavp/four/SMA/100"));
+        }
     }
     #[test]
-    fn capture_only_command_requires_a_path() {
-        assert_eq!(
-            parse_options(&args(&["31", "capture.bin", "--capture-only"])),
-            Options {
-                capture: Some("capture.bin".to_owned()),
-                capture_only: true
-            }
-        );
-        assert!(
-            std::panic::catch_unwind(|| parse_options(&args(&["31", "--capture-only"]))).is_err()
-        );
-    }
-    #[test]
-    fn malformed_commands_are_rejected_before_any_input_or_timer() {
-        for tail in [
+    fn malformed_or_stale_timed_commands_fail_before_any_input_or_timer() {
+        for values in [
             vec![],
-            vec!["5"],
-            vec!["bad"],
-            vec!["31", ""],
-            vec!["31", "capture.bin", "--unknown"],
-            vec!["31", "capture.bin", "--capture-only", "extra"],
+            vec!["31"],
+            vec!["31", "capture.bin"],
+            vec!["5", "capture.bin", "--capture-only"],
+            vec![
+                "31",
+                "capture.bin",
+                "--case",
+                "mavp/four/SMA/100",
+                "--capture-only",
+            ],
+            vec![
+                "31",
+                "capture.bin",
+                "--backend",
+                "current",
+                "--capture-only",
+            ],
+            vec![
+                "31",
+                "capture.bin",
+                "--case",
+                "mavp/four/SMA/100",
+                "--backend",
+                "current",
+            ],
+            vec![
+                "31",
+                "capture.bin",
+                "--case",
+                "mavp/four/SMA/1",
+                "--backend",
+                "current",
+                "--golden",
+                "g",
+            ],
+            vec![
+                "31",
+                "capture.bin",
+                "--case",
+                "mavp/four/SMA/100",
+                "--backend",
+                "unknown",
+                "--golden",
+                "g",
+            ],
+            vec!["31", "capture.bin", "--golden", "g", "--capture-only"],
+            vec!["31", "capture.bin", "--capture-only", "--capture-only"],
         ] {
             assert!(
-                std::panic::catch_unwind(|| parse_options(&args(&tail))).is_err(),
-                "{tail:?}"
+                std::panic::catch_unwind(|| parse_options(&args(&values))).is_err(),
+                "{values:?}"
             );
+        }
+    }
+    #[test]
+    fn chosen_engines_have_no_sibling_backend() {
+        for backend in 0..3 {
+            let engines = Engines::new(Some(backend));
+            assert_eq!(engines.current.is_some(), backend == 0);
+            assert_eq!(engines.registry.is_some(), backend == 1);
+            assert_eq!(engines._reference.is_some(), backend == 2);
+        }
+    }
+    #[test]
+    fn selected_case_inventory_is_identical() {
+        let all = cases();
+        assert_eq!(all.len(), 36);
+        for case in all {
+            let selected = make_case(&case.name);
+            assert_eq!(selected.n, case.n);
+            assert_eq!(selected.range(), case.range());
+            assert!(selected
+                .periods
+                .iter()
+                .zip(case.periods)
+                .all(|(a, b)| a.to_bits() == b.to_bits()));
         }
     }
 }

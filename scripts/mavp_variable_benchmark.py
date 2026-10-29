@@ -183,13 +183,18 @@ def build(args):
 
 
 def stable_metadata(metadata):
-    return {key:value for key,value in metadata.items() if key not in ('capture_only','capture_written')}
+    execution={'capture_only','capture_written','scope','cases','backends','capture_records','selected_case','selected_backend'}
+    return {key:value for key,value in metadata.items() if key not in execution}
 
 
-def harness_command(binary,capture=None,capture_only=False):
-    if capture_only and capture is None:raise ValueError('capture-only mode requires an output path')
-    command=[str(binary),'31']
-    if capture is not None:command.append(str(capture))
+def harness_command(binary,capture,case=None,backend=None,golden=None,capture_only=False):
+    if capture is None:raise ValueError('every mode requires a capture path')
+    selected=any(value is not None for value in (case,backend,golden))
+    command=[str(binary),'31',str(capture)]
+    if selected:
+        if case not in CASES or backend not in BACKENDS or golden is None:raise ValueError('case/backend/golden selectors required together')
+        command+=['--case',case,'--backend',backend,'--golden',str(golden)]
+    elif not capture_only:raise ValueError('full-inventory timing is forbidden')
     if capture_only:command.append('--capture-only')
     return command
 
@@ -199,8 +204,13 @@ def expected_range(name):
     return n,beg,n-beg
 
 
-def parse_records(content,capture_only,expected_os="linux"):
-    metadata=None;parity={};cases={};seen_timing=False
+def parse_records(content,capture_only,selection=None,expected_os="linux"):
+    selected=selection is not None
+    if not selected and not capture_only:raise ValueError('full-inventory timing is forbidden')
+    if selected:
+        case,backend=selection
+        if case not in CASES or backend not in BACKENDS:raise ValueError('invalid selection')
+    metadata=None;parity={};validation={};cases={};seen_timing=False
     for line in content.splitlines():
         if not line.strip():continue
         row=json.loads(line)
@@ -209,37 +219,48 @@ def parse_records(content,capture_only,expected_os="linux"):
         if kind=='metadata':
             if metadata is not None:raise ValueError('duplicate metadata')
             metadata=row;continue
-        if metadata is None:raise ValueError('metadata must precede parity and timing')
+        if metadata is None:raise ValueError('metadata must precede every result')
         key=(row.get('backend'),row.get('case'))
-        if key not in KEYS:raise ValueError('unexpected case/backend')
+        expected={(backend,case)} if selected else KEYS
+        if key not in expected:raise ValueError('unexpected sibling case/backend')
         n,beg,count=expected_range(key[1])
-        if kind=='parity':
-            if seen_timing or key in parity:raise ValueError('parity must be unique and precede every timed row')
-            if type(row.get('count'))is not int or row['count']!=count:raise ValueError('parity range count mismatch')
+        if kind=='parity' and not selected:
+            if seen_timing or key in parity:raise ValueError('duplicate or late parity')
+            if type(row.get('count'))is not int or row['count']!=count:raise ValueError('parity range mismatch')
             counters=[row.get(k) for k in ('exact','within_tolerance','nonfinite_same')]
-            if any(type(x)is not int or x<0 for x in counters) or sum(counters)!=count or type(row.get('signed_zero'))is not int or row['signed_zero']!=0 or row.get('nonfinite_same')!=0:raise ValueError('invalid parity counters, nonfinite output or signed zero change')
-            if key[0]=='current' and counters!=[count,0,0]:raise ValueError('current parity must be exact')
-            for k in ('max_abs','max_scaled'):
-                if type(row.get(k))not in (int,float) or not math.isfinite(row[k]) or row[k]<0:raise ValueError('invalid differential magnitude')
-            if row['max_scaled']>4e-15:raise ValueError('cross-version numeric tolerance exceeded')
+            if any(type(x)is not int or x<0 for x in counters) or sum(counters)!=count or type(row.get('signed_zero'))is not int or row['signed_zero']!=0 or row.get('nonfinite_same')!=0:raise ValueError('invalid parity counters')
+            if key[0]=='current' and counters!=[count,0,0]:raise ValueError('primary current parity must be exact')
+            for field in ('max_abs','max_scaled'):
+                if type(row.get(field))not in (int,float) or not math.isfinite(row[field]) or row[field]<0:raise ValueError('invalid differential')
+            if row['max_scaled']>4e-15:raise ValueError('cross-version tolerance exceeded')
             parity[key]=row
-        elif kind=='case':
+        elif kind=='validation' and selected:
+            if seen_timing or key in validation:raise ValueError('duplicate or late selected validation')
+            expected_values={'n':n,'beg':beg,'count':count,'written_finite':count,'tail_canary':n+8-count,'golden_verified':True,'golden_bytes':8+4+len((backend+'/'+case).encode())+32+(n+8)*8}
+            if any(type(row.get(k))is not type(v) or row[k]!=v for k,v in expected_values.items()):raise ValueError('selected golden/range/padding proof mismatch')
+            validation[key]=row
+        elif kind=='case' and selected:
             seen_timing=True
-            if capture_only or set(parity)!=KEYS or key in cases:raise ValueError('all108 parity rows must complete before any timing')
-            if any(type(row.get(k))is not int or row[k]!=v for k,v in (('n',n),('beg',beg),('count',count),('iterations',ITERATIONS[n]),('warmups',5))):raise ValueError('unexpected case settings')
+            if capture_only or set(validation)!={(backend,case)} or key in cases:raise ValueError('selected golden validation must precede timing')
+            expected_values={'n':n,'beg':beg,'count':count,'iterations':ITERATIONS[n],'warmups':5}
+            if any(type(row.get(k))is not int or row[k]!=v for k,v in expected_values.items()):raise ValueError('case timing settings drift')
             samples=row.get('samples_ns')
-            if not isinstance(samples,list) or len(samples)!=31 or any(type(x)not in (int,float) or not math.isfinite(x) or x<=0 for x in samples):raise ValueError('31 positive finite samples required')
+            if not isinstance(samples,list) or len(samples)!=31 or any(type(x)not in (int,float) or not math.isfinite(x) or x<=0 for x in samples):raise ValueError('31 finite positive samples required')
             cases[key]=row
-        else:raise ValueError('unknown record kind')
-    expected={'format':1,'cases':36,'backends':list(BACKENDS),'canary_bits':'7ff80000000055aa','warmups':5,'repeats':31,'capture_only':capture_only,'registry_version':'0.8.3','current_version':'0.8.4','capture_records':108,'tolerance_relative':4e-15,'tolerance_floor':'max_abs_input','capture_written':capture_only}
-    if metadata is None or any(type(metadata.get(k))is not type(v) or metadata[k]!=v for k,v in expected.items()):raise ValueError('metadata/runtime/inventory mismatch')
-    if metadata.get('os')!=expected_os or type(metadata.get('arch'))is not str or not metadata['arch'] or type(metadata.get('c_version'))is not str or not (metadata['c_version']=='0.8.1' or metadata['c_version'].startswith('0.8.1 (')):raise ValueError('unexpected platform or old-C runtime version')
-    if set(parity)!=KEYS or set(cases)!=(set() if capture_only else KEYS):raise ValueError('exact108 backend/case inventory required')
-    return {'metadata':metadata,'parity':{b+'/'+c:v for (b,c),v in parity.items()},'cases':{b+'/'+c:v for (b,c),v in cases.items()}}
+        else:raise ValueError('mixed/full/unknown execution mode')
+    expected_meta={'format':2,'scope':'isolated' if selected else 'full','cases':1 if selected else 36,'backends':[backend] if selected else list(BACKENDS),'capture_records':1 if selected else 108,'canary_bits':'7ff80000000055aa','warmups':5,'repeats':31,'capture_only':capture_only,'capture_written':True,'registry_version':'0.8.3','current_version':'0.8.4','tolerance_relative':4e-15,'tolerance_floor':'max_abs_input'}
+    if selected:expected_meta.update(selected_case=case,selected_backend=backend)
+    if metadata is None or any(type(metadata.get(k))is not type(v) or metadata[k]!=v for k,v in expected_meta.items()):raise ValueError('metadata/runtime/selection mismatch')
+    if not selected and any(k in metadata for k in ('selected_case','selected_backend')):raise ValueError('global mode cannot carry selectors')
+    if metadata.get('os')!=expected_os or type(metadata.get('arch'))is not str or not metadata['arch'] or type(metadata.get('c_version'))is not str or not(metadata['c_version']=='0.8.1' or metadata['c_version'].startswith('0.8.1 (')):raise ValueError('unexpected runtime')
+    if selected:
+        if set(validation)!={(backend,case)} or parity or set(cases)!=(set() if capture_only else {(backend,case)}):raise ValueError('exact single selected inventory required')
+    elif set(parity)!=KEYS or validation or cases:raise ValueError('global capture must contain all108 parity rows only')
+    return {'metadata':metadata,'parity':{b+'/'+c:v for (b,c),v in parity.items()},'validation':{b+'/'+c:v for (b,c),v in validation.items()},'cases':{b+'/'+c:v for (b,c),v in cases.items()}}
 
 
-def capture_record(path):
-    records={};written=0
+def capture_record(path,selection=None):
+    records={};written=0;expected=KEYS if selection is None else {(selection[1],selection[0])}
     with Path(path).open('rb') as f:
         if f.read(8)!=b'MAVPVC01':raise ValueError('capture magic mismatch')
         while length:=f.read(4):
@@ -250,13 +271,13 @@ def capture_record(path):
             if len(header)!=32:raise ValueError('truncated capture header')
             n,beg,count,outlen=struct.unpack('<QQQQ',header)
             backend,case=name.split('/',1)
-            if (backend,case)not in KEYS or name in records or (n,beg,count)!=expected_range(case) or outlen!=n+8:raise ValueError('capture inventory/range mismatch')
+            if (backend,case)not in expected or name in records or (n,beg,count)!=expected_range(case) or outlen!=n+8:raise ValueError('capture inventory/range mismatch')
             body=f.read(outlen*8)
             if len(body)!=outlen*8:raise ValueError('truncated capture values')
             if body[count*8:]!=struct.pack('<Q',CANARY)*(outlen-count):raise ValueError('capture output padding modified')
             if any(not math.isfinite(value) for (value,) in struct.iter_unpack('<d',body[:count*8])):raise ValueError('capture written prefix contains nonfinite or unwritten canary')
             records[name]={'n':n,'beg':beg,'count':count,'outlen':outlen};written+=count
-    if set(records)!={b+'/'+c for b,c in KEYS}:raise ValueError('capture missing backend/case')
+    if set(records)!={b+'/'+c for b,c in expected}:raise ValueError('capture missing backend/case')
     return {'sha256':sha256(path),'bytes':Path(path).stat().st_size,'records':len(records),'written_values':written,'all_padding_verified':True}
 
 
@@ -287,73 +308,114 @@ def summarize(runs):
 
 
 
+def split_goldens(full_capture,output):
+    capture_record(full_capture)
+    folder=output/'goldens';folder.mkdir(exist_ok=True);records={}
+    with Path(full_capture).open('rb') as f:
+        magic=f.read(8)
+        while length:=f.read(4):
+            size=struct.unpack('<I',length)[0];name_bytes=f.read(size);name=name_bytes.decode();header=f.read(32)
+            n,beg,count,outlen=struct.unpack('<QQQQ',header);body=f.read(outlen*8)
+            path=folder/(name.replace('/','__')+'.bin');path.write_bytes(magic+length+name_bytes+header+body)
+            records[name]={'path':str(path.resolve()),'sha256':sha256(path),'bytes':path.stat().st_size,'n':n,'beg':beg,'count':count,'outlen':outlen}
+    if set(records)!={b+'/'+c for b,c in KEYS}:raise ValueError('golden inventory incomplete')
+    (output/'golden-records.json').write_text(json.dumps(records,indent=2)+'\n')
+    return records
+
+
 def reference_comparisons(runs):
-    result={}
+    result={};negatives=[]
     for side in SIDES:
         result[side]={}
-        for reference in BACKENDS[1:]:
-            cases={}
-            for name in sorted(CASES):
-                current=[statistics.median(r['cases']['current/'+name]['samples_ns']) for r in runs[side]]
-                control=[statistics.median(r['cases'][reference+'/'+name]['samples_ns']) for r in runs[side]]
-                ratios=[a/b for a,b in zip(control,current)]
-                cases[name]={'current_process_medians_ns':current,'reference_process_medians_ns':control,
-                             'current_median_ns':statistics.median(current),'reference_median_ns':statistics.median(control),
-                             'reference_over_current_paired_ratios':ratios,'median_paired_ratio':statistics.median(ratios),
-                             'reference_over_current_envelope':[min(control)/max(current),max(control)/min(current)],
-                             'current_latency_percent':(statistics.median(current)/statistics.median(control)-1)*100,
-                             'current_faster_processes':sum(x>1 for x in ratios)}
-            result[side][reference]=cases
-    return result
+        for backend in BACKENDS[1:]:
+            rows={}
+            for case in sorted(CASES):
+                current=[statistics.median(r['cases']['current/'+case]['samples_ns'])for r in runs[side]]
+                reference=[statistics.median(r['cases'][backend+'/'+case]['samples_ns'])for r in runs[side]]
+                value={'current_process_medians_ns':current,'reference_process_medians_ns':reference,
+                       'current_median_ns':statistics.median(current),'reference_median_ns':statistics.median(reference),
+                       'reference_over_current_ratio_of_medians':statistics.median(reference)/statistics.median(current),
+                       'reference_over_current_envelope':[min(reference)/max(current),max(reference)/min(current)],
+                       'current_latency_percent':(statistics.median(current)/statistics.median(reference)-1)*100}
+                rows[case]=value
+                if value['current_latency_percent']>0:negatives.append({'side':side,'reference':backend,'case':case,**value})
+            result[side][backend]=rows
+    return result,negatives
+
+
+
+def execute_harness(command,stem,env):
+    Path(str(stem)+'-command.json').write_text(json.dumps(command,indent=2)+'\n')
+    response=subprocess.run(command,capture_output=True,text=True,env=env)
+    Path(str(stem)+'.jsonl').write_text(response.stdout)
+    Path(str(stem)+'.stderr.log').write_text(response.stderr)
+    response.check_returncode()
+    return response.stdout
+
+
+def finalize_child_capture(path,selection,golden,proof,proof_path):
+    actual=capture_record(path,selection)
+    if actual['sha256']!=golden['sha256'] or actual['bytes']!=golden['bytes']:raise ValueError('selected child differs from own baseline golden')
+    proof={**proof,'golden':golden,'capture':actual,'duplicate_deleted_after_sha_proof':True}
+    Path(proof_path).write_text(json.dumps(proof,indent=2)+'\n')
+    Path(path).unlink()
+    return proof
 
 
 def measure(args):
-    p=json.loads((args.output/'build-provenance.json').read_text());verify(args,p)
+    provenance=json.loads((args.output/'build-provenance.json').read_text());verify(args,provenance)
     original=set(os.sched_getaffinity(0));affinity=sorted(original)[:1]
-    if not affinity:raise ValueError('one CPU affinity required')
-    env=os.environ.copy();env['MAVP_CLOSE_BIN']=p['input']['path'];runs={s:[] for s in SIDES};captures={};order=[];validations={};metadata=None
+    if not affinity:raise ValueError('oneCPU affinity required')
+    env=os.environ.copy();env['MAVP_CLOSE_BIN']=provenance['input']['path']
+    captures={};validations={};metadata=None;order=[];proofs=[]
+    runs={side:[{'cases':{}}for _ in range(12)]for side in SIDES}
     try:
         os.sched_setaffinity(0,affinity)
         for side in SIDES:
             path=args.output/(side+'.bin');captures[side]=path
-            result=subprocess.run(harness_command(p[side]['binary'],path,True),check=True,capture_output=True,text=True,env=env)
-            (args.output/(side+'-validation.jsonl')).write_text(result.stdout)
-            row=parse_records(result.stdout,True);validations[side]={'records':row,'capture':capture_record(path)}
-            current=stable_metadata(row['metadata'])
-            if metadata is not None and current!=metadata:raise ValueError('capture runtime differs between primary builds')
-            metadata=current
-        a,b=[validations[s]['capture'] for s in SIDES]
-        if not a['bytes'] or a['bytes']!=b['bytes'] or a['sha256']!=b['sha256']:raise ValueError('primary full capture differs; no tolerance waiver')
-        (args.output/'capture-validation.json').write_text(json.dumps({'completed_before_any_timing':True,'primary_exact':True,'validation':validations},indent=2)+'\n')
-        for pair in range(12):
-            for side in SIDES if pair%2==0 else reversed(SIDES):
-                label=f'{side}-{pair+1}';order.append(label);print(time.strftime('%H:%M:%S'),label,flush=True)
-                result=subprocess.run(harness_command(p[side]['binary']),check=True,capture_output=True,text=True,env=env)
-                (args.output/(label+'.jsonl')).write_text(result.stdout);row=parse_records(result.stdout,False)
-                if stable_metadata(row['metadata'])!=metadata:raise ValueError('timed runtime changed')
-                runs[side].append(row)
-        verify(args,p)
+            command=harness_command(provenance[side]['binary'],path,capture_only=True)
+            stdout=execute_harness(command,args.output/(side+'-validation'),env)
+            row=parse_records(stdout,True);current=stable_metadata(row['metadata'])
+            if metadata is not None and current!=metadata:raise ValueError('global capture runtime drift')
+            metadata=current;validations[side]={'records':row,'capture':capture_record(path),'command':command}
+        before,after=(validations[side]['capture']for side in SIDES)
+        if before!=after or not before['bytes']:raise ValueError('global full108 capture differs; no tolerance waiver')
+        goldens=split_goldens(captures['baseline'],args.output)
+        (args.output/'capture-validation.json').write_text(json.dumps({'completed_before_any_timing':True,'primary_exact':True,'validation':validations,'goldens':goldens},indent=2)+'\n')
+        children=args.output/'children';children.mkdir(exist_ok=True)
+        for case in sorted(CASES):
+            for backend in BACKENDS:
+                key=backend+'/'+case;golden=goldens[key]
+                if sha256(golden['path'])!=golden['sha256']:raise ValueError('baseline golden changed')
+                for pair in range(12):
+                    for side in SIDES if pair%2==0 else reversed(SIDES):
+                        label=key.replace('/','__')+'__'+side+'-'+str(pair+1);order.append(label)
+                        path=children/(label+'.bin')
+                        command=harness_command(provenance[side]['binary'],path,case,backend,golden['path'])
+                        print(time.strftime('%H:%M:%S'),label,flush=True)
+                        stdout=execute_harness(command,children/label,env)
+                        row=parse_records(stdout,False,(case,backend))
+                        if stable_metadata(row['metadata'])!=metadata:raise ValueError('isolated child runtime drift')
+                        identity={'label':label,'side':side,'case':case,'backend':backend,'pair':pair+1,'command':command}
+                        proof=finalize_child_capture(path,(case,backend),golden,identity,children/(label+'-proof.json'))
+                        proofs.append(proof);runs[side][pair]['cases'][key]=row['cases'][key]
+        if len(proofs)!=2592:raise ValueError('exact2592 isolated timed children required')
+        verify(args,provenance)
     finally:os.sched_setaffinity(0,original)
-    rows=summarize(runs);negatives={k:v for k,v in rows.items() if v['candidate_latency_percent']>0};references=reference_comparisons(runs)
-    reference_negatives=[{'side':side,'reference':reference,'case':name,**value} for side,groups in references.items() for reference,cases in groups.items() for name,value in cases.items() if value['current_latency_percent']>0]
+    rows=summarize(runs);negatives={k:v for k,v in rows.items()if v['candidate_latency_percent']>0};references,reference_negatives=reference_comparisons(runs)
     report={'run_url':f"https://github.com/{os.environ.get('GITHUB_REPOSITORY','local')}/actions/runs/{os.environ.get('GITHUB_RUN_ID','local')}",
-            'build_provenance':p,'pairs':12,'samples_per_process':31,'warmups':5,'affinity':affinity,'order':order,'harness_metadata':metadata,
-            'capture_validation':validations,'results':rows,'negative_cases':negatives,'reference_comparisons':references,'reference_slower_cases':reference_negatives,
-            'limitations':'Primary comparison is before433 vs candidateb3 within one runner. Registry083 and C081 references are unchanged and timed inside each process, not extra independent primary samples. Cross-version tolerance is separate from mandatory exact primary capture. Inner samples are correlated; ranges are descriptive, not confidence intervals. No formal multiplicity-adjusted inference or allocator attribution. Reference backends run in fixed current/registry/C order inside each process: their ratios are diagnostic Core comparisons, not consumer Polars speedups or fully counterbalanced cross-backend comparisons.'}
+            'build_provenance':provenance,'execution':'freshprocess_per_case_backend','timed_child_count':2592,'pairs_per_case_backend':12,'samples_per_process':31,'warmups':5,'affinity':affinity,'order':order,
+            'harness_metadata':metadata,'capture_validation':validations,'golden_records':goldens,'child_capture_proofs':proofs,'results':rows,'negative_cases':negatives,
+            'reference_comparisons':references,'reference_slower_cases':reference_negatives,
+            'limitations':'Every timed PID constructs and calls only its selected case/backend, verifies its full record against its own baseline backend golden before warmups, then runs5warmups/31samples. Primary before/after pairs alternateAB/BA. Reference/current comparisons are separate process distributions from sequential backend blocks, not same-process or temporally paired ratios. Inner samples are correlated; envelopes are extrema, not confidence limits. Exactness applies to the selected untimed record before warmups; timed calls check ranges, finiteness and tails rather than all values per sample. Golden I/O precedes warmups and can warm allocator state: this isolates sibling workloads, not a pristine allocator. No pooling with old mixed-process evidence or allocator-hypothesis normalization; no consumer Polars performance claim.'}
     (args.output/'summary.json').write_text(json.dumps(report,indent=2)+'\n')
-    lines=['# Variable MAVP same-runner comparison','',report['limitations'],'','| Backend/case | Before ns | After ns | Latency change | Paired ratio | Envelope | Faster pairs |','| --- | ---: | ---: | ---: | ---: | --- | ---: |']
-    for name,r in rows.items():
-        lo,hi=r['ratio_envelope'];lines.append(f"| {name} | {r['baseline_median_ns']:.2f} | {r['candidate_median_ns']:.2f} | {r['candidate_latency_percent']:+.3f}% | {r['median_paired_ratio']:.5f} | {lo:.5f}–{hi:.5f} | {r['candidate_faster_pairs']}/12 |")
+    lines=['# Isolated variable MAVP comparison','',report['limitations'],'','| Backend/case | Before ns | After ns | Latency change | Paired ratio | Range | Faster pairs |','| --- | ---: | ---: | ---: | ---: | --- | ---: |']
+    for name,row in rows.items():
+        lo,hi=row['ratio_envelope'];lines.append(f"| {name} | {row['baseline_median_ns']:.2f} | {row['candidate_median_ns']:.2f} | {row['candidate_latency_percent']:+.3f}% | {row['median_paired_ratio']:.5f} | {lo:.5f}–{hi:.5f} | {row['candidate_faster_pairs']}/12 |")
     (args.output/'comparison.md').write_text('\n'.join(lines)+'\n')
-    (args.output/'negative-cases.json').write_text(json.dumps({'before_after':negatives,'current_slower_than_references':reference_negatives},indent=2)+'\n')
-    reference_lines=['# Same-process Core reference comparisons','','Fixed backend order is current, registry083, originalc081. These diagnostic Core ratios do not measure Polars adapter/grouping costs.','','| Primary side | Reference | Case | Current latency change | Reference/current paired ratio | Range | Current faster processes |','| --- | --- | --- | ---: | ---: | --- | ---: |']
-    for side,groups in references.items():
-        for reference,cases in groups.items():
-            for name,r in cases.items():
-                lo,hi=r['reference_over_current_envelope'];reference_lines.append(f"| {side} | {reference} | {name} | {r['current_latency_percent']:+.3f}% | {r['median_paired_ratio']:.5f} | {lo:.5f}–{hi:.5f} | {r['current_faster_processes']}/12 |")
-    (args.output/'reference-comparisons.md').write_text('\n'.join(reference_lines)+'\n')
+    (args.output/'negative-cases.json').write_text(json.dumps({'before_after':negatives,'current_slower_than_reference':reference_negatives},indent=2)+'\n')
     for path in captures.values():
-        with path.open('rb') as source,gzip.open(str(path)+'.gz','wb') as dest:shutil.copyfileobj(source,dest)
+        with path.open('rb')as source,gzip.open(str(path)+'.gz','wb')as dest:shutil.copyfileobj(source,dest)
         path.unlink()
     print('\n'.join(lines),flush=True)
 

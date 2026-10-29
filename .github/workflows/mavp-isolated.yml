@@ -1,0 +1,131 @@
+name: Isolated upstream variable MAVP evidence
+
+on:
+  push:
+    branches: [codex/mavp-isolated-ci]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mavp-isolated-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  RUSTUP_TOOLCHAIN: '1.97.0'
+  CARGO_BUILD_JOBS: '4'
+  RUSTFLAGS: ''
+  CARGO_ENCODED_RUSTFLAGS: ''
+  CARGO_PROFILE_RELEASE_DEBUG: 'false'
+  CARGO_PROFILE_RELEASE_LTO: thin
+  CARGO_PROFILE_RELEASE_CODEGEN_UNITS: '1'
+  OMP_NUM_THREADS: '1'
+  OPENBLAS_NUM_THREADS: '1'
+  MKL_NUM_THREADS: '1'
+
+jobs:
+  variable-mavp:
+    name: Isolated MAVP / two primary builds and three runtime backends
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          path: control-source
+      - uses: actions/checkout@v6
+        with:
+          repository: TA-Lib/ta-lib
+          ref: 4334163d3a1f5019aa9051342316b936a4dfb994
+          path: baseline
+      - uses: actions/checkout@v6
+        with:
+          repository: Yvictor/ta-lib-native
+          ref: b3f0fa17d0e3485c39ed042d86fff7116c0430a4
+          path: candidate
+      - uses: actions/checkout@v6
+        with:
+          ref: b2bbc26d41ec80823c8bffb0cc436a97f29911cc
+          path: original-c
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - uses: dtolnay/rust-toolchain@1.97.0
+        with:
+          components: clippy,rustfmt
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: actions/setup-dotnet@v5
+        with:
+          global-json-file: candidate/global.json
+      - name: Install pinned evidence dependencies and test controller gates
+        run: |
+          python -m pip install cmake==4.4.4 numpy==2.5.3 pytest==8.4.2
+          mkdir -p mavp-isolated-results
+          git -C control-source rev-parse HEAD > mavp-isolated-results/controller-commit.txt
+          cp control-source/scripts/mavp_variable_benchmark.py control-source/scripts/bench_mavp_variable.rs mavp-isolated-results/
+          cp control-source/.github/workflows/mavp-isolated.yml mavp-isolated-results/workflow.yml
+          python -m pip freeze > mavp-isolated-results/python-dependencies.txt
+          python -m pytest --noconftest control-source/tests/test_mavp_variable_benchmark.py -q
+      - name: Regenerate and validate Rust plus all C/Rust regression functions before timing
+        working-directory: candidate
+        run: |
+          set -o pipefail
+          python scripts/build.py regen-check 2>&1 | tee ../mavp-isolated-results/regenerate.log
+          cargo test --locked --manifest-path ta_codegen/generator/Cargo.toml 2>&1 | tee ../mavp-isolated-results/generator-tests.log
+          cargo test --locked -p ta-lib --manifest-path ta_codegen/output/rust/Cargo.toml 2>&1 | tee ../mavp-isolated-results/rust-tests.log
+          cargo test --locked -p ta-lib --doc --manifest-path ta_codegen/output/rust/Cargo.toml 2>&1 | tee ../mavp-isolated-results/rust-doc-tests.log
+          cargo clippy --locked --all-targets --manifest-path ta_codegen/generator/Cargo.toml -- -D warnings 2>&1 | tee ../mavp-isolated-results/generator-clippy.log
+          cargo clippy --locked -p ta-lib --all-targets --manifest-path ta_codegen/output/rust/Cargo.toml -- -D warnings 2>&1 | tee ../mavp-isolated-results/rust-clippy.log
+          python scripts/build.py servers --language=c,rust 2>&1 | tee ../mavp-isolated-results/regression-build.log
+          (cd bin && ./ta_regtest --codegen --language=c,rust) 2>&1 | tee ../mavp-isolated-results/full-c-rust-regression.log
+          git diff --exit-code
+      - name: Compile Java/CSharp libraries and run upstream main suites before timing
+        working-directory: candidate
+        run: |
+          set -o pipefail
+          python scripts/build.py libraries --language=java,csharp 2>&1 | tee ../mavp-isolated-results/managed-libraries.log
+          dotnet build-server shutdown
+          git diff --exit-code
+      - name: Build identical primary harnesses with pinned registry and original C references
+        run: |
+          python control-source/scripts/mavp_variable_benchmark.py \
+            --baseline-source baseline --candidate-source candidate --c-source original-c \
+            --output mavp-isolated-results --build-only
+          lscpu > mavp-isolated-results/lscpu.txt
+          cat /proc/meminfo > mavp-isolated-results/meminfo.txt
+      - name: Check full captures then measure 2592 case/backend-isolated timed processes
+        run: |
+          python control-source/scripts/mavp_variable_benchmark.py \
+            --baseline-source baseline --candidate-source candidate --c-source original-c \
+            --output mavp-isolated-results --pairs 12 --repeats 31
+          cat mavp-isolated-results/comparison.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: upstream-mavp-isolated-evidence
+          if-no-files-found: error
+          path: |
+            mavp-isolated-results/*.json
+            mavp-isolated-results/*.jsonl
+            mavp-isolated-results/*.md
+            mavp-isolated-results/*.log
+            mavp-isolated-results/*.txt
+            mavp-isolated-results/*.yml
+            mavp-isolated-results/*.rs
+            mavp-isolated-results/*.py
+            mavp-isolated-results/*.gz
+            mavp-isolated-results/*.bin
+            mavp-isolated-results/bin/*
+            mavp-isolated-results/goldens/*
+            mavp-isolated-results/children/*
+            mavp-isolated-results/archives/*
+            mavp-isolated-results/registry-helper/Cargo.*
+            mavp-isolated-results/registry-helper/lib.rs
+            mavp-isolated-results/target-baseline/release/libta_lib.rlib
+            mavp-isolated-results/target-candidate/release/libta_lib.rlib
+            mavp-isolated-results/target-registry/release/deps/*.rlib
+            mavp-isolated-results/target-registry/release/deps/*.so
+            mavp-isolated-results/old-c-install/lib/libta-lib.a
