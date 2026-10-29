@@ -17,6 +17,7 @@
 //! a null never affects another partition. Inputs without nulls are detected
 //! from Polars' null counts, without reading their values.
 
+use crate::generated::option_key;
 use crate::native::{bind_params, core, Param, Params};
 use polars::export::arrow::array::PrimitiveArray;
 use polars::export::arrow::bitmap::{Bitmap, MutableBitmap};
@@ -37,19 +38,15 @@ pub fn lookback(name: &str, params: Option<&PyDict>) -> PyResult<i32> {
     let mut holder = id.new_call(core());
     let mut values = Params::new();
     for opt in id.info().opt_inputs {
-        let key = opt
-            .param_name
-            .strip_prefix("optIn")
-            .unwrap_or(opt.param_name)
-            .to_lowercase();
-        if let Some(value) = params.and_then(|p| p.get_item(&key).ok().flatten()) {
+        let key = option_key(opt.param_name);
+        if let Some(value) = params.and_then(|p| p.get_item(key.as_ref()).ok().flatten()) {
             let value = match opt.kind {
                 OptInputType::RealRange { .. } | OptInputType::RealList { .. } => {
                     Param::Real(value.extract()?)
                 }
                 _ => Param::Int(value.extract()?),
             };
-            values.insert(key, value);
+            values.insert(key.into_owned(), value);
         }
     }
     if bind_params(&mut holder, &values).is_err() {

@@ -6,6 +6,7 @@ metadata: namespace receiver order is part of our existing Python API.
 import json
 from pathlib import Path
 import subprocess
+from generate_usage_manifest import RUST_UNEXPOSED
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -32,6 +33,39 @@ def generate():
         names = ', '.join(f'"{n}"' for n in fields)
         lines += [f'fn {name}(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {{',
                   f'kwargs.apply(inputs, |params| compute(FuncId::{name.upper()}, inputs, &params, &[{order}], &[{names}]))', '}']
+    # Exact metadata-name mapping preserves the prior lowercase-key semantics.
+    options = {p['c_name']: p['name'] for f in api for p in f['params']}
+    lines += ["pub(crate) fn option_key(name: &str) -> std::borrow::Cow<'_, str> {", "match name {"]
+    lines += [f'"{c}" => std::borrow::Cow::Borrowed("{key}"),' for c, key in sorted(options.items())]
+    lines += ['_ => std::borrow::Cow::Owned(name.strip_prefix("optIn").unwrap_or(name).to_lowercase()),', '}', '}']
+    lines += ['#[cfg(test)] mod metadata_tests {', 'use super::*;',
+              'use ta_lib::abstract_api::{InputType, OptInputType, OutputType};',
+              'fn audit(id: FuncId, inputs: usize, outputs: &[OutputType], options: &[(&str, &str, bool, f64)]) {',
+              'let info = id.info();',
+              'assert_eq!(info.inputs.iter().map(|i| match i.kind { InputType::Price => i.flags.0.count_ones() as usize, _ => 1 }).sum::<usize>(), inputs, "{} inputs", info.name);',
+              'assert_eq!(info.opt_inputs.len(), options.len(), "{} options", info.name);',
+              'assert_eq!(info.outputs.len(), outputs.len(), "{} outputs", info.name);',
+              'for (actual, expected) in info.outputs.iter().zip(outputs) { assert_eq!(std::mem::discriminant(&actual.kind), std::mem::discriminant(expected), "{} output type", info.name); }',
+              'for (opt, &(c_name, key, real, value)) in info.opt_inputs.iter().zip(options) {',
+              'assert_eq!(opt.param_name, c_name);',
+              'assert!(matches!(option_key(c_name), std::borrow::Cow::Borrowed(v) if v == key));',
+              'let (is_real, default) = match opt.kind {',
+              'OptInputType::RealRange { default, .. } | OptInputType::RealList { default, .. } => (true, default),',
+              'OptInputType::IntegerRange { default, .. } => (false, default as f64),',
+              'OptInputType::IntegerList { default, .. } => (false, default as f64),',
+              '}; assert_eq!((is_real, default), (real, value), "{} {}", info.name, key);', '}', '}',
+              '#[test] fn frozen_api_matches_official_rust_metadata() {']
+    for f in api:
+        outputs = ', '.join('OutputType::'+('Real' if o['type']=='double' else 'Integer') for o in f['outputs'])
+        options = []
+        for p in f['params']:
+            # The adapter preserves PERCENTILE30; crate0.8.3 metadata is100.
+            value = 100 if f['name']=='percentile' and p['name']=='timeperiod' else p['default']
+            options.append(f'(\"{p["c_name"]}\", \"{p["name"]}\", {str(p["type"]=="double").lower()}, {float(value)!r})')
+        lines += [f'audit(FuncId::{f["name"].upper()}, {len(f["inputs"])}, &[{outputs}], &[{", ".join(options)}]);']
+    expected = sorted([f['name'].upper() for f in api] + RUST_UNEXPOSED)
+    lines += ['let mut inventory = ta_lib::abstract_api::FUNCS.iter().map(|f| f.name).collect::<Vec<_>>();',
+              'inventory.sort_unstable();', f'assert_eq!(inventory, &[{", ".join(json.dumps(n) for n in expected)}]);', '}', '}']
     path = ROOT / 'src/generated.rs'
     path.write_text('\n'.join(lines) + '\n')
     subprocess.run(['rustfmt', '--edition', '2021', str(path)], check=True)

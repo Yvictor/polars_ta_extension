@@ -9,10 +9,10 @@ import pytest
 ROOT = Path(__file__).parents[1]
 
 
-@pytest.fixture
-def allocation(monkeypatch):
+@pytest.fixture(params=["allocation_ci_benchmark", "adapter_ci_benchmark"])
+def allocation(monkeypatch, request):
     monkeypatch.syspath_prepend(str(ROOT/'scripts'))
-    spec = importlib.util.spec_from_file_location('allocation_benchmark', ROOT/'scripts/allocation_ci_benchmark.py')
+    spec = importlib.util.spec_from_file_location('allocation_benchmark', ROOT/'scripts'/(request.param+'.py'))
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
@@ -67,3 +67,22 @@ def test_requested_workload_inventory_has_no_custom_dispatch():
     assert {'grouped_atr/50000x20', 'grouped_ema/1x1000000', 'control_cumsum/10x100000'} <= diagnostic
     assert standard < diagnostic
     assert not any('dispatcher' in name or 'by_group' in name for name in diagnostic)
+
+
+def test_api_annotation_changes_are_reported_but_call_contract_changes_fail(tmp_path):
+    import json
+    spec = importlib.util.spec_from_file_location('api_probe', ROOT/'scripts/migration_probe.py')
+    probe = importlib.util.module_from_spec(spec); spec.loader.exec_module(probe)
+    before, after, report = (tmp_path/n for n in ('before.npz','after.npz','report.json'))
+    def save(path, annotation, contract):
+        meta = {'api': {'aroon': annotation}, 'api_call_contract': {'aroon': contract}, 'cases': {}}
+        np.savez(path, metadata=np.array(json.dumps(meta)))
+    save(before, 'Expr', '(high, low, timeperiod: int = 14)')
+    save(after, 'IntoExpr', '(high, low, timeperiod: int = 14)')
+    assert not probe.compare(before, after, report)
+    result = json.loads(report.read_text())
+    assert not result['api_signatures_match']
+    assert result['api_call_contract_match']
+    assert result['annotation_changed_functions'] == ['aroon']
+    save(after, 'IntoExpr', '(low, high, timeperiod: int = 14)')
+    assert probe.compare(before, after, report)

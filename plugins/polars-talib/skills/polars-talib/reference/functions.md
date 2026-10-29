@@ -6,7 +6,7 @@ Every function exists in two forms:
 
 * namespace method: `pl.col(<receiver>).ta.<name>(<other inputs...>, <params...>)`
 * module function: `plta.<name>(<inputs in TA-Lib order...>, <params...>)`; positional
-  inputs must be `pl.Expr` and default to the columns `open`, `high`, `low`, `close`,
+  inputs accept column-name strings or `pl.Expr` and default to `open`, `high`, `low`, `close`,
   `volume` (`real` defaults to `close`, `real0`/`real1` to `high`/`low`).
 
 Multi-output functions return a `pl.Struct`; use `.struct.field("<output>")` or `.unnest()`.

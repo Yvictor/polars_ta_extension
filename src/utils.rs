@@ -1,5 +1,6 @@
 use polars::datatypes::DataType;
 use polars::prelude::{PolarsError, PolarsResult, Series};
+use std::borrow::Cow;
 
 pub fn cast_series_to_f64(series: &Series) -> PolarsResult<Series> {
     Ok(match series.dtype() {
@@ -9,9 +10,9 @@ pub fn cast_series_to_f64(series: &Series) -> PolarsResult<Series> {
     .rechunk())
 }
 
-/// Align plugin inputs before handing raw buffers to C: length-1 inputs
+/// Align plugin inputs before handing borrowed buffers to TA-Lib: length-1 inputs
 /// (Polars literals) broadcast to the common length, anything else must match.
-pub fn broadcast_inputs(inputs: &[Series]) -> PolarsResult<Vec<Series>> {
+pub fn broadcast_inputs(inputs: &[Series]) -> PolarsResult<Cow<'_, [Series]>> {
     // A scalar also broadcasts to zero rows. Taking max(0, 1) would reject
     // a valid filtered-to-empty column paired with a literal.
     let len = inputs
@@ -19,6 +20,9 @@ pub fn broadcast_inputs(inputs: &[Series]) -> PolarsResult<Vec<Series>> {
         .map(|s| s.len())
         .find(|&len| len != 1)
         .unwrap_or(1);
+    if inputs.iter().all(|s| s.len() == len) {
+        return Ok(Cow::Borrowed(inputs));
+    }
     inputs
         .iter()
         .map(|s| {
@@ -32,5 +36,6 @@ pub fn broadcast_inputs(inputs: &[Series]) -> PolarsResult<Vec<Series>> {
                 ))
             }
         })
-        .collect()
+        .collect::<PolarsResult<Vec<_>>>()
+        .map(Cow::Owned)
 }

@@ -122,9 +122,15 @@ def cases():
 
 def capture(path):
     meta={'python':platform.python_version(),'polars':pl.__version__,'numpy':np.__version__,
-          'talib':ta.__talib_version__, 'cases':{}, 'api':{}}
+          'talib':ta.__talib_version__, 'cases':{}, 'api':{}, 'api_call_contract':{}}
     for f in API:
         meta['api'][f['name']]=re.sub(r' at 0x[0-9A-Fa-f]+', '', str(inspect.signature(getattr(ta,f['name']))))
+        sig = inspect.signature(getattr(ta, f['name']))
+        # Input annotations are widened from Expr to IntoExpr in this correction;
+        # names, order, kinds, defaults and parameter/return types remain frozen.
+        parameters = [p.replace(annotation=inspect.Parameter.empty) if i < len(f['inputs']) else p
+                      for i, p in enumerate(sig.parameters.values())]
+        meta['api_call_contract'][f['name']] = re.sub(r' at 0x[0-9A-Fa-f]+', '', str(sig.replace(parameters=parameters)))
     values={}
     for index,(key,spec,df,params,groups) in enumerate(cases()):
         try:
@@ -189,18 +195,20 @@ def compare(baseline,candidate,report,require_exact=False):
                     detail.append({'old':av[indices].tolist(),'new':bv[indices].tolist(),'bad_count':int((~equal).sum())})
         if reason: failures.append({'case':key,'reason':reason,'detail':detail})
     api_match=om['api']==nm['api']
+    contract_match=om.get('api_call_contract',om['api'])==nm.get('api_call_contract',nm['api'])
     result={'baseline':str(baseline),'candidate':str(candidate),
             'baseline_sha256':hashlib.sha256(baseline.read_bytes()).hexdigest(),
             'candidate_sha256':hashlib.sha256(candidate.read_bytes()).hexdigest(),
-            'baseline_runtime':{k:v for k,v in om.items() if k not in ('cases','api')},
-            'candidate_runtime':{k:v for k,v in nm.items() if k not in ('cases','api')},
+            'baseline_runtime':{k:v for k,v in om.items() if k not in ('cases','api','api_call_contract')},
+            'candidate_runtime':{k:v for k,v in nm.items() if k not in ('cases','api','api_call_contract')},
             'require_exact':require_exact,'rtol':0. if require_exact else 1e-10,'atol':0. if require_exact else 1e-10,'tiny_case_atol':0. if require_exact else 'min(1e-10, max_abs_finite_reference * 1e-10)','cases':len(om['cases']),'checked_values':checked,
-            'api_signatures_match':api_match,'fields_with_bit_differences':bit_different,
+            'api_signatures_match':api_match,'api_call_contract_match':contract_match,
+            'annotation_changed_functions':[name for name in om['api'] if om['api'][name]!=nm['api'].get(name)],'fields_with_bit_differences':bit_different,
             'max_absolute_difference':max_abs,'failures':failures}
     report.parent.mkdir(parents=True,exist_ok=True);report.write_text(json.dumps(result,indent=2,allow_nan=True)+'\n')
     print(json.dumps({k:v for k,v in result.items() if k!='failures'},indent=2))
     print('failures:',len(failures)); print(json.dumps(failures[:20],indent=2))
-    return bool(failures) or not api_match
+    return bool(failures) or not contract_match
 
 
 def main():

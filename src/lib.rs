@@ -33,3 +33,6 @@ fn polars_ta(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(missing::lookback, m)?)?;
     Ok(())
 }
+
+#[cfg(test)]
+mod cost_probe;

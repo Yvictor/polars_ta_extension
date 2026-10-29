@@ -1,6 +1,6 @@
 import atexit
 import polars as pl
-from .utils import register_plugin, parse_version
+from .utils import register_plugin, parse_version, parse_into_expr
 from ._generated import TAExprMixin
 from ._polars_talib import initialize, shutdown, version
 from pathlib import Path
@@ -3674,7 +3674,7 @@ def ht_dcperiod(real: IntoExpr = pl.col("close")) -> pl.Expr:
     Outputs:
         real
     """
-    return real.ta.ht_dcperiod()
+    return parse_into_expr(real).ta.ht_dcperiod()
 
 
 def ht_dcphase(real: IntoExpr = pl.col("close")) -> pl.Expr:
@@ -3686,7 +3686,7 @@ def ht_dcphase(real: IntoExpr = pl.col("close")) -> pl.Expr:
     Outputs:
         real
     """
-    return real.ta.ht_dcphase()
+    return parse_into_expr(real).ta.ht_dcphase()
 
 
 def ht_phasor(real: IntoExpr = pl.col("close")) -> pl.Expr:
@@ -3698,7 +3698,7 @@ def ht_phasor(real: IntoExpr = pl.col("close")) -> pl.Expr:
     Outputs:
         inphase, quadrature
     """
-    return real.ta.ht_phasor()
+    return parse_into_expr(real).ta.ht_phasor()
 
 
 def ht_sine(real: IntoExpr = pl.col("close")) -> pl.Expr:
@@ -3710,7 +3710,7 @@ def ht_sine(real: IntoExpr = pl.col("close")) -> pl.Expr:
     Outputs:
         sine, leadsine
     """
-    return real.ta.ht_sine()
+    return parse_into_expr(real).ta.ht_sine()
 
 
 def ht_trendmode(real: IntoExpr = pl.col("close")) -> pl.Expr:
@@ -3722,7 +3722,7 @@ def ht_trendmode(real: IntoExpr = pl.col("close")) -> pl.Expr:
     Outputs:
         integer
     """
-    return real.ta.ht_trendmode()
+    return parse_into_expr(real).ta.ht_trendmode()
 
 
 def add(
@@ -3738,7 +3738,7 @@ def add(
     Outputs:
         real
     """
-    return real0.ta.add(real1)
+    return parse_into_expr(real0).ta.add(real1)
 
 
 def div(
@@ -3754,7 +3754,7 @@ def div(
     Outputs:
         real
     """
-    return real0.ta.div(real1)
+    return parse_into_expr(real0).ta.div(real1)
 
 
 def max(
@@ -3771,7 +3771,7 @@ def max(
     Outputs:
         real
     """
-    return real.ta.max(timeperiod=timeperiod)
+    return parse_into_expr(real).ta.max(timeperiod=timeperiod)
 
 
 def maxindex(
@@ -3788,7 +3788,7 @@ def maxindex(
     Outputs:
         integer
     """
-    return real.ta.maxindex(timeperiod=timeperiod)
+    return parse_into_expr(real).ta.maxindex(timeperiod=timeperiod)
 
 
 def min(
@@ -3805,7 +3805,7 @@ def min(
     Outputs:
         real
     """
-    return real.ta.min(timeperiod=timeperiod)
+    return parse_into_expr(real).ta.min(timeperiod=timeperiod)
 
 
 def minindex(
@@ -3822,7 +3822,7 @@ def minindex(
     Outputs:
         integer
     """
-    return real.ta.minindex(timeperiod=timeperiod)
+    return parse_into_expr(real).ta.minindex(timeperiod=timeperiod)
 
 
 def minmax(
@@ -3839,7 +3839,7 @@ def minmax(
     Outputs:
         min, max
     """
-    return real.ta.minmax(timeperiod=timeperiod)
+    return parse_into_expr(real).ta.minmax(timeperiod=timeperiod)
 
 
 def minmaxindex(
@@ -3856,7 +3856,7 @@ def minmaxindex(
     Outputs:
         minidx, maxidx
     """
-    return real.ta.minmaxindex(timeperiod=timeperiod)
+    return parse_into_expr(real).ta.minmaxindex(timeperiod=timeperiod)
 
 
 def mult(
@@ -3872,7 +3872,7 @@ def mult(
     Outputs:
         real
     """
-    return real0.ta.mult(real1)
+    return parse_into_expr(real0).ta.mult(real1)
 
 
 def sub(
@@ -3888,7 +3888,7 @@ def sub(
     Outputs:
         real
     """
-    return real0.ta.sub(real1)
+    return parse_into_expr(real0).ta.sub(real1)
 
 
 def sum(
@@ -3905,7 +3905,7 @@ def sum(
     Outputs:
         real
     """
-    return real.ta.sum(timeperiod=timeperiod)
+    return parse_into_expr(real).ta.sum(timeperiod=timeperiod)
 
 
 def acos(
@@ -3919,7 +3919,7 @@ def acos(
     Outputs:
         real
     """
-    return real.ta.acos()
+    return parse_into_expr(real).ta.acos()
 
 
 def asin(
@@ -3933,7 +3933,7 @@ def asin(
     Outputs:
         real
     """
-    return real.ta.asin()
+    return parse_into_expr(real).ta.asin()
 
 
 def atan(
@@ -3947,7 +3947,7 @@ def atan(
     Outputs:
         real
     """
-    return real.ta.atan()
+    return parse_into_expr(real).ta.atan()
 
 
 def ceil(
@@ -3961,7 +3961,7 @@ def ceil(
     Outputs:
         real
     """
-    return real.ta.ceil()
+    return parse_into_expr(real).ta.ceil()
 
 
 def cos(
@@ -3975,7 +3975,7 @@ def cos(
     Outputs:
         real
     """
-    return real.ta.cos()
+    return parse_into_expr(real).ta.cos()
 
 
 def cosh(
@@ -3989,7 +3989,7 @@ def cosh(
     Outputs:
         real
     """
-    return real.ta.cosh()
+    return parse_into_expr(real).ta.cosh()
 
 
 def exp(
@@ -4003,7 +4003,7 @@ def exp(
     Outputs:
         real
     """
-    return real.ta.exp()
+    return parse_into_expr(real).ta.exp()
 
 
 def floor(
@@ -4017,7 +4017,7 @@ def floor(
     Outputs:
         real
     """
-    return real.ta.floor()
+    return parse_into_expr(real).ta.floor()
 
 
 def ln(
@@ -4031,7 +4031,7 @@ def ln(
     Outputs:
         real
     """
-    return real.ta.ln()
+    return parse_into_expr(real).ta.ln()
 
 
 def log10(
@@ -4045,7 +4045,7 @@ def log10(
     Outputs:
         real
     """
-    return real.ta.log10()
+    return parse_into_expr(real).ta.log10()
 
 
 def sin(
@@ -4059,7 +4059,7 @@ def sin(
     Outputs:
         real
     """
-    return real.ta.sin()
+    return parse_into_expr(real).ta.sin()
 
 
 def sinh(
@@ -4073,7 +4073,7 @@ def sinh(
     Outputs:
         real
     """
-    return real.ta.sinh()
+    return parse_into_expr(real).ta.sinh()
 
 
 def sqrt(
@@ -4087,7 +4087,7 @@ def sqrt(
     Outputs:
         real
     """
-    return real.ta.sqrt()
+    return parse_into_expr(real).ta.sqrt()
 
 
 def tan(
@@ -4101,7 +4101,7 @@ def tan(
     Outputs:
         real
     """
-    return real.ta.tan()
+    return parse_into_expr(real).ta.tan()
 
 
 def tanh(
@@ -4115,7 +4115,7 @@ def tanh(
     Outputs:
         real
     """
-    return real.ta.tanh()
+    return parse_into_expr(real).ta.tanh()
 
 
 def adx(
@@ -4134,7 +4134,7 @@ def adx(
     Outputs:
         real
     """
-    return close.ta.adx(high, low, timeperiod=timeperiod)
+    return parse_into_expr(close).ta.adx(high, low, timeperiod=timeperiod)
 
 
 def adxr(
@@ -4153,7 +4153,7 @@ def adxr(
     Outputs:
         real
     """
-    return close.ta.adxr(high, low, timeperiod=timeperiod)
+    return parse_into_expr(close).ta.adxr(high, low, timeperiod=timeperiod)
 
 
 def apo(
@@ -4174,7 +4174,7 @@ def apo(
     Outputs:
         real
     """
-    return real.ta.apo(fastperiod=fastperiod, slowperiod=slowperiod, matype=matype)
+    return parse_into_expr(real).ta.apo(fastperiod=fastperiod, slowperiod=slowperiod, matype=matype)
 
 
 def aroon(
@@ -4192,7 +4192,7 @@ def aroon(
     Outputs:
         aroondown, aroonup
     """
-    return high.ta.aroon(low, timeperiod=timeperiod)
+    return parse_into_expr(high).ta.aroon(low, timeperiod=timeperiod)
 
 
 def aroonosc(
@@ -4210,7 +4210,7 @@ def aroonosc(
     Outputs:
         real
     """
-    return high.ta.aroonosc(low, timeperiod=timeperiod)
+    return parse_into_expr(high).ta.aroonosc(low, timeperiod=timeperiod)
 
 
 def bop(
@@ -4227,7 +4227,7 @@ def bop(
     Outputs:
         real
     """
-    return open.ta.bop(high, low, close)
+    return parse_into_expr(open).ta.bop(high, low, close)
 
 
 def cci(
@@ -4246,7 +4246,7 @@ def cci(
     Outputs:
         real
     """
-    return close.ta.cci(high, low, timeperiod=timeperiod)
+    return parse_into_expr(close).ta.cci(high, low, timeperiod=timeperiod)
 
 
 def cmo(
@@ -4263,7 +4263,7 @@ def cmo(
     Outputs:
         real
     """
-    return real.ta.cmo(timeperiod=timeperiod)
+    return parse_into_expr(real).ta.cmo(timeperiod=timeperiod)
 
 
 def dx(
@@ -4282,7 +4282,7 @@ def dx(
     Outputs:
         real
     """
-    return close.ta.dx(high, low, timeperiod=timeperiod)
+    return parse_into_expr(close).ta.dx(high, low, timeperiod=timeperiod)
 
 
 def macd(
@@ -4303,7 +4303,7 @@ def macd(
     Outputs:
         macd, macdsignal, macdhist
     """
-    return real.ta.macd(fastperiod=fastperiod, slowperiod=slowperiod, signalperiod=signalperiod)
+    return parse_into_expr(real).ta.macd(fastperiod=fastperiod, slowperiod=slowperiod, signalperiod=signalperiod)
 
 
 def macdext(
@@ -4330,7 +4330,7 @@ def macdext(
     Outputs:
         macd, macdsignal, macdhist
     """
-    return real.ta.macdext(
+    return parse_into_expr(real).ta.macdext(
         fastperiod=fastperiod,
         fastmatype=fastmatype,
         slowperiod=slowperiod,
@@ -4351,7 +4351,7 @@ def macdfix(real: IntoExpr = pl.col("close"), signalperiod: int = 9) -> pl.Expr:
     Outputs:
         macd, macdsignal, macdhist
     """
-    return real.ta.macdfix(signalperiod=signalperiod)
+    return parse_into_expr(real).ta.macdfix(signalperiod=signalperiod)
 
 
 def mfi(
@@ -4372,7 +4372,7 @@ def mfi(
     Outputs:
         real
     """
-    return close.ta.mfi(high, low, volume, timeperiod=timeperiod)
+    return parse_into_expr(close).ta.mfi(high, low, volume, timeperiod=timeperiod)
 
 
 def minus_di(
@@ -4391,7 +4391,7 @@ def minus_di(
     Outputs:
         real
     """
-    return close.ta.minus_di(high, low, timeperiod=timeperiod)
+    return parse_into_expr(close).ta.minus_di(high, low, timeperiod=timeperiod)
 
 
 def minus_dm(
@@ -4409,7 +4409,7 @@ def minus_dm(
     Outputs:
         real
     """
-    return high.ta.minus_dm(low, timeperiod=timeperiod)
+    return parse_into_expr(high).ta.minus_dm(low, timeperiod=timeperiod)
 
 
 def mom(
@@ -4426,7 +4426,7 @@ def mom(
     Outputs:
         real
     """
-    return real.ta.mom(timeperiod=timeperiod)
+    return parse_into_expr(real).ta.mom(timeperiod=timeperiod)
 
 
 def plus_di(
@@ -4445,7 +4445,7 @@ def plus_di(
     Outputs:
         real
     """
-    return close.ta.plus_di(high, low, timeperiod=timeperiod)
+    return parse_into_expr(close).ta.plus_di(high, low, timeperiod=timeperiod)
 
 
 def plus_dm(
@@ -4463,7 +4463,7 @@ def plus_dm(
     Outputs:
         real
     """
-    return high.ta.plus_dm(low, timeperiod=timeperiod)
+    return parse_into_expr(high).ta.plus_dm(low, timeperiod=timeperiod)
 
 
 def ppo(
@@ -4484,7 +4484,7 @@ def ppo(
     Outputs:
         real
     """
-    return real.ta.ppo(fastperiod=fastperiod, slowperiod=slowperiod, matype=matype)
+    return parse_into_expr(real).ta.ppo(fastperiod=fastperiod, slowperiod=slowperiod, matype=matype)
 
 
 def roc(
@@ -4501,7 +4501,7 @@ def roc(
     Outputs:
         real
     """
-    return real.ta.roc(timeperiod=timeperiod)
+    return parse_into_expr(real).ta.roc(timeperiod=timeperiod)
 
 
 def rocp(
@@ -4518,7 +4518,7 @@ def rocp(
     Outputs:
         real
     """
-    return real.ta.rocp(timeperiod=timeperiod)
+    return parse_into_expr(real).ta.rocp(timeperiod=timeperiod)
 
 
 def rocr(
@@ -4535,7 +4535,7 @@ def rocr(
     Outputs:
         real
     """
-    return real.ta.rocr(timeperiod=timeperiod)
+    return parse_into_expr(real).ta.rocr(timeperiod=timeperiod)
 
 
 def rocr100(
@@ -4552,7 +4552,7 @@ def rocr100(
     Outputs:
         real
     """
-    return real.ta.rocr100(timeperiod=timeperiod)
+    return parse_into_expr(real).ta.rocr100(timeperiod=timeperiod)
 
 
 def rsi(
@@ -4569,7 +4569,7 @@ def rsi(
     Outputs:
         real
     """
-    return real.ta.rsi(timeperiod=timeperiod)
+    return parse_into_expr(real).ta.rsi(timeperiod=timeperiod)
 
 
 def stoch(
@@ -4596,7 +4596,7 @@ def stoch(
     Outputs:
         slowk, slowd
     """
-    return close.ta.stoch(
+    return parse_into_expr(close).ta.stoch(
         high,
         low,
         fastk_period=fastk_period,
@@ -4627,7 +4627,7 @@ def stochf(
     Outputs:
         fastk, fastd
     """
-    return close.ta.stochf(
+    return parse_into_expr(close).ta.stochf(
         high, low, fastk_period=fastk_period, fastd_period=fastd_period, fastd_matype=fastd_matype
     )
 
@@ -4653,7 +4653,7 @@ def stochrsi(
         fastk
         fastd
     """
-    return close.ta.stochrsi(
+    return parse_into_expr(close).ta.stochrsi(
         timeperiod=timeperiod,
         fastk_period=fastk_period,
         fastd_period=fastd_period,
@@ -4672,7 +4672,7 @@ def trix(price: IntoExpr = pl.col("close"), timeperiod: int = 30) -> pl.Expr:
     Outputs:
         real
     """
-    return price.ta.trix(timeperiod=timeperiod)
+    return parse_into_expr(price).ta.trix(timeperiod=timeperiod)
 
 
 def ultosc(
@@ -4695,7 +4695,7 @@ def ultosc(
     Outputs:
         real
     """
-    return close.ta.ultosc(
+    return parse_into_expr(close).ta.ultosc(
         high, low, timeperiod1=timeperiod1, timeperiod2=timeperiod2, timeperiod3=timeperiod3
     )
 
@@ -4716,7 +4716,7 @@ def willr(
     Outputs:
         real
     """
-    return close.ta.willr(high, low, timeperiod=timeperiod)
+    return parse_into_expr(close).ta.willr(high, low, timeperiod=timeperiod)
 
 
 def bbands(
@@ -4739,7 +4739,7 @@ def bbands(
     Outputs:
         upperband, middleband, lowerband
     """
-    return real.ta.bbands(timeperiod=timeperiod, nbdevup=nbdevup, nbdevdn=nbdevdn, matype=matype)
+    return parse_into_expr(real).ta.bbands(timeperiod=timeperiod, nbdevup=nbdevup, nbdevdn=nbdevdn, matype=matype)
 
 
 def dema(
@@ -4756,7 +4756,7 @@ def dema(
     Outputs:
         real
     """
-    return real.ta.dema(timeperiod=timeperiod)
+    return parse_into_expr(real).ta.dema(timeperiod=timeperiod)
 
 
 def ema(
@@ -4773,7 +4773,7 @@ def ema(
     Outputs:
         real
     """
-    return real.ta.ema(timeperiod=timeperiod)
+    return parse_into_expr(real).ta.ema(timeperiod=timeperiod)
 
 
 def ht_trendline(
@@ -4787,7 +4787,7 @@ def ht_trendline(
     Outputs:
         real
     """
-    return real.ta.ht_trendline()
+    return parse_into_expr(real).ta.ht_trendline()
 
 
 def kama(
@@ -4804,7 +4804,7 @@ def kama(
     Outputs:
         real
     """
-    return real.ta.kama(timeperiod=timeperiod)
+    return parse_into_expr(real).ta.kama(timeperiod=timeperiod)
 
 
 def mama(
@@ -4823,7 +4823,7 @@ def mama(
     Outputs:
         mama, fama
     """
-    return real.ta.mama(fastlimit=fastlimit, slowlimit=slowlimit)
+    return parse_into_expr(real).ta.mama(fastlimit=fastlimit, slowlimit=slowlimit)
 
 
 def mavp(
@@ -4846,7 +4846,7 @@ def mavp(
     Outputs:
         real
     """
-    return real.ta.mavp(periods, minperiod=minperiod, maxperiod=maxperiod, matype=matype)
+    return parse_into_expr(real).ta.mavp(periods, minperiod=minperiod, maxperiod=maxperiod, matype=matype)
 
 
 def midpoint(
@@ -4863,7 +4863,7 @@ def midpoint(
     Outputs:
         real
     """
-    return real.ta.midpoint(timeperiod=timeperiod)
+    return parse_into_expr(real).ta.midpoint(timeperiod=timeperiod)
 
 
 def midprice(
@@ -4881,7 +4881,7 @@ def midprice(
     Outputs:
         real
     """
-    return high.ta.midprice(low, timeperiod=timeperiod)
+    return parse_into_expr(high).ta.midprice(low, timeperiod=timeperiod)
 
 
 def sar(
@@ -4901,7 +4901,7 @@ def sar(
     Outputs:
         real
     """
-    return high.ta.sar(low, acceleration=acceleration, maximum=maximum)
+    return parse_into_expr(high).ta.sar(low, acceleration=acceleration, maximum=maximum)
 
 
 def sarext(
@@ -4933,7 +4933,7 @@ def sarext(
     Outputs:
         real
     """
-    return high.ta.sarext(
+    return parse_into_expr(high).ta.sarext(
         low,
         startvalue=startvalue,
         offsetonreverse=offsetonreverse,
@@ -4957,7 +4957,7 @@ def sma(real: IntoExpr = pl.col("close"), timeperiod: int = 30) -> pl.Expr:
     Outputs:
         real
     """
-    return real.ta.sma(timeperiod=timeperiod)
+    return parse_into_expr(real).ta.sma(timeperiod=timeperiod)
 
 
 def ma(
@@ -4976,7 +4976,7 @@ def ma(
     Outputs:
         real
     """
-    return real.ta.ma(timeperiod=timeperiod, matype=matype)
+    return parse_into_expr(real).ta.ma(timeperiod=timeperiod, matype=matype)
 
 
 def t3(
@@ -4995,7 +4995,7 @@ def t3(
     Outputs:
         real
     """
-    return real.ta.t3(timeperiod=timeperiod, vfactor=vfactor)
+    return parse_into_expr(real).ta.t3(timeperiod=timeperiod, vfactor=vfactor)
 
 
 def tema(
@@ -5012,7 +5012,7 @@ def tema(
     Outputs:
         real
     """
-    return real.ta.tema(timeperiod=timeperiod)
+    return parse_into_expr(real).ta.tema(timeperiod=timeperiod)
 
 
 def trima(
@@ -5029,7 +5029,7 @@ def trima(
     Outputs:
         real
     """
-    return real.ta.trima(timeperiod=timeperiod)
+    return parse_into_expr(real).ta.trima(timeperiod=timeperiod)
 
 
 def wma(
@@ -5046,7 +5046,7 @@ def wma(
     Outputs:
         real
     """
-    return real.ta.wma(timeperiod=timeperiod)
+    return parse_into_expr(real).ta.wma(timeperiod=timeperiod)
 
 
 def cdl2crows(
@@ -5064,7 +5064,7 @@ def cdl2crows(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdl2crows(high, low, close)
+    return parse_into_expr(open).ta.cdl2crows(high, low, close)
 
 
 def cdl3blackcrows(
@@ -5082,7 +5082,7 @@ def cdl3blackcrows(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdl3blackcrows(high, low, close)
+    return parse_into_expr(open).ta.cdl3blackcrows(high, low, close)
 
 
 def cdl3inside(
@@ -5100,7 +5100,7 @@ def cdl3inside(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdl3inside(high, low, close)
+    return parse_into_expr(open).ta.cdl3inside(high, low, close)
 
 
 def cdl3linestrike(
@@ -5118,7 +5118,7 @@ def cdl3linestrike(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdl3linestrike(high, low, close)
+    return parse_into_expr(open).ta.cdl3linestrike(high, low, close)
 
 
 def cdl3outside(
@@ -5136,7 +5136,7 @@ def cdl3outside(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdl3outside(high, low, close)
+    return parse_into_expr(open).ta.cdl3outside(high, low, close)
 
 
 def cdl3starsinsouth(
@@ -5154,7 +5154,7 @@ def cdl3starsinsouth(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdl3starsinsouth(high, low, close)
+    return parse_into_expr(open).ta.cdl3starsinsouth(high, low, close)
 
 
 def cdl3whitesoldiers(
@@ -5172,7 +5172,7 @@ def cdl3whitesoldiers(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdl3whitesoldiers(high, low, close)
+    return parse_into_expr(open).ta.cdl3whitesoldiers(high, low, close)
 
 
 def cdlabandonedbaby(
@@ -5193,7 +5193,7 @@ def cdlabandonedbaby(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdlabandonedbaby(high, low, close, penetration=penetration)
+    return parse_into_expr(open).ta.cdlabandonedbaby(high, low, close, penetration=penetration)
 
 
 def cdladvanceblock(
@@ -5211,7 +5211,7 @@ def cdladvanceblock(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdladvanceblock(high, low, close)
+    return parse_into_expr(open).ta.cdladvanceblock(high, low, close)
 
 
 def cdlbelthold(
@@ -5229,7 +5229,7 @@ def cdlbelthold(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdlbelthold(high, low, close)
+    return parse_into_expr(open).ta.cdlbelthold(high, low, close)
 
 
 def cdlbreakaway(
@@ -5247,7 +5247,7 @@ def cdlbreakaway(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdlbreakaway(high, low, close)
+    return parse_into_expr(open).ta.cdlbreakaway(high, low, close)
 
 
 def cdlclosingmarubozu(
@@ -5265,7 +5265,7 @@ def cdlclosingmarubozu(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdlclosingmarubozu(high, low, close)
+    return parse_into_expr(open).ta.cdlclosingmarubozu(high, low, close)
 
 
 def cdlconcealbabyswall(
@@ -5283,7 +5283,7 @@ def cdlconcealbabyswall(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdlconcealbabyswall(high, low, close)
+    return parse_into_expr(open).ta.cdlconcealbabyswall(high, low, close)
 
 
 def cdlcounterattack(
@@ -5301,7 +5301,7 @@ def cdlcounterattack(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdlcounterattack(high, low, close)
+    return parse_into_expr(open).ta.cdlcounterattack(high, low, close)
 
 
 def cdldarkcloudcover(
@@ -5322,7 +5322,7 @@ def cdldarkcloudcover(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdldarkcloudcover(high, low, close, penetration=penetration)
+    return parse_into_expr(open).ta.cdldarkcloudcover(high, low, close, penetration=penetration)
 
 
 def cdldoji(
@@ -5340,7 +5340,7 @@ def cdldoji(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdldoji(high, low, close)
+    return parse_into_expr(open).ta.cdldoji(high, low, close)
 
 
 def cdldojistar(
@@ -5358,7 +5358,7 @@ def cdldojistar(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdldojistar(high, low, close)
+    return parse_into_expr(open).ta.cdldojistar(high, low, close)
 
 
 def cdldragonflydoji(
@@ -5376,7 +5376,7 @@ def cdldragonflydoji(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdldragonflydoji(high, low, close)
+    return parse_into_expr(open).ta.cdldragonflydoji(high, low, close)
 
 
 def cdlengulfing(
@@ -5394,7 +5394,7 @@ def cdlengulfing(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdlengulfing(high, low, close)
+    return parse_into_expr(open).ta.cdlengulfing(high, low, close)
 
 
 def cdleveningdojistar(
@@ -5415,7 +5415,7 @@ def cdleveningdojistar(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdleveningdojistar(high, low, close, penetration=penetration)
+    return parse_into_expr(open).ta.cdleveningdojistar(high, low, close, penetration=penetration)
 
 
 def cdleveningstar(
@@ -5436,7 +5436,7 @@ def cdleveningstar(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdleveningstar(high, low, close, penetration=penetration)
+    return parse_into_expr(open).ta.cdleveningstar(high, low, close, penetration=penetration)
 
 
 def cdlgapsidesidewhite(
@@ -5454,7 +5454,7 @@ def cdlgapsidesidewhite(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdlgapsidesidewhite(high, low, close)
+    return parse_into_expr(open).ta.cdlgapsidesidewhite(high, low, close)
 
 
 def cdlgravestonedoji(
@@ -5472,7 +5472,7 @@ def cdlgravestonedoji(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdlgravestonedoji(high, low, close)
+    return parse_into_expr(open).ta.cdlgravestonedoji(high, low, close)
 
 
 def cdlhammer(
@@ -5490,7 +5490,7 @@ def cdlhammer(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdlhammer(high, low, close)
+    return parse_into_expr(open).ta.cdlhammer(high, low, close)
 
 
 def cdlhangingman(
@@ -5508,7 +5508,7 @@ def cdlhangingman(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdlhangingman(high, low, close)
+    return parse_into_expr(open).ta.cdlhangingman(high, low, close)
 
 
 def cdlharami(
@@ -5526,7 +5526,7 @@ def cdlharami(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdlharami(high, low, close)
+    return parse_into_expr(open).ta.cdlharami(high, low, close)
 
 
 def cdlharamicross(
@@ -5544,7 +5544,7 @@ def cdlharamicross(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdlharamicross(high, low, close)
+    return parse_into_expr(open).ta.cdlharamicross(high, low, close)
 
 
 def cdlhighwave(
@@ -5562,7 +5562,7 @@ def cdlhighwave(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdlhighwave(high, low, close)
+    return parse_into_expr(open).ta.cdlhighwave(high, low, close)
 
 
 def cdlhikkake(
@@ -5580,7 +5580,7 @@ def cdlhikkake(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdlhikkake(high, low, close)
+    return parse_into_expr(open).ta.cdlhikkake(high, low, close)
 
 
 def cdlhikkakemod(
@@ -5598,7 +5598,7 @@ def cdlhikkakemod(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdlhikkakemod(high, low, close)
+    return parse_into_expr(open).ta.cdlhikkakemod(high, low, close)
 
 
 def cdlhomingpigeon(
@@ -5616,7 +5616,7 @@ def cdlhomingpigeon(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdlhomingpigeon(high, low, close)
+    return parse_into_expr(open).ta.cdlhomingpigeon(high, low, close)
 
 
 def cdlidentical3crows(
@@ -5634,7 +5634,7 @@ def cdlidentical3crows(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdlidentical3crows(high, low, close)
+    return parse_into_expr(open).ta.cdlidentical3crows(high, low, close)
 
 
 def cdlinneck(
@@ -5652,7 +5652,7 @@ def cdlinneck(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdlinneck(high, low, close)
+    return parse_into_expr(open).ta.cdlinneck(high, low, close)
 
 
 def cdlinvertedhammer(
@@ -5670,7 +5670,7 @@ def cdlinvertedhammer(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdlinvertedhammer(high, low, close)
+    return parse_into_expr(open).ta.cdlinvertedhammer(high, low, close)
 
 
 def cdlkicking(
@@ -5688,7 +5688,7 @@ def cdlkicking(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdlkicking(high, low, close)
+    return parse_into_expr(open).ta.cdlkicking(high, low, close)
 
 
 def cdlkickingbylength(
@@ -5706,7 +5706,7 @@ def cdlkickingbylength(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdlkickingbylength(high, low, close)
+    return parse_into_expr(open).ta.cdlkickingbylength(high, low, close)
 
 
 def cdlladderbottom(
@@ -5724,7 +5724,7 @@ def cdlladderbottom(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdlladderbottom(high, low, close)
+    return parse_into_expr(open).ta.cdlladderbottom(high, low, close)
 
 
 def cdllongleggeddoji(
@@ -5742,7 +5742,7 @@ def cdllongleggeddoji(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdllongleggeddoji(high, low, close)
+    return parse_into_expr(open).ta.cdllongleggeddoji(high, low, close)
 
 
 def cdllongline(
@@ -5760,7 +5760,7 @@ def cdllongline(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdllongline(high, low, close)
+    return parse_into_expr(open).ta.cdllongline(high, low, close)
 
 
 def cdlmarubozu(
@@ -5778,7 +5778,7 @@ def cdlmarubozu(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdlmarubozu(high, low, close)
+    return parse_into_expr(open).ta.cdlmarubozu(high, low, close)
 
 
 def cdlmatchinglow(
@@ -5796,7 +5796,7 @@ def cdlmatchinglow(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdlmatchinglow(high, low, close)
+    return parse_into_expr(open).ta.cdlmatchinglow(high, low, close)
 
 
 def cdlmathold(
@@ -5817,7 +5817,7 @@ def cdlmathold(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdlmathold(high, low, close, penetration=penetration)
+    return parse_into_expr(open).ta.cdlmathold(high, low, close, penetration=penetration)
 
 
 def cdlmorningdojistar(
@@ -5838,7 +5838,7 @@ def cdlmorningdojistar(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdlmorningdojistar(high, low, close, penetration=penetration)
+    return parse_into_expr(open).ta.cdlmorningdojistar(high, low, close, penetration=penetration)
 
 
 def cdlmorningstar(
@@ -5859,7 +5859,7 @@ def cdlmorningstar(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdlmorningstar(high, low, close, penetration=penetration)
+    return parse_into_expr(open).ta.cdlmorningstar(high, low, close, penetration=penetration)
 
 
 def cdlonneck(
@@ -5877,7 +5877,7 @@ def cdlonneck(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdlonneck(high, low, close)
+    return parse_into_expr(open).ta.cdlonneck(high, low, close)
 
 
 def cdlpiercing(
@@ -5895,7 +5895,7 @@ def cdlpiercing(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdlpiercing(high, low, close)
+    return parse_into_expr(open).ta.cdlpiercing(high, low, close)
 
 
 def cdlrickshawman(
@@ -5913,7 +5913,7 @@ def cdlrickshawman(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdlrickshawman(high, low, close)
+    return parse_into_expr(open).ta.cdlrickshawman(high, low, close)
 
 
 def cdlrisefall3methods(
@@ -5931,7 +5931,7 @@ def cdlrisefall3methods(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdlrisefall3methods(high, low, close)
+    return parse_into_expr(open).ta.cdlrisefall3methods(high, low, close)
 
 
 def cdlseparatinglines(
@@ -5949,7 +5949,7 @@ def cdlseparatinglines(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdlseparatinglines(high, low, close)
+    return parse_into_expr(open).ta.cdlseparatinglines(high, low, close)
 
 
 def cdlshootingstar(
@@ -5967,7 +5967,7 @@ def cdlshootingstar(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdlshootingstar(high, low, close)
+    return parse_into_expr(open).ta.cdlshootingstar(high, low, close)
 
 
 def cdlshortline(
@@ -5985,7 +5985,7 @@ def cdlshortline(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdlshortline(high, low, close)
+    return parse_into_expr(open).ta.cdlshortline(high, low, close)
 
 
 def cdlspinningtop(
@@ -6003,7 +6003,7 @@ def cdlspinningtop(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdlspinningtop(high, low, close)
+    return parse_into_expr(open).ta.cdlspinningtop(high, low, close)
 
 
 def cdlstalledpattern(
@@ -6021,7 +6021,7 @@ def cdlstalledpattern(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdlstalledpattern(high, low, close)
+    return parse_into_expr(open).ta.cdlstalledpattern(high, low, close)
 
 
 def cdlsticksandwich(
@@ -6039,7 +6039,7 @@ def cdlsticksandwich(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdlsticksandwich(high, low, close)
+    return parse_into_expr(open).ta.cdlsticksandwich(high, low, close)
 
 
 def cdltakuri(
@@ -6057,7 +6057,7 @@ def cdltakuri(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdltakuri(high, low, close)
+    return parse_into_expr(open).ta.cdltakuri(high, low, close)
 
 
 def cdltasukigap(
@@ -6075,7 +6075,7 @@ def cdltasukigap(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdltasukigap(high, low, close)
+    return parse_into_expr(open).ta.cdltasukigap(high, low, close)
 
 
 def cdlthrusting(
@@ -6093,7 +6093,7 @@ def cdlthrusting(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdlthrusting(high, low, close)
+    return parse_into_expr(open).ta.cdlthrusting(high, low, close)
 
 
 def cdltristar(
@@ -6111,7 +6111,7 @@ def cdltristar(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdltristar(high, low, close)
+    return parse_into_expr(open).ta.cdltristar(high, low, close)
 
 
 def cdlunique3river(
@@ -6129,7 +6129,7 @@ def cdlunique3river(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdlunique3river(high, low, close)
+    return parse_into_expr(open).ta.cdlunique3river(high, low, close)
 
 
 def cdlupsidegap2crows(
@@ -6147,7 +6147,7 @@ def cdlupsidegap2crows(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdlupsidegap2crows(high, low, close)
+    return parse_into_expr(open).ta.cdlupsidegap2crows(high, low, close)
 
 
 def cdlxsidegap3methods(
@@ -6165,7 +6165,7 @@ def cdlxsidegap3methods(
         integer (values are -100, 0 or 100)
 
     """
-    return open.ta.cdlxsidegap3methods(high, low, close)
+    return parse_into_expr(open).ta.cdlxsidegap3methods(high, low, close)
 
 
 def avgprice(
@@ -6183,7 +6183,7 @@ def avgprice(
         avgprice
 
     """
-    return open.ta.avgprice(high, low, close)
+    return parse_into_expr(open).ta.avgprice(high, low, close)
 
 
 def medprice(
@@ -6199,7 +6199,7 @@ def medprice(
         medprice
 
     """
-    return high.ta.medprice(low)
+    return parse_into_expr(high).ta.medprice(low)
 
 
 def typprice(
@@ -6216,7 +6216,7 @@ def typprice(
         typprice
 
     """
-    return high.ta.typprice(low, close)
+    return parse_into_expr(high).ta.typprice(low, close)
 
 
 def wclprice(
@@ -6233,7 +6233,7 @@ def wclprice(
         wclprice
 
     """
-    return close.ta.wclprice(high, low)
+    return parse_into_expr(close).ta.wclprice(high, low)
 
 
 def beta(
@@ -6251,7 +6251,7 @@ def beta(
     Outputs:
         beta
     """
-    return price0.ta.beta(price1, timeperiod=timeperiod)
+    return parse_into_expr(price0).ta.beta(price1, timeperiod=timeperiod)
 
 
 def correl(
@@ -6269,7 +6269,7 @@ def correl(
     Outputs:
         correl
     """
-    return price0.ta.correl(price1, timeperiod=timeperiod)
+    return parse_into_expr(price0).ta.correl(price1, timeperiod=timeperiod)
 
 
 def linearreg(
@@ -6286,7 +6286,7 @@ def linearreg(
     Outputs:
         linearreg
     """
-    return price.ta.linearreg(timeperiod=timeperiod)
+    return parse_into_expr(price).ta.linearreg(timeperiod=timeperiod)
 
 
 def linearreg_angle(
@@ -6303,7 +6303,7 @@ def linearreg_angle(
     Outputs:
         linearreg_angle
     """
-    return price.ta.linearreg_angle(timeperiod=timeperiod)
+    return parse_into_expr(price).ta.linearreg_angle(timeperiod=timeperiod)
 
 
 def linearreg_intercept(
@@ -6320,7 +6320,7 @@ def linearreg_intercept(
     Outputs:
         linearreg_intercept
     """
-    return price.ta.linearreg_intercept(timeperiod=timeperiod)
+    return parse_into_expr(price).ta.linearreg_intercept(timeperiod=timeperiod)
 
 
 def linearreg_slope(
@@ -6337,7 +6337,7 @@ def linearreg_slope(
     Outputs:
         linearreg_slope
     """
-    return price.ta.linearreg_slope(timeperiod=timeperiod)
+    return parse_into_expr(price).ta.linearreg_slope(timeperiod=timeperiod)
 
 
 def stddev(
@@ -6356,7 +6356,7 @@ def stddev(
     Outputs:
         stddev
     """
-    return price.ta.stddev(timeperiod=timeperiod, nbdev=nbdev)
+    return parse_into_expr(price).ta.stddev(timeperiod=timeperiod, nbdev=nbdev)
 
 
 def tsf(
@@ -6373,7 +6373,7 @@ def tsf(
     Outputs:
         tsf
     """
-    return price.ta.tsf(timeperiod=timeperiod)
+    return parse_into_expr(price).ta.tsf(timeperiod=timeperiod)
 
 
 def var(
@@ -6392,7 +6392,7 @@ def var(
     Outputs:
         var
     """
-    return price.ta.var(timeperiod=timeperiod, nbdev=nbdev)
+    return parse_into_expr(price).ta.var(timeperiod=timeperiod, nbdev=nbdev)
 
 
 def atr(
@@ -6411,7 +6411,7 @@ def atr(
     Outputs:
         atr
     """
-    return close.ta.atr(high, low, timeperiod=timeperiod)
+    return parse_into_expr(close).ta.atr(high, low, timeperiod=timeperiod)
 
 
 def natr(
@@ -6430,7 +6430,7 @@ def natr(
     Outputs:
         natr
     """
-    return close.ta.natr(high, low, timeperiod=timeperiod)
+    return parse_into_expr(close).ta.natr(high, low, timeperiod=timeperiod)
 
 
 def trange(
@@ -6446,7 +6446,7 @@ def trange(
     Outputs:
         trange
     """
-    return close.ta.trange(high, low)
+    return parse_into_expr(close).ta.trange(high, low)
 
 
 def ad(
@@ -6463,7 +6463,7 @@ def ad(
     Outputs:
         ad
     """
-    return close.ta.ad(high, low, volume)
+    return parse_into_expr(close).ta.ad(high, low, volume)
 
 
 def adosc(
@@ -6485,7 +6485,7 @@ def adosc(
     Outputs:
         adosc
     """
-    return close.ta.adosc(high, low, volume, fastperiod=fastperiod, slowperiod=slowperiod)
+    return parse_into_expr(close).ta.adosc(high, low, volume, fastperiod=fastperiod, slowperiod=slowperiod)
 
 
 def obv(
@@ -6500,7 +6500,7 @@ def obv(
     Outputs:
         obv
     """
-    return close.ta.obv(volume)
+    return parse_into_expr(close).ta.obv(volume)
 
 
 def col(name: str | pl.Expr) -> TAExpr:

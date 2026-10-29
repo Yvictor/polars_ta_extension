@@ -137,7 +137,8 @@ jobs:
         run: |
           python scripts/generate_indicators.py
           python scripts/generate_skill_reference.py
-          git diff --exit-code -- src/generated.rs python/polars_talib/_generated.py python/polars_talib/_param_types.py docs/indicators.md plugins/polars-talib/skills/polars-talib/reference/functions.md
+          python scripts/generate_usage_manifest.py
+          git diff --exit-code -- src/generated.rs python/polars_talib/_generated.py python/polars_talib/_param_types.py scripts/public_api_coverage.json docs/indicators.md plugins/polars-talib/skills/polars-talib/reference/functions.md
       - name: Rust crate tests
         run: cargo test --lib --locked
       - name: Build source distribution and install it without system TA-Lib
@@ -196,7 +197,7 @@ jobs:
             differential.json
 
   benchmark:
-    name: Release benchmark / original vs zero-init vs NaN-init
+    name: Release benchmark / original vs delivered vs optimized adapter
     runs-on: ubuntu-24.04
     timeout-minutes: 75
     env:
@@ -213,8 +214,8 @@ jobs:
           path: original-source
       - uses: actions/checkout@v6
         with:
-          ref: e626bf485a0b4957c034fd85dc0520b6c3b76a01
-          path: zero-source
+          ref: c71cd6ecb4b48601ff409926fdb0a281505e9fec
+          path: prior-source
       - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
@@ -225,43 +226,53 @@ jobs:
       - name: Build all three release wheels sequentially
         run: |
           mkdir -p benchmark-results
-          for side in original zero candidate; do
+          for side in original prior candidate; do
             uv venv --python 3.12 "$side-env"
             uv pip install --python "$side-env" 'maturin==1.15.0' 'cmake==4.4.4' 'polars==1.44.2' 'numpy==2.5.3'
           done
           export PATH="$PWD/original-env/bin:$PATH"
-          for side in original zero candidate; do
+          for side in original prior candidate; do
             (cd "$side-source" && maturin build --release --locked --out "../$side-dist") > "benchmark-results/$side-build.log" 2>&1
             uv pip install --python "$side-env" --no-deps "$side-dist/"*.whl
             uv pip freeze --python "$side-env" > "benchmark-results/$side-dependencies.txt"
           done
-          sha256sum original-dist/*.whl zero-dist/*.whl candidate-dist/*.whl > benchmark-results/wheel-sha256.txt
+          sha256sum original-dist/*.whl prior-dist/*.whl candidate-dist/*.whl > benchmark-results/wheel-sha256.txt
           rustc --version --verbose > benchmark-results/toolchain.txt
           cc --version >> benchmark-results/toolchain.txt
           cmake --version >> benchmark-results/toolchain.txt
           lscpu > benchmark-results/lscpu.txt
           cat /proc/meminfo > benchmark-results/meminfo.txt
-      - name: Original compatibility and exact zero-init versus NaN-init corpus
+      - name: Original compatibility and exact delivered versus candidate corpus
         run: |
           mkdir -p benchmark-results/corpus
-          for side in original zero candidate; do
+          for side in original prior candidate; do
             "$side-env/bin/python" candidate-source/scripts/migration_probe.py --capture "benchmark-results/corpus/$side.npz"
           done
           candidate-env/bin/python candidate-source/scripts/migration_probe.py --compare benchmark-results/corpus/original.npz benchmark-results/corpus/candidate.npz --report benchmark-results/corpus/original-vs-candidate.json
-          candidate-env/bin/python candidate-source/scripts/migration_probe.py --compare benchmark-results/corpus/zero.npz benchmark-results/corpus/candidate.npz --exact --report benchmark-results/corpus/zero-vs-candidate-exact.json
+          candidate-env/bin/python candidate-source/scripts/migration_probe.py --compare benchmark-results/corpus/prior.npz benchmark-results/corpus/candidate.npz --exact --report benchmark-results/corpus/prior-vs-candidate-exact.json
+      - name: Measure isolated Rust setup, preallocated kernel and full adapter
+        working-directory: candidate-source
+        env:
+          PYO3_PYTHON: ${{ github.workspace }}/candidate-env/bin/python
+        run: |
+          cargo test --release --lib --locked adapter_cost_probe -- --ignored --nocapture > ../benchmark-results/rust-cost-probe.log 2>&1
       - name: Check workloads and alternate repeated three-build measurements
         run: |
-          candidate-env/bin/python candidate-source/scripts/allocation_ci_benchmark.py \
+          candidate-env/bin/python candidate-source/scripts/adapter_ci_benchmark.py \
             --original-python original-env/bin/python --original-source original-source \
-            --zero-python zero-env/bin/python --zero-source zero-source \
+            --prior-python prior-env/bin/python --prior-source prior-source \
             --candidate-python candidate-env/bin/python --candidate-source candidate-source \
             --output benchmark-results --rounds 6 --repeats 51 --thread-counts 1 4
           cat benchmark-results/comparison.md >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: migration-allocation-benchmark
-          path: benchmark-results/
+          name: migration-adapter-benchmark
+          path: |
+            benchmark-results/
+            original-dist/*.whl
+            prior-dist/*.whl
+            candidate-dist/*.whl
           if-no-files-found: error
 
   release:

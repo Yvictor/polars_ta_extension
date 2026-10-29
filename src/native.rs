@@ -1,4 +1,5 @@
 //! The sole TA-Lib boundary: borrowed inputs, initialized outputs, immutable settings.
+use crate::generated::option_key;
 use crate::utils::{broadcast_inputs, cast_series_to_f64};
 use polars::prelude::*;
 use serde::Deserialize;
@@ -23,12 +24,8 @@ pub type Params = BTreeMap<String, Param>;
 
 pub fn bind_params(holder: &mut ParamHolder<'_>, params: &Params) -> Result<(), RetCode> {
     for (i, opt) in holder.info().opt_inputs.iter().enumerate() {
-        let key = opt
-            .param_name
-            .strip_prefix("optIn")
-            .unwrap_or(opt.param_name)
-            .to_lowercase();
-        if let Some(value) = params.get(&key) {
+        let key = option_key(opt.param_name);
+        if let Some(value) = params.get(key.as_ref()) {
             if key.contains("matype")
                 && matches!(value,Param::Int(v) if !(0..=13).contains(v) && !(*v==i32::MIN && matches!(holder.info().id,FuncId::PVO|FuncId::KDJ)))
             {
@@ -90,14 +87,12 @@ pub fn compute(
 ) -> PolarsResult<Series> {
     polars_ensure!(inputs.len() == order.len(), ShapeMismatch: "indicator input count differs");
     let aligned = broadcast_inputs(inputs)?;
+    // Series clones share Arrow storage; only casts, rechunks and null fills
+    // materialize numeric input buffers. Keep owners alive through the call.
     let prepared = order
         .iter()
-        .map(|&i| cast_series_to_f64(&aligned[i]))
-        .collect::<PolarsResult<Vec<_>>>()?;
-    // A null conversion owns its memory until the safe TA-Lib call returns.
-    let prepared = prepared
-        .into_iter()
-        .map(|s| {
+        .map(|&i| {
+            let s = cast_series_to_f64(&aligned[i])?;
             if s.null_count() == 0 {
                 Ok(s)
             } else {
@@ -105,7 +100,7 @@ pub fn compute(
             }
         })
         .collect::<PolarsResult<Vec<_>>>()?;
-    let slices = prepared
+    let mut slices = prepared
         .iter()
         .map(|s| s.f64()?.cont_slice())
         .collect::<PolarsResult<Vec<_>>>()?;
@@ -134,14 +129,18 @@ pub fn compute(
         .collect::<Vec<_>>();
     let mut written = 0;
     if offset < len {
-        let shifted = slices.iter().map(|s| &s[begin..]).collect::<Vec<_>>();
-        if let Some(result) = crate::compat::call(id, &shifted, params, &mut outputs, offset) {
+        // Reuse descriptors after recording the original length and offset.
+        for values in &mut slices {
+            *values = &values[begin..];
+        }
+        let shifted = &slices;
+        if let Some(result) = crate::compat::call(id, shifted, params, &mut outputs, offset) {
             let range = result.map_err(error)?;
             polars_ensure!(range.beg_idx == lookback && range.count <= len-offset, ComputeError: "unexpected compatibility output range");
             written = range.count;
             // A later nonfinite value must not change any earlier row's
             // rounding path. Preserve the normal crate result on that prefix.
-            if let Some(prefix) = crate::compat::native_prefix(id, &shifted, params) {
+            if let Some(prefix) = crate::compat::native_prefix(id, shifted, params) {
                 if prefix > lookback {
                     let prefix_values = shifted.iter().map(|s| &s[..prefix]).collect::<Vec<_>>();
                     let range =
@@ -150,30 +149,36 @@ pub fn compute(
                 }
             }
         } else {
-            let range = native_range(holder, id, &shifted, &mut outputs, offset, len - begin - 1)?;
+            let range = native_range(holder, id, shifted, &mut outputs, offset, len - begin - 1)?;
             polars_ensure!(range.beg_idx==lookback && range.count<=len-offset, ComputeError: "unexpected TA-Lib output range");
             written = range.count;
         }
     }
+    // Most indicators have one output; avoid collecting a one-element fields Vec.
+    if outputs.len() == 1 {
+        return Ok(output_series(
+            outputs.pop().unwrap(),
+            names.first().copied().unwrap_or(""),
+            offset,
+            written,
+        ));
+    }
     let fields = outputs
         .into_iter()
         .enumerate()
-        .map(|(i, out)| {
-            let name = names.get(i).copied().unwrap_or("");
-            match out {
-                Output::Real(mut v) => {
-                    v[..offset].fill(f64::NAN);
-                    v[offset + written..].fill(f64::NAN);
-                    Series::from_vec(name, v)
-                }
-                Output::Integer(v) => Series::from_vec(name, v),
-            }
-        })
+        .map(|(i, out)| output_series(out, names.get(i).copied().unwrap_or(""), offset, written))
         .collect::<Vec<_>>();
-    if fields.len() == 1 {
-        Ok(fields.into_iter().next().unwrap())
-    } else {
-        Ok(StructChunked::new("", &fields)?.into_series())
+    Ok(StructChunked::new("", &fields)?.into_series())
+}
+
+fn output_series(out: Output, name: &str, offset: usize, written: usize) -> Series {
+    match out {
+        Output::Real(mut v) => {
+            v[..offset].fill(f64::NAN);
+            v[offset + written..].fill(f64::NAN);
+            Series::from_vec(name, v)
+        }
+        Output::Integer(v) => Series::from_vec(name, v),
     }
 }
 

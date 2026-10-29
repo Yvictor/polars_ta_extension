@@ -1675,3 +1675,1252 @@ fn zlema(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
         compute(FuncId::ZLEMA, inputs, &params, &[0], &[])
     })
 }
+pub(crate) fn option_key(name: &str) -> std::borrow::Cow<'_, str> {
+    match name {
+        "optInATRPeriod" => std::borrow::Cow::Borrowed("atrperiod"),
+        "optInAcceleration" => std::borrow::Cow::Borrowed("acceleration"),
+        "optInAccelerationInitLong" => std::borrow::Cow::Borrowed("accelerationinitlong"),
+        "optInAccelerationInitShort" => std::borrow::Cow::Borrowed("accelerationinitshort"),
+        "optInAccelerationLong" => std::borrow::Cow::Borrowed("accelerationlong"),
+        "optInAccelerationMaxLong" => std::borrow::Cow::Borrowed("accelerationmaxlong"),
+        "optInAccelerationMaxShort" => std::borrow::Cow::Borrowed("accelerationmaxshort"),
+        "optInAccelerationShort" => std::borrow::Cow::Borrowed("accelerationshort"),
+        "optInFastD_MAType" => std::borrow::Cow::Borrowed("fastd_matype"),
+        "optInFastD_Period" => std::borrow::Cow::Borrowed("fastd_period"),
+        "optInFastK_Period" => std::borrow::Cow::Borrowed("fastk_period"),
+        "optInFastLimit" => std::borrow::Cow::Borrowed("fastlimit"),
+        "optInFastMAType" => std::borrow::Cow::Borrowed("fastmatype"),
+        "optInFastPeriod" => std::borrow::Cow::Borrowed("fastperiod"),
+        "optInFirstPeriod" => std::borrow::Cow::Borrowed("firstperiod"),
+        "optInLeftBars" => std::borrow::Cow::Borrowed("leftbars"),
+        "optInMAType" => std::borrow::Cow::Borrowed("matype"),
+        "optInMaxPeriod" => std::borrow::Cow::Borrowed("maxperiod"),
+        "optInMaximum" => std::borrow::Cow::Borrowed("maximum"),
+        "optInMinPeriod" => std::borrow::Cow::Borrowed("minperiod"),
+        "optInMultiplier" => std::borrow::Cow::Borrowed("multiplier"),
+        "optInNbDev" => std::borrow::Cow::Borrowed("nbdev"),
+        "optInNbDevDn" => std::borrow::Cow::Borrowed("nbdevdn"),
+        "optInNbDevUp" => std::borrow::Cow::Borrowed("nbdevup"),
+        "optInOffsetOnReverse" => std::borrow::Cow::Borrowed("offsetonreverse"),
+        "optInPenetration" => std::borrow::Cow::Borrowed("penetration"),
+        "optInPercentile" => std::borrow::Cow::Borrowed("percentile"),
+        "optInROC1Period" => std::borrow::Cow::Borrowed("roc1period"),
+        "optInROC2Period" => std::borrow::Cow::Borrowed("roc2period"),
+        "optInROCPeriod" => std::borrow::Cow::Borrowed("rocperiod"),
+        "optInRightBars" => std::borrow::Cow::Borrowed("rightbars"),
+        "optInSecondPeriod" => std::borrow::Cow::Borrowed("secondperiod"),
+        "optInSignalMAType" => std::borrow::Cow::Borrowed("signalmatype"),
+        "optInSignalPeriod" => std::borrow::Cow::Borrowed("signalperiod"),
+        "optInSlowD_MAType" => std::borrow::Cow::Borrowed("slowd_matype"),
+        "optInSlowD_Period" => std::borrow::Cow::Borrowed("slowd_period"),
+        "optInSlowK_MAType" => std::borrow::Cow::Borrowed("slowk_matype"),
+        "optInSlowK_Period" => std::borrow::Cow::Borrowed("slowk_period"),
+        "optInSlowLimit" => std::borrow::Cow::Borrowed("slowlimit"),
+        "optInSlowMAType" => std::borrow::Cow::Borrowed("slowmatype"),
+        "optInSlowPeriod" => std::borrow::Cow::Borrowed("slowperiod"),
+        "optInStartValue" => std::borrow::Cow::Borrowed("startvalue"),
+        "optInStdDevPeriod" => std::borrow::Cow::Borrowed("stddevperiod"),
+        "optInTimePeriod" => std::borrow::Cow::Borrowed("timeperiod"),
+        "optInTimePeriod1" => std::borrow::Cow::Borrowed("timeperiod1"),
+        "optInTimePeriod2" => std::borrow::Cow::Borrowed("timeperiod2"),
+        "optInTimePeriod3" => std::borrow::Cow::Borrowed("timeperiod3"),
+        "optInVFactor" => std::borrow::Cow::Borrowed("vfactor"),
+        "optInWMAPeriod" => std::borrow::Cow::Borrowed("wmaperiod"),
+        _ => std::borrow::Cow::Owned(name.strip_prefix("optIn").unwrap_or(name).to_lowercase()),
+    }
+}
+#[cfg(test)]
+mod metadata_tests {
+    use super::*;
+    use ta_lib::abstract_api::{InputType, OptInputType, OutputType};
+    fn audit(
+        id: FuncId,
+        inputs: usize,
+        outputs: &[OutputType],
+        options: &[(&str, &str, bool, f64)],
+    ) {
+        let info = id.info();
+        assert_eq!(
+            info.inputs
+                .iter()
+                .map(|i| match i.kind {
+                    InputType::Price => i.flags.0.count_ones() as usize,
+                    _ => 1,
+                })
+                .sum::<usize>(),
+            inputs,
+            "{} inputs",
+            info.name
+        );
+        assert_eq!(
+            info.opt_inputs.len(),
+            options.len(),
+            "{} options",
+            info.name
+        );
+        assert_eq!(info.outputs.len(), outputs.len(), "{} outputs", info.name);
+        for (actual, expected) in info.outputs.iter().zip(outputs) {
+            assert_eq!(
+                std::mem::discriminant(&actual.kind),
+                std::mem::discriminant(expected),
+                "{} output type",
+                info.name
+            );
+        }
+        for (opt, &(c_name, key, real, value)) in info.opt_inputs.iter().zip(options) {
+            assert_eq!(opt.param_name, c_name);
+            assert!(matches!(option_key(c_name), std::borrow::Cow::Borrowed(v) if v == key));
+            let (is_real, default) = match opt.kind {
+                OptInputType::RealRange { default, .. }
+                | OptInputType::RealList { default, .. } => (true, default),
+                OptInputType::IntegerRange { default, .. } => (false, default as f64),
+                OptInputType::IntegerList { default, .. } => (false, default as f64),
+            };
+            assert_eq!((is_real, default), (real, value), "{} {}", info.name, key);
+        }
+    }
+    #[test]
+    fn frozen_api_matches_official_rust_metadata() {
+        audit(
+            FuncId::AC,
+            2,
+            &[OutputType::Real],
+            &[
+                ("optInFastPeriod", "fastperiod", false, 5.0),
+                ("optInSlowPeriod", "slowperiod", false, 34.0),
+                ("optInSignalPeriod", "signalperiod", false, 5.0),
+            ],
+        );
+        audit(
+            FuncId::ACCBANDS,
+            3,
+            &[OutputType::Real, OutputType::Real, OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 20.0)],
+        );
+        audit(FuncId::ACOS, 1, &[OutputType::Real], &[]);
+        audit(FuncId::AD, 4, &[OutputType::Real], &[]);
+        audit(FuncId::ADD, 2, &[OutputType::Real], &[]);
+        audit(
+            FuncId::ADOSC,
+            4,
+            &[OutputType::Real],
+            &[
+                ("optInFastPeriod", "fastperiod", false, 3.0),
+                ("optInSlowPeriod", "slowperiod", false, 10.0),
+            ],
+        );
+        audit(
+            FuncId::ADR,
+            2,
+            &[OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 14.0)],
+        );
+        audit(
+            FuncId::ADX,
+            3,
+            &[OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 14.0)],
+        );
+        audit(
+            FuncId::ADXR,
+            3,
+            &[OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 14.0)],
+        );
+        audit(
+            FuncId::AO,
+            2,
+            &[OutputType::Real],
+            &[
+                ("optInFastPeriod", "fastperiod", false, 5.0),
+                ("optInSlowPeriod", "slowperiod", false, 34.0),
+            ],
+        );
+        audit(
+            FuncId::APO,
+            1,
+            &[OutputType::Real],
+            &[
+                ("optInFastPeriod", "fastperiod", false, 12.0),
+                ("optInSlowPeriod", "slowperiod", false, 26.0),
+                ("optInMAType", "matype", false, 1.0),
+            ],
+        );
+        audit(
+            FuncId::AROON,
+            2,
+            &[OutputType::Real, OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 14.0)],
+        );
+        audit(
+            FuncId::AROONOSC,
+            2,
+            &[OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 14.0)],
+        );
+        audit(FuncId::ASIN, 1, &[OutputType::Real], &[]);
+        audit(FuncId::ATAN, 1, &[OutputType::Real], &[]);
+        audit(
+            FuncId::ATR,
+            3,
+            &[OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 14.0)],
+        );
+        audit(
+            FuncId::AVGDEV,
+            1,
+            &[OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 14.0)],
+        );
+        audit(FuncId::AVGPRICE, 4, &[OutputType::Real], &[]);
+        audit(
+            FuncId::BBANDS,
+            1,
+            &[OutputType::Real, OutputType::Real, OutputType::Real],
+            &[
+                ("optInTimePeriod", "timeperiod", false, 20.0),
+                ("optInNbDevUp", "nbdevup", true, 2.0),
+                ("optInNbDevDn", "nbdevdn", true, 2.0),
+                ("optInMAType", "matype", false, 0.0),
+            ],
+        );
+        audit(
+            FuncId::BETA,
+            2,
+            &[OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 5.0)],
+        );
+        audit(FuncId::BOP, 4, &[OutputType::Real], &[]);
+        audit(
+            FuncId::CCI,
+            3,
+            &[OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 14.0)],
+        );
+        audit(FuncId::CDL2CROWS, 4, &[OutputType::Integer], &[]);
+        audit(FuncId::CDL3BLACKCROWS, 4, &[OutputType::Integer], &[]);
+        audit(FuncId::CDL3INSIDE, 4, &[OutputType::Integer], &[]);
+        audit(FuncId::CDL3LINESTRIKE, 4, &[OutputType::Integer], &[]);
+        audit(FuncId::CDL3OUTSIDE, 4, &[OutputType::Integer], &[]);
+        audit(FuncId::CDL3STARSINSOUTH, 4, &[OutputType::Integer], &[]);
+        audit(FuncId::CDL3WHITESOLDIERS, 4, &[OutputType::Integer], &[]);
+        audit(
+            FuncId::CDLABANDONEDBABY,
+            4,
+            &[OutputType::Integer],
+            &[("optInPenetration", "penetration", true, 0.3)],
+        );
+        audit(FuncId::CDLADVANCEBLOCK, 4, &[OutputType::Integer], &[]);
+        audit(FuncId::CDLBELTHOLD, 4, &[OutputType::Integer], &[]);
+        audit(FuncId::CDLBREAKAWAY, 4, &[OutputType::Integer], &[]);
+        audit(FuncId::CDLCLOSINGMARUBOZU, 4, &[OutputType::Integer], &[]);
+        audit(FuncId::CDLCONCEALBABYSWALL, 4, &[OutputType::Integer], &[]);
+        audit(FuncId::CDLCOUNTERATTACK, 4, &[OutputType::Integer], &[]);
+        audit(
+            FuncId::CDLDARKCLOUDCOVER,
+            4,
+            &[OutputType::Integer],
+            &[("optInPenetration", "penetration", true, 0.5)],
+        );
+        audit(FuncId::CDLDOJI, 4, &[OutputType::Integer], &[]);
+        audit(FuncId::CDLDOJISTAR, 4, &[OutputType::Integer], &[]);
+        audit(FuncId::CDLDRAGONFLYDOJI, 4, &[OutputType::Integer], &[]);
+        audit(FuncId::CDLENGULFING, 4, &[OutputType::Integer], &[]);
+        audit(
+            FuncId::CDLEVENINGDOJISTAR,
+            4,
+            &[OutputType::Integer],
+            &[("optInPenetration", "penetration", true, 0.3)],
+        );
+        audit(
+            FuncId::CDLEVENINGSTAR,
+            4,
+            &[OutputType::Integer],
+            &[("optInPenetration", "penetration", true, 0.3)],
+        );
+        audit(FuncId::CDLGAPSIDESIDEWHITE, 4, &[OutputType::Integer], &[]);
+        audit(FuncId::CDLGRAVESTONEDOJI, 4, &[OutputType::Integer], &[]);
+        audit(FuncId::CDLHAMMER, 4, &[OutputType::Integer], &[]);
+        audit(FuncId::CDLHANGINGMAN, 4, &[OutputType::Integer], &[]);
+        audit(FuncId::CDLHARAMI, 4, &[OutputType::Integer], &[]);
+        audit(FuncId::CDLHARAMICROSS, 4, &[OutputType::Integer], &[]);
+        audit(FuncId::CDLHIGHWAVE, 4, &[OutputType::Integer], &[]);
+        audit(FuncId::CDLHIKKAKE, 4, &[OutputType::Integer], &[]);
+        audit(FuncId::CDLHIKKAKEMOD, 4, &[OutputType::Integer], &[]);
+        audit(FuncId::CDLHOMINGPIGEON, 4, &[OutputType::Integer], &[]);
+        audit(FuncId::CDLIDENTICAL3CROWS, 4, &[OutputType::Integer], &[]);
+        audit(FuncId::CDLINNECK, 4, &[OutputType::Integer], &[]);
+        audit(FuncId::CDLINVERTEDHAMMER, 4, &[OutputType::Integer], &[]);
+        audit(FuncId::CDLKICKING, 4, &[OutputType::Integer], &[]);
+        audit(FuncId::CDLKICKINGBYLENGTH, 4, &[OutputType::Integer], &[]);
+        audit(FuncId::CDLLADDERBOTTOM, 4, &[OutputType::Integer], &[]);
+        audit(FuncId::CDLLONGLEGGEDDOJI, 4, &[OutputType::Integer], &[]);
+        audit(FuncId::CDLLONGLINE, 4, &[OutputType::Integer], &[]);
+        audit(FuncId::CDLMARUBOZU, 4, &[OutputType::Integer], &[]);
+        audit(FuncId::CDLMATCHINGLOW, 4, &[OutputType::Integer], &[]);
+        audit(
+            FuncId::CDLMATHOLD,
+            4,
+            &[OutputType::Integer],
+            &[("optInPenetration", "penetration", true, 0.5)],
+        );
+        audit(
+            FuncId::CDLMORNINGDOJISTAR,
+            4,
+            &[OutputType::Integer],
+            &[("optInPenetration", "penetration", true, 0.3)],
+        );
+        audit(
+            FuncId::CDLMORNINGSTAR,
+            4,
+            &[OutputType::Integer],
+            &[("optInPenetration", "penetration", true, 0.3)],
+        );
+        audit(FuncId::CDLONNECK, 4, &[OutputType::Integer], &[]);
+        audit(FuncId::CDLPIERCING, 4, &[OutputType::Integer], &[]);
+        audit(FuncId::CDLRICKSHAWMAN, 4, &[OutputType::Integer], &[]);
+        audit(FuncId::CDLRISEFALL3METHODS, 4, &[OutputType::Integer], &[]);
+        audit(FuncId::CDLSEPARATINGLINES, 4, &[OutputType::Integer], &[]);
+        audit(FuncId::CDLSHOOTINGSTAR, 4, &[OutputType::Integer], &[]);
+        audit(FuncId::CDLSHORTLINE, 4, &[OutputType::Integer], &[]);
+        audit(FuncId::CDLSPINNINGTOP, 4, &[OutputType::Integer], &[]);
+        audit(FuncId::CDLSTALLEDPATTERN, 4, &[OutputType::Integer], &[]);
+        audit(FuncId::CDLSTICKSANDWICH, 4, &[OutputType::Integer], &[]);
+        audit(FuncId::CDLTAKURI, 4, &[OutputType::Integer], &[]);
+        audit(FuncId::CDLTASUKIGAP, 4, &[OutputType::Integer], &[]);
+        audit(FuncId::CDLTHRUSTING, 4, &[OutputType::Integer], &[]);
+        audit(FuncId::CDLTRISTAR, 4, &[OutputType::Integer], &[]);
+        audit(FuncId::CDLUNIQUE3RIVER, 4, &[OutputType::Integer], &[]);
+        audit(FuncId::CDLUPSIDEGAP2CROWS, 4, &[OutputType::Integer], &[]);
+        audit(FuncId::CDLXSIDEGAP3METHODS, 4, &[OutputType::Integer], &[]);
+        audit(FuncId::CEIL, 1, &[OutputType::Real], &[]);
+        audit(
+            FuncId::CMF,
+            4,
+            &[OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 20.0)],
+        );
+        audit(
+            FuncId::CMO,
+            1,
+            &[OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 14.0)],
+        );
+        audit(
+            FuncId::CMOU,
+            1,
+            &[OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 14.0)],
+        );
+        audit(
+            FuncId::COPPOCK,
+            1,
+            &[OutputType::Real],
+            &[
+                ("optInWMAPeriod", "wmaperiod", false, 10.0),
+                ("optInROC1Period", "roc1period", false, 11.0),
+                ("optInROC2Period", "roc2period", false, 14.0),
+            ],
+        );
+        audit(
+            FuncId::CORREL,
+            2,
+            &[OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 30.0)],
+        );
+        audit(FuncId::COS, 1, &[OutputType::Real], &[]);
+        audit(FuncId::COSH, 1, &[OutputType::Real], &[]);
+        audit(FuncId::CUMSUM, 1, &[OutputType::Real], &[]);
+        audit(
+            FuncId::CVI,
+            2,
+            &[OutputType::Real],
+            &[
+                ("optInTimePeriod", "timeperiod", false, 10.0),
+                ("optInROCPeriod", "rocperiod", false, 10.0),
+            ],
+        );
+        audit(
+            FuncId::DEMA,
+            1,
+            &[OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 30.0)],
+        );
+        audit(FuncId::DIV, 2, &[OutputType::Real], &[]);
+        audit(
+            FuncId::DONCHIAN,
+            2,
+            &[OutputType::Real, OutputType::Real, OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 20.0)],
+        );
+        audit(
+            FuncId::DPO,
+            1,
+            &[OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 20.0)],
+        );
+        audit(
+            FuncId::DX,
+            3,
+            &[OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 14.0)],
+        );
+        audit(
+            FuncId::EFI,
+            2,
+            &[OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 13.0)],
+        );
+        audit(
+            FuncId::EMA,
+            1,
+            &[OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 30.0)],
+        );
+        audit(
+            FuncId::ER,
+            1,
+            &[OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 10.0)],
+        );
+        audit(
+            FuncId::ERI,
+            3,
+            &[OutputType::Real, OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 13.0)],
+        );
+        audit(FuncId::EXP, 1, &[OutputType::Real], &[]);
+        audit(FuncId::FLOOR, 1, &[OutputType::Real], &[]);
+        audit(
+            FuncId::FOSC,
+            1,
+            &[OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 5.0)],
+        );
+        audit(
+            FuncId::FRACTAL,
+            2,
+            &[OutputType::Integer, OutputType::Integer],
+            &[
+                ("optInLeftBars", "leftbars", false, 2.0),
+                ("optInRightBars", "rightbars", false, 2.0),
+            ],
+        );
+        audit(
+            FuncId::HA,
+            4,
+            &[
+                OutputType::Real,
+                OutputType::Real,
+                OutputType::Real,
+                OutputType::Real,
+            ],
+            &[],
+        );
+        audit(
+            FuncId::HMA,
+            1,
+            &[OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 20.0)],
+        );
+        audit(FuncId::HT_DCPERIOD, 1, &[OutputType::Real], &[]);
+        audit(FuncId::HT_DCPHASE, 1, &[OutputType::Real], &[]);
+        audit(
+            FuncId::HT_PHASOR,
+            1,
+            &[OutputType::Real, OutputType::Real],
+            &[],
+        );
+        audit(
+            FuncId::HT_SINE,
+            1,
+            &[OutputType::Real, OutputType::Real],
+            &[],
+        );
+        audit(FuncId::HT_TRENDLINE, 1, &[OutputType::Real], &[]);
+        audit(FuncId::HT_TRENDMODE, 1, &[OutputType::Integer], &[]);
+        audit(
+            FuncId::IMI,
+            2,
+            &[OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 14.0)],
+        );
+        audit(
+            FuncId::KAMA,
+            1,
+            &[OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 30.0)],
+        );
+        audit(
+            FuncId::KC,
+            3,
+            &[OutputType::Real, OutputType::Real, OutputType::Real],
+            &[
+                ("optInTimePeriod", "timeperiod", false, 20.0),
+                ("optInATRPeriod", "atrperiod", false, 10.0),
+                ("optInNbDev", "nbdev", true, 2.0),
+            ],
+        );
+        audit(
+            FuncId::KDJ,
+            3,
+            &[OutputType::Real, OutputType::Real, OutputType::Real],
+            &[
+                ("optInFastK_Period", "fastk_period", false, 9.0),
+                ("optInSlowK_Period", "slowk_period", false, 3.0),
+                ("optInSlowK_MAType", "slowk_matype", false, 13.0),
+                ("optInSlowD_Period", "slowd_period", false, 3.0),
+                ("optInSlowD_MAType", "slowd_matype", false, 13.0),
+            ],
+        );
+        audit(
+            FuncId::LINEARREG,
+            1,
+            &[OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 14.0)],
+        );
+        audit(
+            FuncId::LINEARREG_ANGLE,
+            1,
+            &[OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 14.0)],
+        );
+        audit(
+            FuncId::LINEARREG_INTERCEPT,
+            1,
+            &[OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 14.0)],
+        );
+        audit(
+            FuncId::LINEARREG_SLOPE,
+            1,
+            &[OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 14.0)],
+        );
+        audit(FuncId::LN, 1, &[OutputType::Real], &[]);
+        audit(FuncId::LOG10, 1, &[OutputType::Real], &[]);
+        audit(
+            FuncId::MA,
+            1,
+            &[OutputType::Real],
+            &[
+                ("optInTimePeriod", "timeperiod", false, 30.0),
+                ("optInMAType", "matype", false, 0.0),
+            ],
+        );
+        audit(
+            FuncId::MACD,
+            1,
+            &[OutputType::Real, OutputType::Real, OutputType::Real],
+            &[
+                ("optInFastPeriod", "fastperiod", false, 12.0),
+                ("optInSlowPeriod", "slowperiod", false, 26.0),
+                ("optInSignalPeriod", "signalperiod", false, 9.0),
+            ],
+        );
+        audit(
+            FuncId::MACDEXT,
+            1,
+            &[OutputType::Real, OutputType::Real, OutputType::Real],
+            &[
+                ("optInFastPeriod", "fastperiod", false, 12.0),
+                ("optInFastMAType", "fastmatype", false, 0.0),
+                ("optInSlowPeriod", "slowperiod", false, 26.0),
+                ("optInSlowMAType", "slowmatype", false, 0.0),
+                ("optInSignalPeriod", "signalperiod", false, 9.0),
+                ("optInSignalMAType", "signalmatype", false, 0.0),
+            ],
+        );
+        audit(
+            FuncId::MACDFIX,
+            1,
+            &[OutputType::Real, OutputType::Real, OutputType::Real],
+            &[("optInSignalPeriod", "signalperiod", false, 9.0)],
+        );
+        audit(
+            FuncId::MAMA,
+            1,
+            &[OutputType::Real, OutputType::Real],
+            &[
+                ("optInFastLimit", "fastlimit", true, 0.5),
+                ("optInSlowLimit", "slowlimit", true, 0.05),
+            ],
+        );
+        audit(FuncId::MARKETFI, 3, &[OutputType::Real], &[]);
+        audit(
+            FuncId::MASSI,
+            2,
+            &[OutputType::Real],
+            &[
+                ("optInFastPeriod", "fastperiod", false, 9.0),
+                ("optInSlowPeriod", "slowperiod", false, 25.0),
+            ],
+        );
+        audit(
+            FuncId::MAVP,
+            2,
+            &[OutputType::Real],
+            &[
+                ("optInMinPeriod", "minperiod", false, 2.0),
+                ("optInMaxPeriod", "maxperiod", false, 30.0),
+                ("optInMAType", "matype", false, 0.0),
+            ],
+        );
+        audit(
+            FuncId::MAX,
+            1,
+            &[OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 30.0)],
+        );
+        audit(
+            FuncId::MAXINDEX,
+            1,
+            &[OutputType::Integer],
+            &[("optInTimePeriod", "timeperiod", false, 30.0)],
+        );
+        audit(FuncId::MEDPRICE, 2, &[OutputType::Real], &[]);
+        audit(
+            FuncId::MFI,
+            4,
+            &[OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 14.0)],
+        );
+        audit(
+            FuncId::MIDPOINT,
+            1,
+            &[OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 14.0)],
+        );
+        audit(
+            FuncId::MIDPRICE,
+            2,
+            &[OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 14.0)],
+        );
+        audit(
+            FuncId::MIN,
+            1,
+            &[OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 30.0)],
+        );
+        audit(
+            FuncId::MININDEX,
+            1,
+            &[OutputType::Integer],
+            &[("optInTimePeriod", "timeperiod", false, 30.0)],
+        );
+        audit(
+            FuncId::MINMAX,
+            1,
+            &[OutputType::Real, OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 30.0)],
+        );
+        audit(
+            FuncId::MINMAXINDEX,
+            1,
+            &[OutputType::Integer, OutputType::Integer],
+            &[("optInTimePeriod", "timeperiod", false, 30.0)],
+        );
+        audit(
+            FuncId::MINUS_DI,
+            3,
+            &[OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 14.0)],
+        );
+        audit(
+            FuncId::MINUS_DM,
+            2,
+            &[OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 14.0)],
+        );
+        audit(
+            FuncId::MOM,
+            1,
+            &[OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 10.0)],
+        );
+        audit(FuncId::MULT, 2, &[OutputType::Real], &[]);
+        audit(
+            FuncId::NATR,
+            3,
+            &[OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 14.0)],
+        );
+        audit(FuncId::NVI, 2, &[OutputType::Real], &[]);
+        audit(FuncId::OBV, 2, &[OutputType::Real], &[]);
+        audit(
+            FuncId::PERCENTILE,
+            1,
+            &[OutputType::Real],
+            &[
+                ("optInTimePeriod", "timeperiod", false, 100.0),
+                ("optInPercentile", "percentile", true, 50.0),
+            ],
+        );
+        audit(
+            FuncId::PERCENTRANK,
+            1,
+            &[OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 100.0)],
+        );
+        audit(
+            FuncId::PLUS_DI,
+            3,
+            &[OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 14.0)],
+        );
+        audit(
+            FuncId::PLUS_DM,
+            2,
+            &[OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 14.0)],
+        );
+        audit(
+            FuncId::PPO,
+            1,
+            &[OutputType::Real],
+            &[
+                ("optInFastPeriod", "fastperiod", false, 12.0),
+                ("optInSlowPeriod", "slowperiod", false, 26.0),
+                ("optInMAType", "matype", false, 1.0),
+            ],
+        );
+        audit(FuncId::PVI, 2, &[OutputType::Real], &[]);
+        audit(
+            FuncId::PVO,
+            1,
+            &[OutputType::Real],
+            &[
+                ("optInFastPeriod", "fastperiod", false, 12.0),
+                ("optInSlowPeriod", "slowperiod", false, 26.0),
+                ("optInMAType", "matype", false, 1.0),
+            ],
+        );
+        audit(FuncId::PVT, 2, &[OutputType::Real], &[]);
+        audit(
+            FuncId::QSTICK,
+            2,
+            &[OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 10.0)],
+        );
+        audit(
+            FuncId::RMA,
+            1,
+            &[OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 30.0)],
+        );
+        audit(
+            FuncId::ROC,
+            1,
+            &[OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 10.0)],
+        );
+        audit(
+            FuncId::ROCP,
+            1,
+            &[OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 10.0)],
+        );
+        audit(
+            FuncId::ROCR,
+            1,
+            &[OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 10.0)],
+        );
+        audit(
+            FuncId::ROCR100,
+            1,
+            &[OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 10.0)],
+        );
+        audit(
+            FuncId::RSI,
+            1,
+            &[OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 14.0)],
+        );
+        audit(
+            FuncId::RVI,
+            1,
+            &[OutputType::Real],
+            &[
+                ("optInTimePeriod", "timeperiod", false, 14.0),
+                ("optInStdDevPeriod", "stddevperiod", false, 10.0),
+            ],
+        );
+        audit(
+            FuncId::RVOL,
+            1,
+            &[OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 20.0)],
+        );
+        audit(
+            FuncId::SAR,
+            2,
+            &[OutputType::Real],
+            &[
+                ("optInAcceleration", "acceleration", true, 0.02),
+                ("optInMaximum", "maximum", true, 0.2),
+            ],
+        );
+        audit(
+            FuncId::SAREXT,
+            2,
+            &[OutputType::Real],
+            &[
+                ("optInStartValue", "startvalue", true, 0.0),
+                ("optInOffsetOnReverse", "offsetonreverse", true, 0.0),
+                (
+                    "optInAccelerationInitLong",
+                    "accelerationinitlong",
+                    true,
+                    0.02,
+                ),
+                ("optInAccelerationLong", "accelerationlong", true, 0.02),
+                ("optInAccelerationMaxLong", "accelerationmaxlong", true, 0.2),
+                (
+                    "optInAccelerationInitShort",
+                    "accelerationinitshort",
+                    true,
+                    0.02,
+                ),
+                ("optInAccelerationShort", "accelerationshort", true, 0.02),
+                (
+                    "optInAccelerationMaxShort",
+                    "accelerationmaxshort",
+                    true,
+                    0.2,
+                ),
+            ],
+        );
+        audit(FuncId::SIN, 1, &[OutputType::Real], &[]);
+        audit(FuncId::SINH, 1, &[OutputType::Real], &[]);
+        audit(
+            FuncId::SMA,
+            1,
+            &[OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 30.0)],
+        );
+        audit(
+            FuncId::SMI,
+            3,
+            &[OutputType::Real, OutputType::Real],
+            &[
+                ("optInTimePeriod", "timeperiod", false, 13.0),
+                ("optInFastPeriod", "fastperiod", false, 2.0),
+                ("optInSlowPeriod", "slowperiod", false, 25.0),
+                ("optInSignalPeriod", "signalperiod", false, 9.0),
+            ],
+        );
+        audit(FuncId::SQRT, 1, &[OutputType::Real], &[]);
+        audit(
+            FuncId::STDDEV,
+            1,
+            &[OutputType::Real],
+            &[
+                ("optInTimePeriod", "timeperiod", false, 5.0),
+                ("optInNbDev", "nbdev", true, 1.0),
+            ],
+        );
+        audit(
+            FuncId::STOCH,
+            3,
+            &[OutputType::Real, OutputType::Real],
+            &[
+                ("optInFastK_Period", "fastk_period", false, 5.0),
+                ("optInSlowK_Period", "slowk_period", false, 3.0),
+                ("optInSlowK_MAType", "slowk_matype", false, 0.0),
+                ("optInSlowD_Period", "slowd_period", false, 3.0),
+                ("optInSlowD_MAType", "slowd_matype", false, 0.0),
+            ],
+        );
+        audit(
+            FuncId::STOCHF,
+            3,
+            &[OutputType::Real, OutputType::Real],
+            &[
+                ("optInFastK_Period", "fastk_period", false, 5.0),
+                ("optInFastD_Period", "fastd_period", false, 3.0),
+                ("optInFastD_MAType", "fastd_matype", false, 0.0),
+            ],
+        );
+        audit(
+            FuncId::STOCHRSI,
+            1,
+            &[OutputType::Real, OutputType::Real],
+            &[
+                ("optInTimePeriod", "timeperiod", false, 14.0),
+                ("optInFastK_Period", "fastk_period", false, 5.0),
+                ("optInFastD_Period", "fastd_period", false, 3.0),
+                ("optInFastD_MAType", "fastd_matype", false, 0.0),
+            ],
+        );
+        audit(FuncId::SUB, 2, &[OutputType::Real], &[]);
+        audit(
+            FuncId::SUM,
+            1,
+            &[OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 30.0)],
+        );
+        audit(
+            FuncId::SUPERTREND,
+            3,
+            &[OutputType::Real, OutputType::Integer],
+            &[
+                ("optInTimePeriod", "timeperiod", false, 10.0),
+                ("optInMultiplier", "multiplier", true, 3.0),
+            ],
+        );
+        audit(
+            FuncId::T3,
+            1,
+            &[OutputType::Real],
+            &[
+                ("optInTimePeriod", "timeperiod", false, 5.0),
+                ("optInVFactor", "vfactor", true, 0.7),
+            ],
+        );
+        audit(FuncId::TAN, 1, &[OutputType::Real], &[]);
+        audit(FuncId::TANH, 1, &[OutputType::Real], &[]);
+        audit(
+            FuncId::TEMA,
+            1,
+            &[OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 30.0)],
+        );
+        audit(FuncId::TRANGE, 3, &[OutputType::Real], &[]);
+        audit(
+            FuncId::TRIMA,
+            1,
+            &[OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 30.0)],
+        );
+        audit(
+            FuncId::TRIX,
+            1,
+            &[OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 30.0)],
+        );
+        audit(
+            FuncId::TSF,
+            1,
+            &[OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 14.0)],
+        );
+        audit(
+            FuncId::TSI,
+            1,
+            &[OutputType::Real],
+            &[
+                ("optInFirstPeriod", "firstperiod", false, 25.0),
+                ("optInSecondPeriod", "secondperiod", false, 13.0),
+            ],
+        );
+        audit(FuncId::TYPPRICE, 3, &[OutputType::Real], &[]);
+        audit(
+            FuncId::ULTOSC,
+            3,
+            &[OutputType::Real],
+            &[
+                ("optInTimePeriod1", "timeperiod1", false, 7.0),
+                ("optInTimePeriod2", "timeperiod2", false, 14.0),
+                ("optInTimePeriod3", "timeperiod3", false, 28.0),
+            ],
+        );
+        audit(
+            FuncId::VAR,
+            1,
+            &[OutputType::Real],
+            &[
+                ("optInTimePeriod", "timeperiod", false, 5.0),
+                ("optInNbDev", "nbdev", true, 1.0),
+            ],
+        );
+        audit(
+            FuncId::VHF,
+            1,
+            &[OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 28.0)],
+        );
+        audit(
+            FuncId::VORTEX,
+            3,
+            &[OutputType::Real, OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 14.0)],
+        );
+        audit(FuncId::VWAP, 4, &[OutputType::Real], &[]);
+        audit(
+            FuncId::VWMA,
+            2,
+            &[OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 30.0)],
+        );
+        audit(FuncId::WAD, 3, &[OutputType::Real], &[]);
+        audit(FuncId::WCLPRICE, 3, &[OutputType::Real], &[]);
+        audit(
+            FuncId::WILLR,
+            3,
+            &[OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 14.0)],
+        );
+        audit(
+            FuncId::WMA,
+            1,
+            &[OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 30.0)],
+        );
+        audit(
+            FuncId::ZLEMA,
+            1,
+            &[OutputType::Real],
+            &[("optInTimePeriod", "timeperiod", false, 30.0)],
+        );
+        let mut inventory = ta_lib::abstract_api::FUNCS
+            .iter()
+            .map(|f| f.name)
+            .collect::<Vec<_>>();
+        inventory.sort_unstable();
+        assert_eq!(
+            inventory,
+            &[
+                "AC",
+                "ACCBANDS",
+                "ACOS",
+                "AD",
+                "ADD",
+                "ADOSC",
+                "ADR",
+                "ADX",
+                "ADXR",
+                "ALMA",
+                "AO",
+                "APO",
+                "AROON",
+                "AROONOSC",
+                "ASI",
+                "ASIN",
+                "ATAN",
+                "ATR",
+                "AVGDEV",
+                "AVGPRICE",
+                "BBANDS",
+                "BBW",
+                "BETA",
+                "BOP",
+                "CCI",
+                "CDL2CROWS",
+                "CDL3BLACKCROWS",
+                "CDL3INSIDE",
+                "CDL3LINESTRIKE",
+                "CDL3OUTSIDE",
+                "CDL3STARSINSOUTH",
+                "CDL3WHITESOLDIERS",
+                "CDLABANDONEDBABY",
+                "CDLADVANCEBLOCK",
+                "CDLBELTHOLD",
+                "CDLBREAKAWAY",
+                "CDLCLOSINGMARUBOZU",
+                "CDLCONCEALBABYSWALL",
+                "CDLCOUNTERATTACK",
+                "CDLDARKCLOUDCOVER",
+                "CDLDOJI",
+                "CDLDOJISTAR",
+                "CDLDRAGONFLYDOJI",
+                "CDLENGULFING",
+                "CDLEVENINGDOJISTAR",
+                "CDLEVENINGSTAR",
+                "CDLGAPSIDESIDEWHITE",
+                "CDLGRAVESTONEDOJI",
+                "CDLHAMMER",
+                "CDLHANGINGMAN",
+                "CDLHARAMI",
+                "CDLHARAMICROSS",
+                "CDLHIGHWAVE",
+                "CDLHIKKAKE",
+                "CDLHIKKAKEMOD",
+                "CDLHOMINGPIGEON",
+                "CDLIDENTICAL3CROWS",
+                "CDLINNECK",
+                "CDLINVERTEDHAMMER",
+                "CDLKICKING",
+                "CDLKICKINGBYLENGTH",
+                "CDLLADDERBOTTOM",
+                "CDLLONGLEGGEDDOJI",
+                "CDLLONGLINE",
+                "CDLMARUBOZU",
+                "CDLMATCHINGLOW",
+                "CDLMATHOLD",
+                "CDLMORNINGDOJISTAR",
+                "CDLMORNINGSTAR",
+                "CDLONNECK",
+                "CDLPIERCING",
+                "CDLRICKSHAWMAN",
+                "CDLRISEFALL3METHODS",
+                "CDLSEPARATINGLINES",
+                "CDLSHOOTINGSTAR",
+                "CDLSHORTLINE",
+                "CDLSPINNINGTOP",
+                "CDLSTALLEDPATTERN",
+                "CDLSTICKSANDWICH",
+                "CDLTAKURI",
+                "CDLTASUKIGAP",
+                "CDLTHRUSTING",
+                "CDLTRISTAR",
+                "CDLUNIQUE3RIVER",
+                "CDLUPSIDEGAP2CROWS",
+                "CDLXSIDEGAP3METHODS",
+                "CEIL",
+                "CG",
+                "CHOP",
+                "CHOPTR",
+                "CKSP",
+                "CMF",
+                "CMO",
+                "CMOU",
+                "COPPOCK",
+                "CORREL",
+                "COS",
+                "COSH",
+                "CRSI",
+                "CTI",
+                "CUMSUM",
+                "CVI",
+                "DEMA",
+                "DIV",
+                "DONCHIAN",
+                "DOSC",
+                "DPO",
+                "DX",
+                "EFI",
+                "EMA",
+                "EMV",
+                "ER",
+                "ERI",
+                "EXP",
+                "FISHER",
+                "FLOOR",
+                "FOSC",
+                "FRACTAL",
+                "FRAMA",
+                "HA",
+                "HMA",
+                "HT_DCPERIOD",
+                "HT_DCPHASE",
+                "HT_PHASOR",
+                "HT_SINE",
+                "HT_TRENDLINE",
+                "HT_TRENDMODE",
+                "IBS",
+                "ICHIMOKU",
+                "IMI",
+                "KAMA",
+                "KC",
+                "KDJ",
+                "KST",
+                "KSTEXT",
+                "KURTOSIS",
+                "KVO",
+                "LINEARREG",
+                "LINEARREG_ANGLE",
+                "LINEARREG_INTERCEPT",
+                "LINEARREG_SLOPE",
+                "LN",
+                "LOG10",
+                "MA",
+                "MACD",
+                "MACDEXT",
+                "MACDFIX",
+                "MAMA",
+                "MARKETFI",
+                "MASSI",
+                "MAVP",
+                "MAX",
+                "MAXINDEX",
+                "MCGD",
+                "MEDIAN",
+                "MEDPRICE",
+                "MFI",
+                "MIDPOINT",
+                "MIDPRICE",
+                "MIN",
+                "MININDEX",
+                "MINMAX",
+                "MINMAXINDEX",
+                "MINUS_DI",
+                "MINUS_DM",
+                "MOM",
+                "MULT",
+                "NATR",
+                "NVI",
+                "OBV",
+                "PERCENTB",
+                "PERCENTILE",
+                "PERCENTRANK",
+                "PLUS_DI",
+                "PLUS_DM",
+                "PPO",
+                "PSO",
+                "PVI",
+                "PVO",
+                "PVT",
+                "QSTICK",
+                "RMA",
+                "ROC",
+                "ROCP",
+                "ROCR",
+                "ROCR100",
+                "ROGERSSATCHELL",
+                "RSI",
+                "RVI",
+                "RVIR",
+                "RVOL",
+                "SAR",
+                "SAREXT",
+                "SI",
+                "SIN",
+                "SINH",
+                "SMA",
+                "SMI",
+                "SQRT",
+                "SQZMOM",
+                "STC",
+                "STDDEV",
+                "STOCH",
+                "STOCHF",
+                "STOCHRSI",
+                "SUB",
+                "SUM",
+                "SUPERTREND",
+                "SWAK_2PHP",
+                "SWAK_BP",
+                "SWAK_BUTTER",
+                "SWAK_GAUSS",
+                "SWAK_HP",
+                "T3",
+                "TAN",
+                "TANH",
+                "TEMA",
+                "TRANGE",
+                "TRIMA",
+                "TRIX",
+                "TSF",
+                "TSI",
+                "TYPPRICE",
+                "ULTOSC",
+                "VAR",
+                "VHF",
+                "VIDYA",
+                "VORTEX",
+                "VWAP",
+                "VWMA",
+                "WAD",
+                "WAVETREND",
+                "WCLPRICE",
+                "WILLR",
+                "WMA",
+                "ZIGZAG",
+                "ZLEMA"
+            ]
+        );
+    }
+}
