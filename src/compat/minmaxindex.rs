@@ -126,7 +126,12 @@ impl CompatCore {
         highest = 0.0;
         lowestIdx = 0 - 1;
         lowest = 0.0;
-        while today <= endIdx {
+        let output_count = endIdx - startIdx + 1;
+        let inReal = &inReal[..=endIdx];
+        let outMinIdx = &mut outMinIdx[..output_count];
+        let outMaxIdx = &mut outMaxIdx[..output_count];
+        for (output_index, max_slot) in outMaxIdx.iter_mut().enumerate() {
+            outIdx = output_index;
             tmpHigh = inReal[today];
             tmpLow = tmpHigh;
             if highestIdx < ((trailingIdx) as i32) {
@@ -167,7 +172,7 @@ impl CompatCore {
                 lowestIdx = (today) as i32;
                 lowest = tmpLow;
             }
-            outMaxIdx[outIdx] = (highestIdx) as i32;
+            *max_slot = highestIdx;
             outMinIdx[outIdx] = (lowestIdx) as i32;
             outIdx += 1;
             trailingIdx += 1;
@@ -233,5 +238,68 @@ impl CompatCore {
             }),
             e => Err(e),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn rescans_keep_oldest_ties_and_incremental_updates_take_newest_ties() {
+        let values = [0., 5., 5., 1., 1., 1., 7., 7., 0.];
+        let mut min = [-99; 9];
+        let mut max = [-99; 9];
+        let range = CompatCore
+            .minmaxindex(0, 8, &values, 3, &mut min, &mut max)
+            .unwrap();
+        assert_eq!((range.beg_idx, range.count), (2, 7));
+        assert_eq!(&min[..7], &[0, 3, 4, 5, 5, 5, 8]);
+        assert_eq!(&max[..7], &[1, 1, 2, 3, 6, 7, 7]);
+        assert_eq!(&min[7..], &[-99; 2]);
+        assert_eq!(&max[7..], &[-99; 2]);
+
+        let range = CompatCore
+            .minmaxindex(4, 8, &values, 3, &mut min, &mut max)
+            .unwrap();
+        assert_eq!((range.beg_idx, range.count), (4, 5));
+        assert_eq!(&min[..5], &[3, 5, 5, 5, 8]);
+        assert_eq!(&max[..5], &[2, 3, 6, 7, 7]);
+    }
+
+    #[test]
+    fn nan_rescan_seeds_and_signed_zero_ties_keep_the_legacy_indices() {
+        let values = [f64::NAN, 3., 2., f64::NAN, 1., 4.];
+        let mut min = [0; 5];
+        let mut max = [0; 5];
+        CompatCore
+            .minmaxindex(0, 5, &values, 2, &mut min, &mut max)
+            .unwrap();
+        assert_eq!(min, [0, 2, 2, 3, 4]);
+        assert_eq!(max, [0, 1, 2, 3, 5]);
+
+        CompatCore
+            .minmaxindex(0, 3, &[-0., 0., -0., 0.], 2, &mut min, &mut max)
+            .unwrap();
+        assert_eq!(&min[..3], &[0, 1, 2]);
+        assert_eq!(&max[..3], &[0, 1, 2]);
+    }
+
+    #[test]
+    fn output_capacity_and_no_output_ranges_preserve_the_public_contract() {
+        let values = [1.; 5];
+        let mut min = [0; 3];
+        let mut max = [0; 3];
+        assert!(CompatCore
+            .minmaxindex(0, 4, &values, 3, &mut min, &mut max)
+            .is_ok());
+        assert_eq!(
+            CompatCore.minmaxindex(0, 4, &values, 3, &mut min[..2], &mut max),
+            Err(RetCode::BadParam)
+        );
+        let range = CompatCore
+            .minmaxindex(0, 4, &values, 30, &mut [], &mut [])
+            .unwrap();
+        assert_eq!((range.beg_idx, range.count), (0, 0));
     }
 }
