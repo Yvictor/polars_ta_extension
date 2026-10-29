@@ -1,0 +1,120 @@
+name: Focused SAREXT typed kwargs and kernel diagnostics
+
+on:
+  push:
+    branches: [codex/sarext-diagnostic-ci]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sarext-profile-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  PYO3_USE_ABI3_FORWARD_COMPATIBILITY: '1'
+  RUSTUP_TOOLCHAIN: '1.90.0'
+  CARGO_BUILD_JOBS: '4'
+  CARGO_TERM_COLOR: never
+  CARGO_PROFILE_RELEASE_DEBUG: 'false'
+  CARGO_PROFILE_RELEASE_LTO: 'false'
+  CARGO_PROFILE_RELEASE_CODEGEN_UNITS: '16'
+  CARGO_TARGET_DIR: ${{ github.workspace }}/sarext-target
+  CFLAGS: ''
+  CXXFLAGS: ''
+  RUSTFLAGS: ''
+  CARGO_ENCODED_RUSTFLAGS: ''
+  CMAKE: ${{ github.workspace }}/envs/native/bin/cmake
+  POLARS_MAX_THREADS: '1'
+  OMP_NUM_THREADS: '1'
+  OPENBLAS_NUM_THREADS: '1'
+  MKL_NUM_THREADS: '1'
+  NATIVE_COMMIT: 56f6d5fb139031c20d86d7e818e7d267eb834295
+  ORIGINAL_COMMIT: b2bbc26d41ec80823c8bffb0cc436a97f29911cc
+
+jobs:
+  sarext-profile:
+    name: C081 / Rust083 typed / abstract / native adapter diagnostics
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          path: control-source
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ env.NATIVE_COMMIT }}
+          path: sources/native
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ env.ORIGINAL_COMMIT }}
+          path: sources/original
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - uses: dtolnay/rust-toolchain@1.90.0
+      - uses: astral-sh/setup-uv@v8.2.0
+      - name: Preserve controller and fixed arguments
+        run: |
+          mkdir -p sarext-results/controller
+          cp control-source/scripts/sarext_profile* control-source/scripts/integer_init_provenance.py control-source/scripts/integer_init_stage_benchmark.py control-source/scripts/integer_init_benchmark.py control-source/scripts/integer_init_cases.json control-source/scripts/migration_ci_benchmark.py control-source/scripts/SAREXT_DIAGNOSTIC.md sarext-results/controller/
+          cp control-source/.github/workflows/sarext-profile.yml sarext-results/workflow.yml
+          git -C control-source rev-parse HEAD > sarext-results/controller-commit.txt
+          python - <<'PY'
+          import json,os,re
+          from pathlib import Path
+          for key in ('NATIVE_COMMIT','ORIGINAL_COMMIT'):
+              assert re.fullmatch('[0-9a-f]{40}',os.environ[key])
+          args=[]
+          for side in ('native','original'):
+              args+=['--'+side+'-source','sources/'+side,'--'+side+'-python',str(Path('envs')/side/'bin/python')]
+          args+=['--output','sarext-results','--target-dir',os.environ['CARGO_TARGET_DIR'],'--wheel-dir','wheels']
+          Path('sarext-results/arguments.json').write_text(json.dumps(args))
+          PY
+          cat > sarext-results/run-controller.py <<'PY'
+          import json,subprocess,sys
+          args=json.load(open('sarext-results/arguments.json'))
+          subprocess.run([sys.executable,'control-source/scripts/sarext_profile_benchmark.py',*args,*sys.argv[1:]],check=True)
+          PY
+      - name: Build two fixed product wheels and freeze native graph before C or test builds
+        run: |
+          for side in native original; do
+            uv venv --python 3.12 "envs/$side"
+            uv pip install --python "envs/$side" 'maturin==1.15.0' 'cmake==4.4.4' 'polars==1.44.2' 'numpy==2.5.3' 'pytest==8.4.2'
+            mkdir -p "wheels/$side"
+            python -c 'import json,sys; print(json.dumps({"side":sys.argv[1],"command":sys.argv[2:]}))' "$side" "$PWD/envs/$side/bin/python" -m maturin build --release --locked --interpreter "$PWD/envs/$side/bin/python" --out "$PWD/wheels/$side" >> sarext-results/build-commands.jsonl
+            touch "sources/$side/src/lib.rs"
+            (cd "sources/$side" && "$GITHUB_WORKSPACE/envs/$side/bin/python" -m maturin build --release --locked --interpreter "$GITHUB_WORKSPACE/envs/$side/bin/python" --out "$GITHUB_WORKSPACE/wheels/$side") > "sarext-results/$side-build.log" 2>&1
+            python control-source/scripts/integer_init_provenance.py --compile-log "sarext-results/$side-build.log" --source "sources/$side" >> sarext-results/product-compile-proof.jsonl
+            uv pip install --python "envs/$side" --no-deps "wheels/$side/"*.whl
+            uv pip freeze --python "envs/$side" > "sarext-results/$side-dependencies.txt"
+            if [[ "$side" == native ]]; then
+              envs/native/bin/python sarext-results/run-controller.py --snapshot-native
+            fi
+            if [[ "$side" == original ]]; then
+              envs/native/bin/python sarext-results/run-controller.py --snapshot-original
+            fi
+          done
+          rustc --version --verbose > sarext-results/toolchain.txt
+          lscpu > sarext-results/lscpu.txt
+          cat /proc/meminfo > sarext-results/meminfo.txt
+      - name: Protocol tests and unchanged native contracts before stage builds
+        run: |
+          envs/native/bin/python -m pytest --noconftest control-source/tests/test_sarext_profile_benchmark.py control-source/tests/test_integer_init_benchmark.py -q
+          PYO3_PYTHON="$GITHUB_WORKSPACE/envs/native/bin/python" cargo test --release --lib --locked --manifest-path sources/native/Cargo.toml > sarext-results/native-rust-tests.log 2>&1
+      - name: Build source-bound diagnostic with actual C and Jemalloc libraries
+        run: envs/native/bin/python sarext-results/run-controller.py --build
+      - name: All50 captures and50 isolated counters before600 balanced selected-mode timing children
+        run: envs/native/bin/python sarext-results/run-controller.py --run
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: sarext-typed-kwargs-kernel-evidence
+          include-hidden-files: true
+          if-no-files-found: error
+          path: |
+            sarext-results/
+            wheels/
+            sarext-target/release/build/talib-sys-*/out/lib/libta-lib.a
+            sarext-target/release/build/jemalloc-sys-*/out/lib/*.a
