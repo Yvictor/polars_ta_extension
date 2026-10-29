@@ -55,7 +55,7 @@ pub fn bind_params(holder: &mut ParamHolder<'_>, params: &Params) -> Result<(), 
     Ok(())
 }
 
-fn error(code: RetCode) -> PolarsError {
+pub(crate) fn error(code: RetCode) -> PolarsError {
     PolarsError::ComputeError(
         format!(
             "Could not compute indicator, err: {}",
@@ -74,13 +74,11 @@ pub(crate) enum Output {
     Integer(Vec<i32>),
 }
 
-pub fn compute<const INPUTS: usize, const OUTPUTS: usize>(
+pub(crate) fn prepare_inputs<const INPUTS: usize, const OUTPUTS: usize>(
     id: FuncId,
     inputs: &[Series],
-    params: &Params,
     order: &[usize],
-    names: &[&str],
-) -> PolarsResult<Series> {
+) -> PolarsResult<[Option<Series>; INPUTS]> {
     polars_ensure!(inputs.len() == order.len(), ShapeMismatch: "indicator input count differs");
     let aligned = broadcast_inputs(inputs)?;
     // Series clones share Arrow storage; only casts, rechunks and null fills
@@ -99,20 +97,49 @@ pub fn compute<const INPUTS: usize, const OUTPUTS: usize>(
             s.f64()?.fill_null_with_values(f64::NAN)?.into_series()
         });
     }
+    Ok(prepared)
+}
+
+pub(crate) fn prepared_slices<const INPUTS: usize>(
+    prepared: &[Option<Series>; INPUTS],
+) -> PolarsResult<[&[f64]; INPUTS]> {
     let mut slices: [&[f64]; INPUTS] = [&[]; INPUTS];
-    for (slice, s) in slices.iter_mut().zip(&prepared) {
+    for (slice, s) in slices.iter_mut().zip(prepared) {
         *slice = s.as_ref().unwrap().f64()?.cont_slice()?;
     }
+    Ok(slices)
+}
+
+pub(crate) fn checked_input_len<const INPUTS: usize>(
+    slices: &[&[f64]; INPUTS],
+) -> PolarsResult<usize> {
     let len = slices.first().map_or(0, |s| s.len());
     polars_ensure!(len <= Core::INDEX_MAX + 1, ComputeError: "indicator input too long");
+    Ok(len)
+}
+
+pub(crate) fn first_usable<const INPUTS: usize>(slices: &[&[f64]; INPUTS], len: usize) -> usize {
+    (0..len)
+        .find(|&row| slices.iter().all(|s| !s[row].is_nan()))
+        .unwrap_or(len)
+}
+
+pub fn compute<const INPUTS: usize, const OUTPUTS: usize>(
+    id: FuncId,
+    inputs: &[Series],
+    params: &Params,
+    order: &[usize],
+    names: &[&str],
+) -> PolarsResult<Series> {
+    let prepared = prepare_inputs::<INPUTS, OUTPUTS>(id, inputs, order)?;
+    let mut slices = prepared_slices(&prepared)?;
+    let len = checked_input_len(&slices)?;
     let mut holder = id.new_call(core());
     bind_params(&mut holder, params).map_err(error)?;
     let lookback = crate::compat::lookback(id, params)
         .unwrap_or_else(|| holder.lookback())
         .map_err(error)?;
-    let begin = (0..len)
-        .find(|&row| slices.iter().all(|s| !s[row].is_nan()))
-        .unwrap_or(len);
+    let begin = first_usable(&slices, len);
     let offset = begin.saturating_add(lookback).min(len);
     // ADD writes each produced value once. Build that initialized Vec directly
     // after the same metadata/parameter/input checks, keeping the skipped prefix.
