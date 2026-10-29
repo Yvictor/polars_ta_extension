@@ -251,3 +251,48 @@ def test_published_docstring_examples_execute_and_match_defaults(name):
                 actual = df.lazy().select(expression.alias('result')).collect()['result']
                 assert_exact(actual, reference)
         assert count == 1, (name, function)
+
+
+REAL_OPTIONS = [(name, p['name'], p['default']) for name, spec in SPECS.items()
+                for p in spec['parameters'] if p['type'] == 'double']
+
+
+@pytest.mark.parametrize('name,key,value', REAL_OPTIONS, ids=[f'{n}-{k}' for n,k,_ in REAL_OPTIONS])
+@pytest.mark.parametrize('numpy_type', [np.float32, np.float64])
+def test_numpy_real_options_are_normalized_before_pickle(name, key, value, numpy_type):
+    df = usage_frame(); columns = role_columns(SPECS[name])
+    converted = numpy_type(value)
+    expected = df.select(invocation(name, 'positional_exprs', {key:float(converted)}, columns).alias('result'))['result']
+    for form in ('positional_names', 'namespace_keywords'):
+        expression = invocation(name, form, {key:converted}, columns).alias('result')
+        assert_exact(df.select(expression)['result'], expected)
+        assert_exact(df.lazy().select(expression).collect()['result'], expected)
+
+
+@pytest.mark.parametrize('name', sorted(SPECS))
+@pytest.mark.parametrize('dtype', [pl.Int8, pl.UInt8, pl.Int16, pl.UInt16, pl.Int32, pl.UInt32, pl.Int64, pl.UInt64])
+def test_numeric_integer_inputs_import_cast_and_group(name, dtype):
+    n = 192
+    x = np.arange(n) % 17 + 20
+    df = pl.DataFrame({'open':x, 'high':x+2, 'low':x-1, 'close':x+1,
+                       'volume':np.arange(n)%50+30, 'periods':np.resize([3,5,9],n)}).cast(dtype)
+    df = df.with_columns(pl.when(pl.int_range(pl.len()).is_in([0,1,87])).then(None).otherwise(pl.col(c)).alias(c) for c in df.columns if c != 'periods')
+    assert all(df[c].dtype == dtype for c in df.columns)
+    df = pl.concat([df.slice(0,79), df.slice(79)],rechunk=False)
+    assert df['close'].n_chunks() == 2
+    columns = role_columns(SPECS[name])
+    expression = invocation(name, 'positional_names', {}, columns).alias('result')
+    reference = df.cast(pl.Float64).select(expression)['result']
+    assert_exact(df.select(expression)['result'], reference)
+    assert_exact(df.lazy().select(expression).collect()['result'], reference)
+    grouped = df.with_columns((pl.int_range(pl.len())%3).alias('g'))
+    wanted = grouped.with_columns(pl.exclude('g').cast(pl.Float64)).select(expression.over('g'))['result']
+    assert_exact(grouped.lazy().select(expression.over('g')).collect()['result'], wanted)
+
+
+@pytest.mark.parametrize('name,key,value', [('bbands','nbdevup',2),('stddev','nbdev',1),('sarext','startvalue',0)])
+def test_numpy_integer_real_option_when_its_domain_allows(name,key,value):
+    df = usage_frame(); columns = role_columns(SPECS[name])
+    expected = df.select(invocation(name,'positional_exprs',{key:float(value)},columns).alias('result'))['result']
+    actual = df.select(invocation(name,'positional_names',{key:np.int64(value)},columns).alias('result'))['result']
+    assert_exact(actual,expected)

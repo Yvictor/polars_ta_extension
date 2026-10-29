@@ -198,6 +198,8 @@ def main():
              'The 1-thread sweep includes groups shorter than the default EMA warmup; workload deltas cannot isolate a pure fixed setup cost.', '',
              *sections]
     (args.output/'comparison.md').write_text('\n'.join(lines)+'\n')
+    from regression_inventory import write_inventory
+    write_inventory(args.output/'summary.json')
     print('\n'.join(lines), flush=True)
 
 

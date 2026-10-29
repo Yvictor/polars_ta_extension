@@ -45,7 +45,12 @@ fn adapter_cost_probe() {
             } else {
                 3
             };
-            for mode in ["setup_lookback", "preallocated_kernel", "complete_adapter"] {
+            for mode in [
+                "setup_lookback",
+                "abstract_kernel",
+                "preallocated_kernel",
+                "complete_adapter",
+            ] {
                 let iterations = if mode == "setup_lookback" {
                     10_000
                 } else {
@@ -60,6 +65,26 @@ fn adapter_cost_probe() {
                                 let mut call = black_box(id).new_call(core());
                                 bind_params(&mut call, black_box(&params)).unwrap();
                                 black_box(call.lookback().unwrap());
+                            }
+                            "abstract_kernel" => {
+                                let mut call = black_box(id).new_call(core());
+                                bind_params(&mut call, black_box(&params)).unwrap();
+                                if id == FuncId::EMA {
+                                    call.set_input(0, black_box(&x)).unwrap();
+                                } else {
+                                    call.set_price_input(
+                                        0,
+                                        None,
+                                        Some(black_box(&high)),
+                                        Some(black_box(&low)),
+                                        Some(black_box(&x)),
+                                        None,
+                                        None,
+                                    )
+                                    .unwrap();
+                                }
+                                call.set_output(0, black_box(&mut output)).unwrap();
+                                black_box(call.call(0, n - 1).unwrap());
                             }
                             "preallocated_kernel" => {
                                 let range = if id == FuncId::EMA {
@@ -85,8 +110,8 @@ fn adapter_cost_probe() {
                                 black_box(range);
                             }
                             _ => {
-                                black_box(
-                                    compute(
+                                let _ = black_box(
+                                    compute_probe(
                                         black_box(id),
                                         black_box(inputs),
                                         black_box(&params),
@@ -106,7 +131,7 @@ fn adapter_cost_probe() {
                 );
             }
             // Validate the direct kernel's compact output against adapter alignment.
-            let got = compute(id, inputs, &params, order, &[]).unwrap();
+            let got = compute_probe(id, inputs, &params, order, &[]).unwrap();
             let begin = if id == FuncId::EMA {
                 core().ema(0, n - 1, &x, period, &mut output)
             } else {
@@ -119,5 +144,19 @@ fn adapter_cost_probe() {
                 &output[..begin.count]
             );
         }
+    }
+}
+
+fn compute_probe(
+    id: FuncId,
+    inputs: &[Series],
+    params: &Params,
+    order: &[usize],
+    names: &[&str],
+) -> PolarsResult<Series> {
+    if id == FuncId::EMA {
+        compute::<1, 1>(id, inputs, params, order, names)
+    } else {
+        compute::<3, 1>(id, inputs, params, order, names)
     }
 }

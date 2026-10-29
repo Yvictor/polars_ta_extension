@@ -69,6 +69,8 @@ def generate():
                                     (['length_mismatch'] if count > 1 else []) +
                                     (['parameter_types'] if spec['params'] else [])}
     result = {'schema_version': 1, 'reference': 'TA-Lib Python 0.8.1 / C 0.8.1; Rust 0.8.3 metadata',
+              'integer_input_dtypes': ['Int8','UInt8','Int16','UInt16','Int32','UInt32','Int64','UInt64'],
+              'numpy_real_option_types': ['float32','float64'],
               'rust_metadata_count': 237, 'rust_additional_not_exposed': RUST_UNEXPOSED,
               'helpers_excluded': ['col', 'get_function_groups', 'get_functions', 'get_functions_output_struct',
                                    'initialize', 'shutdown', 'version', 'register_plugin', 'parse_version', 'parse_into_expr'],

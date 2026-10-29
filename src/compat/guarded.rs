@@ -325,12 +325,47 @@ fn has_trigger(values: &[f64]) -> bool {
     }
     values
         .iter()
-        .fold(false, |bad, v| bad | !v.is_finite() | (v.abs() > 1024.))
+        .fold(false, |bad, v| bad | !(v.abs() <= 1024.))
 }
 
 #[cfg(test)]
 mod scan_tests {
     use super::has_trigger;
+    #[test]
+    fn unordered_bound_matches_ieee_routing_predicate() {
+        let mut state = 0x9137_a822_45cf_672du64;
+        for _ in 0..100_000 {
+            state = state.wrapping_mul(6364136223846793005).wrapping_add(1);
+            let value = f64::from_bits(state);
+            assert_eq!(
+                !(value.abs() <= 1024.),
+                !value.is_finite() || value.abs() > 1024.
+            );
+        }
+        for bits in [
+            0,
+            1,
+            0x8000_0000_0000_0000,
+            0x7ff0_0000_0000_0000,
+            0xfff0_0000_0000_0000,
+            0x7ff0_0000_0000_0001,
+            0x7ff8_0000_0000_0001,
+            1024f64.to_bits() - 1,
+            1024f64.to_bits(),
+            1024f64.to_bits() + 1,
+        ] {
+            let value = f64::from_bits(bits);
+            assert_eq!(
+                !(value.abs() <= 1024.),
+                !value.is_finite() || value.abs() > 1024.
+            );
+            assert_eq!(
+                has_trigger(&[0., value]),
+                !value.is_finite() || value.abs() > 1024.
+            );
+        }
+    }
+
     #[test]
     fn vectorizable_scan_matches_original_predicate() {
         let mut state = 19u64;

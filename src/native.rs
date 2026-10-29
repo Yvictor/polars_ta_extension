@@ -78,7 +78,7 @@ pub(crate) enum Output {
     Integer(Vec<i32>),
 }
 
-pub fn compute(
+pub fn compute<const INPUTS: usize, const OUTPUTS: usize>(
     id: FuncId,
     inputs: &[Series],
     params: &Params,
@@ -89,21 +89,24 @@ pub fn compute(
     let aligned = broadcast_inputs(inputs)?;
     // Series clones share Arrow storage; only casts, rechunks and null fills
     // materialize numeric input buffers. Keep owners alive through the call.
-    let prepared = order
-        .iter()
-        .map(|&i| {
-            let s = cast_series_to_f64(&aligned[i])?;
-            if s.null_count() == 0 {
-                Ok(s)
-            } else {
-                Ok(s.f64()?.fill_null_with_values(f64::NAN)?.into_series())
-            }
-        })
-        .collect::<PolarsResult<Vec<_>>>()?;
-    let mut slices = prepared
-        .iter()
-        .map(|s| s.f64()?.cont_slice())
-        .collect::<PolarsResult<Vec<_>>>()?;
+    // Arity is frozen by the generated plugin entry point. Keep the owners and
+    // borrowed slice descriptors on the stack instead of allocating two Vecs
+    // for every partition of a native Polars `.over()` expression.
+    polars_ensure!(order.len() == INPUTS && id.info().outputs.len() == OUTPUTS,
+        ShapeMismatch: "indicator metadata arity differs");
+    let mut prepared: [Option<Series>; INPUTS] = std::array::from_fn(|_| None);
+    for (slot, &i) in prepared.iter_mut().zip(order) {
+        let s = cast_series_to_f64(&aligned[i])?;
+        *slot = Some(if s.null_count() == 0 {
+            s
+        } else {
+            s.f64()?.fill_null_with_values(f64::NAN)?.into_series()
+        });
+    }
+    let mut slices: [&[f64]; INPUTS] = [&[]; INPUTS];
+    for (slice, s) in slices.iter_mut().zip(&prepared) {
+        *slice = s.as_ref().unwrap().f64()?.cont_slice()?;
+    }
     let len = slices.first().map_or(0, |s| s.len());
     polars_ensure!(len <= Core::INDEX_MAX + 1, ComputeError: "indicator input too long");
     let mut holder = id.new_call(core());
@@ -115,18 +118,13 @@ pub fn compute(
         .find(|&row| slices.iter().all(|s| !s[row].is_nan()))
         .unwrap_or(len);
     let offset = begin.saturating_add(lookback).min(len);
-    let mut outputs = id
-        .info()
-        .outputs
-        .iter()
-        .map(|o| match o.kind {
-            // Use initialized NaNs rather than the allocator's zeroed/calloc path.
-            // Zeroed allocations can have different page-fault costs in grouped calls.
-            // Keep explicit range padding below; integer warmups remain zero.
-            OutputType::Real => Output::Real(vec![f64::NAN; len]),
-            OutputType::Integer => Output::Integer(vec![0; len]),
-        })
-        .collect::<Vec<_>>();
+    let mut outputs: [Output; OUTPUTS] = std::array::from_fn(|i| match id.info().outputs[i].kind {
+        // Use initialized NaNs rather than the allocator's zeroed/calloc path.
+        // Zeroed allocations can have different page-fault costs in grouped calls.
+        // Keep explicit range padding below; integer warmups remain zero.
+        OutputType::Real => Output::Real(vec![f64::NAN; len]),
+        OutputType::Integer => Output::Integer(vec![0; len]),
+    });
     let mut written = 0;
     if offset < len {
         // Reuse descriptors after recording the original length and offset.
@@ -157,7 +155,7 @@ pub fn compute(
     // Most indicators have one output; avoid collecting a one-element fields Vec.
     if outputs.len() == 1 {
         return Ok(output_series(
-            outputs.pop().unwrap(),
+            outputs.into_iter().next().unwrap(),
             names.first().copied().unwrap_or(""),
             offset,
             written,

@@ -32,7 +32,7 @@ def generate():
         order = ', '.join(map(str, abi[name]['order']))
         names = ', '.join(f'"{n}"' for n in fields)
         lines += [f'fn {name}(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {{',
-                  f'kwargs.apply(inputs, |params| compute(FuncId::{name.upper()}, inputs, &params, &[{order}], &[{names}]))', '}']
+                  f'kwargs.apply(inputs, |params| compute::<{len(f["inputs"])}, {len(f["outputs"])}>(FuncId::{name.upper()}, inputs, &params, &[{order}], &[{names}]))', '}']
     # Exact metadata-name mapping preserves the prior lowercase-key semantics.
     options = {p['c_name']: p['name'] for f in api for p in f['params']}
     lines += ["pub(crate) fn option_key(name: &str) -> std::borrow::Cow<'_, str> {", "match name {"]

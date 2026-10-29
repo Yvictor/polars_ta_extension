@@ -199,7 +199,7 @@ jobs:
   benchmark:
     name: Release benchmark / original vs delivered vs optimized adapter
     runs-on: ubuntu-24.04
-    timeout-minutes: 75
+    timeout-minutes: 110
     env:
       RUSTUP_TOOLCHAIN: '1.90.0'
       CARGO_PROFILE_RELEASE_DEBUG: 'false'
@@ -264,6 +264,7 @@ jobs:
             --candidate-python candidate-env/bin/python --candidate-source candidate-source \
             --output benchmark-results --rounds 6 --repeats 51 --thread-counts 1 4
           cat benchmark-results/comparison.md >> "$GITHUB_STEP_SUMMARY"
+          cat benchmark-results/regression-inventory.md >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v7
         if: always()
         with:
@@ -274,6 +275,64 @@ jobs:
             prior-dist/*.whl
             candidate-dist/*.whl
           if-no-files-found: error
+
+  upstream-mavp-evidence:
+    name: Upstream MAVP / same-runner correctness and performance
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          repository: Yvictor/ta-lib
+          ref: 7f395b820c2af5941542d1d2d5751c22d38663c2
+          path: candidate
+      - uses: actions/checkout@v7
+        with:
+          repository: TA-Lib/ta-lib
+          ref: 4334163d3a1f5019aa9051342316b936a4dfb994
+          path: baseline
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - uses: dtolnay/rust-toolchain@1.97.0
+        with:
+          components: clippy,rustfmt
+      - name: Verify regeneration, Rust contracts and C regression
+        working-directory: candidate
+        run: |
+          python scripts/quiet.py noisy mavp-ci --defer=60 -- python scripts/build.py regen-check
+          python scripts/quiet.py noisy mavp-ci --defer=60 -- cargo test --locked -p ta-lib --manifest-path ta_codegen/output/rust/Cargo.toml
+          python scripts/quiet.py noisy mavp-ci --defer=60 -- cargo clippy --locked -p ta-lib --all-targets --manifest-path ta_codegen/output/rust/Cargo.toml -- -D warnings
+          python scripts/quiet.py noisy mavp-ci --defer=60 -- python scripts/build.py ta_regtest
+          bin/ta_regtest
+      - name: Build both release libraries and identical thin-LTO harness
+        working-directory: candidate
+        run: |
+          python scripts/quiet.py noisy mavp-ci --defer=60 -- python scripts/bench_mavp_fixed.py \
+            --baseline ../baseline-bench --baseline-source ../baseline \
+            --candidate ../candidate-bench --candidate-source . --output ../mavp-results --build-only
+          lscpu > ../mavp-results/lscpu.txt
+          cat /proc/meminfo > ../mavp-results/meminfo.txt
+      - name: Compare full captures then alternate twelve fresh-process pairs
+        working-directory: candidate
+        run: |
+          python scripts/quiet.py measure mavp-ci 300 --queue=300 -- python scripts/bench_mavp_fixed.py \
+            --baseline ../baseline-bench --baseline-source ../baseline \
+            --candidate ../candidate-bench --candidate-source . --output ../mavp-results --pairs 12 --repeats 31
+          cat ../mavp-results/comparison.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: mavp-fixed-period-evidence
+          path: |
+            mavp-results/*.json
+            mavp-results/*.jsonl
+            mavp-results/*.md
+            mavp-results/*.log
+            mavp-results/*.txt
+            mavp-results/*.gz
+            baseline-bench
+            candidate-bench
 
   release:
     name: Publish tested wheels

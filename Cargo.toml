@@ -15,7 +15,7 @@ crate-type = ["cdylib"]
 [dependencies]
 pyo3 = { version = "0.20", features = ["abi3-py310"] }
 pyo3-polars = { version = "0.10.0", features = ["derive"] }
-polars = {version = "0.36.2", features = ["dtype-struct"]}
+polars = {version = "0.36.2", features = ["dtype-struct", "dtype-i8", "dtype-i16", "dtype-u8", "dtype-u16"]}
 # "performant", "lazy", "dtype-array"
 serde = { version = "*", features = ["derive"] }
 ta-lib = "=0.8.3"

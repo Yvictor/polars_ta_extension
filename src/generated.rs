@@ -9,7 +9,7 @@ use ta_lib::abstract_api::FuncId;
 #[polars_expr(output_type=Float64)]
 fn ac(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::AC, inputs, &params, &[0, 1], &[])
+        compute::<2, 1>(FuncId::AC, inputs, &params, &[0, 1], &[])
     })
 }
 fn accbands_output(_: &[Field]) -> PolarsResult<Field> {
@@ -25,7 +25,7 @@ fn accbands_output(_: &[Field]) -> PolarsResult<Field> {
 #[polars_expr(output_type_func=accbands_output)]
 fn accbands(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(
+        compute::<3, 3>(
             FuncId::ACCBANDS,
             inputs,
             &params,
@@ -37,55 +37,55 @@ fn accbands(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
 #[polars_expr(output_type=Float64)]
 fn acos(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::ACOS, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::ACOS, inputs, &params, &[0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn ad(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::AD, inputs, &params, &[1, 2, 0, 3], &[])
+        compute::<4, 1>(FuncId::AD, inputs, &params, &[1, 2, 0, 3], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn add(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::ADD, inputs, &params, &[0, 1], &[])
+        compute::<2, 1>(FuncId::ADD, inputs, &params, &[0, 1], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn adosc(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::ADOSC, inputs, &params, &[1, 2, 0, 3], &[])
+        compute::<4, 1>(FuncId::ADOSC, inputs, &params, &[1, 2, 0, 3], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn adr(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::ADR, inputs, &params, &[0, 1], &[])
+        compute::<2, 1>(FuncId::ADR, inputs, &params, &[0, 1], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn adx(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::ADX, inputs, &params, &[1, 2, 0], &[])
+        compute::<3, 1>(FuncId::ADX, inputs, &params, &[1, 2, 0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn adxr(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::ADXR, inputs, &params, &[1, 2, 0], &[])
+        compute::<3, 1>(FuncId::ADXR, inputs, &params, &[1, 2, 0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn ao(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::AO, inputs, &params, &[0, 1], &[])
+        compute::<2, 1>(FuncId::AO, inputs, &params, &[0, 1], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn apo(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::APO, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::APO, inputs, &params, &[0], &[])
     })
 }
 fn aroon_output(_: &[Field]) -> PolarsResult<Field> {
@@ -100,7 +100,7 @@ fn aroon_output(_: &[Field]) -> PolarsResult<Field> {
 #[polars_expr(output_type_func=aroon_output)]
 fn aroon(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(
+        compute::<2, 2>(
             FuncId::AROON,
             inputs,
             &params,
@@ -112,37 +112,37 @@ fn aroon(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
 #[polars_expr(output_type=Float64)]
 fn aroonosc(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::AROONOSC, inputs, &params, &[0, 1], &[])
+        compute::<2, 1>(FuncId::AROONOSC, inputs, &params, &[0, 1], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn asin(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::ASIN, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::ASIN, inputs, &params, &[0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn atan(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::ATAN, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::ATAN, inputs, &params, &[0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn atr(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::ATR, inputs, &params, &[1, 2, 0], &[])
+        compute::<3, 1>(FuncId::ATR, inputs, &params, &[1, 2, 0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn avgdev(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::AVGDEV, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::AVGDEV, inputs, &params, &[0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn avgprice(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::AVGPRICE, inputs, &params, &[0, 1, 2, 3], &[])
+        compute::<4, 1>(FuncId::AVGPRICE, inputs, &params, &[0, 1, 2, 3], &[])
     })
 }
 fn bbands_output(_: &[Field]) -> PolarsResult<Field> {
@@ -158,7 +158,7 @@ fn bbands_output(_: &[Field]) -> PolarsResult<Field> {
 #[polars_expr(output_type_func=bbands_output)]
 fn bbands(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(
+        compute::<1, 3>(
             FuncId::BBANDS,
             inputs,
             &params,
@@ -170,55 +170,55 @@ fn bbands(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
 #[polars_expr(output_type=Float64)]
 fn beta(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::BETA, inputs, &params, &[0, 1], &[])
+        compute::<2, 1>(FuncId::BETA, inputs, &params, &[0, 1], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn bop(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::BOP, inputs, &params, &[0, 1, 2, 3], &[])
+        compute::<4, 1>(FuncId::BOP, inputs, &params, &[0, 1, 2, 3], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn cci(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::CCI, inputs, &params, &[1, 2, 0], &[])
+        compute::<3, 1>(FuncId::CCI, inputs, &params, &[1, 2, 0], &[])
     })
 }
 #[polars_expr(output_type=Int32)]
 fn cdl2crows(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::CDL2CROWS, inputs, &params, &[0, 1, 2, 3], &[])
+        compute::<4, 1>(FuncId::CDL2CROWS, inputs, &params, &[0, 1, 2, 3], &[])
     })
 }
 #[polars_expr(output_type=Int32)]
 fn cdl3blackcrows(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::CDL3BLACKCROWS, inputs, &params, &[0, 1, 2, 3], &[])
+        compute::<4, 1>(FuncId::CDL3BLACKCROWS, inputs, &params, &[0, 1, 2, 3], &[])
     })
 }
 #[polars_expr(output_type=Int32)]
 fn cdl3inside(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::CDL3INSIDE, inputs, &params, &[0, 1, 2, 3], &[])
+        compute::<4, 1>(FuncId::CDL3INSIDE, inputs, &params, &[0, 1, 2, 3], &[])
     })
 }
 #[polars_expr(output_type=Int32)]
 fn cdl3linestrike(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::CDL3LINESTRIKE, inputs, &params, &[0, 1, 2, 3], &[])
+        compute::<4, 1>(FuncId::CDL3LINESTRIKE, inputs, &params, &[0, 1, 2, 3], &[])
     })
 }
 #[polars_expr(output_type=Int32)]
 fn cdl3outside(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::CDL3OUTSIDE, inputs, &params, &[0, 1, 2, 3], &[])
+        compute::<4, 1>(FuncId::CDL3OUTSIDE, inputs, &params, &[0, 1, 2, 3], &[])
     })
 }
 #[polars_expr(output_type=Int32)]
 fn cdl3starsinsouth(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(
+        compute::<4, 1>(
             FuncId::CDL3STARSINSOUTH,
             inputs,
             &params,
@@ -230,7 +230,7 @@ fn cdl3starsinsouth(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<S
 #[polars_expr(output_type=Int32)]
 fn cdl3whitesoldiers(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(
+        compute::<4, 1>(
             FuncId::CDL3WHITESOLDIERS,
             inputs,
             &params,
@@ -242,7 +242,7 @@ fn cdl3whitesoldiers(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<
 #[polars_expr(output_type=Int32)]
 fn cdlabandonedbaby(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(
+        compute::<4, 1>(
             FuncId::CDLABANDONEDBABY,
             inputs,
             &params,
@@ -254,25 +254,25 @@ fn cdlabandonedbaby(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<S
 #[polars_expr(output_type=Int32)]
 fn cdladvanceblock(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::CDLADVANCEBLOCK, inputs, &params, &[0, 1, 2, 3], &[])
+        compute::<4, 1>(FuncId::CDLADVANCEBLOCK, inputs, &params, &[0, 1, 2, 3], &[])
     })
 }
 #[polars_expr(output_type=Int32)]
 fn cdlbelthold(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::CDLBELTHOLD, inputs, &params, &[0, 1, 2, 3], &[])
+        compute::<4, 1>(FuncId::CDLBELTHOLD, inputs, &params, &[0, 1, 2, 3], &[])
     })
 }
 #[polars_expr(output_type=Int32)]
 fn cdlbreakaway(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::CDLBREAKAWAY, inputs, &params, &[0, 1, 2, 3], &[])
+        compute::<4, 1>(FuncId::CDLBREAKAWAY, inputs, &params, &[0, 1, 2, 3], &[])
     })
 }
 #[polars_expr(output_type=Int32)]
 fn cdlclosingmarubozu(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(
+        compute::<4, 1>(
             FuncId::CDLCLOSINGMARUBOZU,
             inputs,
             &params,
@@ -284,7 +284,7 @@ fn cdlclosingmarubozu(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult
 #[polars_expr(output_type=Int32)]
 fn cdlconcealbabyswall(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(
+        compute::<4, 1>(
             FuncId::CDLCONCEALBABYSWALL,
             inputs,
             &params,
@@ -296,7 +296,7 @@ fn cdlconcealbabyswall(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResul
 #[polars_expr(output_type=Int32)]
 fn cdlcounterattack(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(
+        compute::<4, 1>(
             FuncId::CDLCOUNTERATTACK,
             inputs,
             &params,
@@ -308,7 +308,7 @@ fn cdlcounterattack(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<S
 #[polars_expr(output_type=Int32)]
 fn cdldarkcloudcover(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(
+        compute::<4, 1>(
             FuncId::CDLDARKCLOUDCOVER,
             inputs,
             &params,
@@ -320,19 +320,19 @@ fn cdldarkcloudcover(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<
 #[polars_expr(output_type=Int32)]
 fn cdldoji(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::CDLDOJI, inputs, &params, &[0, 1, 2, 3], &[])
+        compute::<4, 1>(FuncId::CDLDOJI, inputs, &params, &[0, 1, 2, 3], &[])
     })
 }
 #[polars_expr(output_type=Int32)]
 fn cdldojistar(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::CDLDOJISTAR, inputs, &params, &[0, 1, 2, 3], &[])
+        compute::<4, 1>(FuncId::CDLDOJISTAR, inputs, &params, &[0, 1, 2, 3], &[])
     })
 }
 #[polars_expr(output_type=Int32)]
 fn cdldragonflydoji(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(
+        compute::<4, 1>(
             FuncId::CDLDRAGONFLYDOJI,
             inputs,
             &params,
@@ -344,13 +344,13 @@ fn cdldragonflydoji(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<S
 #[polars_expr(output_type=Int32)]
 fn cdlengulfing(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::CDLENGULFING, inputs, &params, &[0, 1, 2, 3], &[])
+        compute::<4, 1>(FuncId::CDLENGULFING, inputs, &params, &[0, 1, 2, 3], &[])
     })
 }
 #[polars_expr(output_type=Int32)]
 fn cdleveningdojistar(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(
+        compute::<4, 1>(
             FuncId::CDLEVENINGDOJISTAR,
             inputs,
             &params,
@@ -362,13 +362,13 @@ fn cdleveningdojistar(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult
 #[polars_expr(output_type=Int32)]
 fn cdleveningstar(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::CDLEVENINGSTAR, inputs, &params, &[0, 1, 2, 3], &[])
+        compute::<4, 1>(FuncId::CDLEVENINGSTAR, inputs, &params, &[0, 1, 2, 3], &[])
     })
 }
 #[polars_expr(output_type=Int32)]
 fn cdlgapsidesidewhite(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(
+        compute::<4, 1>(
             FuncId::CDLGAPSIDESIDEWHITE,
             inputs,
             &params,
@@ -380,7 +380,7 @@ fn cdlgapsidesidewhite(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResul
 #[polars_expr(output_type=Int32)]
 fn cdlgravestonedoji(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(
+        compute::<4, 1>(
             FuncId::CDLGRAVESTONEDOJI,
             inputs,
             &params,
@@ -392,55 +392,55 @@ fn cdlgravestonedoji(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<
 #[polars_expr(output_type=Int32)]
 fn cdlhammer(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::CDLHAMMER, inputs, &params, &[0, 1, 2, 3], &[])
+        compute::<4, 1>(FuncId::CDLHAMMER, inputs, &params, &[0, 1, 2, 3], &[])
     })
 }
 #[polars_expr(output_type=Int32)]
 fn cdlhangingman(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::CDLHANGINGMAN, inputs, &params, &[0, 1, 2, 3], &[])
+        compute::<4, 1>(FuncId::CDLHANGINGMAN, inputs, &params, &[0, 1, 2, 3], &[])
     })
 }
 #[polars_expr(output_type=Int32)]
 fn cdlharami(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::CDLHARAMI, inputs, &params, &[0, 1, 2, 3], &[])
+        compute::<4, 1>(FuncId::CDLHARAMI, inputs, &params, &[0, 1, 2, 3], &[])
     })
 }
 #[polars_expr(output_type=Int32)]
 fn cdlharamicross(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::CDLHARAMICROSS, inputs, &params, &[0, 1, 2, 3], &[])
+        compute::<4, 1>(FuncId::CDLHARAMICROSS, inputs, &params, &[0, 1, 2, 3], &[])
     })
 }
 #[polars_expr(output_type=Int32)]
 fn cdlhighwave(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::CDLHIGHWAVE, inputs, &params, &[0, 1, 2, 3], &[])
+        compute::<4, 1>(FuncId::CDLHIGHWAVE, inputs, &params, &[0, 1, 2, 3], &[])
     })
 }
 #[polars_expr(output_type=Int32)]
 fn cdlhikkake(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::CDLHIKKAKE, inputs, &params, &[0, 1, 2, 3], &[])
+        compute::<4, 1>(FuncId::CDLHIKKAKE, inputs, &params, &[0, 1, 2, 3], &[])
     })
 }
 #[polars_expr(output_type=Int32)]
 fn cdlhikkakemod(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::CDLHIKKAKEMOD, inputs, &params, &[0, 1, 2, 3], &[])
+        compute::<4, 1>(FuncId::CDLHIKKAKEMOD, inputs, &params, &[0, 1, 2, 3], &[])
     })
 }
 #[polars_expr(output_type=Int32)]
 fn cdlhomingpigeon(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::CDLHOMINGPIGEON, inputs, &params, &[0, 1, 2, 3], &[])
+        compute::<4, 1>(FuncId::CDLHOMINGPIGEON, inputs, &params, &[0, 1, 2, 3], &[])
     })
 }
 #[polars_expr(output_type=Int32)]
 fn cdlidentical3crows(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(
+        compute::<4, 1>(
             FuncId::CDLIDENTICAL3CROWS,
             inputs,
             &params,
@@ -452,13 +452,13 @@ fn cdlidentical3crows(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult
 #[polars_expr(output_type=Int32)]
 fn cdlinneck(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::CDLINNECK, inputs, &params, &[0, 1, 2, 3], &[])
+        compute::<4, 1>(FuncId::CDLINNECK, inputs, &params, &[0, 1, 2, 3], &[])
     })
 }
 #[polars_expr(output_type=Int32)]
 fn cdlinvertedhammer(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(
+        compute::<4, 1>(
             FuncId::CDLINVERTEDHAMMER,
             inputs,
             &params,
@@ -470,13 +470,13 @@ fn cdlinvertedhammer(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<
 #[polars_expr(output_type=Int32)]
 fn cdlkicking(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::CDLKICKING, inputs, &params, &[0, 1, 2, 3], &[])
+        compute::<4, 1>(FuncId::CDLKICKING, inputs, &params, &[0, 1, 2, 3], &[])
     })
 }
 #[polars_expr(output_type=Int32)]
 fn cdlkickingbylength(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(
+        compute::<4, 1>(
             FuncId::CDLKICKINGBYLENGTH,
             inputs,
             &params,
@@ -488,13 +488,13 @@ fn cdlkickingbylength(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult
 #[polars_expr(output_type=Int32)]
 fn cdlladderbottom(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::CDLLADDERBOTTOM, inputs, &params, &[0, 1, 2, 3], &[])
+        compute::<4, 1>(FuncId::CDLLADDERBOTTOM, inputs, &params, &[0, 1, 2, 3], &[])
     })
 }
 #[polars_expr(output_type=Int32)]
 fn cdllongleggeddoji(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(
+        compute::<4, 1>(
             FuncId::CDLLONGLEGGEDDOJI,
             inputs,
             &params,
@@ -506,31 +506,31 @@ fn cdllongleggeddoji(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<
 #[polars_expr(output_type=Int32)]
 fn cdllongline(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::CDLLONGLINE, inputs, &params, &[0, 1, 2, 3], &[])
+        compute::<4, 1>(FuncId::CDLLONGLINE, inputs, &params, &[0, 1, 2, 3], &[])
     })
 }
 #[polars_expr(output_type=Int32)]
 fn cdlmarubozu(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::CDLMARUBOZU, inputs, &params, &[0, 1, 2, 3], &[])
+        compute::<4, 1>(FuncId::CDLMARUBOZU, inputs, &params, &[0, 1, 2, 3], &[])
     })
 }
 #[polars_expr(output_type=Int32)]
 fn cdlmatchinglow(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::CDLMATCHINGLOW, inputs, &params, &[0, 1, 2, 3], &[])
+        compute::<4, 1>(FuncId::CDLMATCHINGLOW, inputs, &params, &[0, 1, 2, 3], &[])
     })
 }
 #[polars_expr(output_type=Int32)]
 fn cdlmathold(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::CDLMATHOLD, inputs, &params, &[0, 1, 2, 3], &[])
+        compute::<4, 1>(FuncId::CDLMATHOLD, inputs, &params, &[0, 1, 2, 3], &[])
     })
 }
 #[polars_expr(output_type=Int32)]
 fn cdlmorningdojistar(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(
+        compute::<4, 1>(
             FuncId::CDLMORNINGDOJISTAR,
             inputs,
             &params,
@@ -542,31 +542,31 @@ fn cdlmorningdojistar(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult
 #[polars_expr(output_type=Int32)]
 fn cdlmorningstar(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::CDLMORNINGSTAR, inputs, &params, &[0, 1, 2, 3], &[])
+        compute::<4, 1>(FuncId::CDLMORNINGSTAR, inputs, &params, &[0, 1, 2, 3], &[])
     })
 }
 #[polars_expr(output_type=Int32)]
 fn cdlonneck(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::CDLONNECK, inputs, &params, &[0, 1, 2, 3], &[])
+        compute::<4, 1>(FuncId::CDLONNECK, inputs, &params, &[0, 1, 2, 3], &[])
     })
 }
 #[polars_expr(output_type=Int32)]
 fn cdlpiercing(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::CDLPIERCING, inputs, &params, &[0, 1, 2, 3], &[])
+        compute::<4, 1>(FuncId::CDLPIERCING, inputs, &params, &[0, 1, 2, 3], &[])
     })
 }
 #[polars_expr(output_type=Int32)]
 fn cdlrickshawman(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::CDLRICKSHAWMAN, inputs, &params, &[0, 1, 2, 3], &[])
+        compute::<4, 1>(FuncId::CDLRICKSHAWMAN, inputs, &params, &[0, 1, 2, 3], &[])
     })
 }
 #[polars_expr(output_type=Int32)]
 fn cdlrisefall3methods(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(
+        compute::<4, 1>(
             FuncId::CDLRISEFALL3METHODS,
             inputs,
             &params,
@@ -578,7 +578,7 @@ fn cdlrisefall3methods(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResul
 #[polars_expr(output_type=Int32)]
 fn cdlseparatinglines(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(
+        compute::<4, 1>(
             FuncId::CDLSEPARATINGLINES,
             inputs,
             &params,
@@ -590,25 +590,25 @@ fn cdlseparatinglines(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult
 #[polars_expr(output_type=Int32)]
 fn cdlshootingstar(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::CDLSHOOTINGSTAR, inputs, &params, &[0, 1, 2, 3], &[])
+        compute::<4, 1>(FuncId::CDLSHOOTINGSTAR, inputs, &params, &[0, 1, 2, 3], &[])
     })
 }
 #[polars_expr(output_type=Int32)]
 fn cdlshortline(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::CDLSHORTLINE, inputs, &params, &[0, 1, 2, 3], &[])
+        compute::<4, 1>(FuncId::CDLSHORTLINE, inputs, &params, &[0, 1, 2, 3], &[])
     })
 }
 #[polars_expr(output_type=Int32)]
 fn cdlspinningtop(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::CDLSPINNINGTOP, inputs, &params, &[0, 1, 2, 3], &[])
+        compute::<4, 1>(FuncId::CDLSPINNINGTOP, inputs, &params, &[0, 1, 2, 3], &[])
     })
 }
 #[polars_expr(output_type=Int32)]
 fn cdlstalledpattern(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(
+        compute::<4, 1>(
             FuncId::CDLSTALLEDPATTERN,
             inputs,
             &params,
@@ -620,7 +620,7 @@ fn cdlstalledpattern(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<
 #[polars_expr(output_type=Int32)]
 fn cdlsticksandwich(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(
+        compute::<4, 1>(
             FuncId::CDLSTICKSANDWICH,
             inputs,
             &params,
@@ -632,37 +632,37 @@ fn cdlsticksandwich(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<S
 #[polars_expr(output_type=Int32)]
 fn cdltakuri(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::CDLTAKURI, inputs, &params, &[0, 1, 2, 3], &[])
+        compute::<4, 1>(FuncId::CDLTAKURI, inputs, &params, &[0, 1, 2, 3], &[])
     })
 }
 #[polars_expr(output_type=Int32)]
 fn cdltasukigap(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::CDLTASUKIGAP, inputs, &params, &[0, 1, 2, 3], &[])
+        compute::<4, 1>(FuncId::CDLTASUKIGAP, inputs, &params, &[0, 1, 2, 3], &[])
     })
 }
 #[polars_expr(output_type=Int32)]
 fn cdlthrusting(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::CDLTHRUSTING, inputs, &params, &[0, 1, 2, 3], &[])
+        compute::<4, 1>(FuncId::CDLTHRUSTING, inputs, &params, &[0, 1, 2, 3], &[])
     })
 }
 #[polars_expr(output_type=Int32)]
 fn cdltristar(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::CDLTRISTAR, inputs, &params, &[0, 1, 2, 3], &[])
+        compute::<4, 1>(FuncId::CDLTRISTAR, inputs, &params, &[0, 1, 2, 3], &[])
     })
 }
 #[polars_expr(output_type=Int32)]
 fn cdlunique3river(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::CDLUNIQUE3RIVER, inputs, &params, &[0, 1, 2, 3], &[])
+        compute::<4, 1>(FuncId::CDLUNIQUE3RIVER, inputs, &params, &[0, 1, 2, 3], &[])
     })
 }
 #[polars_expr(output_type=Int32)]
 fn cdlupsidegap2crows(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(
+        compute::<4, 1>(
             FuncId::CDLUPSIDEGAP2CROWS,
             inputs,
             &params,
@@ -674,7 +674,7 @@ fn cdlupsidegap2crows(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult
 #[polars_expr(output_type=Int32)]
 fn cdlxsidegap3methods(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(
+        compute::<4, 1>(
             FuncId::CDLXSIDEGAP3METHODS,
             inputs,
             &params,
@@ -686,73 +686,73 @@ fn cdlxsidegap3methods(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResul
 #[polars_expr(output_type=Float64)]
 fn ceil(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::CEIL, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::CEIL, inputs, &params, &[0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn cmf(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::CMF, inputs, &params, &[0, 1, 2, 3], &[])
+        compute::<4, 1>(FuncId::CMF, inputs, &params, &[0, 1, 2, 3], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn cmo(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::CMO, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::CMO, inputs, &params, &[0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn cmou(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::CMOU, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::CMOU, inputs, &params, &[0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn coppock(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::COPPOCK, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::COPPOCK, inputs, &params, &[0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn correl(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::CORREL, inputs, &params, &[0, 1], &[])
+        compute::<2, 1>(FuncId::CORREL, inputs, &params, &[0, 1], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn cos(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::COS, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::COS, inputs, &params, &[0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn cosh(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::COSH, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::COSH, inputs, &params, &[0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn cumsum(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::CUMSUM, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::CUMSUM, inputs, &params, &[0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn cvi(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::CVI, inputs, &params, &[0, 1], &[])
+        compute::<2, 1>(FuncId::CVI, inputs, &params, &[0, 1], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn dema(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::DEMA, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::DEMA, inputs, &params, &[0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn div(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::DIV, inputs, &params, &[0, 1], &[])
+        compute::<2, 1>(FuncId::DIV, inputs, &params, &[0, 1], &[])
     })
 }
 fn donchian_output(_: &[Field]) -> PolarsResult<Field> {
@@ -768,7 +768,7 @@ fn donchian_output(_: &[Field]) -> PolarsResult<Field> {
 #[polars_expr(output_type_func=donchian_output)]
 fn donchian(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(
+        compute::<2, 3>(
             FuncId::DONCHIAN,
             inputs,
             &params,
@@ -780,31 +780,31 @@ fn donchian(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
 #[polars_expr(output_type=Float64)]
 fn dpo(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::DPO, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::DPO, inputs, &params, &[0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn dx(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::DX, inputs, &params, &[1, 2, 0], &[])
+        compute::<3, 1>(FuncId::DX, inputs, &params, &[1, 2, 0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn efi(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::EFI, inputs, &params, &[0, 1], &[])
+        compute::<2, 1>(FuncId::EFI, inputs, &params, &[0, 1], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn ema(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::EMA, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::EMA, inputs, &params, &[0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn er(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::ER, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::ER, inputs, &params, &[0], &[])
     })
 }
 fn eri_output(_: &[Field]) -> PolarsResult<Field> {
@@ -819,7 +819,7 @@ fn eri_output(_: &[Field]) -> PolarsResult<Field> {
 #[polars_expr(output_type_func=eri_output)]
 fn eri(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(
+        compute::<3, 2>(
             FuncId::ERI,
             inputs,
             &params,
@@ -831,19 +831,19 @@ fn eri(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
 #[polars_expr(output_type=Float64)]
 fn exp(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::EXP, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::EXP, inputs, &params, &[0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn floor(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::FLOOR, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::FLOOR, inputs, &params, &[0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn fosc(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::FOSC, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::FOSC, inputs, &params, &[0], &[])
     })
 }
 fn fractal_output(_: &[Field]) -> PolarsResult<Field> {
@@ -858,7 +858,7 @@ fn fractal_output(_: &[Field]) -> PolarsResult<Field> {
 #[polars_expr(output_type_func=fractal_output)]
 fn fractal(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(
+        compute::<2, 2>(
             FuncId::FRACTAL,
             inputs,
             &params,
@@ -881,7 +881,7 @@ fn ha_output(_: &[Field]) -> PolarsResult<Field> {
 #[polars_expr(output_type_func=ha_output)]
 fn ha(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(
+        compute::<4, 4>(
             FuncId::HA,
             inputs,
             &params,
@@ -893,19 +893,19 @@ fn ha(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
 #[polars_expr(output_type=Float64)]
 fn hma(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::HMA, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::HMA, inputs, &params, &[0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn ht_dcperiod(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::HT_DCPERIOD, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::HT_DCPERIOD, inputs, &params, &[0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn ht_dcphase(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::HT_DCPHASE, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::HT_DCPHASE, inputs, &params, &[0], &[])
     })
 }
 fn ht_phasor_output(_: &[Field]) -> PolarsResult<Field> {
@@ -920,7 +920,7 @@ fn ht_phasor_output(_: &[Field]) -> PolarsResult<Field> {
 #[polars_expr(output_type_func=ht_phasor_output)]
 fn ht_phasor(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(
+        compute::<1, 2>(
             FuncId::HT_PHASOR,
             inputs,
             &params,
@@ -941,7 +941,7 @@ fn ht_sine_output(_: &[Field]) -> PolarsResult<Field> {
 #[polars_expr(output_type_func=ht_sine_output)]
 fn ht_sine(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(
+        compute::<1, 2>(
             FuncId::HT_SINE,
             inputs,
             &params,
@@ -953,25 +953,25 @@ fn ht_sine(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
 #[polars_expr(output_type=Float64)]
 fn ht_trendline(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::HT_TRENDLINE, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::HT_TRENDLINE, inputs, &params, &[0], &[])
     })
 }
 #[polars_expr(output_type=Int32)]
 fn ht_trendmode(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::HT_TRENDMODE, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::HT_TRENDMODE, inputs, &params, &[0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn imi(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::IMI, inputs, &params, &[0, 1], &[])
+        compute::<2, 1>(FuncId::IMI, inputs, &params, &[0, 1], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn kama(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::KAMA, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::KAMA, inputs, &params, &[0], &[])
     })
 }
 fn kc_output(_: &[Field]) -> PolarsResult<Field> {
@@ -987,7 +987,7 @@ fn kc_output(_: &[Field]) -> PolarsResult<Field> {
 #[polars_expr(output_type_func=kc_output)]
 fn kc(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(
+        compute::<3, 3>(
             FuncId::KC,
             inputs,
             &params,
@@ -1009,49 +1009,49 @@ fn kdj_output(_: &[Field]) -> PolarsResult<Field> {
 #[polars_expr(output_type_func=kdj_output)]
 fn kdj(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::KDJ, inputs, &params, &[0, 1, 2], &["k", "d", "j"])
+        compute::<3, 3>(FuncId::KDJ, inputs, &params, &[0, 1, 2], &["k", "d", "j"])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn linearreg(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::LINEARREG, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::LINEARREG, inputs, &params, &[0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn linearreg_angle(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::LINEARREG_ANGLE, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::LINEARREG_ANGLE, inputs, &params, &[0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn linearreg_intercept(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::LINEARREG_INTERCEPT, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::LINEARREG_INTERCEPT, inputs, &params, &[0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn linearreg_slope(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::LINEARREG_SLOPE, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::LINEARREG_SLOPE, inputs, &params, &[0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn ln(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::LN, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::LN, inputs, &params, &[0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn log10(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::LOG10, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::LOG10, inputs, &params, &[0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn ma(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::MA, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::MA, inputs, &params, &[0], &[])
     })
 }
 fn macd_output(_: &[Field]) -> PolarsResult<Field> {
@@ -1067,7 +1067,7 @@ fn macd_output(_: &[Field]) -> PolarsResult<Field> {
 #[polars_expr(output_type_func=macd_output)]
 fn macd(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(
+        compute::<1, 3>(
             FuncId::MACD,
             inputs,
             &params,
@@ -1089,7 +1089,7 @@ fn macdext_output(_: &[Field]) -> PolarsResult<Field> {
 #[polars_expr(output_type_func=macdext_output)]
 fn macdext(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(
+        compute::<1, 3>(
             FuncId::MACDEXT,
             inputs,
             &params,
@@ -1111,7 +1111,7 @@ fn macdfix_output(_: &[Field]) -> PolarsResult<Field> {
 #[polars_expr(output_type_func=macdfix_output)]
 fn macdfix(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(
+        compute::<1, 3>(
             FuncId::MACDFIX,
             inputs,
             &params,
@@ -1132,73 +1132,73 @@ fn mama_output(_: &[Field]) -> PolarsResult<Field> {
 #[polars_expr(output_type_func=mama_output)]
 fn mama(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::MAMA, inputs, &params, &[0], &["mama", "fama"])
+        compute::<1, 2>(FuncId::MAMA, inputs, &params, &[0], &["mama", "fama"])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn marketfi(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::MARKETFI, inputs, &params, &[0, 1, 2], &[])
+        compute::<3, 1>(FuncId::MARKETFI, inputs, &params, &[0, 1, 2], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn massi(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::MASSI, inputs, &params, &[0, 1], &[])
+        compute::<2, 1>(FuncId::MASSI, inputs, &params, &[0, 1], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn mavp(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::MAVP, inputs, &params, &[0, 1], &[])
+        compute::<2, 1>(FuncId::MAVP, inputs, &params, &[0, 1], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn max(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::MAX, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::MAX, inputs, &params, &[0], &[])
     })
 }
 #[polars_expr(output_type=Int32)]
 fn maxindex(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::MAXINDEX, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::MAXINDEX, inputs, &params, &[0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn medprice(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::MEDPRICE, inputs, &params, &[0, 1], &[])
+        compute::<2, 1>(FuncId::MEDPRICE, inputs, &params, &[0, 1], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn mfi(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::MFI, inputs, &params, &[1, 2, 0, 3], &[])
+        compute::<4, 1>(FuncId::MFI, inputs, &params, &[1, 2, 0, 3], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn midpoint(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::MIDPOINT, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::MIDPOINT, inputs, &params, &[0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn midprice(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::MIDPRICE, inputs, &params, &[0, 1], &[])
+        compute::<2, 1>(FuncId::MIDPRICE, inputs, &params, &[0, 1], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn min(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::MIN, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::MIN, inputs, &params, &[0], &[])
     })
 }
 #[polars_expr(output_type=Int32)]
 fn minindex(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::MININDEX, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::MININDEX, inputs, &params, &[0], &[])
     })
 }
 fn minmax_output(_: &[Field]) -> PolarsResult<Field> {
@@ -1213,7 +1213,7 @@ fn minmax_output(_: &[Field]) -> PolarsResult<Field> {
 #[polars_expr(output_type_func=minmax_output)]
 fn minmax(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::MINMAX, inputs, &params, &[0], &["min", "max"])
+        compute::<1, 2>(FuncId::MINMAX, inputs, &params, &[0], &["min", "max"])
     })
 }
 fn minmaxindex_output(_: &[Field]) -> PolarsResult<Field> {
@@ -1228,7 +1228,7 @@ fn minmaxindex_output(_: &[Field]) -> PolarsResult<Field> {
 #[polars_expr(output_type_func=minmaxindex_output)]
 fn minmaxindex(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(
+        compute::<1, 2>(
             FuncId::MINMAXINDEX,
             inputs,
             &params,
@@ -1240,175 +1240,175 @@ fn minmaxindex(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series
 #[polars_expr(output_type=Float64)]
 fn minus_di(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::MINUS_DI, inputs, &params, &[1, 2, 0], &[])
+        compute::<3, 1>(FuncId::MINUS_DI, inputs, &params, &[1, 2, 0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn minus_dm(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::MINUS_DM, inputs, &params, &[0, 1], &[])
+        compute::<2, 1>(FuncId::MINUS_DM, inputs, &params, &[0, 1], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn mom(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::MOM, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::MOM, inputs, &params, &[0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn mult(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::MULT, inputs, &params, &[0, 1], &[])
+        compute::<2, 1>(FuncId::MULT, inputs, &params, &[0, 1], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn natr(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::NATR, inputs, &params, &[1, 2, 0], &[])
+        compute::<3, 1>(FuncId::NATR, inputs, &params, &[1, 2, 0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn nvi(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::NVI, inputs, &params, &[0, 1], &[])
+        compute::<2, 1>(FuncId::NVI, inputs, &params, &[0, 1], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn obv(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::OBV, inputs, &params, &[0, 1], &[])
+        compute::<2, 1>(FuncId::OBV, inputs, &params, &[0, 1], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn percentile(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::PERCENTILE, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::PERCENTILE, inputs, &params, &[0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn percentrank(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::PERCENTRANK, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::PERCENTRANK, inputs, &params, &[0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn plus_di(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::PLUS_DI, inputs, &params, &[1, 2, 0], &[])
+        compute::<3, 1>(FuncId::PLUS_DI, inputs, &params, &[1, 2, 0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn plus_dm(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::PLUS_DM, inputs, &params, &[0, 1], &[])
+        compute::<2, 1>(FuncId::PLUS_DM, inputs, &params, &[0, 1], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn ppo(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::PPO, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::PPO, inputs, &params, &[0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn pvi(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::PVI, inputs, &params, &[0, 1], &[])
+        compute::<2, 1>(FuncId::PVI, inputs, &params, &[0, 1], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn pvo(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::PVO, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::PVO, inputs, &params, &[0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn pvt(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::PVT, inputs, &params, &[0, 1], &[])
+        compute::<2, 1>(FuncId::PVT, inputs, &params, &[0, 1], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn qstick(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::QSTICK, inputs, &params, &[0, 1], &[])
+        compute::<2, 1>(FuncId::QSTICK, inputs, &params, &[0, 1], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn rma(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::RMA, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::RMA, inputs, &params, &[0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn roc(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::ROC, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::ROC, inputs, &params, &[0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn rocp(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::ROCP, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::ROCP, inputs, &params, &[0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn rocr(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::ROCR, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::ROCR, inputs, &params, &[0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn rocr100(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::ROCR100, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::ROCR100, inputs, &params, &[0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn rsi(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::RSI, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::RSI, inputs, &params, &[0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn rvi(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::RVI, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::RVI, inputs, &params, &[0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn rvol(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::RVOL, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::RVOL, inputs, &params, &[0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn sar(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::SAR, inputs, &params, &[0, 1], &[])
+        compute::<2, 1>(FuncId::SAR, inputs, &params, &[0, 1], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn sarext(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::SAREXT, inputs, &params, &[0, 1], &[])
+        compute::<2, 1>(FuncId::SAREXT, inputs, &params, &[0, 1], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn sin(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::SIN, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::SIN, inputs, &params, &[0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn sinh(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::SINH, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::SINH, inputs, &params, &[0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn sma(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::SMA, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::SMA, inputs, &params, &[0], &[])
     })
 }
 fn smi_output(_: &[Field]) -> PolarsResult<Field> {
@@ -1423,7 +1423,7 @@ fn smi_output(_: &[Field]) -> PolarsResult<Field> {
 #[polars_expr(output_type_func=smi_output)]
 fn smi(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(
+        compute::<3, 2>(
             FuncId::SMI,
             inputs,
             &params,
@@ -1435,13 +1435,13 @@ fn smi(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
 #[polars_expr(output_type=Float64)]
 fn sqrt(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::SQRT, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::SQRT, inputs, &params, &[0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn stddev(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::STDDEV, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::STDDEV, inputs, &params, &[0], &[])
     })
 }
 fn stoch_output(_: &[Field]) -> PolarsResult<Field> {
@@ -1456,7 +1456,7 @@ fn stoch_output(_: &[Field]) -> PolarsResult<Field> {
 #[polars_expr(output_type_func=stoch_output)]
 fn stoch(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(
+        compute::<3, 2>(
             FuncId::STOCH,
             inputs,
             &params,
@@ -1477,7 +1477,7 @@ fn stochf_output(_: &[Field]) -> PolarsResult<Field> {
 #[polars_expr(output_type_func=stochf_output)]
 fn stochf(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(
+        compute::<3, 2>(
             FuncId::STOCHF,
             inputs,
             &params,
@@ -1498,19 +1498,19 @@ fn stochrsi_output(_: &[Field]) -> PolarsResult<Field> {
 #[polars_expr(output_type_func=stochrsi_output)]
 fn stochrsi(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::STOCHRSI, inputs, &params, &[0], &["fastk", "fastd"])
+        compute::<1, 2>(FuncId::STOCHRSI, inputs, &params, &[0], &["fastk", "fastd"])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn sub(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::SUB, inputs, &params, &[0, 1], &[])
+        compute::<2, 1>(FuncId::SUB, inputs, &params, &[0, 1], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn sum(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::SUM, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::SUM, inputs, &params, &[0], &[])
     })
 }
 fn supertrend_output(_: &[Field]) -> PolarsResult<Field> {
@@ -1525,7 +1525,7 @@ fn supertrend_output(_: &[Field]) -> PolarsResult<Field> {
 #[polars_expr(output_type_func=supertrend_output)]
 fn supertrend(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(
+        compute::<3, 2>(
             FuncId::SUPERTREND,
             inputs,
             &params,
@@ -1537,79 +1537,79 @@ fn supertrend(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series>
 #[polars_expr(output_type=Float64)]
 fn t3(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::T3, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::T3, inputs, &params, &[0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn tan(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::TAN, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::TAN, inputs, &params, &[0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn tanh(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::TANH, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::TANH, inputs, &params, &[0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn tema(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::TEMA, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::TEMA, inputs, &params, &[0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn trange(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::TRANGE, inputs, &params, &[1, 2, 0], &[])
+        compute::<3, 1>(FuncId::TRANGE, inputs, &params, &[1, 2, 0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn trima(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::TRIMA, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::TRIMA, inputs, &params, &[0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn trix(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::TRIX, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::TRIX, inputs, &params, &[0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn tsf(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::TSF, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::TSF, inputs, &params, &[0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn tsi(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::TSI, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::TSI, inputs, &params, &[0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn typprice(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::TYPPRICE, inputs, &params, &[1, 2, 0], &[])
+        compute::<3, 1>(FuncId::TYPPRICE, inputs, &params, &[1, 2, 0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn ultosc(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::ULTOSC, inputs, &params, &[1, 2, 0], &[])
+        compute::<3, 1>(FuncId::ULTOSC, inputs, &params, &[1, 2, 0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn var(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::VAR, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::VAR, inputs, &params, &[0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn vhf(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::VHF, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::VHF, inputs, &params, &[0], &[])
     })
 }
 fn vortex_output(_: &[Field]) -> PolarsResult<Field> {
@@ -1624,7 +1624,7 @@ fn vortex_output(_: &[Field]) -> PolarsResult<Field> {
 #[polars_expr(output_type_func=vortex_output)]
 fn vortex(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(
+        compute::<3, 2>(
             FuncId::VORTEX,
             inputs,
             &params,
@@ -1636,43 +1636,43 @@ fn vortex(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
 #[polars_expr(output_type=Float64)]
 fn vwap(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::VWAP, inputs, &params, &[0, 1, 2, 3], &[])
+        compute::<4, 1>(FuncId::VWAP, inputs, &params, &[0, 1, 2, 3], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn vwma(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::VWMA, inputs, &params, &[0, 1], &[])
+        compute::<2, 1>(FuncId::VWMA, inputs, &params, &[0, 1], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn wad(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::WAD, inputs, &params, &[0, 1, 2], &[])
+        compute::<3, 1>(FuncId::WAD, inputs, &params, &[0, 1, 2], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn wclprice(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::WCLPRICE, inputs, &params, &[1, 2, 0], &[])
+        compute::<3, 1>(FuncId::WCLPRICE, inputs, &params, &[1, 2, 0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn willr(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::WILLR, inputs, &params, &[1, 2, 0], &[])
+        compute::<3, 1>(FuncId::WILLR, inputs, &params, &[1, 2, 0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn wma(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::WMA, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::WMA, inputs, &params, &[0], &[])
     })
 }
 #[polars_expr(output_type=Float64)]
 fn zlema(inputs: &[Series], kwargs: Masked<Params>) -> PolarsResult<Series> {
     kwargs.apply(inputs, |params| {
-        compute(FuncId::ZLEMA, inputs, &params, &[0], &[])
+        compute::<1, 1>(FuncId::ZLEMA, inputs, &params, &[0], &[])
     })
 }
 pub(crate) fn option_key(name: &str) -> std::borrow::Cow<'_, str> {

@@ -63,7 +63,8 @@ def test_requested_workload_inventory_has_no_custom_dispatch():
     diagnostic = {name for name, _, _ in workloads.cases(diagnostic=True)}
     assert {'grouped_atr/100x10000', 'grouped_ema/100x10000', 'grouped_atr/10000x100',
             'grouped_ema/10000x100', 'grouped_atr/2000x100_interleaved', 'ema/1000000',
-            'control_cumsum/100x10000', 'control_cumsum/10000x100'} <= standard
+            'control_cumsum/100x10000', 'control_cumsum/10000x100',
+            *{f'grouped_{name}/10000x100' for name in ('rsi','macd','adx','cci','stddev','ppo','add','minmaxindex','cdldoji','hma','supertrend','vwma','mavp')}} <= standard
     assert {'grouped_atr/50000x20', 'grouped_ema/1x1000000', 'control_cumsum/10x100000'} <= diagnostic
     assert standard < diagnostic
     assert not any('dispatcher' in name or 'by_group' in name for name in diagnostic)
@@ -86,3 +87,28 @@ def test_api_annotation_changes_are_reported_but_call_contract_changes_fail(tmp_
     assert result['annotation_changed_functions'] == ['aroon']
     save(after, 'IntoExpr', '(low, high, timeperiod: int = 14)')
     assert probe.compare(before, after, report)
+
+
+def test_regression_inventory_keeps_noisy_and_consistent_slower_cases():
+    spec = importlib.util.spec_from_file_location('regressions', ROOT/'scripts/regression_inventory.py')
+    module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+    def row(old, new, envelope):
+        return {'baseline_median_ms':old,'candidate_median_ms':new,'ratio_envelope':envelope,
+                'median_paired_ratio':old/new,'baseline_process_medians_ms':[old]*6,
+                'candidate_process_medians_ms':[new]*6}
+    data = {'comparisons':{'original_vs_candidate':{
+        'grouped_ema/10000x100':row(10,12,[.8,.9]),
+        'grouped_atr/10000x100':row(10,10.2,[.9,1.1]),
+        'ema/1000':row(10,9,[1.05,1.2]),
+        'control_cumsum/10000x100':row(2,2,[.98,1.02])},
+        'original_vs_prior':{},'prior_vs_candidate':{}}}
+    for name,value in data['comparisons']['original_vs_candidate'].items():
+        data['comparisons']['original_vs_prior'][name] = row(value['baseline_median_ms'],11,[.8,1.2])
+        data['comparisons']['prior_vs_candidate'][name] = row(11,value['candidate_median_ms'],[.8,1.2])
+    rows = module.inventory({'results':{'1':data}})
+    assert len(rows) == 4
+    found = {r['case']:r for r in rows}
+    assert found['grouped_ema/10000x100']['category'] == 'consistent slower >5% on this runner'
+    assert found['grouped_atr/10000x100']['category'] == 'slow median, process ranges overlap'
+    assert found['ema/1000']['category'] == 'not slower by median'
+    assert found['grouped_ema/10000x100']['matching_polars_control'] == 'control_cumsum/10000x100'

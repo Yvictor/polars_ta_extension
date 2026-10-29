@@ -26,32 +26,39 @@ import polars_talib as ta
 
 
 FUNCTIONS = ('ema','rsi','macd','atr','adx','cci','stddev','ppo')
+FAMILY_FUNCTIONS = (*FUNCTIONS, 'add', 'minmaxindex', 'cdldoji', 'hma', 'supertrend', 'vwma', 'mavp', 'bbands', 'sarext')
+
+def indicator(name):
+    if name == 'mavp':
+        return ta.mavp(pl.col('close'), pl.col('periods'))
+    return getattr(ta, name)()
 
 
 def frame(rows,bars):
     rng=np.random.default_rng(260126)
     close=100+np.cumsum(rng.normal(0,.1,rows))
     return pl.DataFrame({'close':close,'open':close-.1,'high':close+1,'low':close-1,
-                         'volume':rng.uniform(100,1000,rows),'symbol':np.arange(rows)//bars})
+                         'volume':rng.uniform(100,1000,rows),'periods':np.resize([3.,5.,9.,14.],rows),'symbol':np.arange(rows)//bars})
 
 
 def cases(diagnostic=False):
     for n in (1000,1_000_000):
         data=frame(n,1000)
-        for f in ('ema','rsi','macd','atr'):
-            yield f'{f}/{n}',data,[getattr(ta,f)().alias(f)]
-        yield f'mix8/{n}',data,[getattr(ta,f)().alias(f) for f in FUNCTIONS]
+        for f in FAMILY_FUNCTIONS:
+            yield f'{f}/{n}',data,[indicator(f).alias(f)]
+        yield f'mix8/{n}',data,[indicator(f).alias(f) for f in FUNCTIONS]
+        yield f'control_cumsum_dense/{n}',data,[pl.col('close').cum_sum().alias('control')]
     layouts=[(100,10000,False),(1000,1000,False),(10000,100,False),(2000,100,True)]
     if diagnostic:layouts += [(50000,20,False),(10,100000,False),(1,1000000,False)]
     for groups,bars,interleaved in layouts:
         data=frame(groups*bars,bars)
         if interleaved:
             data=data.with_row_index('_row').with_columns((pl.col('_row')%bars).alias('_within')).sort('_within','symbol').drop('_row','_within')
-        choices=(('ema',),('atr',),FUNCTIONS) if bars in (100,1000,10000) else (('ema',),('atr',))
+        choices=tuple((f,) for f in FAMILY_FUNCTIONS)+(FUNCTIONS,) if bars in (100,1000,10000) else (('ema',),('atr',))
         for functions in choices:
             label=functions[0] if len(functions)==1 else 'mix8'
             key=f'grouped_{label}/{groups}x{bars}'+('_interleaved' if interleaved else '')
-            yield key,data,[getattr(ta,f)().over('symbol').alias(f) for f in functions]
+            yield key,data,[indicator(f).over('symbol').alias(f) for f in functions]
         suffix='_interleaved' if interleaved else ''
         yield f'control_cumsum/{groups}x{bars}'+suffix,data,[pl.col('close').cum_sum().over('symbol').alias('control')]
 
