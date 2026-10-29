@@ -113,8 +113,12 @@ def run_setting(args, threads, affinity):
         for pattern in ([selected] if selected is not None else args.case_filter):
             command += ['--case-filter', pattern]
         commands.append(command)
+        with (out/'commands.jsonl').open('a') as log:
+            log.write(json.dumps({'label': label, 'side': side, 'selected_case': selected,
+                                  'argv': command, 'polars_threads': threads})+'\n')
         print(f'{time.strftime("%H:%M:%S")} threads={threads} {label} {selected or "validation"}', flush=True)
-        subprocess.run(command, env=env, check=True)
+        with (out/(label+'.stdout.log')).open('w') as stdout, (out/(label+'.stderr.log')).open('w') as stderr:
+            subprocess.run(command, env=env, check=True, stdout=stdout, stderr=stderr)
         result = json.loads((out/(label+'.json')).read_text())
         if selected is not None:
             selected_inventory(result, [selected])
