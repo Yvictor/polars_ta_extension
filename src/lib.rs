@@ -2,6 +2,7 @@ mod compat;
 mod generated;
 mod missing;
 mod native;
+mod params;
 mod utils;
 use pyo3::{pyfunction, pymodule, types::PyModule, wrap_pyfunction, PyResult, Python};
 

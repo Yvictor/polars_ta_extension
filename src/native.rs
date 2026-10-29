@@ -2,7 +2,6 @@
 use crate::generated::option_key;
 use crate::utils::{broadcast_inputs, cast_series_to_f64};
 use polars::prelude::*;
-use serde::Deserialize;
 use std::{collections::BTreeMap, sync::OnceLock};
 use ta_lib::{
     abstract_api::{FuncId, InputType, OptInputType, OutputType, ParamHolder},
@@ -14,12 +13,7 @@ pub fn core() -> &'static Core {
     CORE.get_or_init(Core::new)
 }
 
-#[derive(Debug, Deserialize)]
-#[serde(untagged)]
-pub enum Param {
-    Int(i32),
-    Real(f64),
-}
+pub use crate::params::Param;
 pub type Params = BTreeMap<String, Param>;
 
 pub fn bind_params(holder: &mut ParamHolder<'_>, params: &Params) -> Result<(), RetCode> {

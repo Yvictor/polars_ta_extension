@@ -7,6 +7,7 @@ use ta_lib::abstract_api::FuncId;
 #[test]
 #[ignore = "release-only diagnostic; raw distributions are archived by CI"]
 fn adapter_cost_probe() {
+    kwargs_cost_probe();
     println!(
         "COST_PROBE metadata_functions={}",
         ta_lib::abstract_api::FUNCS.len()
@@ -158,5 +159,66 @@ fn compute_probe(
         compute::<1, 1>(id, inputs, params, order, names)
     } else {
         compute::<3, 1>(id, inputs, params, order, names)
+    }
+}
+
+// The derive macro decodes this envelope once per plugin callback, before
+// compute. Keep this stage separate from numerical/adapter timings above.
+fn kwargs_cost_probe() {
+    use crate::{missing::Masked, params::legacy};
+    use serde::Deserialize;
+    use std::collections::BTreeMap;
+    fn samples<T: for<'de> Deserialize<'de>>(bytes: &[u8]) -> Vec<f64> {
+        let decode =
+            || serde_pickle::from_slice::<Masked<T>>(black_box(bytes), Default::default()).unwrap();
+        for _ in 0..256 {
+            black_box(decode());
+        }
+        (0..9)
+            .map(|_| {
+                let start = Instant::now();
+                for _ in 0..10_000 {
+                    black_box(decode());
+                }
+                start.elapsed().as_nanos() as f64 / 10_000.
+            })
+            .collect()
+    }
+    for (name, bytes) in [
+        (
+            "ADD",
+            &include_bytes!("../tests/data/kwargs-add-protocol5.pkl")[..],
+        ),
+        (
+            "EMA",
+            &include_bytes!("../tests/data/kwargs-ema-protocol5.pkl")[..],
+        ),
+        (
+            "ATR",
+            &include_bytes!("../tests/data/kwargs-atr-protocol5.pkl")[..],
+        ),
+        (
+            "MACD",
+            &include_bytes!("../tests/data/kwargs-macd-protocol5.pkl")[..],
+        ),
+        (
+            "BBANDS",
+            &include_bytes!("../tests/data/kwargs-bbands-protocol5.pkl")[..],
+        ),
+        (
+            "MACDEXT",
+            &include_bytes!("../tests/data/kwargs-macdext-protocol5.pkl")[..],
+        ),
+        (
+            "SAREXT",
+            &include_bytes!("../tests/data/kwargs-sarext-protocol5.pkl")[..],
+        ),
+    ] {
+        let old = samples::<BTreeMap<String, legacy::Param>>(bytes);
+        let current = samples::<Params>(bytes);
+        println!("COST_PROBE {name}/kwargs_pickle_old iterations=10000 ns_per_call={old:?}");
+        println!(
+            "COST_PROBE {name}/kwargs_pickle_current iterations=10000 ns_per_call={current:?}"
+        );
     }
 }

@@ -989,6 +989,7 @@ dependencies = [
  "pyo3",
  "pyo3-polars",
  "serde",
+ "serde-pickle",
  "ta-lib",
 ]
 

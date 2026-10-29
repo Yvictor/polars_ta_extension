@@ -25,3 +25,6 @@ mimalloc = { version = "0.1", default-features = false }
  
 [target.'cfg(target_os = "linux")'.dependencies]
 jemallocator = { version = "0.5", features = ["disable_initial_exec_tls"] }
+
+[dev-dependencies]
+serde-pickle = "=1.2.0"
