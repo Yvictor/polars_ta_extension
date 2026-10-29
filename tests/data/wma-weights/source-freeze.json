@@ -1,0 +1,28 @@
+{
+  "base": "ccd3172940ed1d9daa4e7197f2265810852e8910",
+  "files": {
+    "src/ta_func/ta_WMA.c": "0b649ebb31c17cd11d6135415ac61f7b817d3609c8082940843e402f4470ca44",
+    "ta_codegen/input/wma/wma.c": "c776c28fe6457c6621ebff2620f2038f9fd1c579814808f4a6c232aea6f817cd",
+    "ta_codegen/output/csharp/library/src/Core_WMA.cs": "2455b1566cd5888965949283a5f9fc853e91fd0cd52f474da7a8c6b39371887c",
+    "ta_codegen/output/java/fragments/Core_WMA.java": "a22511c18df98c727230dc52e9fdeeef6a93cef603a8c74eb08ed21afd69cdb2",
+    "ta_codegen/output/java/library/src/main/java/io/github/talib/BuildStamp.java": "f653a4fed9fa3ffa9af1717fd6bb7db7c9c667d8bd97abafac62902517d297b4",
+    "ta_codegen/output/java/library/src/main/java/io/github/talib/Core.java": "1cf0713aef24646928b14185be577ccda32d126d6922afc29296baeb2130a2e0",
+    "ta_codegen/output/java/tools/TaCodegenServe.java": "401b746a092c21afe199efd44213b90160556ac2d6b663b4d4377eff802e7467",
+    "ta_codegen/output/rust/library/src/ta_func/wma.rs": "ff281fe2260db66e3c8eecb727b9a3e60e604bff21f2f1d1def88ef03160c425",
+    "ta_codegen/output/rust/library/tests/data/wma-exact-weights-provenance.json": "5e14f82368e4f756a009cb96ddafee19e4401533ef24f68512f0e1d0283edb3f",
+    "ta_codegen/output/rust/library/tests/data/wma-exact-weights.bin": "9d15ff42749915e825aee787ac216e5545a1f4735c801a91795a2d9c62d1e17f",
+    "ta_codegen/output/rust/library/tests/data/wma-exact-weights.tsv": "99e013bc67556544bf872b63ec7bf18b1183707ff0c72157b6f977fee8640d81",
+    "ta_codegen/output/rust/library/tests/wma_exact_weights.rs": "965d653b492e53a4d20cb566f8c40780500e5fd72f74bef60913116d1922f455"
+  },
+  "published": false,
+  "performance": "UNVERIFIED; no local timings; controlledCIrequiredincludingbefore/newCpair",
+  "proofs": {
+    "public-parity-summary.json": "c040763fb37c948a8cfd10ed24a375ab64c0aa3f5ba1e1c7d0275d61dc9fda10",
+    "public-all-C-and-Rust-parity-summary.json": "0064092be381b1fe6e5580f8090fffce673083f513ff06af53f8230328f5c665",
+    "C081-parity-summary.json": "cee0ae51042feeeb36f8b9c144edb48ebcd783edfec21c55bfb48ad345f10fdc",
+    "state-abi-proof.json": "1fd68690222d4d4c40e561de8229bf739b0c2f84d2edd87699c30ee7c4d2d731",
+    "static-summary.json": "802f65a9be1d02287a72ed2dbc395d1c62cb498a45487b3603465d243e40c264",
+    "full-gates.json": "8ef35081752f428614781c83288b23e333152920c8c8f73446ac799bbf7e4111"
+  },
+  "commit": "220eb7bafcc5f409799f7902809200c0479a12bb"
+}

@@ -1,0 +1,183 @@
+{
+  "PASS": true,
+  "scope": "R1.90normalreleaseO3/cgu16/LTOfalse libraryELFobjects; R1.97O3/cgu1/ThinLTO publicprobe post-importobjects. No targetexecution/no localtimings; notactualnormalpublishedwheel. FunctioninstructionsboundedbyexactELFsymbolst_size; paddingexcluded.",
+  "functions": {
+    "baseline-1.90.0": {
+      "batch": {
+        "object": "baseline-static-1.90.0/library-objects/ta_lib-a99de56cdf066125.ta_lib.4f1d99721d8d97c2-cgu.00.rcgu.o",
+        "object_sha256": "18d3a8f3d0023f34f1057d414a1e6a0d9634a283216c63f0dafb230c8f47e26a",
+        "symbol": "ta_lib::ta_func::wma::_$LT$impl$u20$ta_lib..ta_func..types..Core$GT$::wma::h6d81ff5cce00f4e7",
+        "section": ".text._ZN6ta_lib7ta_func3wma46_$LT$impl$u20$ta_lib..ta_func..types..Core$GT$3wma17h6d81ff5cce00f4e7E",
+        "size_bytes": 909,
+        "instruction_count": 234,
+        "asm": "baseline-static-1.90.0/batch.asm",
+        "asm_sha256": "be0416329167c3e5345776c94b5acfa52eb5f579539654cc27621cb0eb4933c2",
+        "unsigned_reseed_conversion_punpckldq_count": 1,
+        "integer_to_f64_instruction_count": 5
+      },
+      "step": {
+        "object": "baseline-static-1.90.0/library-objects/ta_lib-a99de56cdf066125.ta_lib.4f1d99721d8d97c2-cgu.00.rcgu.o",
+        "object_sha256": "18d3a8f3d0023f34f1057d414a1e6a0d9634a283216c63f0dafb230c8f47e26a",
+        "symbol": ".hidden ta_lib::ta_func::wma::_$LT$impl$u20$ta_lib..ta_func..types..Core$GT$::wma_step_impl::hca922b81c96c2bdb",
+        "section": ".text._ZN6ta_lib7ta_func3wma46_$LT$impl$u20$ta_lib..ta_func..types..Core$GT$13wma_step_impl17hca922b81c96c2bdbE",
+        "size_bytes": 515,
+        "instruction_count": 132,
+        "asm": "baseline-static-1.90.0/step.asm",
+        "asm_sha256": "567e90852821028ca515b34aa3047e1598d858ee0adf51790014a4b9ca6621e7",
+        "unsigned_reseed_conversion_punpckldq_count": 1,
+        "integer_to_f64_instruction_count": 1
+      },
+      "update": {
+        "object": "baseline-static-1.90.0/library-objects/ta_lib-a99de56cdf066125.ta_lib.4f1d99721d8d97c2-cgu.14.rcgu.o",
+        "object_sha256": "122865746e1b10e4d82ea54c587496877d33e7a0efc393ba7ac834e4e85e82b0",
+        "symbol": "ta_lib::ta_func::wma::WmaStream::update::hf808f4d08f702922",
+        "section": ".text._ZN6ta_lib7ta_func3wma9WmaStream6update17hf808f4d08f702922E",
+        "size_bytes": 138,
+        "instruction_count": 34,
+        "asm": "baseline-static-1.90.0/update.asm",
+        "asm_sha256": "ec45fe6367eb04a54ebbd4635844a96539f846d4e8f70276537bdc1e2b1643b3",
+        "unsigned_reseed_conversion_punpckldq_count": 0,
+        "integer_to_f64_instruction_count": 0
+      },
+      "peek": {
+        "object": "baseline-static-1.90.0/library-objects/ta_lib-a99de56cdf066125.ta_lib.4f1d99721d8d97c2-cgu.14.rcgu.o",
+        "object_sha256": "122865746e1b10e4d82ea54c587496877d33e7a0efc393ba7ac834e4e85e82b0",
+        "symbol": "ta_lib::ta_func::wma::WmaStream::peek::hea8d82bf42e6a405",
+        "section": ".text._ZN6ta_lib7ta_func3wma9WmaStream4peek17hea8d82bf42e6a405E",
+        "size_bytes": 372,
+        "instruction_count": 97,
+        "asm": "baseline-static-1.90.0/peek.asm",
+        "asm_sha256": "5f215ef0bba8f7b083383d9fddabf1421e6a0d1a436edec2968a6d7f27ab02a4",
+        "unsigned_reseed_conversion_punpckldq_count": 1,
+        "integer_to_f64_instruction_count": 1
+      }
+    },
+    "candidate-1.90.0": {
+      "batch": {
+        "object": "candidate-static-1.90.0/library-objects/ta_lib-a99de56cdf066125.ta_lib.4f1d99721d8d97c2-cgu.00.rcgu.o",
+        "object_sha256": "95ff71b984a2004ab686c147f8e7f521729bbb9790074feadc145ebef903478e",
+        "symbol": "ta_lib::ta_func::wma::_$LT$impl$u20$ta_lib..ta_func..types..Core$GT$::wma::h6d81ff5cce00f4e7",
+        "section": ".text._ZN6ta_lib7ta_func3wma46_$LT$impl$u20$ta_lib..ta_func..types..Core$GT$3wma17h6d81ff5cce00f4e7E",
+        "size_bytes": 911,
+        "instruction_count": 236,
+        "asm": "candidate-static-1.90.0/batch.asm",
+        "asm_sha256": "60c9a5f8277dd8ce9d8e8829de4145b50d7b9633178df2f3c942ca6e4caa2c56",
+        "unsigned_reseed_conversion_punpckldq_count": 0,
+        "integer_to_f64_instruction_count": 2
+      },
+      "step": {
+        "object": "candidate-static-1.90.0/library-objects/ta_lib-a99de56cdf066125.ta_lib.4f1d99721d8d97c2-cgu.00.rcgu.o",
+        "object_sha256": "95ff71b984a2004ab686c147f8e7f521729bbb9790074feadc145ebef903478e",
+        "symbol": ".hidden ta_lib::ta_func::wma::_$LT$impl$u20$ta_lib..ta_func..types..Core$GT$::wma_step_impl::hca922b81c96c2bdb",
+        "section": ".text._ZN6ta_lib7ta_func3wma46_$LT$impl$u20$ta_lib..ta_func..types..Core$GT$13wma_step_impl17hca922b81c96c2bdbE",
+        "size_bytes": 486,
+        "instruction_count": 122,
+        "asm": "candidate-static-1.90.0/step.asm",
+        "asm_sha256": "ab98eaab63e5073342792fff88f081a250204f16ec0bfed443a1109c3d90290f",
+        "unsigned_reseed_conversion_punpckldq_count": 0,
+        "integer_to_f64_instruction_count": 1
+      },
+      "update": {
+        "object": "candidate-static-1.90.0/library-objects/ta_lib-a99de56cdf066125.ta_lib.4f1d99721d8d97c2-cgu.05.rcgu.o",
+        "object_sha256": "8b66925af6cb02a4ce4dc845fdf64b6909e86cc1df00cefb1810a806265c252e",
+        "symbol": "ta_lib::ta_func::wma::WmaStream::update::hf808f4d08f702922",
+        "section": ".text._ZN6ta_lib7ta_func3wma9WmaStream6update17hf808f4d08f702922E",
+        "size_bytes": 138,
+        "instruction_count": 34,
+        "asm": "candidate-static-1.90.0/update.asm",
+        "asm_sha256": "5ec9437ee4fd031cecbc94bb8ef51640281d02747d00486f5e08fd5e7994b541",
+        "unsigned_reseed_conversion_punpckldq_count": 0,
+        "integer_to_f64_instruction_count": 0
+      },
+      "peek": {
+        "object": "candidate-static-1.90.0/library-objects/ta_lib-a99de56cdf066125.ta_lib.4f1d99721d8d97c2-cgu.05.rcgu.o",
+        "object_sha256": "8b66925af6cb02a4ce4dc845fdf64b6909e86cc1df00cefb1810a806265c252e",
+        "symbol": "ta_lib::ta_func::wma::WmaStream::peek::hea8d82bf42e6a405",
+        "section": ".text._ZN6ta_lib7ta_func3wma9WmaStream4peek17hea8d82bf42e6a405E",
+        "size_bytes": 291,
+        "instruction_count": 78,
+        "asm": "candidate-static-1.90.0/peek.asm",
+        "asm_sha256": "16a9818c3070c6113286ec69b8e741a7fff10383863d8fd2a4eef67e3be5d95e",
+        "unsigned_reseed_conversion_punpckldq_count": 0,
+        "integer_to_f64_instruction_count": 1
+      }
+    },
+    "baseline-1.97.0": {
+      "batch": {
+        "object": "baseline-static-1.97.0/static-probe.ta_lib-51fa72f709535b83.ta_lib.b5d8fdef4152009c-cgu.0.rcgu.o.rcgu.o",
+        "object_sha256": "ffe2fc2c9a0c19b2572f7259ef1cc8d1de9f0b49ac3e118f5bafcd2c0cd1388c",
+        "symbol": "<ta_lib::ta_func::types::Core>::wma",
+        "section": ".text._RNvMNtNtCsfBYb8xZ4HAC_6ta_lib7ta_func3wmaNtNtB4_5types4Core3wma",
+        "size_bytes": 931,
+        "instruction_count": 244,
+        "asm": "baseline-static-1.97.0/batch.asm",
+        "asm_sha256": "0703a6aaae9068a3c210bf0f682c0523cbe2b124c58a5a806c160d4ba5eb8f8d",
+        "unsigned_reseed_conversion_punpckldq_count": 1,
+        "integer_to_f64_instruction_count": 5
+      },
+      "peek": {
+        "object": "baseline-static-1.97.0/static-probe.ta_lib-51fa72f709535b83.ta_lib.b5d8fdef4152009c-cgu.0.rcgu.o.rcgu.o",
+        "object_sha256": "ffe2fc2c9a0c19b2572f7259ef1cc8d1de9f0b49ac3e118f5bafcd2c0cd1388c",
+        "symbol": "<ta_lib::ta_func::wma::WmaStream>::peek",
+        "section": ".text._RNvMs0_NtNtCsfBYb8xZ4HAC_6ta_lib7ta_func3wmaNtB5_9WmaStream4peek",
+        "size_bytes": 372,
+        "instruction_count": 97,
+        "asm": "baseline-static-1.97.0/peek.asm",
+        "asm_sha256": "079ecb3fdec2058accadf68be42c660429660322a1c27325cc93e04d73878731",
+        "unsigned_reseed_conversion_punpckldq_count": 1,
+        "integer_to_f64_instruction_count": 1
+      },
+      "update": {
+        "object": "baseline-static-1.97.0/static-probe.ta_lib-51fa72f709535b83.ta_lib.b5d8fdef4152009c-cgu.0.rcgu.o.rcgu.o",
+        "object_sha256": "ffe2fc2c9a0c19b2572f7259ef1cc8d1de9f0b49ac3e118f5bafcd2c0cd1388c",
+        "symbol": "<ta_lib::ta_func::wma::WmaStream>::update",
+        "section": ".text._RNvMs0_NtNtCsfBYb8xZ4HAC_6ta_lib7ta_func3wmaNtB5_9WmaStream6update",
+        "size_bytes": 672,
+        "instruction_count": 162,
+        "asm": "baseline-static-1.97.0/update.asm",
+        "asm_sha256": "377f647bc061af834b7e52dc24eee214f0aa82e1d2419e8700cc1ba5edd91016",
+        "unsigned_reseed_conversion_punpckldq_count": 1,
+        "integer_to_f64_instruction_count": 1
+      }
+    },
+    "candidate-1.97.0": {
+      "batch": {
+        "object": "candidate-static-1.97.0/static-probe.ta_lib-51fa72f709535b83.ta_lib.b5d8fdef4152009c-cgu.0.rcgu.o.rcgu.o",
+        "object_sha256": "03192c847729b431b4541f65efe17ecc3593e5e8814784a7faccaade116e7d15",
+        "symbol": "<ta_lib::ta_func::types::Core>::wma",
+        "section": ".text._RNvMNtNtCsfBYb8xZ4HAC_6ta_lib7ta_func3wmaNtNtB4_5types4Core3wma",
+        "size_bytes": 933,
+        "instruction_count": 245,
+        "asm": "candidate-static-1.97.0/batch.asm",
+        "asm_sha256": "f6cb611604be11b7815e9d98195fcaed6c0cc1923a8439a4e2221ec2c50c393c",
+        "unsigned_reseed_conversion_punpckldq_count": 0,
+        "integer_to_f64_instruction_count": 2
+      },
+      "peek": {
+        "object": "candidate-static-1.97.0/static-probe.ta_lib-51fa72f709535b83.ta_lib.b5d8fdef4152009c-cgu.0.rcgu.o.rcgu.o",
+        "object_sha256": "03192c847729b431b4541f65efe17ecc3593e5e8814784a7faccaade116e7d15",
+        "symbol": "<ta_lib::ta_func::wma::WmaStream>::peek",
+        "section": ".text._RNvMs0_NtNtCsfBYb8xZ4HAC_6ta_lib7ta_func3wmaNtB5_9WmaStream4peek",
+        "size_bytes": 291,
+        "instruction_count": 78,
+        "asm": "candidate-static-1.97.0/peek.asm",
+        "asm_sha256": "9fa908593b7b8edfe005e1e4144c40bab8ab81c806f4f39ec2652657720a8d9e",
+        "unsigned_reseed_conversion_punpckldq_count": 0,
+        "integer_to_f64_instruction_count": 1
+      },
+      "update": {
+        "object": "candidate-static-1.97.0/static-probe.ta_lib-51fa72f709535b83.ta_lib.b5d8fdef4152009c-cgu.0.rcgu.o.rcgu.o",
+        "object_sha256": "03192c847729b431b4541f65efe17ecc3593e5e8814784a7faccaade116e7d15",
+        "symbol": "<ta_lib::ta_func::wma::WmaStream>::update",
+        "section": ".text._RNvMs0_NtNtCsfBYb8xZ4HAC_6ta_lib7ta_func3wmaNtB5_9WmaStream6update",
+        "size_bytes": 600,
+        "instruction_count": 148,
+        "asm": "candidate-static-1.97.0/update.asm",
+        "asm_sha256": "d8ac78b74e20930d7da9aab88024e20983e76aea231f210b885fc31c83a284e4",
+        "unsigned_reseed_conversion_punpckldq_count": 0,
+        "integer_to_f64_instruction_count": 1
+      }
+    }
+  },
+  "mechanism": "Unsigned reseedweight conversion sequence disappears; f64weights exact1..100000. Bounds, division, reseedfrequency andstatearithmeticorder unchanged. Code-size alone is not speed evidence."
+}

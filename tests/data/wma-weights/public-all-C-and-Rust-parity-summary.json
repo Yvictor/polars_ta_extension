@@ -1,0 +1,130 @@
+{
+  "PASS": true,
+  "comparisons": {
+    "C083-vs-CCD": {
+      "cases": 1966,
+      "elements_including_canaries_and_stream_events": 8169346,
+      "mode_counts": {
+        "wma": 928,
+        "ma": 928,
+        "mavp": 30,
+        "stream": 70,
+        "bank": 10
+      },
+      "failures": [],
+      "NaN_representation_deltas": [],
+      "finite_signed_zero_infinity_words_exact": true,
+      "NaN_positions_exact": true,
+      "all_canary_tail_words_raw_exact": true,
+      "stream_error_codes_ranges_and_peek_no_mutation_checked": true
+    },
+    "CCD-vs-candidate": {
+      "cases": 1966,
+      "elements_including_canaries_and_stream_events": 8169346,
+      "mode_counts": {
+        "wma": 928,
+        "ma": 928,
+        "mavp": 30,
+        "stream": 70,
+        "bank": 10
+      },
+      "failures": [],
+      "NaN_representation_deltas": [],
+      "finite_signed_zero_infinity_words_exact": true,
+      "NaN_positions_exact": true,
+      "all_canary_tail_words_raw_exact": true,
+      "stream_error_codes_ranges_and_peek_no_mutation_checked": true
+    },
+    "C083-vs-candidate": {
+      "cases": 1966,
+      "elements_including_canaries_and_stream_events": 8169346,
+      "mode_counts": {
+        "wma": 928,
+        "ma": 928,
+        "mavp": 30,
+        "stream": 70,
+        "bank": 10
+      },
+      "failures": [],
+      "NaN_representation_deltas": [],
+      "finite_signed_zero_infinity_words_exact": true,
+      "NaN_positions_exact": true,
+      "all_canary_tail_words_raw_exact": true,
+      "stream_error_codes_ranges_and_peek_no_mutation_checked": true
+    },
+    "C083-vs-candidate-C": {
+      "cases": 1966,
+      "elements_including_canaries_and_stream_events": 8169346,
+      "mode_counts": {
+        "wma": 928,
+        "ma": 928,
+        "mavp": 30,
+        "stream": 70,
+        "bank": 10
+      },
+      "failures": [],
+      "NaN_representation_deltas": [],
+      "finite_signed_zero_infinity_words_exact": true,
+      "NaN_positions_exact": true,
+      "all_canary_tail_words_raw_exact": true,
+      "stream_error_codes_ranges_and_peek_no_mutation_checked": true
+    },
+    "candidate-vs-candidate-C": {
+      "cases": 1966,
+      "elements_including_canaries_and_stream_events": 8169346,
+      "mode_counts": {
+        "wma": 928,
+        "ma": 928,
+        "mavp": 30,
+        "stream": 70,
+        "bank": 10
+      },
+      "failures": [],
+      "NaN_representation_deltas": [],
+      "finite_signed_zero_infinity_words_exact": true,
+      "NaN_positions_exact": true,
+      "all_canary_tail_words_raw_exact": true,
+      "stream_error_codes_ranges_and_peek_no_mutation_checked": true
+    },
+    "C083-vs-CCD-C": {
+      "cases": 1966,
+      "elements_including_canaries_and_stream_events": 8169346,
+      "mode_counts": {
+        "wma": 928,
+        "ma": 928,
+        "mavp": 30,
+        "stream": 70,
+        "bank": 10
+      },
+      "failures": [],
+      "NaN_representation_deltas": [],
+      "finite_signed_zero_infinity_words_exact": true,
+      "NaN_positions_exact": true,
+      "all_canary_tail_words_raw_exact": true,
+      "stream_error_codes_ranges_and_peek_no_mutation_checked": true
+    },
+    "CCD-C-vs-candidate-C": {
+      "cases": 1966,
+      "elements_including_canaries_and_stream_events": 8169346,
+      "mode_counts": {
+        "wma": 928,
+        "ma": 928,
+        "mavp": 30,
+        "stream": 70,
+        "bank": 10
+      },
+      "failures": [],
+      "NaN_representation_deltas": [],
+      "finite_signed_zero_infinity_words_exact": true,
+      "NaN_positions_exact": true,
+      "all_canary_tail_words_raw_exact": true,
+      "stream_error_codes_ranges_and_peek_no_mutation_checked": true
+    }
+  },
+  "source_commit": "ccd3172940ed1d9daa4e7197f2265810852e8910",
+  "C083_commit": "62021c1d14ef5499505af5547384cab509adf3fc",
+  "input_manifest_sha256": "af44a2f442be1ac2d750643f12fc1122c5642a413d8320c34ca4d53ccbbc250e",
+  "baseline_index_sha256": "cda5366eb1aa45d0033b75406ed9e57ec999748472b0d7ffad0152bc220a4220",
+  "candidate_index_sha256": "cda5366eb1aa45d0033b75406ed9e57ec999748472b0d7ffad0152bc220a4220",
+  "policy": "Only NaN representation excluded; no finite tolerance and signed zero exact; raw canaries always exact."
+}
