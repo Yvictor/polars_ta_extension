@@ -985,6 +985,7 @@ version = "0.2.1"
 dependencies = [
  "jemallocator",
  "mimalloc",
+ "multiversion",
  "polars",
  "pyo3",
  "pyo3-polars",
