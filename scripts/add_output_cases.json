@@ -1,0 +1,27 @@
+{
+  "description": "ADD initialized-output construction; ordinary native Polars .over only. SUB/MULT retain their kernel but encounter the shared ADD eligibility branch; pure Polars cumsum controls measure host variation.",
+  "cases": [
+    "add/1000000",
+    "grouped_add/100x10000",
+    "grouped_add/10000x100",
+    "grouped_add/100x10000_interleaved",
+    "grouped_add/10000x100_interleaved",
+    "sub/1000000",
+    "grouped_sub/100x10000",
+    "grouped_sub/10000x100",
+    "grouped_sub/100x10000_interleaved",
+    "grouped_sub/10000x100_interleaved",
+    "mult/1000000",
+    "grouped_mult/100x10000",
+    "grouped_mult/10000x100",
+    "control_cumsum_dense/1000000",
+    "control_cumsum/10000x100"
+  ],
+  "integer_families": [],
+  "checked_values": 15000000,
+  "timed_children": 1080,
+  "timed_samples": 33480,
+  "fixtures": {
+    "arithmetic": "Historical seed260126 finite market fixture; ADD/SUB/MULT use distinct close and open operands, same physical arrays in each arm."
+  }
+}
