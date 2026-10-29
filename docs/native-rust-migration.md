@@ -70,33 +70,36 @@ claim bit equivalence or universal all-input equivalence.
 
 ## Correctness evidence
 
-- Original release wheel: **4,624 tests passed**, unchanged baseline suite.
-- Reviewed native release wheel: **5,717 Python tests passed**; **5 Rust unit tests passed**.
-- On the same CPython 3.12 Mac wheel, the complete **5,717-test suite also passed
-  separately on Polars 1.20.0 and 2.0.0**, in addition to benchmark runtime 1.44.2.
-- Original-vs-native capture: **10,110 cases**, **2,041,958 checked values**, **0 failures**.
-- All 201 functions are covered, including Float32/Float64, length and lookback
-  boundaries, parameters and default sentinels, all existing MA modes, domain and
-  tiny-scale inputs, constant/plateau/trend/high-offset/overflow inputs,
-  nulls/NaNs/infinity, chunks, lazy queries, interleaved and ordered windows.
-- Standard `.over()` tests compare exactly against independent partition-local
-  expression evaluation for all functions, multiple/interleaved/null keys, derived
-  keys, nested key dtypes, scalar inputs, integer/Struct outputs and concurrent
-  lifecycle calls. The original API has no added grouping expression.
-- Differential comparison observed **653 output fields with bit differences**;
-  maximum finite absolute difference was **2.1543655748246238e-11**. Those are
-  measured corpus results, not worst-case bounds.
+The [public usage inventory](public-api-validation.md) covers every one of the
+201 exports and fails if an export is unaccounted for. It records applicable
+column-name, expression, positional/keyword and namespace forms, eager/lazy and
+ordinary `.over()` execution, defaults/nondefaults, Struct field order/dtypes,
+missing/short/chunked inputs and invalid calls. Its matrix is systematic sampled
+coverage, not every parameter combination or every possible input dtype.
 
-The [machine-readable differential report](benchmarks/native-rust/differential.json)
-records capture hashes and runtime versions. CI rebuilds the fixed original
-commit, captures both installed wheels and uploads the complete NPZ data and
-report. Reference data are not generated from the candidate implementation.
+The original unchanged release suite passed 4,624 tests. The expanded suite at
+`8d14d0d` passed **11,425 tests in each of twelve CI Python/Polars combinations**
+(Python 3.10/3.11/3.13/3.14; Polars 1.20/1.44/2.0). The full original-vs-native
+corpus has **10,624 cases, 2,167,654 checked values and zero failures**, with maximum
+observed finite absolute difference **2.5067947717616335e-11**. Exact native-vs-native
+checks separately preserve signed zeros, schema, shape, padding and null/NaN
+positions. See [CI40829706571](https://github.com/Yvictor/polars_ta_extension/actions/runs/40829706571)
+for those correctness jobs; its broad timing job timed out, so the overall run
+was not successful. Final-candidate results and artifact links belong in the
+[draft PR evidence](https://github.com/Yvictor/polars_ta_extension/pull/45).
 
-Reproduce on separate installed-wheel environments:
+The corpus includes high-offset, finite-overflow, constant/plateau, tiny-scale,
+nonfinite and MA-mode cases, long periods and partition-local reference checks.
+NaN payloads and every possible Float64 sequence are not exhaustively proved.
+The checked-in [earlier differential report](benchmarks/native-rust/differential.json)
+is historical evidence for its recorded capture hashes and runtime, not the
+expanded current corpus or a later head.
+
+Reproduce using separate installed-wheel environments:
 
 ```sh
-POLARS_MAX_THREADS=4 /path/to/old/python scripts/migration_probe.py --capture baseline.npz
-POLARS_MAX_THREADS=4 /path/to/new/python scripts/migration_probe.py --capture candidate.npz
+/path/to/old/python scripts/migration_probe.py --capture baseline.npz
+/path/to/new/python scripts/migration_probe.py --capture candidate.npz
 /path/to/new/python scripts/migration_probe.py --compare baseline.npz candidate.npz --report differential.json
 ```
 
@@ -139,60 +142,64 @@ an offsets buffer plus a child array, not zero-copy by definition. The source
 analysis, copy/allocation table, reproducible host probe and proposed native
 group-position capability are in [ordinary `.over()` dispatch](over-dispatch.md).
 No alternate expression or list wrapper ships, and no grouped-batching speedup
-is claimed for the final implementation. No upstream PR or message was sent.
+is claimed for the final implementation. No Polars upstream PR or message was sent for this dispatch investigation.
 
 ## Release-build performance: CI is the comparison source
 
-The [allocation follow-up](output-allocation.md) extends this methodology to
-three builds (original, delivered zero-init, current NaN-init), one- and
-four-thread runs, the missing 100 × 10,000-row layout, Polars controls and
-process page-fault samples. The earlier two-build results belong to delivered
-commit `e626bf4`; do not attribute them to the current follow-up head.
+The current CI job rebuilds three immutable sources on **one runner**:
 
+| Build | Source |
+| --- | --- |
+| Original C0.8.1 | `b2bbc26d41ec80823c8bffb0cc436a97f29911cc` |
+| Delivered native NaN-init | `c71cd6ecb4b48601ff409926fdb0a281505e9fec` |
+| Candidate | Exact PR head recorded in every raw report |
 
-The `Release benchmark / rebuilt baseline on same runner` job rebuilds both
-commit `b2bbc26d41ec80823c8bffb0cc436a97f29911cc` and the exact pull-request head,
-sequentially on one Ubuntu runner with Rust 1.90.0, portable `--release --locked`
-flags and the same compiler/Python runtime. It installs separate wheels with
-Polars 1.44.2 and NumPy 2.5.3. Four Polars threads are configured for both and
-processes inherit the same available CPU affinity (up to four CPUs). Compiler,
-CPU, memory, runtime/dependency versions, commit IDs and source fingerprints are
-uploaded alongside raw measurements. Neither timings nor wheels from another
-runner or a published baseline are used.
+All portable release wheels use Rust1.90, the same compiler/Python runtime,
+Polars1.44.2 and NumPy2.5.3. Builds, corpus gates and setup diagnostics finish
+before query timing. `adapter_ci_benchmark.py` uses all six build-order
+permutations, six fresh processes per build/thread setting, five warmups and
+51 samples per query. One- and four-thread settings run sequentially with the
+same CPU affinity within each setting. There is no cross-runner comparison or
+reuse of local timing as a CI result.
 
-`scripts/migration_ci_benchmark.py` constructs an original-output reference and
-validates candidate outputs before timing, then runs six fresh process pairs in
-alternating AB/BA order, each with five warmups and 51 samples per query. Each
-measured process also checks output null/NaN positions exactly and numeric values
-with `rtol=atol=1e-10`. Full lazy `collect()` is timed; data generation, validation
-and reference compression are excluded. Workloads include direct EMA/RSI/MACD/ATR
-and an eight-indicator query at 1,000/1,000,000 rows, standard `.over()` at
-1,000 groups × 1,000 bars and 10,000 × 100, plus 2,000 × 100 interleaved groups.
+`migration_benchmark.py` covers twenty families plus the eight-function query:
+dense1k/1m rows; ordinary `.over()` with100×10k,1000×1000,10k×100 and interleaved
+2k×100 layouts. VAR/CORREL/CMOU are included to check the removed redundant scans.
+The one-thread diagnostic adds EMA/ATR at50k×20,10×100k and1×1m plus Polars-only
+cumsum controls. The20-row groups are shorter than default EMA warmup and cannot
+be interpreted as a pure setup-cost estimate.
 
-The report preserves every sample and process median, p10/p90 distributions,
-paired original/native ratios, and a conservative envelope spanning all process
-medians. It labels overlapping/small differences as noisy instead of claiming a
-speedup. This envelope is descriptive, not a confidence interval. Shared-runner
-contention, frequency and core placement remain uncontrolled; one run cannot
-establish a universal speedup. Correctness is enforced; performance is reported
-without a fixed release threshold.
+Every workload is checked against original output before timing; a separate
+untimed reference checks candidate vs delivered native values and signed zeros
+exactly. Original numerical tolerances are explicit. The full lazy `collect()`
+is timed; construction, comparison, compression and fault-counter reads are
+outside the latency timer. Raw samples, process medians, p10/p90, paired ratios,
+source/wheel hashes, hardware/runtime, commands and all slower-case inventory
+rows are artifacts. Process envelopes are descriptive, not confidence intervals
+or multiple-comparison significance. Shared-host contention, placement and
+frequency remain limits. `getrusage` faults include engine/Python/allocator work;
+they do not by themselves identify allocator or kernel causality.
 
-The former Mac tables and removed dispatcher experiments have been withdrawn from
-the current tree. Local measurements informed the compatible vectorizable input
-scan and output-padding work, which also apply inside ordinary `.over()`, but
-headline performance conclusions will use the corrected final-head CI artifact.
-Use the [draft PR evidence](https://github.com/Yvictor/polars_ta_extension/pull/45)
-for the exact tested head, CI status, benchmark table and raw
-`migration-benchmark` artifact. Performance conclusions require that completed
-same-runner report, not historical local timing.
+The first broad run at8d14d0d preserved a complete one-thread block, but timed out
+after only two four-thread rounds. Its partial artifact is useful for identifying
+MAVP, MINMAXINDEX, CDLDOJI, STDDEV and SUPERTREND regressions, not a complete
+four-thread conclusion. The CI budget is now240minutes to retain the full scope
+and repetitions. The [PR](https://github.com/Yvictor/polars_ta_extension/pull/45)
+links the exact final head, terminal job status and complete artifact; do not
+attribute earlier results to unmeasured source changes.
 
-Reproduce after building both wheels in separate environments:
+The [initialization report](output-allocation.md) describes the historical
+zero-init→NaN-init comparison. Later allocation-map ablations did not establish
+broad throughput gains and are not shipped. Single-chunk wrapper removal avoids
+metadata work, and fixed-arity output fields avoid a descriptor allocation;
+neither is a new borrowed Arrow-buffer path or a standalone speedup claim.
 
 ```sh
-python scripts/migration_ci_benchmark.py \
-  --baseline-python /path/to/old/python --baseline-source /path/to/original-checkout \
-  --candidate-python /path/to/new/python --candidate-source /path/to/candidate-checkout \
-  --output benchmark-results --pairs 6 --repeats 51 --threads 4
+python scripts/adapter_ci_benchmark.py \
+  --original-python /path/to/C/python --original-source /path/to/C-checkout \
+  --prior-python /path/to/delivered/python --prior-source /path/to/delivered-checkout \
+  --candidate-python /path/to/candidate/python --candidate-source /path/to/candidate-checkout \
+  --output benchmark-results --rounds 6 --repeats 51 --thread-counts 1 4
 ```
 
 ## Build and remaining limits

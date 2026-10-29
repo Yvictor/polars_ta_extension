@@ -141,4 +141,4 @@ This would require Polars engine/ABI work for the group-position route. A newer-
 host list composition is an alternative research path, not inherently required
 or inherently efficient. The migration keeps the safe local improvements
 (initialized output padding and reviewed compatibility scans) that already apply
-within normal `.over()` callbacks. No upstream communication is included.
+within normal `.over()` callbacks. No Polars upstream communication is included in this dispatch investigation.

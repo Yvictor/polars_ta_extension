@@ -26,7 +26,7 @@ import polars_talib as ta
 
 
 FUNCTIONS = ('ema','rsi','macd','atr','adx','cci','stddev','ppo')
-FAMILY_FUNCTIONS = (*FUNCTIONS, 'add', 'minmaxindex', 'cdldoji', 'hma', 'supertrend', 'vwma', 'mavp', 'bbands', 'sarext')
+FAMILY_FUNCTIONS = (*FUNCTIONS, 'add', 'minmaxindex', 'cdldoji', 'hma', 'supertrend', 'vwma', 'mavp', 'bbands', 'sarext', 'var', 'correl', 'cmou')
 
 def indicator(name):
     if name == 'mavp':
