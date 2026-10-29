@@ -81,7 +81,8 @@ jobs:
             # Only mtime changes; immutable source bytes and Git cleanliness are checked later.
             touch "sources/$side/src/lib.rs"
             (cd "sources/$side" && "$GITHUB_WORKSPACE/envs/$side/bin/python" -m maturin build --release --locked --interpreter "$GITHUB_WORKSPACE/envs/$side/bin/python" --out "$GITHUB_WORKSPACE/wheels/$side") > "integer-results/$side-build.log" 2>&1
-            rg -q "Compiling polars_talib v0.2.1" "integer-results/$side-build.log"
+            python control-source/scripts/integer_init_provenance.py \
+              --compile-log "integer-results/$side-build.log" --source "sources/$side" >> integer-results/product-compile-proof.jsonl
             uv pip install --python "envs/$side" --no-deps "wheels/$side/"*.whl
             uv pip freeze --python "envs/$side" > "integer-results/$side-dependencies.txt"
             if [[ "$side" != original ]]; then

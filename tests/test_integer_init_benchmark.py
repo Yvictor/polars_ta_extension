@@ -302,3 +302,27 @@ def test_production_controller_issues_one_exact_arm_golden_child_per_case_and_ro
     for case_index,case in enumerate(bench.CASES):
         expected=[(side,case) for order in bench.ORDERS*2 for side in order]
         assert commands[case_index*36:(case_index+1)*36]==expected
+
+
+@pytest.mark.parametrize('kind',['fresh','wrong_source','source_prefix','missing','mixed'])
+def test_compile_log_guard_requires_actual_exact_source_compile(tmp_path,kind):
+    source=tmp_path/'sources/prior';source.mkdir(parents=True)
+    expected=f'   Compiling polars_talib v0.2.1 ({source})\n'
+    if kind=='fresh': text=expected.replace('Compiling','Fresh')
+    elif kind=='wrong_source': text=expected.replace('/prior)', '/candidate)')
+    elif kind=='source_prefix': text=expected.replace('/prior)', '/prior-wrong-prefix)')
+    elif kind=='missing': text='Finished release profile in 0.08s\n'
+    else: text=expected+expected.replace('/prior)', '/candidate)')
+    log=tmp_path/'build.log';log.write_text(text)
+    with pytest.raises(ValueError,match='exactly'):
+        prov.require_product_compile(log,source)
+
+
+def test_compile_log_guard_cli_is_stdlib_and_records_exact_resolved_source(tmp_path):
+    import subprocess
+    source=tmp_path/'sources/prior';source.mkdir(parents=True)
+    log=tmp_path/'build.log';log.write_text(f'   Compiling polars_talib v0.2.1 ({source})\n    Finished release profile\n')
+    output=subprocess.check_output([sys.executable,prov.__file__,'--compile-log',str(log),'--source',str(source/'..'/'prior')],text=True)
+    proof=json.loads(output)
+    assert proof['product_source']==str(source.resolve()) and proof['log_sha256']==prov.sha256(log)
+    assert proof['product_compile_lines']==1

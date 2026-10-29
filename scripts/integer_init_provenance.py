@@ -100,3 +100,25 @@ def validate_identities(identities):
         if identities[side]['talib'] != '0.8.3 (native Rust; polars-talib compatibility)':
             raise ValueError('native runtime must be the pinned compatibility adapter')
     return first
+
+
+def require_product_compile(log, source):
+    """Require an actual product compile from this exact resolved checkout."""
+    source=Path(source).resolve()
+    paths=[]
+    for line in Path(log).read_text().splitlines():
+        match=re.fullmatch(r'\s*Compiling polars_talib v0\.2\.1 \((.+)\)\s*',line)
+        if match: paths.append(Path(match[1]).resolve())
+    if not paths or any(path!=source for path in paths):
+        raise ValueError('build log must compile polars_talib from exactly '+str(source))
+    return {'log':str(Path(log).resolve()),'log_sha256':sha256(log),
+            'product_source':str(source),'product_compile_lines':len(paths)}
+
+
+if __name__=='__main__':
+    import argparse
+    parser=argparse.ArgumentParser(description='Verify an actual source-pinned product compile without optional shell tools')
+    parser.add_argument('--compile-log',type=Path,required=True)
+    parser.add_argument('--source',type=Path,required=True)
+    args=parser.parse_args()
+    print(json.dumps(require_product_compile(args.compile_log,args.source)))
