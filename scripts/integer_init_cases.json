@@ -1,0 +1,29 @@
+{
+  "format": 1,
+  "cases": [
+    "cdldoji/1000000",
+    "grouped_cdldoji/100x10000",
+    "grouped_cdldoji/10000x100",
+    "minmaxindex/1000000",
+    "grouped_minmaxindex/100x10000",
+    "grouped_minmaxindex/10000x100",
+    "grouped_minmaxindex/2000x100_interleaved",
+    "ht_trendmode/1000000",
+    "cdlengulfing/1000000",
+    "grouped_cdlengulfing/100x10000",
+    "grouped_add/10000x100",
+    "control_cumsum/100x10000",
+    "supertrend/1000000"
+  ],
+  "checked_values": 16400000,
+  "integer_families": [
+    "cdldoji",
+    "minmaxindex",
+    "ht_trendmode",
+    "cdlengulfing"
+  ],
+  "scope": "Internal focused benchmark queries using existing native expressions and ordinary Polars over; no public exports.",
+  "mixed_families": [
+    "supertrend"
+  ]
+}

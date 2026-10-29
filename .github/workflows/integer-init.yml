@@ -1,0 +1,148 @@
+name: Focused integer output initialization ablation
+
+on:
+  push:
+    branches: [codex/integer-init-ci]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: integer-init-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  PYO3_USE_ABI3_FORWARD_COMPATIBILITY: '1'
+  RUSTUP_TOOLCHAIN: '1.90.0'
+  CARGO_BUILD_JOBS: '4'
+  CARGO_TERM_COLOR: 'never'
+  CARGO_PROFILE_RELEASE_DEBUG: 'false'
+  CARGO_PROFILE_RELEASE_LTO: 'false'
+  CARGO_PROFILE_RELEASE_CODEGEN_UNITS: '16'
+  CARGO_TARGET_DIR: ${{ github.workspace }}/integer-target
+  RUSTFLAGS: ''
+  CARGO_ENCODED_RUSTFLAGS: ''
+  CMAKE: ${{ github.workspace }}/envs/prior/bin/cmake
+  POLARS_MAX_THREADS: '4'
+  PRIOR_COMMIT: 78c3a1be1d3eeba24970ee20f66a33c10c74c327
+  CANDIDATE_COMMIT: 6c3fb5fb44496c5739ee9f1d8dfa11f7b46dd473
+  ORIGINAL_COMMIT: b2bbc26d41ec80823c8bffb0cc436a97f29911cc
+
+jobs:
+  focused-integer-init:
+    name: Original C / Native control / integer initialization candidate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          path: control-source
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Preserve controller and require immutable product pins
+        run: |
+          mkdir -p integer-results/controller
+          cp control-source/scripts/integer_init* control-source/scripts/migration_probe.py control-source/scripts/migration_ci_benchmark.py integer-results/controller/
+          cp control-source/.github/workflows/integer-init.yml integer-results/workflow.yml
+          git -C control-source rev-parse HEAD > integer-results/controller-commit.txt
+          python - <<'PY'
+          import os,re
+          for key in ('ORIGINAL_COMMIT','PRIOR_COMMIT','CANDIDATE_COMMIT'):
+              if not re.fullmatch('[0-9a-f]{40}',os.environ[key]):
+                  raise SystemExit(key+' must be frozen before this workflow can run')
+          if len({os.environ[k] for k in ('ORIGINAL_COMMIT','PRIOR_COMMIT','CANDIDATE_COMMIT')}) != 3:
+              raise SystemExit('three distinct immutable source pins are required')
+          PY
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ env.PRIOR_COMMIT }}
+          path: sources/prior
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ env.CANDIDATE_COMMIT }}
+          path: sources/candidate
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ env.ORIGINAL_COMMIT }}
+          path: sources/original
+      - uses: dtolnay/rust-toolchain@1.90.0
+      - uses: astral-sh/setup-uv@v8.2.0
+      - name: Build three portable wheels and snapshot actual product graphs before extra builds
+        run: |
+          mkdir -p wheels
+          for side in prior candidate original; do
+            uv venv --python 3.12 "envs/$side"
+            uv pip install --python "envs/$side" 'maturin==1.15.0' 'cmake==4.4.4' 'polars==1.44.2' 'numpy==2.5.3' pytest
+            mkdir -p "wheels/$side"
+            python -c 'import json,sys; print(json.dumps({"side":sys.argv[1],"command":sys.argv[2:]}))' "$side" "$PWD/envs/$side/bin/python" -m maturin build --release --locked --interpreter "$PWD/envs/$side/bin/python" --out "$PWD/wheels/$side" >> integer-results/build-commands.jsonl
+            # Force the product crate to recompile even if a shared Cargo cache saw newer source mtimes.
+            # Only mtime changes; immutable source bytes and Git cleanliness are checked later.
+            touch "sources/$side/src/lib.rs"
+            (cd "sources/$side" && "$GITHUB_WORKSPACE/envs/$side/bin/python" -m maturin build --release --locked --interpreter "$GITHUB_WORKSPACE/envs/$side/bin/python" --out "$GITHUB_WORKSPACE/wheels/$side") > "integer-results/$side-build.log" 2>&1
+            rg -q "Compiling polars_talib v0.2.1" "integer-results/$side-build.log"
+            uv pip install --python "envs/$side" --no-deps "wheels/$side/"*.whl
+            uv pip freeze --python "envs/$side" > "integer-results/$side-dependencies.txt"
+            if [[ "$side" != original ]]; then
+              commit_var="${side^^}_COMMIT"
+              python control-source/scripts/integer_init_stage_benchmark.py --snapshot-side "$side" \
+                --source "sources/$side" --commit "${!commit_var}" --python "$PWD/envs/$side/bin/python" \
+                --target-dir "$CARGO_TARGET_DIR" --wheel-dir wheels --output integer-results
+            fi
+          done
+          rustc --version --verbose > integer-results/toolchain.txt
+          cc --version >> integer-results/toolchain.txt
+          "$CMAKE" --version >> integer-results/toolchain.txt
+          lscpu > integer-results/lscpu.txt
+          cat /proc/meminfo > integer-results/meminfo.txt
+          df -h > integer-results/disk-after-build.txt
+          du -sh "$CARGO_TARGET_DIR" wheels >> integer-results/disk-after-build.txt
+      - name: Define fixed campaign arguments
+        run: |
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          args=[]
+          for side in ('original','prior','candidate'):
+              args += ['--'+side+'-python','envs/'+side+'/bin/python','--'+side+'-source','sources/'+side]
+          args += ['--candidate-commit',os.environ['CANDIDATE_COMMIT'],'--wheel-dir','wheels','--output','integer-results']
+          Path('integer-results/arguments.json').write_text(json.dumps(args))
+          PY
+          cat > run-integer-campaign.py <<'PY'
+          import json,subprocess,sys
+          args=json.load(open('integer-results/arguments.json'))
+          subprocess.run(['envs/prior/bin/python','control-source/scripts/'+sys.argv[1],*args,*sys.argv[2:]],check=True)
+          PY
+      - name: Controller protocol gates and native contracts
+        run: |
+          envs/prior/bin/python -m pytest --noconftest control-source/tests/test_integer_init_benchmark.py -q
+          python run-integer-campaign.py integer_init_benchmark.py --record-build
+          for side in prior candidate; do
+            PYO3_PYTHON="$GITHUB_WORKSPACE/envs/$side/bin/python" cargo test --release --lib --locked --manifest-path "sources/$side/Cargo.toml" > "integer-results/$side-rust-tests.log" 2>&1
+          done
+      - name: Build stage probes against frozen product dependency graphs and C0.8.1
+        run: python run-integer-campaign.py integer_init_stage_benchmark.py --target-dir "$CARGO_TARGET_DIR" --build
+      - name: Full 10624-case corpus and both thread-setting exact integer and Native control goldens
+        run: python run-integer-campaign.py integer_init_benchmark.py --validate-only
+      - name: Exact C kernel and adapter stage outputs at all lengths
+        run: python run-integer-campaign.py integer_init_stage_benchmark.py --target-dir "$CARGO_TARGET_DIR" --validate-only
+      - name: Twelve balanced fresh-single-case rounds at one and four threads
+        run: |
+          python run-integer-campaign.py integer_init_benchmark.py
+          cat integer-results/comparison.md >> "$GITHUB_STEP_SUMMARY"
+          cat integer-results/negative-cases.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Bounded integer initialization and C-controlled stage diagnostics
+        timeout-minutes: 3
+        run: python run-integer-campaign.py integer_init_stage_benchmark.py --target-dir "$CARGO_TARGET_DIR" --measure
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: integer-output-initialization-evidence
+          include-hidden-files: true
+          path: |
+            integer-results/
+            wheels/
+            integer-target/release/build/talib-sys-*/out/lib/libta-lib.a
+            integer-target/release/build/jemalloc-sys-*/out/lib/*.a
+          if-no-files-found: error
