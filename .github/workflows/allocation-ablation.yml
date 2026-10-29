@@ -1,8 +1,8 @@
-name: Native allocation ablation
+name: Compact singleton allocation ablation
 
 on:
   push:
-    branches: [codex/allocation-ablation-ci]
+    branches: [codex/allocation-singleton-ci]
   workflow_dispatch:
 
 permissions:
@@ -23,8 +23,8 @@ env:
   POLARS_MAX_THREADS: '4'
   BASE_COMMIT: 8d14d0dc8eebe28d48536a36bb8c3586b8a7390f
   FIELDS_COMMIT: 0a3118b8118fb7e6b530f09f1d925dca61664fad
-  MAP_COMMIT: e354459bd18616dd7a64e4c10f45055f8ad5f65d
-  COMBINED_COMMIT: 992e12c7d1c6acd5e1b2ec0e9a343e126511937d
+  MAP_COMMIT: 09ac9f2cd6965d78b8491b593d715c7bd4a7468e
+  COMBINED_COMMIT: df92926e46c2870028c3d5d3c2d21468f108384e
 
 jobs:
   native-allocation-ablation:
@@ -111,7 +111,7 @@ jobs:
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: native-allocation-ablation-evidence
+          name: native-singleton-ablation-evidence
           path: |
             ablation-results/
             wheels/
