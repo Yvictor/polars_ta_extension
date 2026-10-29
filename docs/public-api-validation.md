@@ -76,3 +76,12 @@ classified and CMOU always uses legacy arithmetic. Their redundant second
 nonfinite scan is removed; PERCENTILE keeps its needed classification. Numerical
 operations and guard thresholds remain unchanged. Expanded final CI measures
 these affected families, including dense and standard native `.over()` layouts.
+
+The explicit HMA expression also has a weights-only batch backport after
+[upstream565](https://github.com/TA-Lib/ta-lib/pull/565)'s source and kernel CI
+validation. Private renamed methods preserve the official crate's HMA calls
+inside every other MA composition. Its417 direct-oracle scenarios and34 public
+regressions cover reseeds, stack/heap boundaries, maximum period, IEEE values,
+small/invalid buffers and ordinary windows. A separate final-query comparison
+measures the consumer effect; the upstream kernel percentage is not a Polars
+speedup claim.

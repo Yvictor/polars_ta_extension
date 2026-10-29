@@ -15,7 +15,7 @@ existing Python expressions
     partition-local null masks
       safe native adapter
         immutable ta_lib::Core + per-call ParamHolder
-        selected batch-only 0.8.1 compatibility kernels
+        selected batch-only compatibility kernels and scoped SMA/HMA backports
 ```
 
 Inputs borrow contiguous Float64 values where possible. Casts/rechunking and
@@ -51,7 +51,8 @@ found additional changes beyond those release notes.
 
 Compatibility kernels are batch-only adaptations of the official `v0.8.1` Rust
 sources, retaining BSD attribution. Their composed EMA/MA dependencies resolve
-through the same compatibility layer. The common native route remains 0.8.3.
+through the same compatibility layer. The dependency remains pinned to0.8.3; explicit SMA-MAVP and HMA batch backports
+are documented separately below. Other MA compositions retain the official crate.
 The routing thresholds (`abs(input) > 1024`, period > 128) are conservative,
 empirically tested choices, not a proof for every possible Float64 sequence.
 
@@ -235,3 +236,21 @@ checked. The final-head CI matrix validates other CPUs/OSes, Python versions and
 Polars 1.20/1.44/2.x. Passing sampled coverage does not prove every parameter
 combination, every finite value, or every future Polars ABI. No release, merge,
 deployment or credential/security change is part of this draft.
+
+## HMA weights-only backport
+
+The explicit HMA expression uses a BSD-attributed copy of the pinned0.8.3 batch
+method with multiplier-only weights kept as exactly representable floating-point
+integers. Indices, rings, validations, arithmetic order and signatures stay the
+same. Renamed internal helpers prevent this route from shadowing HMA calls inside
+other MA compositions. All inputs use this exact-operation path, so it does not
+need finite-prefix restoration.
+
+[Upstream draft565](https://github.com/TA-Lib/ta-lib/pull/565) contains the canonical
+change and [completed kernel CI](https://github.com/Yvictor/polars_ta_extension/actions/runs/40859198225).
+The default-period1m kernel improves7.86% on that runner, with remaining C and
+control caveats in the draft. Those Rust1.97 kernel results do not establish the
+effect of this Rust1.90 Polars backport; the final three-build query CI measures
+that separately. Local exact checks cover period2703/2704,100000, IEEE values,
+output guards and ordinary native windows. The public API and missing-value
+contract are unchanged.
