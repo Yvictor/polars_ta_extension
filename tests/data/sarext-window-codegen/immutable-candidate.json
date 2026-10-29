@@ -1,0 +1,28 @@
+{
+  "commit": "da9dd99bc1780f569dfc24f35c09d4a25063162c",
+  "branch": "codex/sarext-output-window",
+  "base": "ccd3172940ed1d9daa4e7197f2265810852e8910",
+  "clean": true,
+  "files": {
+    "ta_codegen/generator/src/backends/rust_window.rs": "7f8d509f65c03c79bb9fab442ecd7b9402aed8f0bdf6819deca8f15cb05ccc8b",
+    "ta_codegen/generator/src/backends/rust_lang.rs": "a8d0726864fdd4e6061e5c3322435269f372f76e3af9f23fb10bb2f608504aff",
+    "ta_codegen/output/rust/library/src/ta_func/sar.rs": "99834c29f04a0a9bd631115e673a108d26cbed009992bf2740d673b54cf4e788",
+    "ta_codegen/output/rust/library/src/ta_func/sarext.rs": "fc66c4e512420bd62c74607f67d64a7217487a7501cf7673e30c52a399c9e4ea"
+  },
+  "author": "Yvictor <yvictor3141@gmail.com>",
+  "no_push": true,
+  "static_scope": "1.97comparisonprofilebothpathscheckfree;1.90cgu16consumerprofileoneexecutedcheck/barremains",
+  "gates": {
+    "generator_unit": 522,
+    "generator_integration": 624,
+    "focused_proof": 8,
+    "Rust_library": 102,
+    "Rust_doctest": 721,
+    "C_codegen": 237,
+    "Rust_codegen": 237,
+    "exact_public_baseline_cases": 36864,
+    "exact_C083_successful_calls": 10836,
+    "exact_C083_written_elements": 501732
+  },
+  "independent_review": "source+bothprofileactualstatic+emittedequivalencecleared /root/independent_review; runtimeCIperformance/retentionpending"
+}

@@ -1,0 +1,122 @@
+{
+  "result": "Currentupstreamdevelopmenttoolchainpin1.97 (libraryMSRV1.88): BOTHscalar/FMAfastloopscheckfree; candidate pendingfullcorrectness/review/controlledCI. Consumer1.90O3cgu16localThinLTOprofile: REJECTbackport, oneexecutedcheck/barremainsandcodegrows. OlderupstreamO3cgu1thinprofileperformancependingindependentCI; no runtimeorportableimprovementclaim.",
+  "source_freeze": "prefix-final-freeze.json",
+  "baseline_commit": "ccd3172940ed1d9daa4e7197f2265810852e8910",
+  "rows": [
+    {
+      "rust": "1.90.0",
+      "kernel": "generic",
+      "baseline_bytes": 2835,
+      "output_only_bytes": 3796,
+      "prefix_candidate_bytes": 3824,
+      "code_growth_percent": 34.885361552028215,
+      "candidate_object_sha256": "f5cf0b8cc5fa8b6eb081c051fcdd854c20a4730de33576150b41f40f0322bc60",
+      "assembly_sha256": "0ce892a70b4740cdd35b1cdf4faf69e6c02acffff957d5534bb42812fa07135a",
+      "fast_instructions_sha256": "5ae8f1271e020d002572f06c130a2229450326f5297c71b81e711c1bd51ae902",
+      "fast_loop": [
+        "0x66f",
+        "0x96d"
+      ],
+      "bounds_compare_sites": [
+        "0x6db",
+        "0x732",
+        "0x78b",
+        "0x82c"
+      ],
+      "bounds_branch_sites": [
+        "0x6de",
+        "0x735",
+        "0x794",
+        "0x835"
+      ],
+      "cold_targets": [
+        "0xeb5",
+        "0xe5f",
+        "0xe8a",
+        "0xe34"
+      ],
+      "executed_bounds_checks_per_bar": 1
+    },
+    {
+      "rust": "1.90.0",
+      "kernel": "fma",
+      "baseline_bytes": 2032,
+      "output_only_bytes": 2439,
+      "prefix_candidate_bytes": 2531,
+      "code_growth_percent": 24.55708661417322,
+      "candidate_object_sha256": "f5cf0b8cc5fa8b6eb081c051fcdd854c20a4730de33576150b41f40f0322bc60",
+      "assembly_sha256": "f57163abbb90803f750adb9e2fe522b6ce2b09fd8a1d1bf911f785095b471144",
+      "fast_instructions_sha256": "5a0b2ce342c5439ea7505b82db7a661292fc73e360760569cd388401d716d368",
+      "fast_loop": [
+        "0x5a6",
+        "0x71f"
+      ],
+      "bounds_compare_sites": [
+        "0x5e1",
+        "0x63a",
+        "0x68c",
+        "0x6d5"
+      ],
+      "bounds_branch_sites": [
+        "0x5e4",
+        "0x63d",
+        "0x68f",
+        "0x6d8"
+      ],
+      "cold_targets": [
+        "0x9b0",
+        "0x96a",
+        "0x98d",
+        "0x947"
+      ],
+      "executed_bounds_checks_per_bar": 1
+    },
+    {
+      "rust": "1.97.0",
+      "kernel": "generic",
+      "baseline_bytes": 2593,
+      "output_only_bytes": 3599,
+      "prefix_candidate_bytes": 3519,
+      "code_growth_percent": 35.71153104512148,
+      "candidate_object_sha256": "0aea5e6d2230eee214e38e8ec87721ffef20c462ce00146f86bd10ecdc941616",
+      "assembly_sha256": "53a3c27bbdb2590ff86d70cccad4f8cb53cb1c7d72c5a4f1caab1e5aa9794237",
+      "fast_instructions_sha256": "873b40908abe752b0ba447a5123e196724f9f5940d37e8dcce246688c1773eb0",
+      "fast_loop": [
+        "0x5a4",
+        "0x8b5"
+      ],
+      "bounds_compare_sites": [],
+      "bounds_branch_sites": [],
+      "cold_targets": [],
+      "executed_bounds_checks_per_bar": 0,
+      "fallback_starts": "0x8ba"
+    },
+    {
+      "rust": "1.97.0",
+      "kernel": "fma",
+      "baseline_bytes": 1838,
+      "output_only_bytes": 2237,
+      "prefix_candidate_bytes": 2215,
+      "code_growth_percent": 20.511425462459187,
+      "candidate_object_sha256": "0aea5e6d2230eee214e38e8ec87721ffef20c462ce00146f86bd10ecdc941616",
+      "assembly_sha256": "e187a2269f8dc4bc98d8ef60309b52b355a02fe47499c97275211069250c72dc",
+      "fast_instructions_sha256": "086d412a07449beb866a0a8593d11b6f7a07f3d1a1c6d548963ac15560d35a3d",
+      "fast_loop": [
+        "0x4ec",
+        "0x64b"
+      ],
+      "bounds_compare_sites": [],
+      "bounds_branch_sites": [],
+      "cold_targets": [],
+      "executed_bounds_checks_per_bar": 0,
+      "fallback_starts": "0x650"
+    }
+  ],
+  "profile_notes": {
+    "1.90.0": "normal O3,16codegenunits,Cargo lto=false; inspect actual postlocalThinLTO library ELF objects",
+    "1.97.0": "normal O3,1codegenunit,thinLTO; inspect final compiler postThinLTO ELF objects from dynamic-argument probe. Fake linker is not a final Linux product executable; no code executed."
+  },
+  "bounds_classification": "Manual fast-loop CFG audit distinguishes integer compare/branch-to-panic from floating SAR decisions and range termination. Four output leaves are mutually exclusive, hence1 executed check/bar on1.90. Cold fallback may retain checks on1.97; not counted as fast-loop checks.",
+  "next_gates_not_run": "ActualLinuxlinkedproductCI and performance comparisonCI pending. Completed: fullregen/idempotence,102librarytests,721doctests,strictgenerator+libraryClippy/docs,237C/Rusteach,36864publicexactbaseline,10836successfulC083calls/501732writtenelements exact.",
+  "safety": "No unsafe/API/ABI/FP expression changes; no local timings; no push; isolated uncommitted candidate preserved."
+}

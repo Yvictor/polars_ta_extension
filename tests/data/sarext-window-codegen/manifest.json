@@ -1,0 +1,32 @@
+{
+  "baseline_commit": "ccd3172940ed1d9daa4e7197f2265810852e8910",
+  "candidate_commit": "da9dd99bc1780f569dfc24f35c09d4a25063162c",
+  "library_msrv": "1.88",
+  "development_toolchain": "1.97.0",
+  "qualification": "Historical static source proof only;1.90 cgu16/localThinLTO differs from both CIthin1 jobs. Actual normal ELF CFG gates are generated anew before CI timing.",
+  "files": {
+    "baseline-1.90.0-compile-commands.json": "4cabf5b97b64dd789703403cd513bbda45610400586017a28c9a474a10efc6e0",
+    "baseline-1.90.0-function-symbols.json": "c77fbfdfab5479956e0b6d48c2b6254c4622f3acd736bda2ada2b466ce3fa353",
+    "baseline-1.90.0-sarext-0.asm": "4681bd70b6a7bf9d6325b3e7ac7af6443d7f7b2031dba32e719fd9b4fe243bc5",
+    "baseline-1.90.0-sarext-1.asm": "4b8c33841936cdd43e392bfdf11eafadd2604fd21a7b341f54b45023bee07642",
+    "baseline-1.97.0-compile-commands.json": "23c38f5382f851ae581cb6e3a817f6bf2d168c3fd8700c2478a058ec4ec69f3d",
+    "baseline-1.97.0-function-symbols.json": "41b078aeb843f5386d52c692a95e887da83453e933b7dfa9d651fdd5be9d8ed1",
+    "baseline-1.97.0-sarext-0.asm": "637338fab59bf978a503c122e85f107307b12f528323397d37ec473182228e2a",
+    "baseline-1.97.0-sarext-1.asm": "8a38b2514e49d0e3a9ed9460765fda5140dbb681b5c8b01edaf5da83a52fcbe2",
+    "candidate-1.90.0-compile-commands.json": "5240c7d6b675ddbc9edbb6a7e0a912555dfe28729aa75e065cbbf787b9b4c344",
+    "candidate-1.90.0-function-symbols.json": "77067190123a2e1fc68f13eb454ae22c07ab321ad2e38bdc7c449cc6fc386b5e",
+    "candidate-1.90.0-sarext-0.asm": "0ce892a70b4740cdd35b1cdf4faf69e6c02acffff957d5534bb42812fa07135a",
+    "candidate-1.90.0-sarext-1.asm": "f57163abbb90803f750adb9e2fe522b6ce2b09fd8a1d1bf911f785095b471144",
+    "candidate-1.97.0-compile-commands.json": "4d9bc9da4a890a5dea75abd07f63a0bcb9a1c4085304ecbe95f6c0022a298cd0",
+    "candidate-1.97.0-function-symbols.json": "94eb91ce6f52791c1b5b6c561b6950497c83691091ebe7a4ef7ba9b986852d57",
+    "candidate-1.97.0-sarext-0.asm": "53a3c27bbdb2590ff86d70cccad4f8cb53cb1c7d72c5a4f1caab1e5aa9794237",
+    "candidate-1.97.0-sarext-1.asm": "e187a2269f8dc4bc98d8ef60309b52b355a02fe47499c97275211069250c72dc",
+    "emitted-equivalence.json": "5866859b48e6488b4ee06684216f4a653baad136db104a43195b75bd9e863db0",
+    "immutable-candidate.json": "23cfb50535fd4b3851dc9ddee8f91f13846ed6e68ccdafb5384e214dd27fee40",
+    "prefix-final-freeze.json": "cf3e8b99435fd6352ea1ad4c948596a890cc51f0a41c6a13680ed047aef41463",
+    "prefix-static-summary.json": "57718926506d0145a7a9e9393d4701ebcaaedf1974cb97106dea42d271502951",
+    "public-C083-summary.json": "b66805d027cff3ab6af7ffd268df1cab733d447c37c9bd4ef98508ea77f9662f",
+    "public-parity-summary.json": "3c6676e947a2ba7deaad79b83a0b44bcd83b0390c81957240ef81966fe4b913c",
+    "signed-zero-boundary-summary.json": "7d0d08febd8b338a2ec165ae85abcb2d9dcdd059350450001830e163503051cd"
+  }
+}

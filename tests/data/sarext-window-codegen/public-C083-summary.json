@@ -1,0 +1,11 @@
+{
+  "PASS": true,
+  "successful_Rust_calls_compared": 10836,
+  "written_elements": 501732,
+  "mismatch_calls": 0,
+  "signed_zero_mismatches": 0,
+  "NaN_bit_mismatches": 0,
+  "C083_library_sha256": "5041065b3814d8df0f9238c9c7acc65d66ae0f51c63f376f765322f6273691b8",
+  "capture_sha256": "554a12482be80f4710b007cfae6b1bcc95025b1d608098f9555621fd786f4d70",
+  "note": "Only valid Rust calls are passed to C; invalid/undersized Rust calls checked exact against baseline by separate capture. C083 is official release oracle, not originalC081; all output buffer bits include canary tails."
+}

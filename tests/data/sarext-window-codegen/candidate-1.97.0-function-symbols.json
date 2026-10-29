@@ -1,0 +1,18 @@
+[
+  {
+    "object": "/tmp/polars-recovery/sarext-window-evidence/candidate-static-1.97.0/static-probe.ta_lib-51fa72f709535b83.ta_lib.b5d8fdef4152009c-cgu.0.rcgu.o.rcgu.o",
+    "object_sha256": "0aea5e6d2230eee214e38e8ec87721ffef20c462ce00146f86bd10ecdc941616",
+    "symbol": "_RNvMNtNtCsfBYb8xZ4HAC_6ta_lib7ta_func6sarextNtNtB4_5types4Core11sarext_impl",
+    "size": 3519,
+    "assembly": "/tmp/polars-recovery/sarext-window-evidence/candidate-static-1.97.0/sarext-0.asm",
+    "assembly_sha256": "53a3c27bbdb2590ff86d70cccad4f8cb53cb1c7d72c5a4f1caab1e5aa9794237"
+  },
+  {
+    "object": "/tmp/polars-recovery/sarext-window-evidence/candidate-static-1.97.0/static-probe.ta_lib-51fa72f709535b83.ta_lib.b5d8fdef4152009c-cgu.0.rcgu.o.rcgu.o",
+    "object_sha256": "0aea5e6d2230eee214e38e8ec87721ffef20c462ce00146f86bd10ecdc941616",
+    "symbol": "_RNvMNtNtCsfBYb8xZ4HAC_6ta_lib7ta_func6sarextNtNtB4_5types4Core15sarext_impl_fma",
+    "size": 2215,
+    "assembly": "/tmp/polars-recovery/sarext-window-evidence/candidate-static-1.97.0/sarext-1.asm",
+    "assembly_sha256": "e187a2269f8dc4bc98d8ef60309b52b355a02fe47499c97275211069250c72dc"
+  }
+]

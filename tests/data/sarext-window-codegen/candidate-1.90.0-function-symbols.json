@@ -1,0 +1,18 @@
+[
+  {
+    "object": "/tmp/polars-recovery/sarext-window-evidence/candidate-static-1.90.0/library-objects/ta_lib-a99de56cdf066125.ta_lib.4f1d99721d8d97c2-cgu.00.rcgu.o",
+    "object_sha256": "f5cf0b8cc5fa8b6eb081c051fcdd854c20a4730de33576150b41f40f0322bc60",
+    "symbol": "_ZN6ta_lib7ta_func6sarext46_$LT$impl$u20$ta_lib..ta_func..types..Core$GT$11sarext_impl17h3d3cd2b1bc2feed3E",
+    "size": 3824,
+    "assembly": "/tmp/polars-recovery/sarext-window-evidence/candidate-static-1.90.0/sarext-0.asm",
+    "assembly_sha256": "0ce892a70b4740cdd35b1cdf4faf69e6c02acffff957d5534bb42812fa07135a"
+  },
+  {
+    "object": "/tmp/polars-recovery/sarext-window-evidence/candidate-static-1.90.0/library-objects/ta_lib-a99de56cdf066125.ta_lib.4f1d99721d8d97c2-cgu.00.rcgu.o",
+    "object_sha256": "f5cf0b8cc5fa8b6eb081c051fcdd854c20a4730de33576150b41f40f0322bc60",
+    "symbol": "_ZN6ta_lib7ta_func6sarext46_$LT$impl$u20$ta_lib..ta_func..types..Core$GT$15sarext_impl_fma17h01a1668133c96c69E",
+    "size": 2531,
+    "assembly": "/tmp/polars-recovery/sarext-window-evidence/candidate-static-1.90.0/sarext-1.asm",
+    "assembly_sha256": "f57163abbb90803f750adb9e2fe522b6ce2b09fd8a1d1bf911f785095b471144"
+  }
+]

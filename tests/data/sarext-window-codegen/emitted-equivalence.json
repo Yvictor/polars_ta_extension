@@ -1,0 +1,19 @@
+{
+  "PASS": true,
+  "rows": [
+    {
+      "function": "sar",
+      "original_loop_body_sha256": "015636bbe1762c9715ff54d22d5b3b9ce985dd453731077f6e5e6bf63fff7d20",
+      "fallback_body_exact_after_indent_normalization": true,
+      "fast_body_exact_after_only_three_window_index_substitutions_and_indent_normalization": true,
+      "entire_file_outside_replaced_loop_byte_identical": true
+    },
+    {
+      "function": "sarext",
+      "original_loop_body_sha256": "9e5860335945a748acdc77f7466c55ebdd09460088d10a14e3d426cee8707ebd",
+      "fallback_body_exact_after_indent_normalization": true,
+      "fast_body_exact_after_only_three_window_index_substitutions_and_indent_normalization": true,
+      "entire_file_outside_replaced_loop_byte_identical": true
+    }
+  ]
+}

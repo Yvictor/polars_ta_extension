@@ -1,0 +1,51 @@
+{
+  "PASS": true,
+  "comparison": "all return/range/entire initialized output buffer bits EXACT including errors and canary tails",
+  "source_sha256": "7890e5abe5a49a39879d08e2cd25f4839538868e5403ef9d93f72393e24ea528",
+  "arms": [
+    {
+      "arm": "baseline",
+      "command": [
+        "/Users/ec666/.rustup/toolchains/1.97.0-aarch64-apple-darwin/bin/rustc",
+        "--edition=2021",
+        "-O",
+        "-Ccodegen-units=1",
+        "-Clto=thin",
+        "/tmp/polars-recovery/sarext-window-evidence/public-parity.rs",
+        "-Ldependency=/tmp/polars-recovery/sarext-window-evidence/baseline-native-build/release/deps",
+        "--extern",
+        "ta_lib=/tmp/polars-recovery/sarext-window-evidence/baseline-native-build/release/deps/libta_lib-881241c0c09c964b.rlib",
+        "-o",
+        "/tmp/polars-recovery/sarext-window-evidence/baseline-public-parity"
+      ],
+      "library": "/tmp/polars-recovery/sarext-window-evidence/baseline-native-build/release/deps/libta_lib-881241c0c09c964b.rlib",
+      "library_sha256": "589559713deee2c2d5513dc4063965a1dc435f3fa00ce64134aef8fd2f62cb1a",
+      "binary_sha256": "28b75df4f9153fa651381125ec35f68b313d193d293ae34cecd1128d9dc7132b",
+      "capture_sha256": "554a12482be80f4710b007cfae6b1bcc95025b1d608098f9555621fd786f4d70",
+      "cases": 36864
+    },
+    {
+      "arm": "candidate",
+      "command": [
+        "/Users/ec666/.rustup/toolchains/1.97.0-aarch64-apple-darwin/bin/rustc",
+        "--edition=2021",
+        "-O",
+        "-Ccodegen-units=1",
+        "-Clto=thin",
+        "/tmp/polars-recovery/sarext-window-evidence/public-parity.rs",
+        "-Ldependency=/tmp/polars-recovery/sarext-window-evidence/native-build/release/deps",
+        "--extern",
+        "ta_lib=/tmp/polars-recovery/sarext-window-evidence/native-build/release/deps/libta_lib-881241c0c09c964b.rlib",
+        "-o",
+        "/tmp/polars-recovery/sarext-window-evidence/candidate-public-parity"
+      ],
+      "library": "/tmp/polars-recovery/sarext-window-evidence/native-build/release/deps/libta_lib-881241c0c09c964b.rlib",
+      "library_sha256": "93ab2bbc42f85b447e18c05199647412cf0286f2ac79762e6849f5b599a980ae",
+      "binary_sha256": "a3aa88e1872d56353c8da4aeb158f064700f60fac0ae8ec1771f59e3b5190b91",
+      "capture_sha256": "554a12482be80f4710b007cfae6b1bcc95025b1d608098f9555621fd786f4d70",
+      "cases": 36864
+    }
+  ],
+  "runtime": "MacARM64 public dispatch; not a timing measurement; x86 scalar/FMA runtime still CI",
+  "matrix_qualification": "36864 is executed matrix calls, not unique parameter/input combinations. SAREXT has12distinctbitwiseparametervectors;SARreads2ofthose8slotsandthereforehas3distincteffectiveparameterpairs,withotherrowsdeliberatecrossproductduplicates. Buffer/rangecellsalsooverlapatedgelengths. Noexhaustiveallparametercombinationclaim."
+}
