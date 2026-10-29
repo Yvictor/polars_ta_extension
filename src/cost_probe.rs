@@ -8,6 +8,7 @@ use ta_lib::abstract_api::FuncId;
 #[ignore = "release-only diagnostic; raw distributions are archived by CI"]
 fn adapter_cost_probe() {
     kwargs_cost_probe();
+    multi_output_materialization_probe();
     println!(
         "COST_PROBE metadata_functions={}",
         ta_lib::abstract_api::FUNCS.len()
@@ -222,5 +223,46 @@ fn kwargs_cost_probe() {
         println!(
             "COST_PROBE {name}/kwargs_pickle_current iterations=10000 ns_per_call={current:?}"
         );
+    }
+}
+
+// Isolate the ownership/materialization stage shared by MACD's three outputs.
+// Buffer construction remains in both timings; these are nonadditive stages.
+fn multi_output_materialization_probe() {
+    use crate::native::{output_series, Output};
+    const NAMES: [&str; 3] = ["macd", "macdsignal", "macdhist"];
+    for n in [0usize, 100, 1_000] {
+        for mode in ["fields_vec", "fields_array"] {
+            let materialize = || {
+                let outputs = std::array::from_fn::<_, 3, _>(|_| Output::Real(vec![f64::NAN; n]));
+                let offset = n.min(33);
+                if mode == "fields_vec" {
+                    let fields = outputs
+                        .into_iter()
+                        .enumerate()
+                        .map(|(i, out)| output_series(out, NAMES[i], offset, n - offset))
+                        .collect::<Vec<_>>();
+                    StructChunked::new("", &fields).unwrap().into_series()
+                } else {
+                    let mut names = NAMES.iter().copied();
+                    let fields = outputs
+                        .map(|out| output_series(out, names.next().unwrap(), offset, n - offset));
+                    StructChunked::new("", &fields).unwrap().into_series()
+                }
+            };
+            for _ in 0..256 {
+                black_box(materialize());
+            }
+            let samples = (0..9)
+                .map(|_| {
+                    let start = Instant::now();
+                    for _ in 0..2000 {
+                        black_box(materialize());
+                    }
+                    start.elapsed().as_nanos() as f64 / 2000.
+                })
+                .collect::<Vec<_>>();
+            println!("COST_PROBE MACD/{n}/{mode} iterations=2000 ns_per_call={samples:?}");
+        }
     }
 }
