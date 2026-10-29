@@ -63,12 +63,12 @@ jobs:
       - name: Install pinned evidence dependencies and test controller gates
         run: |
           python -m pip install cmake==4.4.4 numpy==2.5.3 pytest==8.4.2
-          python -m pytest control-source/tests/test_mavp_variable_benchmark.py -q
           mkdir -p mavp-variable-results
           git -C control-source rev-parse HEAD > mavp-variable-results/controller-commit.txt
           cp control-source/scripts/mavp_variable_benchmark.py control-source/scripts/bench_mavp_variable.rs mavp-variable-results/
           cp control-source/.github/workflows/mavp-variable.yml mavp-variable-results/workflow.yml
           python -m pip freeze > mavp-variable-results/python-dependencies.txt
+          python -m pytest --noconftest control-source/tests/test_mavp_variable_benchmark.py -q
       - name: Regenerate and validate Rust plus all C/Rust regression functions before timing
         working-directory: candidate
         run: |
