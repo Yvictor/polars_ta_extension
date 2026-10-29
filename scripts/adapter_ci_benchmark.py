@@ -1,7 +1,7 @@
 """Original C / delivered native / optimized adapter comparison on one CI runner.
 
 Builds happen in the workflow, never during measurements. Every thread setting
-uses fresh processes, all six permutations of the three implementations, workload
+uses one fresh process per case and round, all six permutations of the three implementations, workload
 correctness checks, raw samples and descriptive process-noise ranges.
 """
 from __future__ import annotations
@@ -20,6 +20,8 @@ import time
 from migration_ci_benchmark import percentile, summarize
 
 SIDES = ('original', 'prior', 'candidate')
+ORIGINAL_COMMIT = 'b2bbc26d41ec80823c8bffb0cc436a97f29911cc'
+PRIOR_COMMIT = 'c71cd6ecb4b48601ff409926fdb0a281505e9fec'
 ORDERS = (
     ('original', 'prior', 'candidate'),
     ('prior', 'candidate', 'original'),
@@ -49,7 +51,7 @@ def analyze(runs, repeats, threads):
     if expected < 6 or any(len(runs[side]) != expected for side in SIDES):
         raise ValueError('at least six matched rounds required for each build')
     for side in SIDES:
-        for key in ('commit', 'source_sha256'):
+        for key in ('commit', 'source_sha256', 'native_binary_sha256'):
             if len({r[key] for r in runs[side]}) != 1:
                 raise ValueError(f'{side} source changed')
     for key in ('python', 'platform', 'cpu', 'polars', 'numpy', 'rust', 'profile',
@@ -75,6 +77,19 @@ def analyze(runs, repeats, threads):
     return comparisons, faults
 
 
+def selected_inventory(report, expected):
+    if report.get('case_inventory') != expected:
+        raise ValueError('child case inventory differs from the requested selection')
+    if not isinstance(expected, list) or not expected or len(set(expected)) != len(expected):
+        raise ValueError('empty or duplicate case inventory')
+    if set(report['results']) != set(expected):
+        raise ValueError('timed child did not run exactly the requested cases')
+    if report['case_filters'] != expected:
+        raise ValueError('timed child selector differs')
+    if report['checked_values'] <= 0:
+        raise ValueError('timed child did not validate its selected workload')
+
+
 def run_setting(args, threads, affinity):
     out = args.output.resolve() / f'threads-{threads}'
     out.mkdir(parents=True, exist_ok=True)
@@ -87,7 +102,7 @@ def run_setting(args, threads, affinity):
     reference = out / 'reference.npz'
     commands = []
 
-    def run(side, label, *extra):
+    def run(side, label, *extra, selected=None):
         # absolute() retains the virtualenv symlink and therefore sys.prefix.
         command = [str(getattr(args, side+'_python').absolute()), str(script),
                    '--source-root', str(getattr(args, side+'_source').resolve()),
@@ -95,43 +110,79 @@ def run_setting(args, threads, affinity):
                    '--repeats', str(args.repeats), *map(str, extra)]
         if threads == 1:
             command.append('--diagnostic')
-        for pattern in args.case_filter:
-            command += ['--case-filter',pattern]
+        for pattern in ([selected] if selected is not None else args.case_filter):
+            command += ['--case-filter', pattern]
         commands.append(command)
-        print(f'{time.strftime("%H:%M:%S")} threads={threads} {label}', flush=True)
+        print(f'{time.strftime("%H:%M:%S")} threads={threads} {label} {selected or "validation"}', flush=True)
         subprocess.run(command, env=env, check=True)
-        return json.loads((out/(label+'.json')).read_text())
+        result = json.loads((out/(label+'.json')).read_text())
+        if selected is not None:
+            selected_inventory(result, [selected])
+        return result
 
     reference_run = run('original', 'reference', '--check-only', '--write-reference', reference)
     validations = {side: run(side, f'validation-{side}', '--check-only', '--reference', reference)
                    for side in ('prior', 'candidate')}
+    if reference_run['commit'] != ORIGINAL_COMMIT or validations['prior']['commit'] != PRIOR_COMMIT:
+        raise ValueError('original or delivered source commit differs from its immutable pin')
+    if not reference_run['talib'].startswith('0.8.1'):
+        raise ValueError('original runtime is not the pinned C0.8.1')
+    for validation in validations.values():
+        if validation['talib'] != '0.8.3 (native Rust; polars-talib compatibility)':
+            raise ValueError('native runtime is not the pinned compatibility adapter')
+    inventory = reference_run['case_inventory']
+    if not inventory or len(set(inventory)) != len(inventory):
+        raise ValueError('empty or duplicate reference inventory')
+    for validation in validations.values():
+        if validation['case_inventory'] != inventory or validation['checked_values'] <= 0:
+            raise ValueError('reference validation omitted workloads')
     prior_reference = out / 'prior-reference.npz'
     run('prior', 'reference-prior', '--check-only', '--write-reference', prior_reference)
     exact_validation = run('candidate', 'validation-exact-prior', '--check-only',
                            '--reference', prior_reference, '--exact-reference')
-    if not exact_validation['exact_reference'] or exact_validation['checked_values'] <= 0:
+    if (not exact_validation['exact_reference'] or exact_validation['checked_values'] <= 0
+            or exact_validation['case_inventory'] != inventory):
         raise ValueError('delivered vs optimized workload validation did not run exactly')
-    prior_reference.unlink()
-    runs = {side: [] for side in SIDES}
+    # Retain both golden references. A failed later child must remain auditable.
+    source_validations = {'original': reference_run, **validations}
+    comparisons = {key: {} for key in ('original_vs_prior', 'prior_vs_candidate', 'original_vs_candidate')}
+    faults = {}
     order = []
-    for index in range(args.rounds):
-        for side in ORDERS[index % len(ORDERS)]:
-            label = f'{side}-{index+1}'
-            order.append(label)
-            runs[side].append(run(side, label, '--reference', reference))
-    comparisons, faults = analyze(runs, args.repeats, threads)
-    first = runs['candidate'][0]
-    for side, validation in validations.items():
-        if validation['commit'] != runs[side][0]['commit'] or validation['source_sha256'] != runs[side][0]['source_sha256']:
-            raise ValueError(f'{side} validation source differs')
-    if reference_run['commit'] != runs['original'][0]['commit'] or reference_run['source_sha256'] != runs['original'][0]['source_sha256']:
-        raise ValueError('original reference source differs')
+    process_manifest = []
+    first = validations['candidate']
+    for case_index, name in enumerate(inventory):
+        runs = {side: [] for side in SIDES}
+        for index in range(args.rounds):
+            for side in ORDERS[index % len(ORDERS)]:
+                label = f'case-{case_index+1:03d}-{side}-{index+1}'
+                order.append(label)
+                child = run(side, label, '--reference', reference, selected=name)
+                origin = source_validations[side]
+                for key in ('commit', 'source_sha256', 'native_binary_sha256', 'talib', 'python', 'platform', 'cpu',
+                            'polars', 'numpy', 'rust', 'profile', 'threads', 'affinity'):
+                    if child[key] != origin[key]:
+                        raise ValueError(f'{side} child source/runtime changed: {key}')
+                runs[side].append(child)
+                process_manifest.append({'case': name, 'side': side, 'round': index+1,
+                                         'report': label+'.json'})
+        # Analyze one case at a time: every sample set has its OWN fresh process,
+        # rather than a reused process carrying previous indicators' heap state.
+        case_comparisons, case_faults = analyze(runs, args.repeats, threads)
+        for key, values in case_comparisons.items():
+            if set(values) != {name} or name in comparisons[key]:
+                raise ValueError('case comparison inventory drift')
+            comparisons[key].update(values)
+        faults.update(case_faults)
     metadata = {key: first[key] for key in ('cpu', 'platform', 'python', 'polars', 'numpy',
                 'rust', 'threads', 'affinity', 'repeats', 'warmups', 'diagnostic', 'checked_values', 'case_filters')}
-    metadata.update(commits={side: runs[side][0]['commit'] for side in SIDES},
-                    source_sha256={side: runs[side][0]['source_sha256'] for side in SIDES},
-                    rounds=args.rounds, order=order, commands=commands, exact_prior_validation=exact_validation['checked_values'],
+    metadata.update(commits={side: source_validations[side]['commit'] for side in SIDES},
+                    source_sha256={side: source_validations[side]['source_sha256'] for side in SIDES},
+                    native_binary_sha256={side: source_validations[side]['native_binary_sha256'] for side in SIDES},
+                    rounds=args.rounds, order=order, commands=commands,
+                    case_inventory=inventory, process_isolation='one case per fresh process',
+                    processes=process_manifest, exact_prior_validation=exact_validation['checked_values'],
                     reference_sha256=hashlib.sha256(reference.read_bytes()).hexdigest(),
+                    prior_reference_sha256=hashlib.sha256(prior_reference.read_bytes()).hexdigest(),
                     comparisons=comparisons, faults=faults)
     (out/'summary.json').write_text(json.dumps(metadata, indent=2)+'\n')
     lines = [f'## {threads} thread(s)', '',
@@ -149,9 +200,6 @@ def run_setting(args, threads, affinity):
         vals = [faults[name][side]['minor_faults'] for side in SIDES]
         lines.append('| '+name+' | '+' | '.join('unavailable' if v is None else str(v['median']) for v in vals)+' |')
     (out/'comparison.md').write_text('\n'.join(lines)+'\n')
-    # The deterministic reference is regenerated for the other thread setting;
-    # retain its hash, not multiple large untimed NPZ buffers on the runner.
-    reference.unlink()
     return metadata, lines
 
 
@@ -190,7 +238,7 @@ def main():
     lines = ['# Three-build adapter follow-up', '',
              *[f'{side}: `{first["commits"][side]}`' for side in SIDES], '',
              f"{first['cpu']}; {first['platform']}; Python {first['python']}, Polars {first['polars']}, NumPy {first['numpy']}; {first['rust']}.",
-             f'{args.rounds} fresh processes per build/thread setting; all six build-order permutations; {args.repeats} samples after five warmups.',
+             f'{args.rounds} fresh processes per CASE/build/thread setting; all six build-order permutations; {args.repeats} samples after five warmups. No sibling query runs before the selected case.',
              'Ratios use matched-round medians. Envelopes span min(before medians)/max(after medians) to max(before)/min(after).',
              'These are descriptive ranges, not confidence intervals. Shared-host contention, frequency and placement remain uncontrolled.',
              'getrusage counters are process totals sampled outside the latency interval; they do not isolate jemalloc or kernel faults.',

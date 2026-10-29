@@ -41,26 +41,45 @@ def frame(rows,bars):
                          'volume':rng.uniform(100,1000,rows),'periods':np.resize([3.,5.,9.,14.],rows),'symbol':np.arange(rows)//bars})
 
 
-def cases(diagnostic=False):
-    for n in (1000,1_000_000):
-        data=frame(n,1000)
+def case_specs(diagnostic=False):
+    """Describe layouts without constructing frames or touching the allocator."""
+    for n in (1000, 1_000_000):
         for f in FAMILY_FUNCTIONS:
-            yield f'{f}/{n}',data,[indicator(f).alias(f)]
-        yield f'mix8/{n}',data,[indicator(f).alias(f) for f in FUNCTIONS]
-        yield f'control_cumsum_dense/{n}',data,[pl.col('close').cum_sum().alias('control')]
-    layouts=[(100,10000,False),(1000,1000,False),(10000,100,False),(2000,100,True)]
-    if diagnostic:layouts += [(50000,20,False),(10,100000,False),(1,1000000,False)]
-    for groups,bars,interleaved in layouts:
-        data=frame(groups*bars,bars)
-        if interleaved:
-            data=data.with_row_index('_row').with_columns((pl.col('_row')%bars).alias('_within')).sort('_within','symbol').drop('_row','_within')
-        choices=tuple((f,) for f in FAMILY_FUNCTIONS)+(FUNCTIONS,) if bars in (100,1000,10000) else (('ema',),('atr',))
+            yield f'{f}/{n}', n, 1000, False, False, (f,)
+        yield f'mix8/{n}', n, 1000, False, False, FUNCTIONS
+        yield f'control_cumsum_dense/{n}', n, 1000, False, False, ()
+    layouts = [(100,10000,False),(1000,1000,False),(10000,100,False),(2000,100,True)]
+    if diagnostic:
+        layouts += [(50000,20,False),(10,100000,False),(1,1000000,False)]
+    for groups, bars, interleaved in layouts:
+        choices = tuple((f,) for f in FAMILY_FUNCTIONS)+(FUNCTIONS,) if bars in (100,1000,10000) else (('ema',),('atr',))
+        suffix = '_interleaved' if interleaved else ''
         for functions in choices:
-            label=functions[0] if len(functions)==1 else 'mix8'
-            key=f'grouped_{label}/{groups}x{bars}'+('_interleaved' if interleaved else '')
-            yield key,data,[indicator(f).over('symbol').alias(f) for f in functions]
-        suffix='_interleaved' if interleaved else ''
-        yield f'control_cumsum/{groups}x{bars}'+suffix,data,[pl.col('close').cum_sum().over('symbol').alias('control')]
+            label = functions[0] if len(functions)==1 else 'mix8'
+            yield f'grouped_{label}/{groups}x{bars}'+suffix, groups*bars, bars, True, interleaved, functions
+        yield f'control_cumsum/{groups}x{bars}'+suffix, groups*bars, bars, True, interleaved, ()
+
+
+def cases(diagnostic=False, filters=()):
+    # Select BEFORE allocation: a selected-case subprocess must not inherit the
+    # allocation history of any earlier layout or sibling indicator.
+    previous = None
+    data = None
+    for name, rows, bars, grouped, interleaved, functions in case_specs(diagnostic):
+        if filters and not any(fnmatch.fnmatchcase(name, pattern) for pattern in filters):
+            continue
+        layout = (rows, bars, grouped, interleaved)
+        if layout != previous:
+            data = frame(rows, bars)
+            if interleaved:
+                data = data.with_row_index('_row').with_columns((pl.col('_row')%bars).alias('_within')).sort('_within','symbol').drop('_row','_within')
+            previous = layout
+        if functions:
+            expressions = [(indicator(f).over('symbol') if grouped else indicator(f)).alias(f) for f in functions]
+        else:
+            value = pl.col('close').cum_sum()
+            expressions = [(value.over('symbol') if grouped else value).alias('control')]
+        yield name, data, expressions
 
 
 def flatten(result):
@@ -83,9 +102,9 @@ def main():
     args=p.parse_args()
     if args.repeats<5:p.error('at least five repetitions required')
     reference=np.load(args.reference,allow_pickle=False) if args.reference else None
-    values={};results={};load_start=os.getloadavg();checked_values=0
-    for name,data,exprs in cases(args.diagnostic):
-        if args.case_filter and not any(fnmatch.fnmatchcase(name,p) for p in args.case_filter):continue
+    values={};results={};load_start=os.getloadavg();checked_values=0;case_inventory=[]
+    for name,data,exprs in cases(args.diagnostic, args.case_filter):
+        case_inventory.append(name)
         query=data.lazy().select(exprs)
         result=query.collect()
         if reference is not None:
@@ -141,6 +160,10 @@ def main():
         except (subprocess.CalledProcessError,OSError):pass
     elif Path('/proc/cpuinfo').is_file():
         cpu=next((s.split(':',1)[1].strip() for s in Path('/proc/cpuinfo').read_text().splitlines() if s.startswith('model name')),cpu)
+    native_files = list(Path(ta.__file__).parent.glob('_polars_talib*.so')) + list(Path(ta.__file__).parent.glob('_polars_talib*.pyd'))
+    if len(native_files) != 1:
+        raise ValueError('installed native extension is missing or ambiguous')
+    native_sha256 = hashlib.sha256(native_files[0].read_bytes()).hexdigest()
     commit=subprocess.check_output(['git','-C',str(args.source_root),'rev-parse','HEAD'],text=True).strip()
     payload={'label':args.label,'commit':commit,'cpu':cpu,'memory_bytes':memory,'logical_cpus':os.cpu_count(),
              'python':platform.python_version(),'platform':platform.platform(),'polars':pl.__version__,
@@ -149,9 +172,9 @@ def main():
              'profile':'release (maturin --release --locked), portable CPU target',
              'threads':pl.thread_pool_size(),'repeats':args.repeats,'warmups':5,'diagnostic':args.diagnostic,
              'fault_counter':'getrusage(RUSAGE_SELF), process counters across query threads including engine/Python/allocator activity between reads' if resource is not None else None,
-             'load_start':load_start,'load_end':os.getloadavg(),'source_sha256':source.hexdigest(),
+             'native_binary_sha256':native_sha256,'load_start':load_start,'load_end':os.getloadavg(),'source_sha256':source.hexdigest(),
              'correctness_reference':str(args.reference) if args.reference else None,'exact_reference':args.exact_reference,
-             'case_filters':args.case_filter,'checked_values':checked_values,'affinity':sorted(os.sched_getaffinity(0)) if hasattr(os,'sched_getaffinity') else None,
+             'case_filters':args.case_filter,'case_inventory':case_inventory,'checked_values':checked_values,'affinity':sorted(os.sched_getaffinity(0)) if hasattr(os,'sched_getaffinity') else None,
              'results':results}
     args.output.parent.mkdir(parents=True,exist_ok=True);args.output.write_text(json.dumps(payload,indent=2)+'\n')
     print(json.dumps({n:round(r['median_ms'],4) for n,r in results.items()},indent=2))

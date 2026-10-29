@@ -202,7 +202,7 @@ jobs:
   benchmark:
     name: Release benchmark / original vs delivered vs optimized adapter
     runs-on: ubuntu-24.04
-    timeout-minutes: 240
+    timeout-minutes: 330
     env:
       RUSTUP_TOOLCHAIN: '1.90.0'
       CARGO_PROFILE_RELEASE_DEBUG: 'false'
@@ -228,7 +228,9 @@ jobs:
       # published wheel, local timing or wheel built by another job is compared.
       - name: Build all three release wheels sequentially
         run: |
-          mkdir -p benchmark-results
+          mkdir -p benchmark-results/controller
+          cp candidate-source/scripts/adapter_ci_benchmark.py candidate-source/scripts/migration_benchmark.py candidate-source/scripts/regression_inventory.py benchmark-results/controller/
+          cp candidate-source/.github/workflows/CI.yml benchmark-results/controller/workflow.yml
           for side in original prior candidate; do
             uv venv --python 3.12 "$side-env"
             uv pip install --python "$side-env" 'maturin==1.15.0' 'cmake==4.4.4' 'polars==1.44.2' 'numpy==2.5.3'
@@ -259,7 +261,7 @@ jobs:
           PYO3_PYTHON: ${{ github.workspace }}/candidate-env/bin/python
         run: |
           cargo test --release --lib --locked adapter_cost_probe -- --ignored --nocapture > ../benchmark-results/rust-cost-probe.log 2>&1
-      - name: Check workloads and alternate repeated three-build measurements
+      - name: Validate workloads and alternate fresh single-case three-build processes
         run: |
           candidate-env/bin/python candidate-source/scripts/adapter_ci_benchmark.py \
             --original-python original-env/bin/python --original-source original-source \

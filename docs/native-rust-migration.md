@@ -175,8 +175,11 @@ The current CI job rebuilds three immutable sources on **one runner**:
 All portable release wheels use Rust1.90, the same compiler/Python runtime,
 Polars1.44.2 and NumPy2.5.3. Builds, corpus gates and setup diagnostics finish
 before query timing. `adapter_ci_benchmark.py` uses all six build-order
-permutations, six fresh processes per build/thread setting, five warmups and
-51 samples per query. One- and four-thread settings run sequentially with the
+permutations, six fresh processes per case/build/thread setting, five warmups and
+51 samples per query. No sibling indicator runs before a selected case: filtering occurs before frame
+construction, and that child validates only its selected query. This prevents
+earlier functions from changing later cases through allocator history. Both
+golden query references are retained. One- and four-thread settings run sequentially with the
 same CPU affinity within each setting. There is no cross-runner comparison or
 reuse of local timing as a CI result.
 
@@ -201,8 +204,8 @@ they do not by themselves identify allocator or kernel causality.
 The first broad run at8d14d0d preserved a complete one-thread block, but timed out
 after only two four-thread rounds. Its partial artifact is useful for identifying
 MAVP, MINMAXINDEX, CDLDOJI, STDDEV and SUPERTREND regressions, not a complete
-four-thread conclusion. The CI budget is now240minutes to retain the full scope
-and repetitions. The [PR](https://github.com/Yvictor/polars_ta_extension/pull/45)
+four-thread conclusion. The CI budget is now330minutes to retain the full scope
+and repetitions, including fresh Python starts for every timed case. The [PR](https://github.com/Yvictor/polars_ta_extension/pull/45)
 links the exact final head, terminal job status and complete artifact; do not
 attribute earlier results to unmeasured source changes.
 
