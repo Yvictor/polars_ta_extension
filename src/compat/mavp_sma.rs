@@ -66,22 +66,36 @@ pub(super) fn call(
         });
     }
 
-    let mut selected = vec![0_i32; count];
-    let (mut min_used, mut max_used) = (max, min);
-    for (slot, &value) in selected.iter_mut().zip(&periods[start..=end]) {
-        let period = if !(value >= f64::from(min)) {
+    let normalize = |value: f64| {
+        if !(value >= f64::from(min)) {
             min
         } else if value > f64::from(max) {
             max
         } else {
             value as i32
-        };
+        }
+    };
+    let first = normalize(periods[start]);
+    // Uniform normalized periods need no per-row scratch. Stop the prefix
+    // probe at the first difference so mixed inputs do not add a full pass.
+    let split = periods[start + 1..=end]
+        .iter()
+        .position(|&value| normalize(value) != first)
+        .map(|i| i + 1);
+    let Some(split) = split else {
+        return crate::native::core().ma(start, end, price, first, MAType::SMA, output);
+    };
+    let mut selected = vec![0_i32; count];
+    selected[..split].fill(first);
+    let (mut min_used, mut max_used) = (first, first);
+    for (slot, &value) in selected[split..]
+        .iter_mut()
+        .zip(&periods[start + split..=end])
+    {
+        let period = normalize(value);
         *slot = period;
         min_used = min_used.min(period);
         max_used = max_used.max(period);
-    }
-    if min_used == max_used {
-        return crate::native::core().ma(start, end, price, min_used, MAType::SMA, output);
     }
     let mut last = vec![-1_i32; (max_used - min_used + 1) as usize];
     for (i, &period) in selected.iter().enumerate() {
@@ -402,4 +416,61 @@ mod tests {
             call.result.unwrap();
         }
     }
+
+    #[test]
+    fn normalized_uniform_prefix_and_last_row_change_keep_exact_values_and_tails() {
+        let core = crate::native::core();
+        let mut checked = 0;
+        for n in [29usize, 30, 31, 32, 64, 257] {
+            for (min, max) in [(1, 1), (1, 30), (2, 30)] {
+                for period_pattern in 0..4 {
+                    for change in [None, Some(29), Some(30), Some(n - 1)] {
+                        let mut periods: Vec<_> = (0..n)
+                            .map(|i| match period_pattern {
+                                0 => [14.01, 14.25, 14.999][i % 3],
+                                1 => [f64::NAN, f64::NEG_INFINITY, -0., 0.75][i % 4],
+                                2 => [31., f64::INFINITY, 10001.][i % 3],
+                                _ => 1.,
+                            })
+                            .collect();
+                        if let Some(row) = change.filter(|&row| row < n) {
+                            periods[row] = if period_pattern == 2 { 1. } else { 30. };
+                        }
+                        for price_pattern in 0..4 {
+                            let mut price: Vec<_> = (0..n)
+                                .map(|i| {
+                                    if price_pattern == 1 {
+                                        if i % 2 == 0 { -0. } else { 0. }
+                                    } else {
+                                        100. + (i % 17) as f64 / 100.
+                                    }
+                                })
+                                .collect();
+                            if price_pattern == 2 {
+                                price[n / 2] = f64::NAN;
+                            } else if price_pattern == 3 {
+                                price[n / 2] = f64::INFINITY;
+                            }
+                            let mut expected = vec![POISON; n + 8];
+                            let mut actual = expected.clone();
+                            let old = core.mavp(
+                                0, n - 1, &price, &periods, min, max,
+                                MAType::SMA, &mut expected,
+                            );
+                            let new = call(&price, &periods, min, max, &mut actual);
+                            assert_eq!(old, new);
+                            assert!(expected.iter().zip(&actual).all(|(&a, &b)| same(a, b)),
+                                "n{n}/{min}/{max}/period{period_pattern}/change{change:?}/price{price_pattern}");
+                            let range = new.unwrap();
+                            assert!(actual[range.count..].iter()
+                                .all(|v| v.to_bits() == POISON.to_bits()));
+                            checked += 1;
+                        }
+                    }
+                }
+            }
+        }
+        assert_eq!(checked, 1152);
+    }
+
 }
