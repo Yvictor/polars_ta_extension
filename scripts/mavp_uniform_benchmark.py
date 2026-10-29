@@ -24,7 +24,7 @@ from mavp_uniform_inputs import validate as validate_input_snapshots
 
 SIDES = ('original', 'prior', 'combined', 'candidate')
 COMBINED_COMMIT = '0eb91280cf5d13095cbfdc6f8bcc477cfbcd1498'
-CANDIDATE_HELPER_SHA256 = 'UNSET_REVIEWED_HELPER_SHA256'
+CANDIDATE_HELPER_SHA256 = 'c90e922f7a2289e6408306409ce77edc582e5a25ee98d21138f74a2bbab23fd8'
 ORIGINAL_COMMIT = 'b2bbc26d41ec80823c8bffb0cc436a97f29911cc'
 PRIOR_COMMIT = '56f6d5fb139031c20d86d7e818e7d267eb834295'
 NATIVE_SIDES = ('prior', 'combined', 'candidate')
@@ -32,7 +32,7 @@ LABELS = {'original':'Original C081', 'prior':'Delivered56', 'combined':'Combine
 MANIFEST = Path(__file__).with_name('mavp_uniform_cases.json')
 CASES = tuple(json.loads(MANIFEST.read_text())['cases'])
 CHECKED_VALUES = 30_400_000
-CANDIDATE_COMMIT = "UNSET_REVIEWED_UNIFORM_CANDIDATE"
+CANDIDATE_COMMIT = "916b0de68369df410559b6dc651731cf4c36b94c"
 CHILD_TIMEOUT_SECONDS = 120
 MEASUREMENT_BUDGET_SECONDS = 7200
 from mavp_uniform_provenance import sha256, source_record, identity, wheel_record, flags_record, validate_identities, elf_record
