@@ -19,6 +19,7 @@ polars = {version = "0.36.2", features = ["dtype-struct", "dtype-i8", "dtype-i16
 # "performant", "lazy", "dtype-array"
 serde = { version = "*", features = ["derive"] }
 ta-lib = "=0.8.3"
+multiversion = "=0.7.4"
 
 [target.'cfg(any(not(target_os = "linux"), use_mimalloc))'.dependencies]
 mimalloc = { version = "0.1", default-features = false }

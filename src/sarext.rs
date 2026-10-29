@@ -86,7 +86,8 @@ impl SarExtParams {
         low: &[f64],
         output: &mut [f64],
     ) -> Result<OutRange, RetCode> {
-        let range = core.sarext(
+        crate::sarext_legacy::call(
+            core,
             0,
             high.len() - 1,
             high,
@@ -100,36 +101,7 @@ impl SarExtParams {
             self.accelerationshort,
             self.accelerationmaxshort,
             output,
-        )?;
-        // C0.8.1 wrote 0-sar for the short side, whereas C/Rust0.8.3
-        // writes -sar. The only non-NaN bit difference is +0 versus -0.
-        // A negative zero can also be a legitimate long-side value: replay
-        // the exact two-site compatibility body instead of normalizing zeros.
-        let written = output.get(..range.count).ok_or(RetCode::InternalError)?;
-        if written.iter().fold(false, |found, v| {
-            found | (v.to_bits() == (-0.0f64).to_bits())
-        }) {
-            let compatibility_range = crate::sarext_legacy::call(
-                core,
-                0,
-                high.len() - 1,
-                high,
-                low,
-                self.startvalue,
-                self.offsetonreverse,
-                self.accelerationinitlong,
-                self.accelerationlong,
-                self.accelerationmaxlong,
-                self.accelerationinitshort,
-                self.accelerationshort,
-                self.accelerationmaxshort,
-                output,
-            )?;
-            if compatibility_range != range {
-                return Err(RetCode::InternalError);
-            }
-        }
-        Ok(range)
+        )
     }
 }
 

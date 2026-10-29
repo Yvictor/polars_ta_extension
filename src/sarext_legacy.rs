@@ -96,7 +96,7 @@ pub(crate) fn call(
     }
     let mut outBegIdx: usize = 0;
     let mut outNBElement: usize = 0;
-    let retCode = scalar(
+    let retCode = dispatched_scalar(
         core,
         startIdx,
         endIdx,
@@ -123,6 +123,48 @@ pub(crate) fn call(
     }
 }
 
+// Public multiversion0.7.4 supplies runtime FMA detection and the portable
+// fallback. Keep the scalar body inline so its .mul_add lowers in that context.
+#[multiversion::multiversion(targets("x86_64+fma"), dispatcher = "direct")]
+fn dispatched_scalar(
+    core: &Core,
+    startIdx: usize,
+    endIdx: usize,
+    inHigh: &[f64],
+    inLow: &[f64],
+    mut optInStartValue: f64,
+    mut optInOffsetOnReverse: f64,
+    mut optInAccelerationInitLong: f64,
+    mut optInAccelerationLong: f64,
+    mut optInAccelerationMaxLong: f64,
+    mut optInAccelerationInitShort: f64,
+    mut optInAccelerationShort: f64,
+    mut optInAccelerationMaxShort: f64,
+    outBegIdx: &mut usize,
+    outNBElement: &mut usize,
+    outReal: &mut [f64],
+) -> RetCode {
+    scalar(
+        core,
+        startIdx,
+        endIdx,
+        inHigh,
+        inLow,
+        optInStartValue,
+        optInOffsetOnReverse,
+        optInAccelerationInitLong,
+        optInAccelerationLong,
+        optInAccelerationMaxLong,
+        optInAccelerationInitShort,
+        optInAccelerationShort,
+        optInAccelerationMaxShort,
+        outBegIdx,
+        outNBElement,
+        outReal,
+    )
+}
+
+#[inline(always)]
 fn scalar(
     core: &Core,
     startIdx: usize,
@@ -583,5 +625,76 @@ mod tests {
                 compare(0, 7, &high, &low, options, 8);
             }
         }
+    }
+    #[test]
+    fn cold_parallel_dispatch_matches_portable_scalar_without_shared_mutable_inputs() {
+        let barrier = std::sync::Barrier::new(8);
+        std::thread::scope(|scope| {
+            for worker in 0..8 {
+                let barrier = &barrier;
+                scope.spawn(move || {
+                    let core = crate::native::core();
+                    let high: Vec<f64> = (0..193)
+                        .map(|i| [2., -0., 0., -1., f64::NAN, f64::INFINITY, 4.][(i + worker) % 7])
+                        .collect();
+                    let low: Vec<f64> = (0..193)
+                        .map(|i| [1., -2., -0., 0., f64::NEG_INFINITY, 3.][(i + worker) % 6])
+                        .collect();
+                    let mut expected = vec![f64::from_bits(0x7ff8_0012_3456_789a); 201];
+                    let mut beg = 0;
+                    let mut count = 0;
+                    let status = scalar(
+                        core,
+                        0,
+                        192,
+                        &high,
+                        &low,
+                        DEFAULTS[0],
+                        DEFAULTS[1],
+                        DEFAULTS[2],
+                        DEFAULTS[3],
+                        DEFAULTS[4],
+                        DEFAULTS[5],
+                        DEFAULTS[6],
+                        DEFAULTS[7],
+                        &mut beg,
+                        &mut count,
+                        &mut expected[2..199],
+                    );
+                    assert_eq!(status, RetCode::Success);
+                    // Run this test alone in a fresh process to exercise the
+                    // production dispatcher's first atomic selection concurrently.
+                    barrier.wait();
+                    for _ in 0..32 {
+                        let mut actual = vec![f64::from_bits(0x7ff8_0012_3456_789a); 201];
+                        let range = call(
+                            core,
+                            0,
+                            192,
+                            &high,
+                            &low,
+                            DEFAULTS[0],
+                            DEFAULTS[1],
+                            DEFAULTS[2],
+                            DEFAULTS[3],
+                            DEFAULTS[4],
+                            DEFAULTS[5],
+                            DEFAULTS[6],
+                            DEFAULTS[7],
+                            &mut actual[2..199],
+                        )
+                        .unwrap();
+                        assert_eq!((range.beg_idx, range.count), (beg, count));
+                        for (i, (a, b)) in actual.iter().zip(&expected).enumerate() {
+                            if (2..2 + count).contains(&i) && (a.is_nan() || b.is_nan()) {
+                                assert!(a.is_nan() && b.is_nan());
+                            } else {
+                                assert_eq!(a.to_bits(), b.to_bits());
+                            }
+                        }
+                    }
+                });
+            }
+        });
     }
 }

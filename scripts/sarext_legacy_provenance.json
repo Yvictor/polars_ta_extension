@@ -10,7 +10,7 @@
   "c_math_sha256": "62029d7250233dca4720dbda232d9ae6dbce44964c2b5f36c4a67b00754c97f3",
   "adaptations": [
     "Methods become free functions with an explicit borrowed Core; Self constants and self method calls reference Core.",
-    "Public wrapper calls the copied scalar body rather than private CPU feature dispatch.",
+    "Public wrapper calls a public multiversion0.7.4 dispatched safe wrapper around the inline scalar body instead of private TA-Lib CPU dispatch.",
     "Private c_min is copied with its exact conditional semantics."
   ],
   "semantic_changes": [
@@ -26,8 +26,29 @@
     "Full NaN output initialization retained.",
     "Official Core .sarext_lookback and .minus_dm remain public API calls."
   ],
-  "performance_boundary": "The copied safe scalar body cannot use the original private target_feature FMA dispatch. Portable code may call libm fma; same-runner final-code CI is required.",
-  "routing": "Official typed Core call first. Inspect only range.count written values for negative-zero bits. If present, replay the two-store compatibility scalar into the same initialized buffer and require identical OutRange; no blanket zero normalization.",
+  "performance_boundary": "Explicit x86_64+fma target expands to its documented feature dependencies; runtime CPUID guard chooses FMA clone or portable fallback. Verify final Linux product ELF and same-runner CI before retention.",
+  "routing": "Exactly one corrected scalar kernel invocation via public multiversion0.7.4 runtime CPU dispatch; no output scan or replay. Public Core lookback/metadata and minus_dm remain unchanged.",
   "scalar_source_token_sha256": "5dfe1e154121643a72448069e982f90a8b7f106b8737ec8ad9546799c19c77e8",
-  "scalar_source_token_count": 1409
+  "scalar_source_token_count": 1409,
+  "public_dispatch": {
+    "crate": "multiversion",
+    "version": "=0.7.4",
+    "features": [
+      "default",
+      "std"
+    ],
+    "attribute": "targets(\"x86_64+fma\"), dispatcher=\"direct\"",
+    "documentation": "https://docs.rs/multiversion/0.7.4/multiversion/attr.multiversion.html",
+    "expanded_preflight_features": [
+      "avx",
+      "fma",
+      "sse",
+      "sse2",
+      "sse3",
+      "sse4.1",
+      "ssse3"
+    ],
+    "handwritten_unsafe_added": false,
+    "macro_generated_unsafe": "Public provider emits guarded target-feature calls and unreachable fallback; independently review feature guard, immutable cached index and portable branch."
+  }
 }
