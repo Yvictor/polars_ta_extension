@@ -7,9 +7,15 @@
   "corrected_trust_sha256": "81c94112c85a0e7a02017c79b67996655861f3d3467713d8eb3f29f15b15e5f6",
   "trust_correction": "Independent review approved only Path-component aggregate source-fingerprint ordering; all frozen file bytes remained unchanged. Original failed trust/log retained in audit bundle. No numerical gate was weakened.",
   "files": {
-    "all50-counters.csv": "ee2d2d78b8808ec02b1eacdbbd01c5cf06eb5a8f1bb35fe9d6be4b5555e865f5",
+    "all50-counters.csv": "4747026cee654d393a50a2d7489892e3fe7c050750258c1125cd0d9255acebd7",
     "README.md": "85b4c15ba6db4484a62c2ef46427e72f9f97f0fbbda98d1ccb3520c2ec150a69",
+    "all57-comparisons.csv": "0bfa680d8f6028d522de9c5d599ed8b4cdc8ffdfb379ba850f107891b87cfb2d",
+    "all50-cells.csv": "a6e00a25993283d8620c9554e443c4f988e11cb673ff781a33030c4325148feb"
+  },
+  "source_csv_sha256_before_LF_normalization": {
+    "all50-counters.csv": "ee2d2d78b8808ec02b1eacdbbd01c5cf06eb5a8f1bb35fe9d6be4b5555e865f5",
     "all57-comparisons.csv": "9dce6f668244325d73d88e301ba621246200abf271b1ada2c364d586ad7405ff",
     "all50-cells.csv": "e44bd1b12428ee611a4a60221310b0454b450b738955d390a1d7639314ac52a3"
-  }
+  },
+  "archival_line_endings": "LF; every parsed CSV record is unchanged from the audited source file."
 }

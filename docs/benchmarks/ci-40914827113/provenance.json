@@ -10,7 +10,11 @@
   "auditor_fixtures": 25,
   "description": "Independent read-only replay of source-bound raw CI artifacts; this report measures only the pinned56 candidate, not later candidates. Audit limitations are in README.",
   "files": {
-    "all-observations.csv": "62f65abf00457c2fa2231cd3b2598086de15cd0f644ad3197689bc59d9e94989",
+    "all-observations.csv": "53e92efcf777bb9a9885b39ba764ba66f0405af6a772ac0c587a708d3e01f9d9",
     "README.md": "7a0abe61e2c77e9b20f882dc37c9c785ba39d534af1f150f64ca65b9d9fe5243"
-  }
+  },
+  "source_csv_sha256_before_LF_normalization": {
+    "all-observations.csv": "62f65abf00457c2fa2231cd3b2598086de15cd0f644ad3197689bc59d9e94989"
+  },
+  "archival_line_endings": "LF; every parsed CSV record is unchanged from the audited source file."
 }
