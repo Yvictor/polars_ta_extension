@@ -6,65 +6,73 @@ pub enum Param {
     Int(i32),
     Real(f64),
 }
-// Most exposed functions have at most eight options. Keep those descriptors
-// inline; retain an uncapped tree spill for larger metadata/unknown-key maps.
-// Pickle's own dictionary, memo and key-string allocations remain unchanged.
+// Keep empty and single-option calls small. A second distinct key promotes
+// into the original uncapped tree; no fixed-capacity array crosses callbacks.
+// Pickle's dictionary, memo and key-string allocations remain unchanged.
 #[derive(Debug)]
-pub struct Params {
-    inline: [Option<(String, Param)>; 8],
-    spill: std::collections::BTreeMap<String, Param>,
+pub enum Params {
+    Empty,
+    One(String, Param),
+    Tree(std::collections::BTreeMap<String, Param>),
 }
 
 impl Default for Params {
     fn default() -> Self {
-        Self {
-            inline: std::array::from_fn(|_| None),
-            spill: std::collections::BTreeMap::new(),
-        }
+        Self::Empty
     }
 }
 
 impl Params {
     pub fn new() -> Self {
-        Self::default()
+        Self::Empty
     }
 
     pub fn get(&self, key: &str) -> Option<&Param> {
-        self.inline
-            .iter()
-            .flatten()
-            .find_map(|(k, value)| (k == key).then_some(value))
-            .or_else(|| self.spill.get(key))
+        match self {
+            Self::Empty => None,
+            Self::One(k, value) => (k == key).then_some(value),
+            Self::Tree(tree) => tree.get(key),
+        }
     }
 
     pub fn iter(&self) -> impl Iterator<Item = (&String, &Param)> {
-        self.inline
-            .iter()
-            .flatten()
-            .map(|(key, value)| (key, value))
-            .chain(self.spill.iter())
+        let (one, tree) = match self {
+            Self::Empty => (None, None),
+            Self::One(key, value) => (Some((key, value)), None),
+            Self::Tree(tree) => (None, Some(tree.iter())),
+        };
+        one.into_iter().chain(tree.into_iter().flatten())
     }
 
     pub fn insert(&mut self, key: String, value: Param) -> Option<Param> {
-        for (k, current) in self.inline.iter_mut().flatten() {
-            if *k == key {
-                return Some(std::mem::replace(current, value));
+        match self {
+            Self::Empty => {
+                *self = Self::One(key, value);
+                None
             }
-        }
-        if let Some(current) = self.spill.get_mut(&key) {
-            return Some(std::mem::replace(current, value));
-        }
-        if let Some(slot) = self.inline.iter_mut().find(|slot| slot.is_none()) {
-            *slot = Some((key, value));
-            None
-        } else {
-            self.spill.insert(key, value)
+            Self::One(k, current) if *k == key => Some(std::mem::replace(current, value)),
+            Self::One(..) => {
+                let Self::One(previous_key, previous_value) = std::mem::replace(self, Self::Empty)
+                else {
+                    unreachable!()
+                };
+                let mut tree = std::collections::BTreeMap::new();
+                tree.insert(previous_key, previous_value);
+                let replaced = tree.insert(key, value);
+                *self = Self::Tree(tree);
+                replaced
+            }
+            Self::Tree(tree) => tree.insert(key, value),
         }
     }
 
     #[cfg(test)]
     fn len(&self) -> usize {
-        self.inline.iter().flatten().count() + self.spill.len()
+        match self {
+            Self::Empty => 0,
+            Self::One(..) => 1,
+            Self::Tree(tree) => tree.len(),
+        }
     }
 }
 
@@ -187,6 +195,31 @@ mod tests {
     use std::collections::BTreeMap;
 
     #[test]
+    fn singleton_promotes_only_on_a_distinct_key() {
+        let mut values = Params::new();
+        assert!(matches!(values, Params::Empty));
+        assert!(values.insert("z".to_owned(), Param::Int(7)).is_none());
+        assert!(matches!(values, Params::One(..)));
+        assert!(matches!(
+            values.insert("z".to_owned(), Param::Real(-0.0)),
+            Some(Param::Int(7))
+        ));
+        assert!(matches!(values, Params::One(..)));
+        assert!(values.insert("a".to_owned(), Param::Int(2)).is_none());
+        assert!(matches!(values, Params::Tree(_)));
+        assert!(
+            matches!(values.get("z"), Some(Param::Real(value)) if value.to_bits() == (-0.0_f64).to_bits())
+        );
+        assert_eq!(
+            values
+                .iter()
+                .map(|(key, _)| key.as_str())
+                .collect::<Vec<_>>(),
+            ["a", "z"]
+        );
+    }
+
+    #[test]
     fn numeric_pickle_kinds_and_errors_match_untagged_decoder() {
         // Real Python pickle bytes, protocols 0..=5: i32/i64 boundaries, default
         // sentinels, huge integers, signed zero, nonfinite and nonnumeric values.
@@ -281,7 +314,7 @@ mod tests {
     }
 
     #[test]
-    fn inline_map_keeps_spill_duplicates_and_full_metadata_lookback() {
+    fn parameter_map_keeps_large_maps_duplicates_and_full_metadata_lookback() {
         let mut values = Params::new();
         for i in 0..64 {
             assert!(values.insert(format!("key{i}"), Param::Int(i)).is_none());
@@ -322,7 +355,7 @@ mod tests {
     }
 
     #[test]
-    fn inline_map_preserves_plugin_envelope_errors_and_unknown_fields() {
+    fn parameter_map_preserves_plugin_envelope_errors_and_unknown_fields() {
         for line in include_str!("../tests/data/param-map-envelopes-pickle.hex")
             .lines()
             .filter(|line| !line.starts_with('#'))
