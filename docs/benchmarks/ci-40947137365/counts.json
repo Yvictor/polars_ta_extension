@@ -1,0 +1,182 @@
+{
+  "original_vs_prior": {
+    "all": {
+      "rows": 44,
+      "slower_medians": 35,
+      "disjoint_faster": 0,
+      "disjoint_slower": 20,
+      "overlap": 24
+    },
+    "eligible_guard_fusion_workload": {
+      "rows": 36,
+      "slower_medians": 30,
+      "disjoint_faster": 0,
+      "disjoint_slower": 20,
+      "overlap": 16
+    },
+    "ineligible_native_factory_overhead_control": {
+      "rows": 4,
+      "slower_medians": 4,
+      "disjoint_faster": 0,
+      "disjoint_slower": 0,
+      "overlap": 4
+    },
+    "pure_polars_drift_control": {
+      "rows": 4,
+      "slower_medians": 1,
+      "disjoint_faster": 0,
+      "disjoint_slower": 0,
+      "overlap": 4
+    }
+  },
+  "original_vs_initialization": {
+    "all": {
+      "rows": 44,
+      "slower_medians": 39,
+      "disjoint_faster": 0,
+      "disjoint_slower": 21,
+      "overlap": 23
+    },
+    "eligible_guard_fusion_workload": {
+      "rows": 36,
+      "slower_medians": 34,
+      "disjoint_faster": 0,
+      "disjoint_slower": 21,
+      "overlap": 15
+    },
+    "ineligible_native_factory_overhead_control": {
+      "rows": 4,
+      "slower_medians": 4,
+      "disjoint_faster": 0,
+      "disjoint_slower": 0,
+      "overlap": 4
+    },
+    "pure_polars_drift_control": {
+      "rows": 4,
+      "slower_medians": 1,
+      "disjoint_faster": 0,
+      "disjoint_slower": 0,
+      "overlap": 4
+    }
+  },
+  "original_vs_candidate": {
+    "all": {
+      "rows": 44,
+      "slower_medians": 39,
+      "disjoint_faster": 0,
+      "disjoint_slower": 21,
+      "overlap": 23
+    },
+    "eligible_guard_fusion_workload": {
+      "rows": 36,
+      "slower_medians": 34,
+      "disjoint_faster": 0,
+      "disjoint_slower": 21,
+      "overlap": 15
+    },
+    "ineligible_native_factory_overhead_control": {
+      "rows": 4,
+      "slower_medians": 3,
+      "disjoint_faster": 0,
+      "disjoint_slower": 0,
+      "overlap": 4
+    },
+    "pure_polars_drift_control": {
+      "rows": 4,
+      "slower_medians": 2,
+      "disjoint_faster": 0,
+      "disjoint_slower": 0,
+      "overlap": 4
+    }
+  },
+  "prior_vs_initialization": {
+    "all": {
+      "rows": 44,
+      "slower_medians": 24,
+      "disjoint_faster": 0,
+      "disjoint_slower": 0,
+      "overlap": 44
+    },
+    "eligible_guard_fusion_workload": {
+      "rows": 36,
+      "slower_medians": 20,
+      "disjoint_faster": 0,
+      "disjoint_slower": 0,
+      "overlap": 36
+    },
+    "ineligible_native_factory_overhead_control": {
+      "rows": 4,
+      "slower_medians": 3,
+      "disjoint_faster": 0,
+      "disjoint_slower": 0,
+      "overlap": 4
+    },
+    "pure_polars_drift_control": {
+      "rows": 4,
+      "slower_medians": 1,
+      "disjoint_faster": 0,
+      "disjoint_slower": 0,
+      "overlap": 4
+    }
+  },
+  "prior_vs_candidate": {
+    "all": {
+      "rows": 44,
+      "slower_medians": 24,
+      "disjoint_faster": 0,
+      "disjoint_slower": 0,
+      "overlap": 44
+    },
+    "eligible_guard_fusion_workload": {
+      "rows": 36,
+      "slower_medians": 20,
+      "disjoint_faster": 0,
+      "disjoint_slower": 0,
+      "overlap": 36
+    },
+    "ineligible_native_factory_overhead_control": {
+      "rows": 4,
+      "slower_medians": 2,
+      "disjoint_faster": 0,
+      "disjoint_slower": 0,
+      "overlap": 4
+    },
+    "pure_polars_drift_control": {
+      "rows": 4,
+      "slower_medians": 2,
+      "disjoint_faster": 0,
+      "disjoint_slower": 0,
+      "overlap": 4
+    }
+  },
+  "initialization_vs_candidate": {
+    "all": {
+      "rows": 44,
+      "slower_medians": 23,
+      "disjoint_faster": 0,
+      "disjoint_slower": 0,
+      "overlap": 44
+    },
+    "eligible_guard_fusion_workload": {
+      "rows": 36,
+      "slower_medians": 18,
+      "disjoint_faster": 0,
+      "disjoint_slower": 0,
+      "overlap": 36
+    },
+    "ineligible_native_factory_overhead_control": {
+      "rows": 4,
+      "slower_medians": 2,
+      "disjoint_faster": 0,
+      "disjoint_slower": 0,
+      "overlap": 4
+    },
+    "pure_polars_drift_control": {
+      "rows": 4,
+      "slower_medians": 3,
+      "disjoint_faster": 0,
+      "disjoint_slower": 0,
+      "overlap": 4
+    }
+  }
+}

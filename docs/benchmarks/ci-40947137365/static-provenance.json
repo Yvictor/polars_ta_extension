@@ -1,0 +1,99 @@
+{
+  "source_ablation": {
+    "candidate_commit": "98d933f2e027458e1f87d6847d199f59e13c041c",
+    "initialization_commit": "1cf188bf417bc842a9c6227bb833542b7914d24e",
+    "initialization_parent": "98d933f2e027458e1f87d6847d199f59e13c041c",
+    "changed_paths": [
+      "src/compat/guarded.rs"
+    ],
+    "candidate_guard_sha256": "c97050fd79fcf0a64864730f0f7a28a63c987ca03f24156461ca82d827bf8039",
+    "initialization_guard_sha256": "bc928ae6063da862ae33e77c1a1b739f2df2098d9016b0c4dccbdbcc967fc910",
+    "patch_sha256": "58a5ad65c152bc79224011fa61be7cbccb59e1f7ca1a82be243d2fa5fed3c5fe",
+    "git_diff_sha256": "2bccb2f10a4689cbad0fa2207577830871ae648c4bfe23f95ea9c1404a6327da",
+    "description": "Immutable init-only commit derived from fused; exact same eligibility/token/capacity and constant NaN fill THEN has_trigger once. CI checks source/diff; no patch is applied during CI."
+  },
+  "shape": {
+    "fused_backedges": [
+      5550305
+    ],
+    "control_scan_backedges": [
+      5567157
+    ],
+    "control_fill_backedges": [
+      5566740,
+      5566932
+    ]
+  },
+  "decoder": "Apple LLVM version 21.0.0\n  Optimized build.\n\n\n  Registered Targets:\n    aarch64    - AArch64 (little endian)\n    aarch64_32 - AArch64 (little endian ILP32)\n    aarch64_be - AArch64 (big endian)\n    arm        - ARM\n    arm64      - ARM64 (little endian)\n    arm64_32   - ARM64 (little endian ILP32)\n    armeb      - ARM (big endian)\n    thumb      - Thumb\n    thumbeb    - Thumb (big endian)\n    wasm32     - WebAssembly 32-bit\n    wasm64     - WebAssembly 64-bit\n    x86        - 32-bit X86: Pentium-Pro and above\n    x86-64     - 64-bit X86: EM64T and AMD64\n",
+  "products": {
+    "initialization": {
+      "elf_sha256": "4e0097701768144677895151c3f064fe1fc714712ba8e7dc89a3e4fb4b28b6f3",
+      "symbol": "_ZN13_polars_talib6compat7guarded17initialized_first17h42f33e4e33fe386aE",
+      "address": 5566128,
+      "length": 1209,
+      "independent_llvm_disassembly_sha256": "3f833c2fa073cc856e4739c2d9b095673d00fd73a3b69ed1b9184a385a2673ea",
+      "argv": [
+        "/usr/bin/objdump",
+        "-d",
+        "--no-show-raw-insn",
+        "--disassemble-symbols=_ZN13_polars_talib6compat7guarded17initialized_first17h42f33e4e33fe386aE",
+        "--start-address=5566128",
+        "--stop-address=5567337",
+        "/tmp/polars-recovery/ci-guard-fusion/raw/guard-results/actual-native/initialization/_polars_talib.abi3.so"
+      ]
+    },
+    "candidate": {
+      "elf_sha256": "ef4800e8d15cf3f24af1c609a5ff68de4ce77520c0710216e784de71d74e4c57",
+      "symbol": "_ZN13_polars_talib6compat7guarded17initialized_first17h42f33e4e33fe386aE",
+      "address": 5549296,
+      "length": 1091,
+      "independent_llvm_disassembly_sha256": "8aec3d7209d71c59c69b8344fcaf3b73872c555047981d24ef94aba3178b0a2c",
+      "argv": [
+        "/usr/bin/objdump",
+        "-d",
+        "--no-show-raw-insn",
+        "--disassemble-symbols=_ZN13_polars_talib6compat7guarded17initialized_first17h42f33e4e33fe386aE",
+        "--start-address=5549296",
+        "--stop-address=5550387",
+        "/tmp/polars-recovery/ci-guard-fusion/raw/guard-results/actual-native/candidate/_polars_talib.abi3.so"
+      ]
+    }
+  },
+  "span_correction": {
+    "initialization": {
+      "start": 5566128,
+      "length": 1209,
+      "old_llvm_trailing_padding_count": 7,
+      "bounded_instruction_count": 292,
+      "GNU_instruction_count": 292,
+      "address_inventory_exact": true,
+      "argv": [
+        "/usr/bin/objdump",
+        "-d",
+        "--no-show-raw-insn",
+        "--disassemble-symbols=_ZN13_polars_talib6compat7guarded17initialized_first17h42f33e4e33fe386aE",
+        "--start-address=5566128",
+        "--stop-address=5567337",
+        "/tmp/polars-recovery/ci-guard-fusion/raw/guard-results/actual-native/initialization/_polars_talib.abi3.so"
+      ]
+    },
+    "candidate": {
+      "start": 5549296,
+      "length": 1091,
+      "old_llvm_trailing_padding_count": 13,
+      "bounded_instruction_count": 266,
+      "GNU_instruction_count": 266,
+      "address_inventory_exact": true,
+      "argv": [
+        "/usr/bin/objdump",
+        "-d",
+        "--no-show-raw-insn",
+        "--disassemble-symbols=_ZN13_polars_talib6compat7guarded17initialized_first17h42f33e4e33fe386aE",
+        "--start-address=5549296",
+        "--stop-address=5550387",
+        "/tmp/polars-recovery/ci-guard-fusion/raw/guard-results/actual-native/candidate/_polars_talib.abi3.so"
+      ]
+    }
+  },
+  "scope": "Normal installed measured product, original GNU and own bounded LLVM instruction inventory/shape match. Pure CFG matcher is previously source-reviewed scoped recognizer; no wheel/controller execution, no latency inference from shape."
+}
