@@ -1,11 +1,55 @@
 // Bindings for the explicitly preserved legacy EMA family.
 use super::*;
+// A classification is valid only for the same function and immutable slice.
+// Construction stays private so unrelated callers cannot bypass the guard.
+#[derive(Clone, Copy)]
+pub(crate) struct FirstInputClass<'a> {
+    id: FuncId,
+    input: &'a [f64],
+    trigger: bool,
+}
+impl FirstInputClass<'_> {
+    fn for_input(self, id: FuncId, input: &[f64]) -> Option<bool> {
+        (self.id == id && std::ptr::eq(self.input, input)).then_some(self.trigger)
+    }
+}
+
+pub(crate) fn initialized_first<'a>(
+    id: FuncId,
+    input: &'a [f64],
+    p: &Params,
+    begin: usize,
+    offset: usize,
+) -> Option<(Vec<f64>, FirstInputClass<'a>)> {
+    if offset >= input.len()
+        || !matches!(id, FuncId::VAR | FuncId::STDDEV | FuncId::CORREL | FuncId::BBANDS | FuncId::MACD)
+        || p.iter().any(|(key, value)| {
+            key.contains("period") && matches!(value, Param::Int(v) if *v > 128)
+        })
+    {
+        return None;
+    }
+    let first = input.get(begin..)?;
+    if first.first().is_some_and(|v| !v.is_finite() || v.abs() > 1024.) {
+        return None;
+    }
+    let mut trigger = false;
+    let mut output = Vec::with_capacity(input.len());
+    output.resize(begin, f64::NAN);
+    output.extend(first.iter().map(|value| {
+        trigger |= !(value.abs() <= 1024.);
+        f64::NAN
+    }));
+    Some((output, FirstInputClass { id, input: first, trigger }))
+}
+
 pub fn guarded_call(
     id: FuncId,
     input: &[&[f64]],
     p: &Params,
     outputs: &mut [Output],
     offset: usize,
+    first_class: Option<FirstInputClass<'_>>,
 ) -> Option<Result<OutRange, RetCode>> {
     if !supports(id) {
         return None;
@@ -15,7 +59,18 @@ pub fn guarded_call(
     let long_period = p
         .iter()
         .any(|(key, value)| key.contains("period") && matches!(value,Param::Int(v) if *v>128));
-    if id != FuncId::ADOSC && !long_period && !input.iter().any(|s| has_trigger(s)) {
+    if id != FuncId::ADOSC
+        && !long_period
+        && !input.iter().enumerate().any(|(index, values)| {
+            if index == 0 {
+                first_class
+                    .and_then(|proof| proof.for_input(id, values))
+                    .unwrap_or_else(|| has_trigger(values))
+            } else {
+                has_trigger(values)
+            }
+        })
+    {
         return None;
     }
     let end = input[0].len() - 1;
@@ -331,6 +386,94 @@ fn has_trigger(values: &[f64]) -> bool {
 #[cfg(test)]
 mod scan_tests {
     use super::has_trigger;
+    #[test]
+    fn fused_initialization_preserves_bits_and_shifted_predicate() {
+        use super::*;
+        let mut state = 0x291026_u64;
+        for len in [1usize, 2, 7, 31, 100, 1000] {
+            for begin in [0, len / 2, len - 1] {
+                for _ in 0..128 {
+                    let mut input = vec![100.; len];
+                    input[..begin].fill(f64::NAN);
+                    for value in input.iter_mut().skip(begin + 1) {
+                        state = state.wrapping_mul(6364136223846793005).wrapping_add(1);
+                        *value = f64::from_bits(state);
+                    }
+                    for id in [FuncId::VAR, FuncId::STDDEV, FuncId::CORREL, FuncId::BBANDS, FuncId::MACD] {
+                        let (out, class) = initialized_first(id, &input, &Params::new(), begin, begin).unwrap();
+                        assert_eq!(out.len(), len);
+                        assert_eq!(out.capacity(), len);
+                        assert!(out.iter().all(|v| v.to_bits() == f64::NAN.to_bits()));
+                        assert_eq!(class.for_input(id, &input[begin..]), Some(has_trigger(&input[begin..])));
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn fused_token_includes_function_pointer_and_slice_length() {
+        use super::*;
+        let values = [1., 2., 3., f64::NAN];
+        let (_, class) = initialized_first(FuncId::VAR, &values[..3], &Params::new(), 0, 0).unwrap();
+        assert_eq!(class.for_input(FuncId::VAR, &values[..3]), Some(false));
+        assert_eq!(class.for_input(FuncId::STDDEV, &values[..3]), None);
+        assert_eq!(class.for_input(FuncId::VAR, &values[..4]), None);
+        assert_eq!(class.for_input(FuncId::VAR, &values[1..]), None);
+        let distinct = [1., 2., 3.];
+        assert_eq!(class.for_input(FuncId::VAR, &distinct), None);
+    }
+
+    #[test]
+    fn fusion_skips_forced_unsupported_first_trigger_and_no_call() {
+        use super::*;
+        let values = [1., 2., 3.];
+        for id in [FuncId::EMA, FuncId::ADOSC, FuncId::SMA, FuncId::SAREXT] {
+            assert!(initialized_first(id, &values, &Params::new(), 0, 0).is_none());
+        }
+        assert!(initialized_first(FuncId::VAR, &values, &Params::new(), usize::MAX, values.len()).is_none());
+        assert!(initialized_first(FuncId::VAR, &values, &Params::new(), usize::MAX, 0).is_none());
+        assert!(initialized_first(FuncId::VAR, &[], &Params::new(), usize::MAX, 0).is_none());
+        for trigger in [f64::NAN, f64::INFINITY, f64::NEG_INFINITY, 1025., -1025.] {
+            assert!(initialized_first(FuncId::VAR, &[trigger, 1.], &Params::new(), 0, 0).is_none());
+        }
+        for period in [i32::MIN, 0, 30, 128, 129, 10000] {
+            let params = [("timeperiod".to_owned(), Param::Int(period))].into_iter().collect();
+            assert_eq!(initialized_first(FuncId::VAR, &values, &params, 0, 0).is_none(), period > 128);
+        }
+        let params = [("unrelated".to_owned(), Param::Int(10000))].into_iter().collect();
+        assert!(initialized_first(FuncId::VAR, &values, &params, 0, 0).is_some());
+    }
+
+    #[test]
+    fn classification_cannot_hide_second_input_trigger_or_change_guard_result() {
+        use super::*;
+        let a = vec![1.; 256];
+        let mut b = vec![2.; 256];
+        b[200] = 2048.;
+        for id in [FuncId::VAR, FuncId::STDDEV, FuncId::CORREL, FuncId::BBANDS, FuncId::MACD] {
+            let params = Params::new();
+            let offset = id.new_call(crate::native::core()).lookback().unwrap();
+            let (_, class) = initialized_first(id, &a, &params, 0, offset).unwrap();
+            let input_values = [a.as_slice(), b.as_slice()];
+            let inputs = &input_values[..if id == FuncId::CORREL { 2 } else { 1 }];
+            let mut old: Vec<Output> = id.info().outputs.iter().map(|_| Output::Real(vec![f64::NAN; 256])).collect();
+            let mut new: Vec<Output> = id.info().outputs.iter().map(|_| Output::Real(vec![f64::NAN; 256])).collect();
+            let expected = guarded_call(id, inputs, &params, &mut old, offset, None);
+            let actual = guarded_call(id, inputs, &params, &mut new, offset, Some(class));
+            assert_eq!(expected, actual);
+            assert_eq!(expected.is_some(), id == FuncId::CORREL);
+            if let Some(result) = expected {
+                assert!(result.is_ok(), "the legacy branch must actually write valid outputs");
+            }
+            for (old, new) in old.iter().zip(&new) {
+                if let (Output::Real(old), Output::Real(new)) = (old, new) {
+                    assert!(old.iter().zip(new).all(|(a, b)| a.to_bits() == b.to_bits()));
+                }
+            }
+        }
+    }
+
     #[test]
     fn unordered_bound_matches_ieee_routing_predicate() {
         let mut state = 0x9137_a822_45cf_672du64;

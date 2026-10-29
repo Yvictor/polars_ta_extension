@@ -54,6 +54,7 @@ impl CompatCore {
 pub static LEGACY: CompatCore = CompatCore;
 use crate::native::{Output, Param, Params};
 mod guarded;
+pub(crate) use guarded::{initialized_first, FirstInputClass};
 use ta_lib::abstract_api::FuncId;
 fn int(p: &Params, key: &str, default: i32) -> i32 {
     match p.get(key) {
@@ -100,8 +101,19 @@ pub fn call(
     outputs: &mut [Output],
     offset: usize,
 ) -> Option<CompatCall> {
+    call_with_class(id, input, p, outputs, offset, None)
+}
+
+pub(crate) fn call_with_class(
+    id: FuncId,
+    input: &[&[f64]],
+    p: &Params,
+    outputs: &mut [Output],
+    offset: usize,
+    first_class: Option<FirstInputClass<'_>>,
+) -> Option<CompatCall> {
     use FuncId::*;
-    if let Some(result) = guarded::guarded_call(id, input, p, outputs, offset) {
+    if let Some(result) = guarded::guarded_call(id, input, p, outputs, offset, first_class) {
         return Some(CompatCall {
             result,
             restore_native_prefix: true,

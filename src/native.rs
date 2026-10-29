@@ -112,11 +112,23 @@ pub fn compute<const INPUTS: usize, const OUTPUTS: usize>(
         .find(|&row| slices.iter().all(|s| !s[row].is_nan()))
         .unwrap_or(len);
     let offset = begin.saturating_add(lookback).min(len);
+    let first_input = slices.first().copied();
+    let mut first_class = None;
     let mut outputs: [Output; OUTPUTS] = std::array::from_fn(|i| match id.info().outputs[i].kind {
         // Use initialized NaNs rather than the allocator's zeroed/calloc path.
         // Zeroed allocations can have different page-fault costs in grouped calls.
         // Keep explicit range padding below; integer warmups remain zero.
-        OutputType::Real => Output::Real(vec![f64::NAN; len]),
+        OutputType::Real => {
+            if i == 0 {
+                if let Some((values, class)) = first_input.and_then(|values| {
+                    crate::compat::initialized_first(id, values, params, begin, offset)
+                }) {
+                    first_class = Some(class);
+                    return Output::Real(values);
+                }
+            }
+            Output::Real(vec![f64::NAN; len])
+        }
         OutputType::Integer => {
             // Upstream receives a fully initialized slice, including warm-up padding.
             let mut values = Vec::with_capacity(len);
@@ -131,7 +143,9 @@ pub fn compute<const INPUTS: usize, const OUTPUTS: usize>(
             *values = &values[begin..];
         }
         let shifted = &slices;
-        if let Some(call) = crate::compat::call(id, shifted, params, &mut outputs, offset) {
+        if let Some(call) = crate::compat::call_with_class(
+            id, shifted, params, &mut outputs, offset, first_class,
+        ) {
             let range = call.result.map_err(error)?;
             polars_ensure!(range.beg_idx == lookback && range.count <= len-offset, ComputeError: "unexpected compatibility output range");
             written = range.count;
