@@ -1,0 +1,179 @@
+name: ADD shared-route composition ablation
+
+on:
+  push:
+    branches: [codex/add-shared-route-ci]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: add-shared-route-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  PYO3_USE_ABI3_FORWARD_COMPATIBILITY: '1'
+  RUSTUP_TOOLCHAIN: '1.90.0'
+  CARGO_BUILD_JOBS: '4'
+  CARGO_INCREMENTAL: '0'
+  CARGO_TERM_COLOR: 'never'
+  CARGO_PROFILE_RELEASE_DEBUG: 'false'
+  CARGO_PROFILE_RELEASE_OPT_LEVEL: '3'
+  CARGO_PROFILE_RELEASE_LTO: 'false'
+  CARGO_PROFILE_RELEASE_CODEGEN_UNITS: '16'
+  CARGO_TARGET_DIR: ${{ github.workspace }}/add-shared-route-target
+  CARGO_BUILD_BUILD_DIR: ${{ github.workspace }}/add-shared-route-target
+  CFLAGS: ''
+  CXXFLAGS: ''
+  RUSTFLAGS: ''
+  CARGO_ENCODED_RUSTFLAGS: ''
+  CMAKE: ${{ github.workspace }}/envs/prior/bin/cmake
+  POLARS_MAX_THREADS: '4'
+  PRIOR_COMMIT: 56f6d5fb139031c20d86d7e818e7d267eb834295
+  COMBINED_COMMIT: e79ac0785436bbf3ba4c411d80936f8dd4ecfa24
+  CANDIDATE_COMMIT: 76e9803832f6726bb0499c2fd45f2222c5505349
+  CANDIDATE_HELPER_SHA256: 6b5347f07993afa318a6dbe5dd4af79f1d07450cbda9ee8ca924c9c1f3ba03a8
+  ORIGINAL_COMMIT: b2bbc26d41ec80823c8bffb0cc436a97f29911cc
+
+jobs:
+  focused-add-shared-route:
+    name: Original C / native56 / finale79 / ADD shared-route ablation
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          path: control-source
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12.15'
+      - name: Preserve controller and require immutable product pins
+        run: |
+          mkdir -p add-shared-route-results/controller
+          cp control-source/scripts/add_shared_route* control-source/scripts/migration_probe.py control-source/scripts/migration_ci_benchmark.py control-source/scripts/api.json control-source/scripts/ADD_SHARED_ROUTE_CI.md add-shared-route-results/controller/
+          cp control-source/tests/test_add_shared_route_benchmark.py add-shared-route-results/controller/
+          cp control-source/.github/workflows/add-shared-route.yml add-shared-route-results/workflow.yml
+          git -C control-source rev-parse HEAD > add-shared-route-results/controller-commit.txt
+          python - <<'PY'
+          import os,re,sys
+          sys.path.insert(0,'control-source/scripts')
+          from add_shared_route_benchmark import workflow_pins
+          from add_shared_route_provenance import require_public_test_dependencies
+          from pathlib import Path
+          require_public_test_dependencies(Path('control-source/.github/workflows/add-shared-route.yml').read_text())
+          workflow_pins(os.environ)
+          for key in ('ORIGINAL_COMMIT','PRIOR_COMMIT','COMBINED_COMMIT','CANDIDATE_COMMIT'):
+              if not re.fullmatch('[0-9a-f]{40}',os.environ[key]):
+                  raise SystemExit(key+' must be frozen before this workflow can run')
+          for key in ('CANDIDATE_HELPER_SHA256',):
+              if not re.fullmatch('[0-9a-f]{64}',os.environ[key]):
+                  raise SystemExit(key+' must be reviewed and frozen before any product build')
+          if len({os.environ[k] for k in ('ORIGINAL_COMMIT','PRIOR_COMMIT','COMBINED_COMMIT','CANDIDATE_COMMIT')}) != 4:
+              raise SystemExit('four distinct immutable source pins are required')
+          PY
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ env.PRIOR_COMMIT }}
+          path: sources/prior
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ env.COMBINED_COMMIT }}
+          path: sources/combined
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ env.CANDIDATE_COMMIT }}
+          path: sources/candidate
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ env.ORIGINAL_COMMIT }}
+          path: sources/original
+      - uses: dtolnay/rust-toolchain@1.90.0
+      - uses: astral-sh/setup-uv@v8.2.0
+      - name: Build four portable wheels and preserve actual wheel-time Cargo fingerprints
+        run: |
+          mkdir -p wheels
+          for side in prior combined candidate original; do
+            uv venv --python 3.12.15 "envs/$side"
+            uv pip install --python "envs/$side" 'maturin==1.15.0' 'cmake==4.4.4' 'polars==1.44.2' 'numpy==2.5.3' 'TA-Lib==0.8.1' 'pytest-benchmark==5.3.0' pytest
+            mkdir -p "wheels/$side"
+            python -c 'import json,sys; print(json.dumps({"side":sys.argv[1],"command":sys.argv[2:]}))' "$side" "$PWD/envs/$side/bin/python" -m maturin build --release --locked --interpreter "$PWD/envs/$side/bin/python" --out "$PWD/wheels/$side" >> add-shared-route-results/build-commands.jsonl
+            # Force the product crate to recompile even if a shared Cargo cache saw newer source mtimes.
+            # Only mtime changes; immutable source bytes and Git cleanliness are checked later.
+            touch "sources/$side/src/lib.rs"
+            (cd "sources/$side" && "$GITHUB_WORKSPACE/envs/$side/bin/python" -m maturin build --release --locked --interpreter "$GITHUB_WORKSPACE/envs/$side/bin/python" --out "$GITHUB_WORKSPACE/wheels/$side") > "add-shared-route-results/$side-build.log" 2>&1
+            python control-source/scripts/add_shared_route_provenance.py \
+              --compile-log "add-shared-route-results/$side-build.log" --source "sources/$side" >> add-shared-route-results/product-compile-proof.jsonl
+            uv pip install --python "envs/$side" --no-deps "wheels/$side/"*.whl
+            uv pip freeze --python "envs/$side" > "add-shared-route-results/$side-dependencies.txt"
+            mkdir -p "add-shared-route-results/product-fingerprints/$side"
+            cp -a "$CARGO_TARGET_DIR/release/.fingerprint/." "add-shared-route-results/product-fingerprints/$side/"
+          done
+          rustc --version --verbose > add-shared-route-results/toolchain.txt
+          cc --version >> add-shared-route-results/toolchain.txt
+          "$CMAKE" --version >> add-shared-route-results/toolchain.txt
+          lscpu > add-shared-route-results/lscpu.txt
+          cat /proc/meminfo > add-shared-route-results/meminfo.txt
+          df -h > add-shared-route-results/disk-after-build.txt
+          du -sh "$CARGO_TARGET_DIR" wheels >> add-shared-route-results/disk-after-build.txt
+      - name: Define fixed campaign arguments
+        run: |
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          args=[]
+          for side in ('original','prior','combined','candidate'):
+              args += ['--'+side+'-python','envs/'+side+'/bin/python','--'+side+'-source','sources/'+side]
+          args += ['--candidate-commit',os.environ['CANDIDATE_COMMIT'],'--wheel-dir','wheels','--output','add-shared-route-results']
+          Path('add-shared-route-results/arguments.json').write_text(json.dumps(args))
+          PY
+          cat > run-add-shared-route-campaign.py <<'PY'
+          import json,subprocess,sys
+          args=json.load(open('add-shared-route-results/arguments.json'))
+          subprocess.run(['envs/prior/bin/python','control-source/scripts/'+sys.argv[1],*args,*sys.argv[2:]],check=True)
+          PY
+      - name: Controller protocol gates and native contracts
+        run: |
+          envs/prior/bin/python -m pytest --noconftest control-source/tests/test_add_shared_route_benchmark.py -q
+          python run-add-shared-route-campaign.py add_shared_route_benchmark.py --record-build
+          for side in combined candidate; do
+            PYO3_PYTHON="$GITHUB_WORKSPACE/envs/$side/bin/python" cargo test --release --lib --locked --manifest-path "sources/$side/Cargo.toml" -- --list > "add-shared-route-results/$side-cold-list.log" 2>&1
+            PYO3_PYTHON="$GITHUB_WORKSPACE/envs/$side/bin/python" cargo test --release --lib --locked --manifest-path "sources/$side/Cargo.toml" -- sarext_legacy::tests::cold_parallel_dispatch_matches_portable_scalar_without_shared_mutable_inputs --exact --nocapture --test-threads=1 > "add-shared-route-results/$side-cold.log" 2>&1
+            python - "$side" <<'PYCODE'
+          import json,sys
+          from pathlib import Path
+          sys.path.insert(0,'control-source/scripts')
+          from add_shared_route_provenance import require_cold_dispatch
+          side=sys.argv[1];root=Path('add-shared-route-results')
+          proof=require_cold_dispatch(root/(side+'-cold-list.log'),root/(side+'-cold.log'))
+          (root/(side+'-cold-proof.json')).write_text(json.dumps(proof,indent=2)+'\n')
+          PYCODE
+          done
+          for side in prior combined candidate; do
+            PYO3_PYTHON="$GITHUB_WORKSPACE/envs/$side/bin/python" cargo test --release --lib --locked --manifest-path "sources/$side/Cargo.toml" > "add-shared-route-results/$side-rust-tests.log" 2>&1
+          done
+          (cd sources/candidate && "$GITHUB_WORKSPACE/envs/candidate/bin/python" -m pytest -q tests --benchmark-disable -p no:cacheprovider) > add-shared-route-results/candidate-public-tests.log 2>&1
+          python - <<'PYCODE'
+          import re
+          from pathlib import Path
+          if not re.search(r'\b12479 passed\b',Path('add-shared-route-results/candidate-public-tests.log').read_text()):
+              raise SystemExit('all12479 candidate public tests must pass before timing')
+          PYCODE
+      - name: Full10624-case all6comparisons and8own-arm query goldens before timers
+        run: python run-add-shared-route-campaign.py add_shared_route_benchmark.py --validate-only
+      - name: Twelve four-arm Williams fresh-single-case rounds at one and four threads
+        run: |
+          python run-add-shared-route-campaign.py add_shared_route_benchmark.py
+          cat add-shared-route-results/comparison.md >> "$GITHUB_STEP_SUMMARY"
+          cat add-shared-route-results/negative-cases.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: consumer-add-shared-route-evidence
+          include-hidden-files: true
+          path: |
+            add-shared-route-results/
+            wheels/
+            add-shared-route-target/release/build/talib-sys-*/out/lib/libta-lib.a
+            add-shared-route-target/release/build/jemalloc-sys-*/out/lib/*.a
+          if-no-files-found: error

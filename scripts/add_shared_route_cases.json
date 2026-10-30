@@ -1,0 +1,66 @@
+{
+  "description": "OriginalC081/native56/finale79/e79-minus-ADD-shared-route. Eleven loss queries, seven retained-positive tradeoffs, five pure-Polars controls. Ordinary native .over only.",
+  "cases": [
+    "grouped_cmou/100x10000",
+    "grouped_ppo/10000x100",
+    "grouped_cmou/10000x100",
+    "grouped_ppo/2000x100_interleaved",
+    "grouped_ema/50000x20",
+    "mavp/1000000",
+    "cmou/1000000",
+    "grouped_mix8/10000x100",
+    "grouped_ema/2000x100_interleaved",
+    "grouped_atr/2000x100_interleaved",
+    "grouped_correl/2000x100_interleaved",
+    "add/1000000",
+    "grouped_add/10000x100",
+    "cdlengulfing/1000000",
+    "grouped_sarext/10000x100",
+    "grouped_sarext/2000x100_interleaved",
+    "mavp_one/1000000",
+    "grouped_mavp_one/100x10000",
+    "control_cumsum_dense/1000000",
+    "control_cumsum/100x10000",
+    "control_cumsum/10000x100",
+    "control_cumsum/2000x100_interleaved",
+    "control_cumsum/50000x20"
+  ],
+  "integer_families": [
+    "cdlengulfing"
+  ],
+  "checked_values": 27200000,
+  "timed_children": 2208,
+  "timed_samples": 68448,
+  "measurement_budget_seconds": 7200,
+  "child_timeout_seconds": 120,
+  "input_dedup": 7,
+  "primary_loss_queries": [
+    "grouped_cmou/100x10000",
+    "grouped_ppo/10000x100",
+    "grouped_cmou/10000x100",
+    "grouped_ppo/2000x100_interleaved",
+    "grouped_ema/50000x20",
+    "mavp/1000000",
+    "cmou/1000000",
+    "grouped_mix8/10000x100",
+    "grouped_ema/2000x100_interleaved",
+    "grouped_atr/2000x100_interleaved",
+    "grouped_correl/2000x100_interleaved"
+  ],
+  "retained_positive_tradeoff_queries": [
+    "add/1000000",
+    "grouped_add/10000x100",
+    "cdlengulfing/1000000",
+    "grouped_sarext/10000x100",
+    "grouped_sarext/2000x100_interleaved",
+    "mavp_one/1000000",
+    "grouped_mavp_one/100x10000"
+  ],
+  "pure_Polars_controls": [
+    "control_cumsum_dense/1000000",
+    "control_cumsum/100x10000",
+    "control_cumsum/10000x100",
+    "control_cumsum/2000x100_interleaved",
+    "control_cumsum/50000x20"
+  ]
+}
