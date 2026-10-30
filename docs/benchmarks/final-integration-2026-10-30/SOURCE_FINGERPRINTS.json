@@ -1,0 +1,16 @@
+{
+  "runtime": {
+    "files": 55,
+    "algorithm": "SHA256 of UTF8 canonical JSON(path-to-SHA256 mapping), sort_keys=True,separators=(comma,colon)",
+    "sha256": "182e8e8a684676c3c1d0f69df383051e3c746cda87028bb266e278b29aa3ba3a"
+  },
+  "verification": {
+    "files": 63,
+    "algorithm": "SHA256 of UTF8 canonical JSON(path-to-SHA256 mapping), sort_keys=True,separators=(comma,colon)",
+    "sha256": "20f6ac992916d4ea30da4876a8c192ad29785c15b1107581ff144d56cb41e53d"
+  },
+  "source_manifest_sha256": "3d7a4422179956709f0fb6968dcaaa97f31714b12740b13453210b8856b4e00b",
+  "gate_record_sha256": "b4d503dd58f73e6d8f402cd35b2349d93d35464aee69400fe2cb07e74779028f",
+  "source_head": "97aeffb91a648f792f3c6689c5967e2dd0a14051",
+  "head_at_completion": "97aeffb91a648f792f3c6689c5967e2dd0a14051"
+}

@@ -1,0 +1,61 @@
+{
+  "source_head_at_start": "97aeffb91a648f792f3c6689c5967e2dd0a14051",
+  "head_at_end": "97aeffb91a648f792f3c6689c5967e2dd0a14051",
+  "runtime_and_verification_file_set_and_bytes_unchanged": true,
+  "wheel": "/tmp/polars-recovery/final-integration-evidence/wheels/polars_talib-0.2.1-cp310-abi3-macosx_11_0_arm64.whl",
+  "wheel_sha256": "d7982d6ea7b13e11f923b5d6b2dc82fc5c0ac38bfc7a63f299e0f29cb37e233a",
+  "native_sha256": "9a919626915cda3a2e1fe2e42a8a6fbe254fb233abe41cec1ef6cd3084d0bb11",
+  "runtime_counts": {
+    "144": 12479,
+    "120": 12479,
+    "21": 12479
+  },
+  "full_suite_summaries": {
+    "144": "12479 passed in 77.20s (0:01:17)",
+    "120": "12479 passed in 41.17s",
+    "21": "12479 passed in 39.58s"
+  },
+  "Rust": {
+    "passed": 46,
+    "ignored": 1
+  },
+  "corpus_cases": 10624,
+  "corpus_values": 2167654,
+  "reference_capture_hashes": {
+    "original_C": {
+      "path": "/tmp/polars-recovery/engulf-consumer-evidence/final-window/original-mac.npz",
+      "sha256": "63067603c940fbd5451b2b66f427553f1c28f656839515e4c7d55242f49f1977"
+    },
+    "native0eb": {
+      "path": "/tmp/polars-recovery/integration-evidence/candidate.npz",
+      "sha256": "e902065788fdbf90c54a9c39c5968a58e25ae5e432539c8def4f00bb95483abf"
+    },
+    "native916": {
+      "path": "/tmp/polars-recovery/mavp-uniform-evidence/candidate.npz",
+      "sha256": "e902065788fdbf90c54a9c39c5968a58e25ae5e432539c8def4f00bb95483abf"
+    }
+  },
+  "fixture_proof_sha256": "b4409ec0de8e05acd4a9fef17b52098ddbc6c02d1c3fdcb4f511ab3adb206402",
+  "collection_proof_sha256": "9b886d4b391c406887f4c0b54c5195d31d8b14bcbf4cb071fc176c3308f3ec24",
+  "raw_IEEE_proof_sha256": "4b58b5547c9f0d0f2043c7c078aa8ded66f4834cf84846b42cf63400ec597cf8",
+  "legacy_benchmark_tests_executed_per_runtime": 5,
+  "local_benchmark_timings_used_for_performance_conclusions": false,
+  "verification_process_did_not_edit_product_source_Git_or_remotes": true,
+  "verification_side_script_stops": [
+    {
+      "file": "verify_installed.py",
+      "sha256": "9b39bfdce5accc7eaaf109153006a8f47467e4fba7e73cfb2eed9e3aec6d0f23",
+      "log": "gate-runner.log",
+      "log_sha256": "cc714505a659ac9f93f52d23fb04154e58f4d2f99c8191c87a5e52169b379fbc",
+      "reason": "Original-C raw metadata Unicode width assertion; independently approved correction preserves all numeric and normalized API/schema checks."
+    },
+    {
+      "file": "verify_remaining.py",
+      "sha256": "83da8fe10d772cdefd9482e7dfbca62b3f01351a0c2c0d83f61ec43468ba8a8b",
+      "log": "remaining-gates.log",
+      "log_sha256": "96a62351edfffbe92a548ceec169820f9c10046b922a90abf32896009f68c137",
+      "reason": "Missing refhash variable while constructing final summary AFTER every gate passed and after-source proof was written."
+    }
+  ],
+  "completion": "Record-only writer verified existing exits/proofs and current immutable source/module hashes; no build/test/capture/comparison was repeated."
+}

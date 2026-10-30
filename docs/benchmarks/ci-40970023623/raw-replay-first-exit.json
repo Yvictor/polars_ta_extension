@@ -1,0 +1,15 @@
+{
+  "command": [
+    "/tmp/polars-recovery/mavp-sma-windows-env/bin/python",
+    "/tmp/polars-recovery/audit-mavp-uniform/audit.py",
+    "/tmp/polars-recovery/ci-mavp-uniform/raw",
+    "--output",
+    "/tmp/polars-recovery/audit-mavp-uniform/audit-result.json"
+  ],
+  "started_utc": "2026-10-30T00:54:46.081104+00:00",
+  "finished_utc": "2026-10-30T00:55:14.797882+00:00",
+  "exit_code": 0,
+  "approved_audit_unchanged": true,
+  "log": "/tmp/polars-recovery/audit-mavp-uniform/raw-replay-first.log",
+  "output": "/tmp/polars-recovery/audit-mavp-uniform/audit-result.json"
+}

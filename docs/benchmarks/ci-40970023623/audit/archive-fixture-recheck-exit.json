@@ -1,0 +1,22 @@
+{
+  "command": [
+    "/tmp/polars-recovery/mavp-sma-windows-env/bin/python",
+    "-m",
+    "pytest",
+    "-c",
+    "/dev/null",
+    "--noconftest",
+    "-p",
+    "no:cacheprovider",
+    "/private/tmp/polars-recovery/consumer-integration/docs/benchmarks/ci-40970023623/audit/test_ledger.py",
+    "/private/tmp/polars-recovery/consumer-integration/docs/benchmarks/ci-40970023623/audit/test_inputs.py",
+    "/private/tmp/polars-recovery/consumer-integration/docs/benchmarks/ci-40970023623/audit/test_boundaries.py",
+    "/private/tmp/polars-recovery/consumer-integration/docs/benchmarks/ci-40970023623/audit/test_provenance.py",
+    "-q"
+  ],
+  "started_utc": "2026-10-30T01:08:52.327751+00:00",
+  "finished_utc": "2026-10-30T01:09:03.799672+00:00",
+  "exit_code": 0,
+  "approved_hashes_unchanged": true,
+  "scope": "Archived synthetic fixtures only, no product timing/campaign invocation."
+}

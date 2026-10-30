@@ -1,0 +1,51 @@
+{
+  "run": 40970023623,
+  "controller": "5171ea5583f83766da05ef0d1f8bc69091063369",
+  "pins": {
+    "original": "b2bbc26d41ec80823c8bffb0cc436a97f29911cc",
+    "prior": "56f6d5fb139031c20d86d7e818e7d267eb834295",
+    "combined": "0eb91280cf5d13095cbfdc6f8bcc477cfbcd1498",
+    "candidate": "916b0de68369df410559b6dc651731cf4c36b94c"
+  },
+  "source_record": {
+    "original": {
+      "commit": "b2bbc26d41ec80823c8bffb0cc436a97f29911cc",
+      "source_sha256": "f1bae62655e4b18a1cbf77bbbe2b0a3cbfd7cb46099637af1b827b1e9207ff34",
+      "clean": true
+    },
+    "prior": {
+      "commit": "56f6d5fb139031c20d86d7e818e7d267eb834295",
+      "source_sha256": "e27e9f5f02a017e097204f38577961ac0a22d15547575a2d2b43a78cdc98036d",
+      "clean": true
+    },
+    "combined": {
+      "commit": "0eb91280cf5d13095cbfdc6f8bcc477cfbcd1498",
+      "source_sha256": "66a9304f265339d4a1af4c074a0b04c31eac6ae00bdf4f188e6754605e7d33e2",
+      "clean": true
+    },
+    "candidate": {
+      "commit": "916b0de68369df410559b6dc651731cf4c36b94c",
+      "source_sha256": "6bbaea2fa5f0a9553680fbb6ae56e7612fc901f259b559e6fb14e3c64417ac31",
+      "clean": true
+    }
+  },
+  "candidate_git_changes": {
+    "src/compat/mavp_sma.rs": "c90e922f7a2289e6408306409ce77edc582e5a25ee98d21138f74a2bbab23fd8",
+    "tests/test_mavp_uniform_prefix.py": "d8659d98d81b231ce4699c0f6bfed9a3921e94952f247cd7fe5fdc97bf0b91c4"
+  },
+  "protocol": {
+    "cases_per_thread": 32,
+    "threads": [
+      1,
+      4
+    ],
+    "rounds": 12,
+    "samples": 31,
+    "warmups": 5,
+    "children": 3072,
+    "raw_samples": 95232,
+    "checked_values_per_setting": 30400000,
+    "physical_snapshots": 24,
+    "pair_rows": 384
+  }
+}

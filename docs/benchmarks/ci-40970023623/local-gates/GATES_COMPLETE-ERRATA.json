@@ -1,0 +1,93 @@
+{
+  "record_type": "additive evidence erratum; original immutable file is preserved",
+  "original_file": "/tmp/polars-recovery/mavp-uniform-evidence/GATES_COMPLETE.json",
+  "original_sha256": "4646343a57014e732b152b007def7141b0eeb508e56ebc4ffeaf020838fad11f",
+  "candidate": "916b0de68369df410559b6dc651731cf4c36b94c",
+  "correction": {
+    "field": "no_timing_invocations",
+    "original_value": true,
+    "correct_value": false,
+    "reason": "The later complete pytest -q tests verification executed all five legacy tests/test_bench.py pytest-benchmark tests. Their benchmark fixtures execute timers. The inherited earlier sentinel was not updated after replacing the command that ignored that file.",
+    "scope": "All five are correctness-suite executions. No local benchmark timing was used for a performance conclusion; comparative performance acceptance remains the separately pinned same-runner CI campaign."
+  },
+  "observed_uniform_full_commands": {
+    "144": {
+      "command": [
+        "/tmp/polars-recovery/mavp-uniform-env/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "tests"
+      ],
+      "code": 0
+    },
+    "120": {
+      "command": [
+        "/tmp/polars-recovery/mavp-uniform-polars120/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "tests"
+      ],
+      "code": 0
+    },
+    "21": {
+      "command": [
+        "/tmp/polars-recovery/mavp-uniform-polars21/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "tests"
+      ],
+      "code": 0
+    }
+  },
+  "observed_uniform_full_pass_count_each": 12476,
+  "observed_node_proof": {
+    "file": "collection-node-diff.json",
+    "sha256": "69a68e1d49e20b840a0c6fa589a95df30a8571e35c597312a616dde849768d4c",
+    "baseline0eb_nodes": 11975,
+    "uniform916_nodes": 12476,
+    "added_uniform_nodes": 501,
+    "removed_uniform_nodes": 0
+  },
+  "suite_inventory": {
+    "baseline0eb": {
+      "full": 11975,
+      "when_legacy_benchmark_file_is_excluded": 11970,
+      "status": "full observed; excluded count is exact subtraction of five known nodes"
+    },
+    "uniform916_before_windows_fix": {
+      "full": 12476,
+      "when_legacy_benchmark_file_is_excluded": 12471,
+      "status": "both commands observed"
+    },
+    "windows3af_without_uniform": {
+      "full": 11978,
+      "when_legacy_benchmark_file_is_excluded": 11973,
+      "status": "expected until final composition collection/execution"
+    },
+    "uniform916_plus_windows3af": {
+      "full": 12479,
+      "when_legacy_benchmark_file_is_excluded": 12474,
+      "status": "expected until final composition collection/execution; no retention decision implied"
+    }
+  },
+  "windows_node_accounting": {
+    "commit": "3af3e6ea00758c4a68ce9cae49dd13796f3ad933",
+    "old_signed_zero_nodes_replaced": 2,
+    "new_signed_zero_nodes": 4,
+    "new_optional_load_capture_node": 1,
+    "net_added": 3,
+    "reason": "Signed-zero reference checks now cover loadavg-present and loadavg-absent for both sign directions; a separate capture test covers optional telemetry. Thus the final node-ID comparison should map two removed old IDs to four replacements, not assert literally zero removed IDs."
+  },
+  "unchanged_gates": [
+    "Source-bound release wheel and native module hashes",
+    "All three installed runtime identities",
+    "46 Rust tests passed; one ignored",
+    "10624 differential cases and2167654 values exact against0eb",
+    "26351 capture arrays byte-identical against0eb",
+    "Original-C tolerance result and declared IEEE policy"
+  ],
+  "performance_status": "No latency retention decision; await independently audited raw controlled CI evidence."
+}

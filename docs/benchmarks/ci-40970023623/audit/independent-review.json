@@ -1,0 +1,12 @@
+{
+  "reviewer": "/root/combined_review",
+  "approved_at_utc": "2026-10-29T23:10:45.490965+00:00",
+  "run": 40970023623,
+  "auditor_sha256": "c2bee85f744553ab3b9a1f96288b7c5de0e8dfc668dc2ae20e78f48d69b746a5",
+  "inputs_sha256": "c1199e1522ee04c0031b992d6b8b4d4eb6cc2468cdc9e37ec9097ad9266cf5e8",
+  "shared_core_sha256": "b8c0b004daac5d920835c7a316cf97919cc3a13633eeecd860fdd02ab669cba9",
+  "trust_sha256": "eebbfe55a7479a1cfb94477faca536dbbcd10538d067a6feed08a500bd84dac6",
+  "independent_tests": "19passed10.99s",
+  "uniform_raw_access": false,
+  "conditions": "Run only after root officialZIP/SHA/READY verification; no numerical/statistical/provenance rulechanges in response to measurements; preserve all384pairs/allslowercontrols and explicit limitations."
+}

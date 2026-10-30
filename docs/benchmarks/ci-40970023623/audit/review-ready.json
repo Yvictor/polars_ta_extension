@@ -1,0 +1,29 @@
+{
+  "time_utc": "2026-10-29T23:07:14.363566+00:00",
+  "run": 40970023623,
+  "controller": "5171ea5583f83766da05ef0d1f8bc69091063369",
+  "uniform_raw_access": false,
+  "tests": {
+    "methods": 19,
+    "result": "PASS",
+    "seconds": 11.02,
+    "command": "/tmp/polars-recovery/mavp-sma-windows-env/bin/python -m pytest -q test_ledger.py test_inputs.py test_boundaries.py test_provenance.py"
+  },
+  "files": {
+    "audit.py": "c2bee85f744553ab3b9a1f96288b7c5de0e8dfc668dc2ae20e78f48d69b746a5",
+    "inputs.py": "c1199e1522ee04c0031b992d6b8b4d4eb6cc2468cdc9e37ec9097ad9266cf5e8",
+    "shared_core.py": "b8c0b004daac5d920835c7a316cf97919cc3a13633eeecd860fdd02ab669cba9",
+    "prepare_trust.py": "db0f4eb13f4df8985d8870ae73a1b3e3751c9fe38faf2281d1a9e3d32a23743b",
+    "trusted.json": "eebbfe55a7479a1cfb94477faca536dbbcd10538d067a6feed08a500bd84dac6",
+    "test_ledger.py": "f972b1ab59e0bb12615bc173f198a41c222ca13652b7d4b5c7a36254cd8dabf5",
+    "test_inputs.py": "abc087a9e9c9cb85f9393f00d573ff8ecdfaab7601890abf65352a2bc3114908",
+    "test_boundaries.py": "36ff6f96b9928f04ab8de73a5aeb022df0762af9e729bcc57f6e1cdc8db241a5",
+    "test_provenance.py": "425ccafc5433d1fd2e3288bed7189c6b8d69b629c036fa4c7978076f02fc00d1"
+  },
+  "reused_sources": {
+    "MAVP24": "approved numerical/golden/physical source/wheel binding and negative fixtures",
+    "SAREXT4arm": "reviewed all6corpus/fieldslot/type checks, Williamsledger/CLI/timing functions",
+    "shared_core": "b8unchanged"
+  },
+  "pending": "Separate reviewer approval before root-verified RAW artifact replay; no timing conclusions."
+}

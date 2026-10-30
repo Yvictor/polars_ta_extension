@@ -1,0 +1,126 @@
+{
+  "source_head": "97aeffb91a648f792f3c6689c5967e2dd0a14051",
+  "archive_checkout_head": "97aeffb91a648f792f3c6689c5967e2dd0a14051",
+  "archive_scope": "Documentation only; original private evidence retained; no builds/tests/Git mutations or performance conclusions.",
+  "files": {
+    "GATES_COMPLETE.json": {
+      "bytes": 2922,
+      "sha256": "b4d503dd58f73e6d8f402cd35b2349d93d35464aee69400fe2cb07e74779028f",
+      "origin": "byte-identical private copy",
+      "private_source": "/tmp/polars-recovery/final-integration-evidence/GATES_COMPLETE.json",
+      "private_source_sha256": "b4d503dd58f73e6d8f402cd35b2349d93d35464aee69400fe2cb07e74779028f"
+    },
+    "README.md": {
+      "bytes": 4632,
+      "sha256": "0ba04726b13f6f8d3bc54596518bd3154d130c8fde2568fb8a2be242db63e1a7",
+      "origin": "derived concise archive record"
+    },
+    "REPORT.md": {
+      "bytes": 5401,
+      "sha256": "bd1457d5ea72dccc4c7b1ca2ce0c762a1ccc85b58ae81ab9baa826bfc303445b",
+      "origin": "byte-identical private copy",
+      "private_source": "/tmp/polars-recovery/final-integration-evidence/REPORT.md",
+      "private_source_sha256": "bd1457d5ea72dccc4c7b1ca2ce0c762a1ccc85b58ae81ab9baa826bfc303445b"
+    },
+    "SOURCE_FINGERPRINTS.json": {
+      "bytes": 791,
+      "sha256": "9cfd470ba791c87d78eb4d4b9e5ad9b0495d58aec21531cdee3bbf236d4e34c0",
+      "origin": "byte-identical private copy",
+      "private_source": "/tmp/polars-recovery/final-integration-evidence/SOURCE_FINGERPRINTS.json",
+      "private_source_sha256": "9cfd470ba791c87d78eb4d4b9e5ad9b0495d58aec21531cdee3bbf236d4e34c0"
+    },
+    "build-commands.json": {
+      "bytes": 1424,
+      "sha256": "fe7b59e950a9e5ef0e5c58f6cc683e31afb250df59a46f1cd74b73d16f5cc107",
+      "origin": "byte-identical private copy",
+      "private_source": "/tmp/polars-recovery/final-integration-evidence/build-commands.json",
+      "private_source_sha256": "fe7b59e950a9e5ef0e5c58f6cc683e31afb250df59a46f1cd74b73d16f5cc107"
+    },
+    "commands-and-exits.json": {
+      "bytes": 8064,
+      "sha256": "cae866d6185f017d5e69a3cdf9df99c62577724df5192de42563366fad0434e6",
+      "origin": "derived concise archive record"
+    },
+    "immutable-fixture-proof.json": {
+      "bytes": 428,
+      "sha256": "b4409ec0de8e05acd4a9fef17b52098ddbc6c02d1c3fdcb4f511ab3adb206402",
+      "origin": "byte-identical private copy",
+      "private_source": "/tmp/polars-recovery/final-integration-evidence/immutable-fixture-proof.json",
+      "private_source_sha256": "b4409ec0de8e05acd4a9fef17b52098ddbc6c02d1c3fdcb4f511ab3adb206402"
+    },
+    "independent-review.json": {
+      "bytes": 1032,
+      "sha256": "ea2d526cd0e5fa91814f060e0f476444f4954e3551f5a9978a9c39590be2fd22",
+      "origin": "byte-identical private copy",
+      "private_source": "/tmp/polars-recovery/final-integration-evidence/independent-review.json",
+      "private_source_sha256": "ea2d526cd0e5fa91814f060e0f476444f4954e3551f5a9978a9c39590be2fd22"
+    },
+    "installed-provenance.json": {
+      "bytes": 2133,
+      "sha256": "e6fe2fd47ddf1fb6d5537c9b790ff2084b3c85ba82f62e221be0dd9a14309c4b",
+      "origin": "byte-identical private copy",
+      "private_source": "/tmp/polars-recovery/final-integration-evidence/installed-provenance.json",
+      "private_source_sha256": "e6fe2fd47ddf1fb6d5537c9b790ff2084b3c85ba82f62e221be0dd9a14309c4b"
+    },
+    "node-inventory-summary.json": {
+      "bytes": 5069,
+      "sha256": "de6aebdbbc2915903e364bc8f105855c688c442f53116a778820985d72916dca",
+      "origin": "derived concise archive record"
+    },
+    "private-evidence-index.json": {
+      "bytes": 10374,
+      "sha256": "6441ab950bf97eaee2a1d60c02ee854bf85502f28b98e436e5ed7258ab94f933",
+      "origin": "derived concise archive record"
+    },
+    "reference-captures.json": {
+      "bytes": 547,
+      "sha256": "961395bf44aad03fec43a3b66ebeaeb0cb9a2bb445fb7e102126cc9a557cb321",
+      "origin": "byte-identical private copy",
+      "private_source": "/tmp/polars-recovery/final-integration-evidence/reference-captures.json",
+      "private_source_sha256": "961395bf44aad03fec43a3b66ebeaeb0cb9a2bb445fb7e102126cc9a557cb321"
+    },
+    "source-before.json": {
+      "bytes": 11955,
+      "sha256": "3d7a4422179956709f0fb6968dcaaa97f31714b12740b13453210b8856b4e00b",
+      "origin": "byte-identical private copy",
+      "private_source": "/tmp/polars-recovery/final-integration-evidence/source-before.json",
+      "private_source_sha256": "3d7a4422179956709f0fb6968dcaaa97f31714b12740b13453210b8856b4e00b"
+    },
+    "strict-IEEE-and-raw-array-proof.json": {
+      "bytes": 12296,
+      "sha256": "4b58b5547c9f0d0f2043c7c078aa8ded66f4834cf84846b42cf63400ec597cf8",
+      "origin": "byte-identical private copy",
+      "private_source": "/tmp/polars-recovery/final-integration-evidence/strict-IEEE-and-raw-array-proof.json",
+      "private_source_sha256": "4b58b5547c9f0d0f2043c7c078aa8ded66f4834cf84846b42cf63400ec597cf8"
+    },
+    "TEST-DISCOVERY-SUPPLEMENT.json": {
+      "bytes": 7156,
+      "sha256": "b46bbf521f3430c7276206a73163374d35d90e774f40abef5beeaa2480647e22",
+      "origin": "derived additive pytest discovery/configuration record"
+    }
+  },
+  "manifest_self_excluded_from_file_hashes": true,
+  "copied_records_byte_identical": [
+    "REPORT.md",
+    "GATES_COMPLETE.json",
+    "SOURCE_FINGERPRINTS.json",
+    "source-before.json",
+    "strict-IEEE-and-raw-array-proof.json",
+    "reference-captures.json",
+    "build-commands.json",
+    "installed-provenance.json",
+    "immutable-fixture-proof.json",
+    "independent-review.json"
+  ],
+  "source_snapshots": {
+    "source-before.json": "3d7a4422179956709f0fb6968dcaaa97f31714b12740b13453210b8856b4e00b",
+    "source-after-build.json": "3d7a4422179956709f0fb6968dcaaa97f31714b12740b13453210b8856b4e00b",
+    "source-after-all-gates.json": "3d7a4422179956709f0fb6968dcaaa97f31714b12740b13453210b8856b4e00b",
+    "source-final-file-set.json": "3d7a4422179956709f0fb6968dcaaa97f31714b12740b13453210b8856b4e00b"
+  },
+  "source_snapshot_bytes_and_sets_identical": true,
+  "runtime_source_files": 55,
+  "verification_source_files": 63,
+  "excluded_private_evidence_index": "private-evidence-index.json",
+  "no_source_git_or_remote_mutation_by_archive_writer": true
+}

@@ -41,3 +41,6 @@ dev = [
 line-length = 100
 fix = true
 src = ["python"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

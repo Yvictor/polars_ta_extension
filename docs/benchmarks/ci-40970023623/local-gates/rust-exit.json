@@ -1,0 +1,1 @@
+{"returncode": 0, "command": ["/Users/ec666/.rustup/toolchains/1.90.0-aarch64-apple-darwin/bin/cargo", "test", "--release", "--offline", "--locked", "--lib", "--", "--test-threads=1"]}

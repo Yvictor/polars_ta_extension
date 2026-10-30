@@ -1,0 +1,87 @@
+{
+  "source_file": "/tmp/polars-recovery/final-integration-evidence/collection-node-diff.json",
+  "source_sha256": "9b886d4b391c406887f4c0b54c5195d31d8b14bcbf4cb071fc176c3308f3ec24",
+  "source_full_collections_retained_in_repository": false,
+  "summary": "Lossless counts and exact portability replacements derived from the retained full private node-diff; the501uniform parameter IDs and full12479-node collections are intentionally not copied.",
+  "runtimes": {
+    "144": {
+      "baseline0eb_count": 11975,
+      "final_count": 12479,
+      "added_count": 506,
+      "replaced_old_count": 2,
+      "new_uniform_tests": 501,
+      "uniform_test_file": "tests/test_mavp_uniform_prefix.py",
+      "replaced_old_signed_zero_ids": [
+        "tests/test_allocation_benchmark.py::test_workload_tolerant_reference_rejects_opposite_signed_zero[-0.0-0.0]",
+        "tests/test_allocation_benchmark.py::test_workload_tolerant_reference_rejects_opposite_signed_zero[0.0--0.0]"
+      ],
+      "replacement_signed_zero_ids": [
+        "tests/test_allocation_benchmark.py::test_workload_tolerant_reference_rejects_opposite_signed_zero[-0.0-0.0-loadavg-absent]",
+        "tests/test_allocation_benchmark.py::test_workload_tolerant_reference_rejects_opposite_signed_zero[-0.0-0.0-loadavg-present]",
+        "tests/test_allocation_benchmark.py::test_workload_tolerant_reference_rejects_opposite_signed_zero[0.0--0.0-loadavg-absent]",
+        "tests/test_allocation_benchmark.py::test_workload_tolerant_reference_rejects_opposite_signed_zero[0.0--0.0-loadavg-present]"
+      ],
+      "new_capture_test": "tests/test_allocation_benchmark.py::test_workload_optional_load_average_does_not_block_capture",
+      "legacy_benchmark_nodes": [
+        "tests/test_bench.py::test_ema_expr",
+        "tests/test_bench.py::test_ema_talib",
+        "tests/test_bench.py::test_natr_expr",
+        "tests/test_bench.py::test_natr_expr_with_null",
+        "tests/test_bench.py::test_natr_talib"
+      ]
+    },
+    "120": {
+      "baseline0eb_count": 11975,
+      "final_count": 12479,
+      "added_count": 506,
+      "replaced_old_count": 2,
+      "new_uniform_tests": 501,
+      "uniform_test_file": "tests/test_mavp_uniform_prefix.py",
+      "replaced_old_signed_zero_ids": [
+        "tests/test_allocation_benchmark.py::test_workload_tolerant_reference_rejects_opposite_signed_zero[-0.0-0.0]",
+        "tests/test_allocation_benchmark.py::test_workload_tolerant_reference_rejects_opposite_signed_zero[0.0--0.0]"
+      ],
+      "replacement_signed_zero_ids": [
+        "tests/test_allocation_benchmark.py::test_workload_tolerant_reference_rejects_opposite_signed_zero[-0.0-0.0-loadavg-absent]",
+        "tests/test_allocation_benchmark.py::test_workload_tolerant_reference_rejects_opposite_signed_zero[-0.0-0.0-loadavg-present]",
+        "tests/test_allocation_benchmark.py::test_workload_tolerant_reference_rejects_opposite_signed_zero[0.0--0.0-loadavg-absent]",
+        "tests/test_allocation_benchmark.py::test_workload_tolerant_reference_rejects_opposite_signed_zero[0.0--0.0-loadavg-present]"
+      ],
+      "new_capture_test": "tests/test_allocation_benchmark.py::test_workload_optional_load_average_does_not_block_capture",
+      "legacy_benchmark_nodes": [
+        "tests/test_bench.py::test_ema_expr",
+        "tests/test_bench.py::test_ema_talib",
+        "tests/test_bench.py::test_natr_expr",
+        "tests/test_bench.py::test_natr_expr_with_null",
+        "tests/test_bench.py::test_natr_talib"
+      ]
+    },
+    "21": {
+      "baseline0eb_count": 11975,
+      "final_count": 12479,
+      "added_count": 506,
+      "replaced_old_count": 2,
+      "new_uniform_tests": 501,
+      "uniform_test_file": "tests/test_mavp_uniform_prefix.py",
+      "replaced_old_signed_zero_ids": [
+        "tests/test_allocation_benchmark.py::test_workload_tolerant_reference_rejects_opposite_signed_zero[-0.0-0.0]",
+        "tests/test_allocation_benchmark.py::test_workload_tolerant_reference_rejects_opposite_signed_zero[0.0--0.0]"
+      ],
+      "replacement_signed_zero_ids": [
+        "tests/test_allocation_benchmark.py::test_workload_tolerant_reference_rejects_opposite_signed_zero[-0.0-0.0-loadavg-absent]",
+        "tests/test_allocation_benchmark.py::test_workload_tolerant_reference_rejects_opposite_signed_zero[-0.0-0.0-loadavg-present]",
+        "tests/test_allocation_benchmark.py::test_workload_tolerant_reference_rejects_opposite_signed_zero[0.0--0.0-loadavg-absent]",
+        "tests/test_allocation_benchmark.py::test_workload_tolerant_reference_rejects_opposite_signed_zero[0.0--0.0-loadavg-present]"
+      ],
+      "new_capture_test": "tests/test_allocation_benchmark.py::test_workload_optional_load_average_does_not_block_capture",
+      "legacy_benchmark_nodes": [
+        "tests/test_bench.py::test_ema_expr",
+        "tests/test_bench.py::test_ema_talib",
+        "tests/test_bench.py::test_natr_expr",
+        "tests/test_bench.py::test_natr_expr_with_null",
+        "tests/test_bench.py::test_natr_talib"
+      ]
+    }
+  },
+  "expected_excluding_legacy_benchmark_file": 12474
+}

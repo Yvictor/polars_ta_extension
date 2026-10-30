@@ -1,0 +1,10 @@
+{
+  "run": 40970023623,
+  "head": "5171ea5583f83766da05ef0d1f8bc69091063369",
+  "job": 123784169502,
+  "conclusion": "full four-arm run success",
+  "artifact": 12945010556,
+  "zip_sha256": "d1c657249dc0142c78fba54ed82e719cc85cfe34e13fff3973daf46ac34b3255",
+  "files": 13460,
+  "raw": "/tmp/polars-recovery/ci-mavp-uniform/raw"
+}

@@ -1,0 +1,301 @@
+{
+  "original_vs_prior": {
+    "all": {
+      "observations": 64,
+      "slower_medians": 35,
+      "ranges": {
+        "disjoint faster": 20,
+        "overlap": 26,
+        "disjoint slower": 18
+      },
+      "latency_percent_minmax": [
+        -39.06194633778557,
+        73.72361449433436
+      ]
+    },
+    "uniform fast path": {
+      "observations": 16,
+      "slower_medians": 15,
+      "ranges": {
+        "disjoint slower": 5,
+        "overlap": 11
+      },
+      "latency_percent_minmax": [
+        -4.505804442485961,
+        66.58096465215375
+      ]
+    },
+    "nonuniform fallback regression guard": {
+      "observations": 32,
+      "slower_medians": 5,
+      "ranges": {
+        "disjoint faster": 20,
+        "overlap": 10,
+        "disjoint slower": 2
+      },
+      "latency_percent_minmax": [
+        -39.06194633778557,
+        8.025840201003497
+      ]
+    },
+    "unchanged EMA/WMA or Polars control": {
+      "observations": 16,
+      "slower_medians": 15,
+      "ranges": {
+        "disjoint slower": 11,
+        "overlap": 5
+      },
+      "latency_percent_minmax": [
+        -1.4994036440283076,
+        73.72361449433436
+      ]
+    }
+  },
+  "original_vs_combined": {
+    "all": {
+      "observations": 64,
+      "slower_medians": 31,
+      "ranges": {
+        "disjoint faster": 19,
+        "overlap": 30,
+        "disjoint slower": 15
+      },
+      "latency_percent_minmax": [
+        -40.60629378367705,
+        74.33677115514124
+      ]
+    },
+    "uniform fast path": {
+      "observations": 16,
+      "slower_medians": 16,
+      "ranges": {
+        "disjoint slower": 4,
+        "overlap": 12
+      },
+      "latency_percent_minmax": [
+        1.5970862520917617,
+        67.26318067401158
+      ]
+    },
+    "nonuniform fallback regression guard": {
+      "observations": 32,
+      "slower_medians": 0,
+      "ranges": {
+        "disjoint faster": 19,
+        "overlap": 13
+      },
+      "latency_percent_minmax": [
+        -40.60629378367705,
+        -0.20610108231405855
+      ]
+    },
+    "unchanged EMA/WMA or Polars control": {
+      "observations": 16,
+      "slower_medians": 15,
+      "ranges": {
+        "disjoint slower": 11,
+        "overlap": 5
+      },
+      "latency_percent_minmax": [
+        -0.46294559390258616,
+        74.33677115514124
+      ]
+    }
+  },
+  "original_vs_candidate": {
+    "all": {
+      "observations": 64,
+      "slower_medians": 24,
+      "ranges": {
+        "disjoint faster": 25,
+        "overlap": 28,
+        "disjoint slower": 11
+      },
+      "latency_percent_minmax": [
+        -40.709020305510826,
+        71.30989733834008
+      ]
+    },
+    "uniform fast path": {
+      "observations": 16,
+      "slower_medians": 8,
+      "ranges": {
+        "overlap": 13,
+        "disjoint faster": 3
+      },
+      "latency_percent_minmax": [
+        -28.886656871606554,
+        23.351258090106896
+      ]
+    },
+    "nonuniform fallback regression guard": {
+      "observations": 32,
+      "slower_medians": 1,
+      "ranges": {
+        "disjoint faster": 22,
+        "overlap": 10
+      },
+      "latency_percent_minmax": [
+        -40.709020305510826,
+        0.02626424093252755
+      ]
+    },
+    "unchanged EMA/WMA or Polars control": {
+      "observations": 16,
+      "slower_medians": 15,
+      "ranges": {
+        "disjoint slower": 11,
+        "overlap": 5
+      },
+      "latency_percent_minmax": [
+        -0.5502712697638579,
+        71.30989733834008
+      ]
+    }
+  },
+  "prior_vs_combined": {
+    "all": {
+      "observations": 64,
+      "slower_medians": 25,
+      "ranges": {
+        "overlap": 60,
+        "disjoint faster": 4
+      },
+      "latency_percent_minmax": [
+        -10.633678057985485,
+        6.390849892967654
+      ]
+    },
+    "uniform fast path": {
+      "observations": 16,
+      "slower_medians": 12,
+      "ranges": {
+        "overlap": 16
+      },
+      "latency_percent_minmax": [
+        -1.3990694321991959,
+        6.390849892967654
+      ]
+    },
+    "nonuniform fallback regression guard": {
+      "observations": 32,
+      "slower_medians": 5,
+      "ranges": {
+        "overlap": 28,
+        "disjoint faster": 4
+      },
+      "latency_percent_minmax": [
+        -10.633678057985485,
+        0.7829428488665968
+      ]
+    },
+    "unchanged EMA/WMA or Polars control": {
+      "observations": 16,
+      "slower_medians": 8,
+      "ranges": {
+        "overlap": 16
+      },
+      "latency_percent_minmax": [
+        -1.34222607574509,
+        2.248918346496387
+      ]
+    }
+  },
+  "prior_vs_candidate": {
+    "all": {
+      "observations": 64,
+      "slower_medians": 10,
+      "ranges": {
+        "overlap": 49,
+        "disjoint faster": 15
+      },
+      "latency_percent_minmax": [
+        -34.88917154234487,
+        1.218887669655122
+      ]
+    },
+    "uniform fast path": {
+      "observations": 16,
+      "slower_medians": 2,
+      "ranges": {
+        "disjoint faster": 11,
+        "overlap": 5
+      },
+      "latency_percent_minmax": [
+        -34.88917154234487,
+        0.9738785408728301
+      ]
+    },
+    "nonuniform fallback regression guard": {
+      "observations": 32,
+      "slower_medians": 2,
+      "ranges": {
+        "overlap": 28,
+        "disjoint faster": 4
+      },
+      "latency_percent_minmax": [
+        -13.407712245978164,
+        0.26073134416648713
+      ]
+    },
+    "unchanged EMA/WMA or Polars control": {
+      "observations": 16,
+      "slower_medians": 6,
+      "ranges": {
+        "overlap": 16
+      },
+      "latency_percent_minmax": [
+        -1.9959698433102857,
+        1.218887669655122
+      ]
+    }
+  },
+  "combined_vs_candidate": {
+    "all": {
+      "observations": 64,
+      "slower_medians": 12,
+      "ranges": {
+        "overlap": 53,
+        "disjoint faster": 11
+      },
+      "latency_percent_minmax": [
+        -38.48486511930972,
+        1.7608888824521607
+      ]
+    },
+    "uniform fast path": {
+      "observations": 16,
+      "slower_medians": 0,
+      "ranges": {
+        "disjoint faster": 11,
+        "overlap": 5
+      },
+      "latency_percent_minmax": [
+        -38.48486511930972,
+        -0.13722234492972163
+      ]
+    },
+    "nonuniform fallback regression guard": {
+      "observations": 32,
+      "slower_medians": 9,
+      "ranges": {
+        "overlap": 32
+      },
+      "latency_percent_minmax": [
+        -11.71931606737494,
+        1.7608888824521607
+      ]
+    },
+    "unchanged EMA/WMA or Polars control": {
+      "observations": 16,
+      "slower_medians": 3,
+      "ranges": {
+        "overlap": 16
+      },
+      "latency_percent_minmax": [
+        -2.7257627841958842,
+        1.2847263909081086
+      ]
+    }
+  }
+}

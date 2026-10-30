@@ -1,0 +1,12 @@
+{
+  "command": [
+    "/tmp/polars-recovery/mavp-uniform-env/bin/python",
+    "/tmp/polars-recovery/mavp-uniform-candidate/scripts/migration_probe.py",
+    "--compare",
+    "/tmp/polars-recovery/engulf-consumer-evidence/final-window/original-mac.npz",
+    "/tmp/polars-recovery/mavp-uniform-evidence/candidate.npz",
+    "--report",
+    "/tmp/polars-recovery/mavp-uniform-evidence/original-mac-tolerance.json"
+  ],
+  "code": 0
+}

@@ -1,0 +1,44 @@
+{
+  "source_sha256": "c90e922f7a2289e6408306409ce77edc582e5a25ee98d21138f74a2bbab23fd8",
+  "source_unchanged": true,
+  "no_timing_invocations": true,
+  "wheel": "/tmp/polars-recovery/mavp-uniform-evidence/wheels/polars_talib-0.2.1-cp310-abi3-macosx_11_0_arm64.whl",
+  "wheel_sha256": "db1063823117c289f2490343c5eb61fd0070803b198180aa7882aa9477f67937",
+  "native_sha256": "9a919626915cda3a2e1fe2e42a8a6fbe254fb233abe41cec1ef6cd3084d0bb11",
+  "runtime": {
+    "144": {
+      "python": "3.12.14 (main, Sep  1 2026, 14:09:38) [Clang 22.1.3 ]",
+      "polars": "1.44.2",
+      "numpy": "2.5.3",
+      "C": "0.8.1 (Sep 21 2026 16:38:04)",
+      "prefix": "/tmp/polars-recovery/mavp-uniform-env",
+      "module": "/tmp/polars-recovery/mavp-uniform-env/lib/python3.12/site-packages/polars_talib/_polars_talib.abi3.so",
+      "native_sha256": "9a919626915cda3a2e1fe2e42a8a6fbe254fb233abe41cec1ef6cd3084d0bb11"
+    },
+    "120": {
+      "python": "3.12.14 (main, Sep  1 2026, 14:09:38) [Clang 22.1.3 ]",
+      "polars": "1.20.0",
+      "numpy": "2.5.3",
+      "C": "0.8.1 (Sep 21 2026 16:38:04)",
+      "prefix": "/tmp/polars-recovery/mavp-uniform-polars120",
+      "module": "/tmp/polars-recovery/mavp-uniform-polars120/lib/python3.12/site-packages/polars_talib/_polars_talib.abi3.so",
+      "native_sha256": "9a919626915cda3a2e1fe2e42a8a6fbe254fb233abe41cec1ef6cd3084d0bb11"
+    },
+    "21": {
+      "python": "3.12.14 (main, Sep  1 2026, 14:09:38) [Clang 22.1.3 ]",
+      "polars": "2.1.0",
+      "numpy": "2.5.3",
+      "C": "0.8.1 (Sep 21 2026 16:38:04)",
+      "prefix": "/tmp/polars-recovery/mavp-uniform-polars21",
+      "module": "/tmp/polars-recovery/mavp-uniform-polars21/lib/python3.12/site-packages/polars_talib/_polars_talib.abi3.so",
+      "native_sha256": "9a919626915cda3a2e1fe2e42a8a6fbe254fb233abe41cec1ef6cd3084d0bb11"
+    }
+  },
+  "full_pytest_includes_legacy_benchmark_nodes": true,
+  "collection_node_diff_sha256": "69a68e1d49e20b840a0c6fa589a95df30a8571e35c597312a616dde849768d4c",
+  "full_node_counts": {
+    "144": 12476,
+    "120": 12476,
+    "21": 12476
+  }
+}
