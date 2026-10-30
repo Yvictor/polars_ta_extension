@@ -1,0 +1,16 @@
+{
+  "frozen_at_utc": "2026-10-29T22:28:40.036470+00:00",
+  "raw_result_access": false,
+  "controller": "37a98e2326cdcdd3d8c3b8048b1b4143199e09c6",
+  "run": 40965216581,
+  "tests": "17 pytest and17 unittest methods passed; mutations within methods",
+  "files": {
+    "audit.py": "0a08f54ee3304ed7e5bb085dc7ef6a0e58e4b1b08889545235b80599f496e98b",
+    "inputs.py": "4fd0d2ab84a13af79f16c727d5b6191f87ffe6344e4ad35f8f06c7ab22265cc1",
+    "test_audit.py": "8deb05b057851787cb265f409ff351d1b7ded69b62331ab3521949c27e70d7f7",
+    "shared_core.py": "b8c0b004daac5d920835c7a316cf97919cc3a13633eeecd860fdd02ab669cba9",
+    "prepare_trust.py": "f13c73a2ef45ecfbf3b444826e118981c5945475b54c6729bba4af8637053368",
+    "trusted.json": "726880c2b4ad089767fc56c11563548a5f0fedc0025dbd61ba25e97190ab2e04"
+  },
+  "pending": "Separate review before any rawartifact access; exact NumPyuniform policy copied from reviewed independent MAVPoracle, no approximation."
+}

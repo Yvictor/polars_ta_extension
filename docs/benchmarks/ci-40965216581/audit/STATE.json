@@ -1,0 +1,36 @@
+{
+  "updated_at_utc": "2026-10-29T23:23:53.774167+00:00",
+  "status": "RAW_AUDIT_AND_RETENTION_REPORT_INDEPENDENTLY_APPROVED",
+  "run": 40965216581,
+  "controller": "37a98e2326cdcdd3d8c3b8048b1b4143199e09c6",
+  "reviewer": "/root/combined_review",
+  "approved_audit_sha256": "761c29f8242cebc41a89627ccb7e758b610336ac5fb3c5c4cc9a187ca86b7e33",
+  "approved_inputs_sha256": "4fd0d2ab84a13af79f16c727d5b6191f87ffe6344e4ad35f8f06c7ab22265cc1",
+  "approved_trust_sha256": "726880c2b4ad089767fc56c11563548a5f0fedc0025dbd61ba25e97190ab2e04",
+  "shared_core_sha256": "b8c0b004daac5d920835c7a316cf97919cc3a13633eeecd860fdd02ab669cba9",
+  "tests": "17 pytest and17 unittest methods passed; independent reviewer reran17pytest",
+  "raw_artifact_access": true,
+  "raw_timing_access": true,
+  "artifact_download_owner": "/root",
+  "next_action": "Root can archive report/CSV plus top-level RETENTION.md/RETENTION.json/result.json, source/trust/independent-review/parser-fix provenance. Await final composed consumer CI; no merge/release.",
+  "review_fixes": [
+    "Independently derive unique actual FMA/portable/resolver role names instead of trusting report labels.",
+    "Bind exactly one disassembly header to exact defined text symbol and address before classifying transfers."
+  ],
+  "limits": [
+    "No separately archived final timed arrays/hash; pinned immutable final check plus pre-timer digest and flag.",
+    "Global C finite/tiny tolerance remains; timed zero positions and all both-zero signs strict.",
+    "Shared Cargo graph snapshots do not uniquely map ELF to Rust rlibs.",
+    "No cross-run timing ratio pooling or allocator-only fault attribution."
+  ],
+  "artifact_verified_READY": "/tmp/polars-recovery/ci-sarext-typed/READY",
+  "proposed_audit_sha256": "761c29f8242cebc41a89627ccb7e758b610336ac5fb3c5c4cc9a187ca86b7e33",
+  "first_stop_log": "replay-v1-path-stop.log",
+  "result_sha256": "5d25f46fbe329bce2967b064c8526bfff81bd2faf95135693cde22dba4c0a2a0",
+  "report_sha256": "30176b5bff9d6484695410758e91d03996c61ceba9837f1d942f2f988848f12a",
+  "children": 1344,
+  "samples": 41664,
+  "retention": "RETAIN B pending final composed consumer CI;9target disjointgainsvs56/no disjointregression;Cslowermedians8of20explicit.",
+  "final_report_reviewer": "/root/combined_review",
+  "final_review": "Independently recomputed all168 CSV rows from1344 raw child reports/41664 samples; checked alltarget/control/stress/noise counts and373 rawNaNsign-only deltas; retainB recommendation approved, final composedconsumerCI still required."
+}

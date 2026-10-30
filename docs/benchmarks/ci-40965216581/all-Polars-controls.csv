@@ -1,0 +1,25 @@
+threads,case,role,comparison,before_median_ms,after_median_ms,after_latency_percent,before_over_after_low,before_over_after_high,after_faster_rounds,status
+1,control_cumsum_dense/1000000,pure_polars_drift_control,original_vs_prior,2.8956485,2.8906555000000003,-0.172431149706187,0.8128047348503247,1.062998463399671,8,overlapping process ranges
+1,control_cumsum/10000x100,pure_polars_drift_control,original_vs_prior,16.7628355,16.784516500000002,0.12933969315633842,0.8455248416714904,1.082752998681958,6,overlapping process ranges
+1,control_cumsum_dense/1000000,pure_polars_drift_control,original_vs_candidate,2.8956485,2.897516,0.06449332507034722,0.9548319236069486,1.0368427233821234,8,overlapping process ranges
+1,control_cumsum/10000x100,pure_polars_drift_control,original_vs_candidate,16.7628355,16.692978,-0.41674035398129305,0.9586165345153884,1.0876266011365383,7,overlapping process ranges
+1,control_cumsum_dense/1000000,pure_polars_drift_control,original_vs_alternative,2.8956485,2.9148925,0.6645834257852812,0.9581005821767761,1.0344927638326595,6,overlapping process ranges
+1,control_cumsum/10000x100,pure_polars_drift_control,original_vs_alternative,16.7628355,16.642202500000003,-0.7196455516132572,0.9287981522789996,1.0931051211110652,8,overlapping process ranges
+1,control_cumsum_dense/1000000,pure_polars_drift_control,prior_vs_candidate,2.8906555000000003,2.897516,0.23733371202483422,0.936580100673326,1.2234212708128567,5,overlapping process ranges
+1,control_cumsum/10000x100,pure_polars_drift_control,prior_vs_candidate,16.784516500000002,16.692978,-0.5453746612242405,0.9576416600381644,1.1892302257717708,7,overlapping process ranges
+1,control_cumsum_dense/1000000,pure_polars_drift_control,prior_vs_alternative,2.8906555000000003,2.9148925,0.8384603422995074,0.9397862781132583,1.2206484389903158,5,overlapping process ranges
+1,control_cumsum/10000x100,pure_polars_drift_control,prior_vs_alternative,16.784516500000002,16.642202500000003,-0.8478885882712173,0.9278536018977491,1.1952205367290365,7,overlapping process ranges
+1,control_cumsum_dense/1000000,pure_polars_drift_control,candidate_vs_alternative,2.897516,2.9148925,0.5997033320954914,0.9634936399031041,1.0390821738040243,3,overlapping process ranges
+1,control_cumsum/10000x100,pure_polars_drift_control,candidate_vs_alternative,16.692978,16.642202500000003,-0.30417280847070405,0.9236959345632293,1.0542157564507455,7,overlapping process ranges
+4,control_cumsum_dense/1000000,pure_polars_drift_control,original_vs_prior,2.9468455000000002,2.9595535,0.4312407963023457,0.9742919322755597,1.0512629712002908,8,overlapping process ranges
+4,control_cumsum/10000x100,pure_polars_drift_control,original_vs_prior,12.9823755,13.123994,1.0908519785150173,0.9264048912405025,1.0651120944354173,6,overlapping process ranges
+4,control_cumsum_dense/1000000,pure_polars_drift_control,original_vs_candidate,2.9468455000000002,2.958437,0.393352824231874,0.8586446208686297,1.045263331085767,7,overlapping process ranges
+4,control_cumsum/10000x100,pure_polars_drift_control,original_vs_candidate,12.9823755,13.0411535,0.4527522717240773,0.9434523712926391,1.0430909883758082,5,overlapping process ranges
+4,control_cumsum_dense/1000000,pure_polars_drift_control,original_vs_alternative,2.9468455000000002,2.949138,0.07779505237039963,0.9708450844964186,1.0476491797510696,6,overlapping process ranges
+4,control_cumsum/10000x100,pure_polars_drift_control,original_vs_alternative,12.9823755,12.971226,-0.08588181723753197,0.8894300193459218,1.062615775682286,8,overlapping process ranges
+4,control_cumsum_dense/1000000,pure_polars_drift_control,prior_vs_candidate,2.9595535,2.958437,-0.03772528524995655,0.8555895792815214,1.0241727312603284,4,overlapping process ranges
+4,control_cumsum/10000x100,pure_polars_drift_control,prior_vs_candidate,13.123994,13.0411535,-0.6312140953432244,0.9486101234661646,1.0513764940903423,8,overlapping process ranges
+4,control_cumsum_dense/1000000,pure_polars_drift_control,prior_vs_alternative,2.9595535,2.949138,-0.35192808644952667,0.9673908357470632,1.0265104399230618,5,overlapping process ranges
+4,control_cumsum/10000x100,pure_polars_drift_control,prior_vs_alternative,13.123994,12.971226,-1.1640358872459067,0.894292437158487,1.07105637116234,8,overlapping process ranges
+4,control_cumsum_dense/1000000,pure_polars_drift_control,candidate_vs_alternative,2.958437,2.949138,-0.3143213798367128,0.9729435005081448,1.1647669078761869,7,overlapping process ranges
+4,control_cumsum/10000x100,pure_polars_drift_control,candidate_vs_alternative,13.0411535,12.971226,-0.5362064022940927,0.9131721982018048,1.0517031820902865,6,overlapping process ranges

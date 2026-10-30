@@ -1,0 +1,12 @@
+{
+  "before_audit_sha256": "0a08f54ee3304ed7e5bb085dc7ef6a0e58e4b1b08889545235b80599f496e98b",
+  "proposed_audit_sha256": "761c29f8242cebc41a89627ccb7e758b610336ac5fb3c5c4cc9a187ca86b7e33",
+  "trust_sha256": "726880c2b4ad089767fc56c11563548a5f0fedc0025dbd61ba25e97190ab2e04",
+  "tests": "..................                                                       [100%]\n18 passed in 0.08s",
+  "raw_numerical_timing_access": false,
+  "cause": "Exact producer emits workspace-relative sarext-results/product-elf paths; original parser assumed absolute recorded-workspace paths only.",
+  "change": "Accept only exact producer prefix or recorded workspace absolute path and require expected diagnostic area+arm, nontraversal/nonsymlink real file inside that arm. No numerical/statistical/ELF gate relaxation.",
+  "status": "APPROVED_BY_INDEPENDENT_REVIEW",
+  "reviewer": "/root/combined_review",
+  "approved_at_utc": "2026-10-29T23:16:48.527806+00:00"
+}

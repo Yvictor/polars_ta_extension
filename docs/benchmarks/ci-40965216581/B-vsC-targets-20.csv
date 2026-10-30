@@ -1,0 +1,21 @@
+threads,case,role,comparison,before_median_ms,after_median_ms,after_latency_percent,before_over_after_low,before_over_after_high,after_faster_rounds,status
+1,sarext/1000000,ordinary_sarext_no_negative_zero,original_vs_alternative,10.0888435,10.5377425,4.4494594449800084,0.9048463539375503,1.0074021979703285,1,overlapping process ranges
+1,grouped_sarext/100x10000,ordinary_sarext_no_negative_zero,original_vs_alternative,13.2037295,13.6796085,3.6041256373814834,0.8859953148759538,1.1196404556542456,4,overlapping process ranges
+1,grouped_sarext/10000x100,ordinary_sarext_no_negative_zero,original_vs_alternative,64.198751,62.943166500000004,-1.9557771458824758,0.9923233900768178,1.052476697904555,11,overlapping process ranges
+1,grouped_sarext/2000x100_interleaved,ordinary_sarext_no_negative_zero,original_vs_alternative,12.025429500000001,11.700109999999999,-2.705263042787809,0.9491119835872321,1.1560491857748258,11,overlapping process ranges
+1,sarext_reversal/1000000,ordinary_sarext_no_negative_zero,original_vs_alternative,4.3062615,4.429545,2.8628893066526606,0.9041712586394017,1.0558189629251604,2,overlapping process ranges
+1,grouped_sarext_reversal/100x10000,ordinary_sarext_no_negative_zero,original_vs_alternative,7.240254,7.2167895,-0.32408393407192815,0.9378051129563508,1.0760133300839998,6,overlapping process ranges
+1,grouped_sarext_reversal/10000x100,ordinary_sarext_no_negative_zero,original_vs_alternative,59.4072795,56.665392499999996,-4.615405760164471,1.000552974999794,1.0776533353510476,12,disjoint faster process ranges
+1,grouped_sarext_reversal/2000x100_interleaved,ordinary_sarext_no_negative_zero,original_vs_alternative,11.8772185,11.376933000000001,-4.212143609212871,0.9486467400097415,1.1328658539100829,11,overlapping process ranges
+1,sarext_longzero/1000000,legitimate_long_zero_replay_stress,original_vs_alternative,5.6828875,5.6407655000000005,-0.7412077047099563,0.9555027963979537,1.1047790529397905,7,overlapping process ranges
+1,grouped_sarext_longzero/10000x100,legitimate_long_zero_replay_stress,original_vs_alternative,60.471665,58.6220675,-3.058618445514938,0.9928580836213893,1.066989336576434,12,overlapping process ranges
+4,sarext/1000000,ordinary_sarext_no_negative_zero,original_vs_alternative,10.596286,10.9093075,2.954068057430703,0.9287381419126148,1.027074387258854,0,overlapping process ranges
+4,grouped_sarext/100x10000,ordinary_sarext_no_negative_zero,original_vs_alternative,13.842696,14.179172999999999,2.4307186981495477,0.8623542646129291,1.0384815113390025,3,overlapping process ranges
+4,grouped_sarext/10000x100,ordinary_sarext_no_negative_zero,original_vs_alternative,66.781639,66.65123299999999,-0.19527223643014402,0.9454416034209928,1.0790622536949654,6,overlapping process ranges
+4,grouped_sarext/2000x100_interleaved,ordinary_sarext_no_negative_zero,original_vs_alternative,12.363774,12.463531,0.8068491061062666,0.9399909786014082,1.0814026493966822,6,overlapping process ranges
+4,sarext_reversal/1000000,ordinary_sarext_no_negative_zero,original_vs_alternative,4.386756500000001,4.4527295,1.5039129707792087,0.8969310565662074,1.0527216256724945,3,overlapping process ranges
+4,grouped_sarext_reversal/100x10000,ordinary_sarext_no_negative_zero,original_vs_alternative,7.429796,7.6039650000000005,2.344196260570297,0.8820584288718702,1.0455521398570133,2,overlapping process ranges
+4,grouped_sarext_reversal/10000x100,ordinary_sarext_no_negative_zero,original_vs_alternative,60.044598,58.971497,-1.7871732607819268,0.9881251222947401,1.0924598200762725,12,overlapping process ranges
+4,grouped_sarext_reversal/2000x100_interleaved,ordinary_sarext_no_negative_zero,original_vs_alternative,10.930851,10.734745,-1.7940597671672665,0.9360966097293317,1.10735339582845,11,overlapping process ranges
+4,sarext_longzero/1000000,legitimate_long_zero_replay_stress,original_vs_alternative,5.7442845,5.5716525,-3.00528290337988,0.9967838004877618,1.1352857379724797,12,overlapping process ranges
+4,grouped_sarext_longzero/10000x100,legitimate_long_zero_replay_stress,original_vs_alternative,61.107954500000005,60.291372,-1.3362949335834817,0.9703343479994619,1.080278187983853,8,overlapping process ranges
