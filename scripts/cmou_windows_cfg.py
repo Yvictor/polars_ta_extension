@@ -184,5 +184,3 @@ def cfg(rows,names,gots):
           'unknown_exit_or_call_reachable':any(reachable(a,unknown) for a in group),
           'instruction_sha256':hashlib.sha256(json.dumps([(a,*by[a]) for a in group]).encode()).hexdigest()})
     return {'fma_register_proof':fma_proof,'cyclic_cfgs':loops,'panic_sites':[hex(a) for a in sorted(bad)],'unknown_sites':[hex(a) for a in sorted(unknown)],'calls':{hex(a):n for a,n in calls.items()}}
-
-
