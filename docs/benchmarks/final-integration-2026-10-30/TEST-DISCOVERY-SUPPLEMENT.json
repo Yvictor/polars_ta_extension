@@ -1,0 +1,169 @@
+{
+  "purpose": "Additive pytest discovery configuration proof; original97 correctness records remain immutable historical evidence.",
+  "configuration_change": {
+    "authorized_change": "Only add [tool.pytest.ini_options] testpaths=[\"tests\"].",
+    "source_head_before_configuration": "97aeffb91a648f792f3c6689c5967e2dd0a14051",
+    "before_sha256": "b65b0545ac5c8cd91b7485100a57874087a4e21690b1baa542116300863ed390",
+    "after_sha256": "828191f0c587986b5bd65ed0b6ae351957263067ae0484e16236c1c7f97294a6",
+    "old_bytes_preserved_as_prefix": true,
+    "parsed_before_equals_after_with_only_new_pytest_table_removed": true,
+    "added_table": {
+      "ini_options": {
+        "testpaths": [
+          "tests"
+        ]
+      }
+    },
+    "existing_tool_settings_equal": {
+      "maturin": true,
+      "ruff": true
+    },
+    "scope": "Project/build-system/dependency/maturin/ruff settings unchanged. No build or new wheel/sdist byte-equivalence claim; final CI will rebuild with this configuration.",
+    "sections_after_removing_only_added_pytest_table_equal": {
+      "project": true,
+      "tool": true,
+      "build-system": true,
+      "dependency-groups": true
+    }
+  },
+  "default_collection": {
+    "144": {
+      "command": [
+        "/tmp/polars-recovery/mavp-uniform-env/bin/python",
+        "-m",
+        "pytest",
+        "--collect-only",
+        "-q"
+      ],
+      "returncode": 0,
+      "default_nodes": 12479,
+      "explicit_previously_verified_nodes": 12479,
+      "ordered_node_ids_identical": true,
+      "missing": [],
+      "extra": [],
+      "legacy_benchmark_nodes": 5,
+      "canonical_ordered_node_ids_sha256": "5fecb70d5ab223523913e7ed447984b67222767f57a8b84a1de664d8f5dbf4bf",
+      "default_log": {
+        "private_path": "/tmp/polars-recovery/final-integration-evidence/test-discovery-configuration/default-collect-144.log",
+        "sha256": "642421a1e0256bc1fb5d281bddebf1dfb2776a050bc8aa8582de37684ea6d44b"
+      },
+      "previous_explicit_log": {
+        "private_path": "/tmp/polars-recovery/final-integration-evidence/collect-144.log",
+        "sha256": "fd7902184efb101e62c75886dc06750bbefd3fad74b84bd2c887416132a9d617"
+      }
+    },
+    "120": {
+      "command": [
+        "/tmp/polars-recovery/mavp-uniform-polars120/bin/python",
+        "-m",
+        "pytest",
+        "--collect-only",
+        "-q"
+      ],
+      "returncode": 0,
+      "default_nodes": 12479,
+      "explicit_previously_verified_nodes": 12479,
+      "ordered_node_ids_identical": true,
+      "missing": [],
+      "extra": [],
+      "legacy_benchmark_nodes": 5,
+      "canonical_ordered_node_ids_sha256": "5fecb70d5ab223523913e7ed447984b67222767f57a8b84a1de664d8f5dbf4bf",
+      "default_log": {
+        "private_path": "/tmp/polars-recovery/final-integration-evidence/test-discovery-configuration/default-collect-120.log",
+        "sha256": "73d56e686583883bbbd0e9715470b367dde76047c7ec33d30859aed52dfff508"
+      },
+      "previous_explicit_log": {
+        "private_path": "/tmp/polars-recovery/final-integration-evidence/collect-120.log",
+        "sha256": "969a41a037fc94ddc1027e5366039532b4320b36f1d0552e448549f0d030bff6"
+      }
+    },
+    "21": {
+      "command": [
+        "/tmp/polars-recovery/mavp-uniform-polars21/bin/python",
+        "-m",
+        "pytest",
+        "--collect-only",
+        "-q"
+      ],
+      "returncode": 0,
+      "default_nodes": 12479,
+      "explicit_previously_verified_nodes": 12479,
+      "ordered_node_ids_identical": true,
+      "missing": [],
+      "extra": [],
+      "legacy_benchmark_nodes": 5,
+      "canonical_ordered_node_ids_sha256": "5fecb70d5ab223523913e7ed447984b67222767f57a8b84a1de664d8f5dbf4bf",
+      "default_log": {
+        "private_path": "/tmp/polars-recovery/final-integration-evidence/test-discovery-configuration/default-collect-21.log",
+        "sha256": "9771242863d8fafb23c66cbeba25101e150c911bec0c600d9a2c6b5337b353dd"
+      },
+      "previous_explicit_log": {
+        "private_path": "/tmp/polars-recovery/final-integration-evidence/collect-21.log",
+        "sha256": "969a41a037fc94ddc1027e5366039532b4320b36f1d0552e448549f0d030bff6"
+      }
+    }
+  },
+  "pre_fix_discovery": {
+    "total_nodes": 12516,
+    "public_tests_nodes": 12479,
+    "archived_auditor_fixture_nodes": 37,
+    "collection_log": {
+      "private_path": "/tmp/polars-recovery/final-integration-evidence/root-discovery-before.log",
+      "sha256": "f46ccbaaf79d6ef87523b4db3e71242c4fa01019b9f4cbab0c12b12f4e032576"
+    },
+    "combined_archive_fixtures": {
+      "failed": 5,
+      "passed": 32,
+      "reason": "Independent archived auditors use generic inputs module names and collide when imported in one Python process. No product test was dropped or repaired.",
+      "log": {
+        "private_path": "/tmp/polars-recovery/final-integration-evidence/archive-fixture-tests.log",
+        "sha256": "2940f249ade3e3941e73dc314e116b97f55d592f47d7326e351ef6157022aefe"
+      },
+      "record": {
+        "private_path": "/tmp/polars-recovery/final-integration-evidence/archive-fixture-tests.json",
+        "sha256": "48c12f0ff7627608a242e6f798a864168f85445dc315c9c35939577e00c86170"
+      }
+    }
+  },
+  "selected_original_source_snapshots": {
+    "old_snapshot_excludes_pyproject": true,
+    "exact_runtime_and_verification_file_sets_and_bytes_unchanged": true,
+    "fingerprints": {
+      "runtime": {
+        "files": 55,
+        "sha256": "182e8e8a684676c3c1d0f69df383051e3c746cda87028bb266e278b29aa3ba3a"
+      },
+      "verification": {
+        "files": 63,
+        "sha256": "20f6ac992916d4ea30da4876a8c192ad29785c15b1107581ff144d56cb41e53d"
+      }
+    }
+  },
+  "original_55_runtime_63_verification_snapshots_exclude_pyproject": true,
+  "successor_scope": "Final configuration plus documentation change, not a documentation-only successor. The changed pyproject.toml is independently bound above; every existing parsed project/build/dependency/maturin/ruff setting remains identical.",
+  "packaging_claim": "No package rebuild performed for this fix; unchanged parsed metadata/build settings do not assert future wheel or sdist byte equality. Final CI will rebuild with the actual configuration.",
+  "verification_performed": "Collection only in3fresh runtime processes; allordered12479 IDs match the previously executed explicit full suites, including5legacy benchmark tests. No full suite, Rust test, build, capture or numerical comparison was repeated.",
+  "archive_fixture_guidance": {
+    "scope": "Keep frozen auditor files unchanged; select each archive explicitly in a separate fresh Python process. Do not combine their directories in one pytest process.",
+    "commands": [
+      [
+        "python",
+        "-m",
+        "pytest",
+        "--noconftest",
+        "-q",
+        "docs/benchmarks/ci-40965216581/audit"
+      ],
+      [
+        "python",
+        "-m",
+        "pytest",
+        "--noconftest",
+        "-q",
+        "docs/benchmarks/ci-40970023623/audit"
+      ]
+    ],
+    "executed_for_this_fix": false
+  },
+  "independent_review": "combined_review independently approved exactTOML semantics and all3ordered-node comparisons; final additive archive review follows."
+}

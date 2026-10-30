@@ -1,0 +1,21 @@
+{
+  "run": 40942396197,
+  "controller": "bcbb2a6c74699ddf59eacd531d3e904be198d127",
+  "pins": {
+    "original": "b2bbc26d41ec80823c8bffb0cc436a97f29911cc",
+    "prior": "56f6d5fb139031c20d86d7e818e7d267eb834295",
+    "candidate": "46db222092c4f8f391377420e441f12a403f8fce"
+  },
+  "artifact": 12930801241,
+  "artifact_sha256": "ce17f4e50c191deef592095723dd5a879213123d597f3aaee54f34a27a594776",
+  "auditor_sha256": "2be5622ea479ee4e423ed22d34fe2a21fc0e82890ff6e8bc2f48aed3f0852a4c",
+  "trust_sha256": "e64a3eb9ada99c9f0daf24520d9b4e56d046bde9633153b2df36dee1567258bc",
+  "files": {
+    "all-observations.csv": "aaa504a3e469b730cb205a191bfb0956fc66b5e5ba7571dc22e15aa2570db49d",
+    "README.md": "b21c186c2f8f0b118f00d44a96962b49170a12bc22f8b2c0b1a0f0f306457352"
+  },
+  "source_csv_sha256_before_LF_normalization": {
+    "all-observations.csv": "a938c8989c45336bf0cec138a0b8c070c327b1b7f636b4fa7313b622539975e6"
+  },
+  "archival_line_endings": "LF; every parsed CSV record is unchanged from the audited source file."
+}

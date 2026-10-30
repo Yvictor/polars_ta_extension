@@ -1,0 +1,48 @@
+{
+  "root": "/tmp/polars-recovery/mavp-uniform-candidate",
+  "head": "0eb91280cf5d13095cbfdc6f8bcc477cfbcd1498",
+  "env": {
+    "CARGO_HOME": "/tmp/polars-recovery/engulf-consumer-cargo",
+    "CARGO_TARGET_DIR": "/tmp/polars-recovery/mavp-uniform-target",
+    "CARGO_BUILD_BUILD_DIR": "/tmp/polars-recovery/mavp-uniform-build",
+    "RUSTC": "/Users/ec666/.rustup/toolchains/1.90.0-aarch64-apple-darwin/bin/rustc",
+    "RUSTUP_TOOLCHAIN": "1.90.0",
+    "CARGO_PROFILE_RELEASE_DEBUG": "false",
+    "CARGO_PROFILE_RELEASE_CODEGEN_UNITS": "16",
+    "CARGO_PROFILE_RELEASE_LTO": "false",
+    "CARGO_BUILD_JOBS": "2",
+    "RUSTFLAGS": "",
+    "CARGO_ENCODED_RUSTFLAGS": "",
+    "PYO3_PYTHON": "/tmp/polars-recovery/mavp-uniform-env/bin/python",
+    "VIRTUAL_ENV": "/tmp/polars-recovery/mavp-uniform-env"
+  },
+  "commands": [
+    [
+      "rust",
+      [
+        "/Users/ec666/.rustup/toolchains/1.90.0-aarch64-apple-darwin/bin/cargo",
+        "test",
+        "--release",
+        "--offline",
+        "--locked",
+        "--lib",
+        "--",
+        "--test-threads=1"
+      ]
+    ],
+    [
+      "wheel",
+      [
+        "/tmp/polars-recovery/mavp-uniform-env/bin/python",
+        "-m",
+        "maturin",
+        "build",
+        "--release",
+        "--offline",
+        "--locked",
+        "--out",
+        "/tmp/polars-recovery/mavp-uniform-evidence/wheels"
+      ]
+    ]
+  ]
+}

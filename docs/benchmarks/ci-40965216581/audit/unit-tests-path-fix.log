@@ -1,0 +1,23 @@
+test_contract_corruptions (test_audit.Arrays.test_contract_corruptions) ... ok
+test_exact_and_tolerant_zero_semantics (test_audit.Arrays.test_exact_and_tolerant_zero_semantics) ... ok
+test_strict_json_and_types (test_audit.Arrays.test_strict_json_and_types) ... ok
+test_exact_single_function_header_and_defined_text_symbol (test_audit.ElfHeaderBinding.test_exact_single_function_header_and_defined_text_symbol) ... ok
+test_roles_require_exact_unique_source_bound_names (test_audit.ElfRoles.test_roles_require_exact_unique_source_bound_names) ... ok
+test_complete_balanced_inventory (test_audit.Ledger.test_complete_balanced_inventory) ... ok
+test_exact_command_own_arm_reference (test_audit.Ledger.test_exact_command_own_arm_reference) ... ok
+test_timing_recomputes_sample_semantics (test_audit.Ledger.test_timing_recomputes_sample_semantics) ... ok
+test_coverage_warmup_reversal_longzero (test_audit.Physical.test_coverage_warmup_reversal_longzero) ... ok
+test_cumsum_scatter_and_uniform_fixed_operators (test_audit.Physical.test_cumsum_scatter_and_uniform_fixed_operators) ... ok
+test_exact_physical_seed_and_group_mapping (test_audit.Physical.test_exact_physical_seed_and_group_mapping) ... ok
+test_only_exact_recorded_absolute_or_producer_relative_paths_same_arm (test_audit.ProducerDiagnosticPaths.test_only_exact_recorded_absolute_or_producer_relative_paths_same_arm) ... ok
+test_cold_proof_rejects_zero_filtered_comment_or_wrong_test (test_audit.Provenance.test_cold_proof_rejects_zero_filtered_comment_or_wrong_test) ... ok
+test_golden_schema_zero_masks_and_inventory (test_audit.Provenance.test_golden_schema_zero_masks_and_inventory) ... ok
+test_metadata_requires_immutable_product_and_real_affinity (test_audit.Provenance.test_metadata_requires_immutable_product_and_real_affinity) ... ok
+test_exact_relative_fma_scope_and_tail_calls (test_audit.ZeroAndElf.test_exact_relative_fma_scope_and_tail_calls) ... ok
+test_word_diagnostics_report_nan_sign_zero_and_position_separately (test_audit.ZeroAndElf.test_word_diagnostics_report_nan_sign_zero_and_position_separately) ... ok
+test_zero_waiver_cannot_escape_named_untimed_positions (test_audit.ZeroAndElf.test_zero_waiver_cannot_escape_named_untimed_positions) ... ok
+
+----------------------------------------------------------------------
+Ran 18 tests in 0.024s
+
+OK

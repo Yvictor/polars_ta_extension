@@ -13,16 +13,19 @@ crate-type = ["cdylib"]
 
 
 [dependencies]
-pyo3 = { version = "0.20", features = ["extension-module", "abi3-py310"] }
+pyo3 = { version = "0.20", features = ["abi3-py310"] }
 pyo3-polars = { version = "0.10.0", features = ["derive"] }
-polars = {version = "0.36.2", features = ["dtype-struct"]}
+polars = {version = "0.36.2", features = ["dtype-struct", "dtype-i8", "dtype-i16", "dtype-u8", "dtype-u16"]}
 # "performant", "lazy", "dtype-array"
 serde = { version = "*", features = ["derive"] }
-talib-sys = { path = "talib-sys"}
-talib = { path = "talib"}
+ta-lib = "=0.8.3"
+multiversion = "=0.7.4"
 
 [target.'cfg(any(not(target_os = "linux"), use_mimalloc))'.dependencies]
 mimalloc = { version = "0.1", default-features = false }
  
 [target.'cfg(target_os = "linux")'.dependencies]
 jemallocator = { version = "0.5", features = ["disable_initial_exec_tls"] }
+
+[dev-dependencies]
+serde-pickle = "=1.2.0"

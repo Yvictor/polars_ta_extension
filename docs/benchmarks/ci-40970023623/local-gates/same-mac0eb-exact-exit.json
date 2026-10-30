@@ -1,0 +1,13 @@
+{
+  "command": [
+    "/tmp/polars-recovery/mavp-uniform-env/bin/python",
+    "/tmp/polars-recovery/mavp-uniform-candidate/scripts/migration_probe.py",
+    "--compare",
+    "/tmp/polars-recovery/integration-evidence/candidate.npz",
+    "/tmp/polars-recovery/mavp-uniform-evidence/candidate.npz",
+    "--report",
+    "/tmp/polars-recovery/mavp-uniform-evidence/same-mac0eb-exact.json",
+    "--exact"
+  ],
+  "code": 0
+}

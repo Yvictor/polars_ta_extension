@@ -1,0 +1,14 @@
+{
+  "original_C": {
+    "path": "/tmp/polars-recovery/engulf-consumer-evidence/final-window/original-mac.npz",
+    "sha256": "63067603c940fbd5451b2b66f427553f1c28f656839515e4c7d55242f49f1977"
+  },
+  "native0eb": {
+    "path": "/tmp/polars-recovery/integration-evidence/candidate.npz",
+    "sha256": "e902065788fdbf90c54a9c39c5968a58e25ae5e432539c8def4f00bb95483abf"
+  },
+  "native916": {
+    "path": "/tmp/polars-recovery/mavp-uniform-evidence/candidate.npz",
+    "sha256": "e902065788fdbf90c54a9c39c5968a58e25ae5e432539c8def4f00bb95483abf"
+  }
+}

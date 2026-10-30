@@ -336,3 +336,66 @@ INTEGER_PARAMETERS = {
         "timeperiod"
     ]
 }
+REAL_PARAMETERS = {
+    "bbands": [
+        "nbdevup",
+        "nbdevdn"
+    ],
+    "cdlabandonedbaby": [
+        "penetration"
+    ],
+    "cdldarkcloudcover": [
+        "penetration"
+    ],
+    "cdleveningdojistar": [
+        "penetration"
+    ],
+    "cdleveningstar": [
+        "penetration"
+    ],
+    "cdlmathold": [
+        "penetration"
+    ],
+    "cdlmorningdojistar": [
+        "penetration"
+    ],
+    "cdlmorningstar": [
+        "penetration"
+    ],
+    "kc": [
+        "nbdev"
+    ],
+    "mama": [
+        "fastlimit",
+        "slowlimit"
+    ],
+    "percentile": [
+        "percentile"
+    ],
+    "sar": [
+        "acceleration",
+        "maximum"
+    ],
+    "sarext": [
+        "startvalue",
+        "offsetonreverse",
+        "accelerationinitlong",
+        "accelerationlong",
+        "accelerationmaxlong",
+        "accelerationinitshort",
+        "accelerationshort",
+        "accelerationmaxshort"
+    ],
+    "stddev": [
+        "nbdev"
+    ],
+    "supertrend": [
+        "multiplier"
+    ],
+    "t3": [
+        "vfactor"
+    ],
+    "var": [
+        "nbdev"
+    ]
+}

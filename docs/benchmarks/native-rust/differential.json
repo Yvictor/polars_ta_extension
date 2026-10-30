@@ -1,0 +1,27 @@
+{
+  "baseline": "../baseline-probe.npz",
+  "candidate": "../candidate-probe.npz",
+  "baseline_sha256": "965710d70a126d1f1a1bc85277e8b240d7a370ab9f7fd2a4c33e7d9fead1149e",
+  "candidate_sha256": "e2a3b9b43e604c3f001addf0bd8aca3bf0085890296f52bdbc584d9d0f500277",
+  "baseline_runtime": {
+    "python": "3.12.14",
+    "polars": "1.44.2",
+    "numpy": "2.5.3",
+    "talib": "0.8.1 (Oct 26 2026 12:21:06)"
+  },
+  "candidate_runtime": {
+    "python": "3.12.14",
+    "polars": "1.44.2",
+    "numpy": "2.5.3",
+    "talib": "0.8.3 (native Rust; polars-talib compatibility)"
+  },
+  "rtol": 1e-10,
+  "atol": 1e-10,
+  "tiny_case_atol": "min(1e-10, max_abs_finite_reference * 1e-10)",
+  "cases": 10110,
+  "checked_values": 2041958,
+  "api_signatures_match": true,
+  "fields_with_bit_differences": 653,
+  "max_absolute_difference": 2.1543655748246238e-11,
+  "failures": []
+}

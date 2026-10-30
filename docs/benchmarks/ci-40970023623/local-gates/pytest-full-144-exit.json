@@ -1,0 +1,1 @@
+{"command": ["/tmp/polars-recovery/mavp-uniform-env/bin/python", "-m", "pytest", "-q", "tests"], "code": 0}

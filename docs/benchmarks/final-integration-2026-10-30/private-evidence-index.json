@@ -1,0 +1,240 @@
+{
+  "scope": "These files remain private executor evidence. Their bytes are NOT included in this repository archive; entries are identity pointers, not claims of in-repository retention.",
+  "verification_side_script_stops": [
+    {
+      "file": "verify_installed.py",
+      "sha256": "9b39bfdce5accc7eaaf109153006a8f47467e4fba7e73cfb2eed9e3aec6d0f23",
+      "log": "gate-runner.log",
+      "log_sha256": "cc714505a659ac9f93f52d23fb04154e58f4d2f99c8191c87a5e52169b379fbc",
+      "reason": "Original-C raw metadata Unicode width assertion; independently approved correction preserves all numeric and normalized API/schema checks."
+    },
+    {
+      "file": "verify_remaining.py",
+      "sha256": "83da8fe10d772cdefd9482e7dfbca62b3f01351a0c2c0d83f61ec43468ba8a8b",
+      "log": "remaining-gates.log",
+      "log_sha256": "96a62351edfffbe92a548ceec169820f9c10046b922a90abf32896009f68c137",
+      "reason": "Missing refhash variable while constructing final summary AFTER every gate passed and after-source proof was written."
+    }
+  ],
+  "independent_resume_and_record_reviews": "independent-review.json",
+  "local_legacy_benchmark_timers_did_execute": true,
+  "local_benchmark_timings_used_for_performance_conclusions": false,
+  "files": [
+    {
+      "private_path": "/tmp/polars-recovery/final-integration-evidence/rust.log",
+      "sha256": "451ff8809a6bb3494524b4003ac72175da6744a07ce68e89da136075d12391af",
+      "bytes": 5513,
+      "retained_in_repository": false
+    },
+    {
+      "private_path": "/tmp/polars-recovery/final-integration-evidence/wheel.log",
+      "sha256": "b7fd18198995701e0e24fd2432b062bb3463ee2a3f926741c9253de55a63ba2a",
+      "bytes": 2465,
+      "retained_in_repository": false
+    },
+    {
+      "private_path": "/tmp/polars-recovery/final-integration-evidence/install-144.log",
+      "sha256": "526af4aa11f230b842aea48c998e5b46bb0e252128c713b61ddb26de3a0e6b87",
+      "bytes": 640,
+      "retained_in_repository": false
+    },
+    {
+      "private_path": "/tmp/polars-recovery/final-integration-evidence/install-120.log",
+      "sha256": "afadb725d09fc8f4ac4d8168a0687fb9cd9d9b678a86f5663de0e2988ce07a1d",
+      "bytes": 651,
+      "retained_in_repository": false
+    },
+    {
+      "private_path": "/tmp/polars-recovery/final-integration-evidence/install-21.log",
+      "sha256": "2bbf75eeb71170a52d287eb5679eb789c265e8be714cc44bcd57094251e108ce",
+      "bytes": 650,
+      "retained_in_repository": false
+    },
+    {
+      "private_path": "/tmp/polars-recovery/final-integration-evidence/capture.log",
+      "sha256": "e15ae463319fc3d43c27a3c11c68b50dbde732e9f67ef2626b1b89ad003da8bf",
+      "bytes": 158,
+      "retained_in_repository": false
+    },
+    {
+      "private_path": "/tmp/polars-recovery/final-integration-evidence/original_C-comparison.log",
+      "sha256": "cc293d43e2c1ef18fd4301e791e1c8e3e698b4a0ceb714263f6f9d71cee7bf2d",
+      "bytes": 1586,
+      "retained_in_repository": false
+    },
+    {
+      "private_path": "/tmp/polars-recovery/final-integration-evidence/native0eb-comparison.log",
+      "sha256": "4837e148674a484dd789631cc769f5347e0fd252881e4f2f85a8990f21179830",
+      "bytes": 979,
+      "retained_in_repository": false
+    },
+    {
+      "private_path": "/tmp/polars-recovery/final-integration-evidence/native916-comparison.log",
+      "sha256": "e715a9c2dec17bd8bf8b1eca81f8739e3ae4a329f03b0bdd52a23a7fd517173d",
+      "bytes": 980,
+      "retained_in_repository": false
+    },
+    {
+      "private_path": "/tmp/polars-recovery/final-integration-evidence/collect-144.log",
+      "sha256": "fd7902184efb101e62c75886dc06750bbefd3fad74b84bd2c887416132a9d617",
+      "bytes": 1119446,
+      "retained_in_repository": false
+    },
+    {
+      "private_path": "/tmp/polars-recovery/final-integration-evidence/collect-120.log",
+      "sha256": "969a41a037fc94ddc1027e5366039532b4320b36f1d0552e448549f0d030bff6",
+      "bytes": 1119446,
+      "retained_in_repository": false
+    },
+    {
+      "private_path": "/tmp/polars-recovery/final-integration-evidence/collect-21.log",
+      "sha256": "969a41a037fc94ddc1027e5366039532b4320b36f1d0552e448549f0d030bff6",
+      "bytes": 1119446,
+      "retained_in_repository": false
+    },
+    {
+      "private_path": "/tmp/polars-recovery/final-integration-evidence/pytest-full-144.log",
+      "sha256": "81b756d0a198341a3f21e9af43821eb3f05506127dcc88019e7e4269e825d30d",
+      "bytes": 15960,
+      "retained_in_repository": false
+    },
+    {
+      "private_path": "/tmp/polars-recovery/final-integration-evidence/pytest-full-120.log",
+      "sha256": "5fc0e1eac80778a3d76688ca91c543a6e8bedcf98aa624a11c12026813e4681a",
+      "bytes": 15977,
+      "retained_in_repository": false
+    },
+    {
+      "private_path": "/tmp/polars-recovery/final-integration-evidence/pytest-full-21.log",
+      "sha256": "88cfda5951c3a5cfd515b0cf8e1875b76cffd148fb1db3db4a96b98126a2c3a3",
+      "bytes": 15941,
+      "retained_in_repository": false
+    },
+    {
+      "private_path": "/tmp/polars-recovery/final-integration-evidence/toolchain.txt",
+      "sha256": "69369fec0fad824e6cb2d5b8d1fb0e42094942bbe950f1cb28a6f03ad5495225",
+      "bytes": 192,
+      "retained_in_repository": false
+    },
+    {
+      "private_path": "/tmp/polars-recovery/final-integration-evidence/collection-node-diff.json",
+      "sha256": "9b886d4b391c406887f4c0b54c5195d31d8b14bcbf4cb071fc176c3308f3ec24",
+      "bytes": 173570,
+      "retained_in_repository": false
+    },
+    {
+      "private_path": "/tmp/polars-recovery/final-integration-evidence/candidate.npz",
+      "sha256": "e902065788fdbf90c54a9c39c5968a58e25ae5e432539c8def4f00bb95483abf",
+      "bytes": 11298697,
+      "retained_in_repository": false
+    },
+    {
+      "private_path": "/tmp/polars-recovery/final-integration-evidence/source-after-build.json",
+      "sha256": "3d7a4422179956709f0fb6968dcaaa97f31714b12740b13453210b8856b4e00b",
+      "bytes": 11955,
+      "retained_in_repository": false
+    },
+    {
+      "private_path": "/tmp/polars-recovery/final-integration-evidence/source-after-all-gates.json",
+      "sha256": "3d7a4422179956709f0fb6968dcaaa97f31714b12740b13453210b8856b4e00b",
+      "bytes": 11955,
+      "retained_in_repository": false
+    },
+    {
+      "private_path": "/tmp/polars-recovery/final-integration-evidence/source-final-file-set.json",
+      "sha256": "3d7a4422179956709f0fb6968dcaaa97f31714b12740b13453210b8856b4e00b",
+      "bytes": 11955,
+      "retained_in_repository": false
+    },
+    {
+      "private_path": "/tmp/polars-recovery/final-integration-evidence/verify_installed.py",
+      "sha256": "9b39bfdce5accc7eaaf109153006a8f47467e4fba7e73cfb2eed9e3aec6d0f23",
+      "bytes": 8537,
+      "retained_in_repository": false
+    },
+    {
+      "private_path": "/tmp/polars-recovery/final-integration-evidence/gate-runner.log",
+      "sha256": "cc714505a659ac9f93f52d23fb04154e58f4d2f99c8191c87a5e52169b379fbc",
+      "bytes": 596,
+      "retained_in_repository": false
+    },
+    {
+      "private_path": "/tmp/polars-recovery/final-integration-evidence/verify_remaining.py",
+      "sha256": "83da8fe10d772cdefd9482e7dfbca62b3f01351a0c2c0d83f61ec43468ba8a8b",
+      "bytes": 6481,
+      "retained_in_repository": false
+    },
+    {
+      "private_path": "/tmp/polars-recovery/final-integration-evidence/remaining-gates.log",
+      "sha256": "96a62351edfffbe92a548ceec169820f9c10046b922a90abf32896009f68c137",
+      "bytes": 1664,
+      "retained_in_repository": false
+    },
+    {
+      "private_path": "/tmp/polars-recovery/final-integration-evidence/verification-resume-provenance.json",
+      "sha256": "31c925d7f07e57f1a11546e983754235975328d326dda4514fb436aa77fd900c",
+      "bytes": 1098,
+      "retained_in_repository": false
+    },
+    {
+      "private_path": "/tmp/polars-recovery/final-integration-evidence/finish_record_only.py",
+      "sha256": "13add3d34d42c46c1c6b674b7e4448f9abdbad83a79e05dddc0c9bffb1271c28",
+      "bytes": 5009,
+      "retained_in_repository": false
+    },
+    {
+      "private_path": "/tmp/polars-recovery/final-integration-evidence/record-completion.log",
+      "sha256": "93daaf4be5804a2e87591ff2ef4b31b1869e7e3ce584de579ee8796cc94c7619",
+      "bytes": 2959,
+      "retained_in_repository": false
+    },
+    {
+      "private_path": "/tmp/polars-recovery/final-integration-evidence/build_and_rust.py",
+      "sha256": "50a12c0fffb8a8c1c566375bfa58ad48bd15f6a178b8d1b4be23a2369b780699",
+      "bytes": 2813,
+      "retained_in_repository": false
+    },
+    {
+      "private_path": "/tmp/polars-recovery/engulf-consumer-evidence/final-window/original-mac.npz",
+      "sha256": "63067603c940fbd5451b2b66f427553f1c28f656839515e4c7d55242f49f1977",
+      "bytes": 11298078,
+      "retained_in_repository": false
+    },
+    {
+      "private_path": "/tmp/polars-recovery/integration-evidence/candidate.npz",
+      "sha256": "e902065788fdbf90c54a9c39c5968a58e25ae5e432539c8def4f00bb95483abf",
+      "bytes": 11298697,
+      "retained_in_repository": false
+    },
+    {
+      "private_path": "/tmp/polars-recovery/mavp-uniform-evidence/candidate.npz",
+      "sha256": "e902065788fdbf90c54a9c39c5968a58e25ae5e432539c8def4f00bb95483abf",
+      "bytes": 11298697,
+      "retained_in_repository": false
+    },
+    {
+      "private_path": "/tmp/polars-recovery/final-integration-evidence/wheels/polars_talib-0.2.1-cp310-abi3-macosx_11_0_arm64.whl",
+      "sha256": "d7982d6ea7b13e11f923b5d6b2dc82fc5c0ac38bfc7a63f299e0f29cb37e233a",
+      "bytes": 4712858,
+      "retained_in_repository": false
+    },
+    {
+      "private_path": "/tmp/polars-recovery/mavp-uniform-env/lib/python3.12/site-packages/polars_talib/_polars_talib.abi3.so",
+      "sha256": "9a919626915cda3a2e1fe2e42a8a6fbe254fb233abe41cec1ef6cd3084d0bb11",
+      "bytes": 20329808,
+      "retained_in_repository": false
+    },
+    {
+      "private_path": "/tmp/polars-recovery/mavp-uniform-polars120/lib/python3.12/site-packages/polars_talib/_polars_talib.abi3.so",
+      "sha256": "9a919626915cda3a2e1fe2e42a8a6fbe254fb233abe41cec1ef6cd3084d0bb11",
+      "bytes": 20329808,
+      "retained_in_repository": false
+    },
+    {
+      "private_path": "/tmp/polars-recovery/mavp-uniform-polars21/lib/python3.12/site-packages/polars_talib/_polars_talib.abi3.so",
+      "sha256": "9a919626915cda3a2e1fe2e42a8a6fbe254fb233abe41cec1ef6cd3084d0bb11",
+      "bytes": 20329808,
+      "retained_in_repository": false
+    }
+  ]
+}

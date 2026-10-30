@@ -1,0 +1,443 @@
+{
+  "decision": "RETAIN916 for final composition with scoped uniform benefits and remaining C losses explicit",
+  "isolated_component_comparison": true,
+  "not_evidence_for_later_combined_head": true,
+  "run": 40970023623,
+  "run_url": "https://github.com/Yvictor/polars_ta_extension/actions/runs/40970023623",
+  "controller": "5171ea5583f83766da05ef0d1f8bc69091063369",
+  "job": 123784169502,
+  "artifact": 12945010556,
+  "artifact_url": "https://github.com/Yvictor/polars_ta_extension/actions/runs/40970023623/artifacts/12945010556",
+  "artifact_bytes": 2560047031,
+  "artifact_zip_sha256": "d1c657249dc0142c78fba54ed82e719cc85cfe34e13fff3973daf46ac34b3255",
+  "extracted_files": 13460,
+  "pins": {
+    "original": "b2bbc26d41ec80823c8bffb0cc436a97f29911cc",
+    "prior": "56f6d5fb139031c20d86d7e818e7d267eb834295",
+    "combined": "0eb91280cf5d13095cbfdc6f8bcc477cfbcd1498",
+    "candidate": "916b0de68369df410559b6dc651731cf4c36b94c"
+  },
+  "runtime": {
+    "1": {
+      "cpu": "Intel(R) Xeon(R) 6973P-C",
+      "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+      "python": "3.12.15",
+      "polars": "1.44.2",
+      "numpy": "2.5.3",
+      "rust": "rustc 1.90.0 (1159e78c4 2025-09-14)",
+      "profile": "release (maturin --release --locked), portable CPU target",
+      "affinity": [
+        0
+      ]
+    },
+    "4": {
+      "cpu": "Intel(R) Xeon(R) 6973P-C",
+      "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+      "python": "3.12.15",
+      "polars": "1.44.2",
+      "numpy": "2.5.3",
+      "rust": "rustc 1.90.0 (1159e78c4 2025-09-14)",
+      "profile": "release (maturin --release --locked), portable CPU target",
+      "affinity": [
+        0,
+        1,
+        2,
+        3
+      ]
+    }
+  },
+  "protocol": {
+    "cases": 32,
+    "arms": 4,
+    "threads": [
+      1,
+      4
+    ],
+    "rounds": 12,
+    "order": "Four Williams orders repeated three times",
+    "samples": 31,
+    "warmups": 5,
+    "children": 3072,
+    "raw_samples": 95232,
+    "physical_IPC_files": 24,
+    "own_arm_query_goldens": 8,
+    "full_corpus_cases_per_arm": 10624,
+    "checked_corpus_values_per_comparison": 2167654,
+    "pairwise_comparisons": 6,
+    "all_pair_rows": 384
+  },
+  "approved_auditor": {
+    "reviewer": "/root/combined_review",
+    "approved_at_utc": "2026-10-29T23:10:45.490965+00:00",
+    "run": 40970023623,
+    "auditor_sha256": "c2bee85f744553ab3b9a1f96288b7c5de0e8dfc668dc2ae20e78f48d69b746a5",
+    "inputs_sha256": "c1199e1522ee04c0031b992d6b8b4d4eb6cc2468cdc9e37ec9097ad9266cf5e8",
+    "shared_core_sha256": "b8c0b004daac5d920835c7a316cf97919cc3a13633eeecd860fdd02ab669cba9",
+    "trust_sha256": "eebbfe55a7479a1cfb94477faca536dbbcd10538d067a6feed08a500bd84dac6",
+    "independent_tests": "19passed10.99s",
+    "uniform_raw_access": false,
+    "conditions": "Run only after root officialZIP/SHA/READY verification; no numerical/statistical/provenance rulechanges in response to measurements; preserve all384pairs/allslowercontrols and explicit limitations."
+  },
+  "source_files": {
+    "REPORT.md": {
+      "source": "/tmp/polars-recovery/audit-mavp-uniform/REPORT.md",
+      "sha256": "270278a7edbbe0689ef93016a9021c45af6345b02ef79b7bd02e2e4e91b729eb",
+      "bytes": 12917,
+      "copy": "byte-identical"
+    },
+    "all-384-comparisons.csv": {
+      "source": "/tmp/polars-recovery/audit-mavp-uniform/all-384-comparisons.csv",
+      "sha256": "b6e751db6ab9baf9157880d5963b332468bd63838f34e9e84fc7e41a54a1c2cb",
+      "bytes": 297971,
+      "copy": "byte-identical"
+    },
+    "all-slower-medians.csv": {
+      "source": "/tmp/polars-recovery/audit-mavp-uniform/all-slower-medians.csv",
+      "sha256": "624b5c35479050d26efc75a552692daa2b1d7f912fb3f295f6193811199d1c5d",
+      "bytes": 105991,
+      "copy": "byte-identical"
+    },
+    "all-slower-medians.json": {
+      "source": "/tmp/polars-recovery/audit-mavp-uniform/all-slower-medians.json",
+      "sha256": "b02cfcd821f3775e1ba75430b4c42e4e2a2944804b0b9aee956ac78ada6981d3",
+      "bytes": 214996,
+      "copy": "byte-identical"
+    },
+    "comparison-inventory.json": {
+      "source": "/tmp/polars-recovery/audit-mavp-uniform/comparison-inventory.json",
+      "sha256": "2b1d89da72b95b17bd6bd491af0c448477bfc407c4ecf993e3ea4443cd63fd61",
+      "bytes": 6636,
+      "copy": "byte-identical"
+    },
+    "audit-result.json": {
+      "source": "/tmp/polars-recovery/audit-mavp-uniform/audit-result.json",
+      "sha256": "91a8ffa42cd2152f01893005ff179ca7d8628b99b026c1cb1340ae854681699d",
+      "bytes": 985175,
+      "copy": "byte-identical"
+    },
+    "report-provenance.json": {
+      "source": "/tmp/polars-recovery/audit-mavp-uniform/report-provenance.json",
+      "sha256": "7924e75ebdf1c6d419d1da7c3522a8fdebd9e516f8f687261add3f96a1b5dc0e",
+      "bytes": 1935,
+      "copy": "byte-identical"
+    },
+    "INDEPENDENT-384-ROW-REVIEW.json": {
+      "source": "/tmp/polars-recovery/audit-mavp-uniform/INDEPENDENT-384-ROW-REVIEW.json",
+      "sha256": "72a4a0d8182e7b5816b221166b2735b309328e5a94306e9bcb57457ebf072335",
+      "bytes": 2889,
+      "copy": "byte-identical"
+    },
+    "summary.log": {
+      "source": "/tmp/polars-recovery/audit-mavp-uniform/summary.log",
+      "sha256": "52da208977cb3b202a546fa938110f8a55c0f2a62894c29a4719524f67a2e8be",
+      "bytes": 70236,
+      "copy": "byte-identical"
+    },
+    "raw-replay-first.log": {
+      "source": "/tmp/polars-recovery/audit-mavp-uniform/raw-replay-first.log",
+      "sha256": "83593398126757a68613428160f73e52d89e026e99be812618de589360f31074",
+      "bytes": 147,
+      "copy": "byte-identical"
+    },
+    "raw-replay-first-exit.json": {
+      "source": "/tmp/polars-recovery/audit-mavp-uniform/raw-replay-first-exit.json",
+      "sha256": "500f2cfa688d2cb48753f20bea3c404018023d47c6d060fb11c8d7366434d94a",
+      "bytes": 574,
+      "copy": "byte-identical"
+    },
+    "summarize.py": {
+      "source": "/tmp/polars-recovery/audit-mavp-uniform/summarize.py",
+      "sha256": "b786904062b764f5e3787a00c0602a2129e707807920c19dd68f0e9d7f894610",
+      "bytes": 2953,
+      "copy": "byte-identical"
+    },
+    "write_report.py": {
+      "source": "/tmp/polars-recovery/audit-mavp-uniform/write_report.py",
+      "sha256": "099e26c45953e420f34283b77205c5a7d5357bbd8e601f4f3e938a9501159bde",
+      "bytes": 9306,
+      "copy": "byte-identical"
+    },
+    "independent-review.json": {
+      "source": "/tmp/polars-recovery/audit-mavp-uniform/independent-review.json",
+      "sha256": "3a9a61ee9b39a20135fbd86363e69d1caf7d7f4405c8b6600f04c416d42ee6ab",
+      "bytes": 763,
+      "copy": "byte-identical"
+    },
+    "audit/audit.py": {
+      "source": "/tmp/polars-recovery/audit-mavp-uniform/audit.py",
+      "sha256": "c2bee85f744553ab3b9a1f96288b7c5de0e8dfc668dc2ae20e78f48d69b746a5",
+      "bytes": 28679,
+      "copy": "byte-identical"
+    },
+    "audit/inputs.py": {
+      "source": "/tmp/polars-recovery/audit-mavp-uniform/inputs.py",
+      "sha256": "c1199e1522ee04c0031b992d6b8b4d4eb6cc2468cdc9e37ec9097ad9266cf5e8",
+      "bytes": 9105,
+      "copy": "byte-identical"
+    },
+    "audit/shared_core.py": {
+      "source": "/tmp/polars-recovery/audit-mavp-uniform/shared_core.py",
+      "sha256": "b8c0b004daac5d920835c7a316cf97919cc3a13633eeecd860fdd02ab669cba9",
+      "bytes": 31665,
+      "copy": "byte-identical"
+    },
+    "audit/prepare_trust.py": {
+      "source": "/tmp/polars-recovery/audit-mavp-uniform/prepare_trust.py",
+      "sha256": "db0f4eb13f4df8985d8870ae73a1b3e3751c9fe38faf2281d1a9e3d32a23743b",
+      "bytes": 4894,
+      "copy": "byte-identical"
+    },
+    "audit/trusted.json": {
+      "source": "/tmp/polars-recovery/audit-mavp-uniform/trusted.json",
+      "sha256": "eebbfe55a7479a1cfb94477faca536dbbcd10538d067a6feed08a500bd84dac6",
+      "bytes": 118605,
+      "copy": "byte-identical"
+    },
+    "audit/test_ledger.py": {
+      "source": "/tmp/polars-recovery/audit-mavp-uniform/test_ledger.py",
+      "sha256": "f972b1ab59e0bb12615bc173f198a41c222ca13652b7d4b5c7a36254cd8dabf5",
+      "bytes": 8869,
+      "copy": "byte-identical"
+    },
+    "audit/test_inputs.py": {
+      "source": "/tmp/polars-recovery/audit-mavp-uniform/test_inputs.py",
+      "sha256": "abc087a9e9c9cb85f9393f00d573ff8ecdfaab7601890abf65352a2bc3114908",
+      "bytes": 6979,
+      "copy": "byte-identical"
+    },
+    "audit/test_boundaries.py": {
+      "source": "/tmp/polars-recovery/audit-mavp-uniform/test_boundaries.py",
+      "sha256": "36ff6f96b9928f04ab8de73a5aeb022df0762af9e729bcc57f6e1cdc8db241a5",
+      "bytes": 4950,
+      "copy": "byte-identical"
+    },
+    "audit/test_provenance.py": {
+      "source": "/tmp/polars-recovery/audit-mavp-uniform/test_provenance.py",
+      "sha256": "425ccafc5433d1fd2e3288bed7189c6b8d69b629c036fa4c7978076f02fc00d1",
+      "bytes": 5687,
+      "copy": "byte-identical"
+    },
+    "audit/review-ready.json": {
+      "source": "/tmp/polars-recovery/audit-mavp-uniform/review-ready.json",
+      "sha256": "7970a56bca615f76b9454256e97af46ec7943f18dc0d1715b766894df09fa964",
+      "bytes": 1585,
+      "copy": "byte-identical"
+    },
+    "audit/independent-review.json": {
+      "source": "/tmp/polars-recovery/audit-mavp-uniform/independent-review.json",
+      "sha256": "3a9a61ee9b39a20135fbd86363e69d1caf7d7f4405c8b6600f04c416d42ee6ab",
+      "bytes": 763,
+      "copy": "byte-identical"
+    },
+    "audit/prepare-trust.log": {
+      "source": "/tmp/polars-recovery/audit-mavp-uniform/prepare-trust.log",
+      "sha256": "a9634260f1f94eb5cae0e811135eaf175dd3bc04da9a6d3459ceae9eddd28da7",
+      "bytes": 1674,
+      "copy": "byte-identical"
+    },
+    "official/artifact-metadata.json": {
+      "source": "/tmp/polars-recovery/ci-mavp-uniform/artifact-metadata.json",
+      "sha256": "979004af0f735b8f6e785981bd352ffee088bec064c40e463b4177b78cd3c412",
+      "bytes": 738,
+      "copy": "byte-identical"
+    },
+    "official/run.json": {
+      "source": "/tmp/polars-recovery/ci-mavp-uniform/run.json",
+      "sha256": "1424ce5d8052ecd85be2561cddb99de19aade23f267dc37e709c8e7aabe7f491",
+      "bytes": 12918,
+      "copy": "byte-identical"
+    },
+    "official/job.json": {
+      "source": "/tmp/polars-recovery/ci-mavp-uniform/job.json",
+      "sha256": "893c24a48f8e4c57069f46f2b2f96a0238b30fa25bc5eeb24b86660bcecda3b0",
+      "bytes": 5228,
+      "copy": "byte-identical"
+    },
+    "official/READY": {
+      "source": "/tmp/polars-recovery/ci-mavp-uniform/READY",
+      "sha256": "5dae5e4500849b2e68aaee7719a498fd28bd95b4b8cbd60f4c577372327d992d",
+      "bytes": 329,
+      "copy": "byte-identical"
+    },
+    "official/extracted-sha256.json": {
+      "source": "/tmp/polars-recovery/ci-mavp-uniform/extracted-sha256.json",
+      "sha256": "0374ef3ee48af3a61a2238594985a31229e7c7f7067787ad58b7376f9d4cec49",
+      "bytes": 2454237,
+      "copy": "byte-identical"
+    },
+    "local-gates/GATES_COMPLETE.json": {
+      "source": "/tmp/polars-recovery/mavp-uniform-evidence/GATES_COMPLETE.json",
+      "sha256": "4646343a57014e732b152b007def7141b0eeb508e56ebc4ffeaf020838fad11f",
+      "bytes": 2078,
+      "copy": "byte-identical"
+    },
+    "local-gates/GATES_COMPLETE-ERRATA.json": {
+      "source": "/tmp/polars-recovery/mavp-uniform-evidence/GATES_COMPLETE-ERRATA.json",
+      "sha256": "673976f4e96b65598e55cf4a247eff9da792111d075e5d25fbf42fe13db6776a",
+      "bytes": 3650,
+      "copy": "byte-identical"
+    },
+    "local-gates/immutable-candidate.json": {
+      "source": "/tmp/polars-recovery/mavp-uniform-evidence/immutable-candidate.json",
+      "sha256": "b8a061eb44635651573829f1d0f50949642428d41825f0a99a79a1c6722fb393",
+      "bytes": 764,
+      "copy": "byte-identical"
+    },
+    "local-gates/collection-node-diff.json": {
+      "source": "/tmp/polars-recovery/mavp-uniform-evidence/collection-node-diff.json",
+      "sha256": "69a68e1d49e20b840a0c6fa589a95df30a8571e35c597312a616dde849768d4c",
+      "bytes": 171424,
+      "copy": "byte-identical"
+    },
+    "local-gates/installed-provenance.json": {
+      "source": "/tmp/polars-recovery/mavp-uniform-evidence/installed-provenance.json",
+      "sha256": "8f44c208e4a337fc6d5456dd051dffe2350b3cd811e8aabb50ee5268da18f745",
+      "bytes": 1693,
+      "copy": "byte-identical"
+    },
+    "local-gates/source-before.json": {
+      "source": "/tmp/polars-recovery/mavp-uniform-evidence/source-before.json",
+      "sha256": "d67c931605d25eeb523a9100bdcef8c7cbda8827e0cd86322ebbd72d0f24ed44",
+      "bytes": 5119,
+      "copy": "byte-identical"
+    },
+    "local-gates/source-after.json": {
+      "source": "/tmp/polars-recovery/mavp-uniform-evidence/source-after.json",
+      "sha256": "d67c931605d25eeb523a9100bdcef8c7cbda8827e0cd86322ebbd72d0f24ed44",
+      "bytes": 5119,
+      "copy": "byte-identical"
+    },
+    "local-gates/build-commands.json": {
+      "source": "/tmp/polars-recovery/mavp-uniform-evidence/build-commands.json",
+      "sha256": "504483fe2b6e2efaceae337033f5be41aa62aac176453356d4842805e97306c6",
+      "bytes": 1377,
+      "copy": "byte-identical"
+    },
+    "local-gates/rust-exit.json": {
+      "source": "/tmp/polars-recovery/mavp-uniform-evidence/rust-exit.json",
+      "sha256": "213088c927b2e71450f9fcab072fa4ac048630270b91c2cc5b6bfb8361d2e00c",
+      "bytes": 185,
+      "copy": "byte-identical"
+    },
+    "local-gates/same-mac0eb-byte-identity.json": {
+      "source": "/tmp/polars-recovery/mavp-uniform-evidence/same-mac0eb-byte-identity.json",
+      "sha256": "f7f61a144c63492bd94ac74cc20c96fcb75cc9a7161144ebc54e9becc7cd2649",
+      "bytes": 79,
+      "copy": "byte-identical"
+    },
+    "local-gates/same-mac0eb-exact.json": {
+      "source": "/tmp/polars-recovery/mavp-uniform-evidence/same-mac0eb-exact.json",
+      "sha256": "90ebd536351857808403391fd5764e705a6c6099a5da91ad5fd80ef71c56a23b",
+      "bytes": 977,
+      "copy": "byte-identical"
+    },
+    "local-gates/same-mac0eb-exact.log": {
+      "source": "/tmp/polars-recovery/mavp-uniform-evidence/same-mac0eb-exact.log",
+      "sha256": "0774127569a5012fe0fb0ccef3caba4e837eafa03719caa058cb8703f7e6fc1e",
+      "bytes": 974,
+      "copy": "byte-identical"
+    },
+    "local-gates/same-mac0eb-exact-exit.json": {
+      "source": "/tmp/polars-recovery/mavp-uniform-evidence/same-mac0eb-exact-exit.json",
+      "sha256": "e6f33c3f8ddba5a4059952a22f0014da130c4780e3e8af3f5633884ccf88434c",
+      "bytes": 416,
+      "copy": "byte-identical"
+    },
+    "local-gates/original-mac-tolerance.json": {
+      "source": "/tmp/polars-recovery/mavp-uniform-evidence/original-mac-tolerance.json",
+      "sha256": "a610793675d904d316c95e8a88384464b559dc47ab66efd8e9ea27a967d00069",
+      "bytes": 1584,
+      "copy": "byte-identical"
+    },
+    "local-gates/original-mac-tolerance.log": {
+      "source": "/tmp/polars-recovery/mavp-uniform-evidence/original-mac-tolerance.log",
+      "sha256": "7941a62cf992235ccdb23aa432e53dfb970e70e311ec34e4e4abe0883a22be94",
+      "bytes": 1581,
+      "copy": "byte-identical"
+    },
+    "local-gates/original-mac-tolerance-exit.json": {
+      "source": "/tmp/polars-recovery/mavp-uniform-evidence/original-mac-tolerance-exit.json",
+      "sha256": "d00687046ed5eb791c1afaa18126881e345c59fcc99ae92bbab07dfdc49d30e6",
+      "bytes": 426,
+      "copy": "byte-identical"
+    },
+    "local-gates/pytest-full-120.log": {
+      "source": "/tmp/polars-recovery/mavp-uniform-evidence/pytest-full-120.log",
+      "sha256": "2c307f109906cdb74837e7f20826e9c6959aedb66c893a9124e66d3d874c4506",
+      "bytes": 15941,
+      "copy": "byte-identical"
+    },
+    "local-gates/pytest-full-120-exit.json": {
+      "source": "/tmp/polars-recovery/mavp-uniform-evidence/pytest-full-120-exit.json",
+      "sha256": "3e636b7063e2021d71cce380c7c4e69a983576cf1c29263ad1ee21770f4ae8d8",
+      "bytes": 114,
+      "copy": "byte-identical"
+    },
+    "local-gates/pytest-full-144.log": {
+      "source": "/tmp/polars-recovery/mavp-uniform-evidence/pytest-full-144.log",
+      "sha256": "223819c1dfe44ddd944f3cd35be76ede70149a70c9e28612a91792ffd1be1e3c",
+      "bytes": 15941,
+      "copy": "byte-identical"
+    },
+    "local-gates/pytest-full-144-exit.json": {
+      "source": "/tmp/polars-recovery/mavp-uniform-evidence/pytest-full-144-exit.json",
+      "sha256": "6ae6f85e4d5bcedbd9a554dcfc541d0f05ece66dc0e34c362bfa3dd3a2a9c7be",
+      "bytes": 108,
+      "copy": "byte-identical"
+    },
+    "local-gates/pytest-full-21.log": {
+      "source": "/tmp/polars-recovery/mavp-uniform-evidence/pytest-full-21.log",
+      "sha256": "6a746463df2320da98d8c51feb5bb265e958b3e7c3ff0b1782521ae885608800",
+      "bytes": 15950,
+      "copy": "byte-identical"
+    },
+    "local-gates/pytest-full-21-exit.json": {
+      "source": "/tmp/polars-recovery/mavp-uniform-evidence/pytest-full-21-exit.json",
+      "sha256": "f70d80e6d1d464b6231ee918a5fe5f53e7f2a3d43362b8c93d6589e444311f3f",
+      "bytes": 113,
+      "copy": "byte-identical"
+    },
+    "local-gates/rust.log.json": {
+      "source": "/tmp/polars-recovery/mavp-uniform-evidence/rust.log",
+      "sha256": "3d852d50059b7aab66765a6cb71862a97788c9869f330b788d035da021d1d813",
+      "bytes": 5718,
+      "copy": "lossless UTF-8 JSON string; decoded bytes exactly equal original source",
+      "stored_sha256": "5b4640e55505cee78766a86e43c382cc16637d290c7620baff91f7d5de704261",
+      "stored_bytes": 5806,
+      "decoded_sha256": "3d852d50059b7aab66765a6cb71862a97788c9869f330b788d035da021d1d813",
+      "decoded_bytes": 5718
+    }
+  },
+  "derived_csv_rows": {
+    "uniform-vs-combined-16.csv": 16,
+    "fallback-vs-combined-32.csv": 32,
+    "controls-vs-combined-16.csv": 16,
+    "all-candidate-slower-C.csv": 24,
+    "short-interleaved-vs-combined.csv": 14
+  },
+  "derived_csv_policy": "Exact string records filtered from approved all-384-comparisons.csv; no numeric reformatting. Float parsing is used only for positive-latency selection. Parsed output rows exactly equal selected original rows.",
+  "local_gate_correction": "LOCAL-GATE-ERRATA.json; original Mac gate records/logs untouched and excluded from latency acceptance.",
+  "limits": [
+    "Trust frozen from immutable Git before any uniform-MAVP raw artifact/results access.",
+    "All24physical IPC inputs, all8own-arm/thread query goldens and4full corpora are retained. Timedfinal arrays are checked/hashed against each arm golden but not duplicated for every child.",
+    "Shared-target Cargo snapshots bind selected dependency edges/flags but may include old roots; no unique measuredELF-to-linkedrlib bridge is claimed. Source/wheel/actualELF compile and byte identities are checked.",
+    "Twelve process rounds and correlated31inner samples are descriptive; process ranges are not confidence intervals or multiple-comparison significance. No pooling runners or thread settings.",
+    "Fault counters are whole-process engine/Python/allocator/thread activity, not allocator-only causation. Zero-allocation evidence is separate from latency.",
+    "C finite differences use declared1e-10 policy with tighter tiny absolute tolerance; both-zero signs are strict. Native finite/signedzero/null/NaN/Inf positions are exact. NaNpayload/sign are outside the exact contract.",
+    "Actual normal-wheel bounds removal or cold-dispatch speedups are not established by source labels. Source route/early-split proofs are eligibility, not branch instrumentation.",
+    "The direct-window finite SMA oracle is independent of the rolling helper and uses declared C finite tolerance. EMA/WMA control arithmetic relies on retained original-C goldens; every native golden pair is exact including finite/signedzero/masks/NaN/Inf positions.",
+    "Explicit globally unfused100+900*random transform regenerates Linux volume bits; ARM Generator.uniform may fuse. This is exact input provenance, not numerical tolerance."
+  ],
+  "source_copy_counts": {
+    "byte_identical": 53,
+    "lossless_json_string": 1
+  },
+  "lossless_log_encoding": {
+    "file": "local-gates/rust.log.json",
+    "source_sha256": "3d852d50059b7aab66765a6cb71862a97788c9869f330b788d035da021d1d813",
+    "decoded_sha256": "3d852d50059b7aab66765a6cb71862a97788c9869f330b788d035da021d1d813",
+    "decode": "json.loads(path.read_text()).encode(\"utf-8\")",
+    "why": "Preserve the original final blank line without trimming it or waiving whitespace checks.",
+    "original_source_unchanged": true
+  }
+}

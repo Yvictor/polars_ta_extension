@@ -1,0 +1,21 @@
+threads,case,role,comparison,before_median_ms,after_median_ms,after_latency_percent,before_over_after_low,before_over_after_high,after_faster_rounds,status
+1,sarext/1000000,ordinary_sarext_no_negative_zero,prior_vs_alternative,10.504838,10.5377425,0.3132318651653643,0.932842821812393,1.0672488743848887,3,overlapping process ranges
+1,grouped_sarext/100x10000,ordinary_sarext_no_negative_zero,prior_vs_alternative,13.564793,13.6796085,0.8464227946567204,0.9013870885035329,1.0717987911433358,7,overlapping process ranges
+1,grouped_sarext/10000x100,ordinary_sarext_no_negative_zero,prior_vs_alternative,68.17009999999999,62.943166500000004,-7.667486918751754,1.0533034456744144,1.1286448885369635,12,disjoint faster process ranges
+1,grouped_sarext/2000x100_interleaved,ordinary_sarext_no_negative_zero,prior_vs_alternative,12.9264025,11.700109999999999,-9.486726875478324,1.0077353460403367,1.2256907350584167,12,disjoint faster process ranges
+1,sarext_reversal/1000000,ordinary_sarext_no_negative_zero,prior_vs_alternative,4.345620500000001,4.429545,1.93124319070197,0.8859209398591914,1.0634543833331487,3,overlapping process ranges
+1,grouped_sarext_reversal/100x10000,ordinary_sarext_no_negative_zero,prior_vs_alternative,7.220725,7.2167895,-0.05450283731897043,0.9254727767756622,1.1225378411974745,6,overlapping process ranges
+1,grouped_sarext_reversal/10000x100,ordinary_sarext_no_negative_zero,prior_vs_alternative,62.7135825,56.665392499999996,-9.644146864038595,1.061442392741115,1.147164036795483,12,disjoint faster process ranges
+1,grouped_sarext_reversal/2000x100_interleaved,ordinary_sarext_no_negative_zero,prior_vs_alternative,12.626191,11.376933000000001,-9.894179487701393,0.9815944751066832,1.1946089825538624,12,overlapping process ranges
+1,sarext_longzero/1000000,legitimate_long_zero_replay_stress,prior_vs_alternative,5.5633995,5.6407655000000005,1.3906245632728798,0.926837586825208,1.0779514765329055,4,overlapping process ranges
+1,grouped_sarext_longzero/10000x100,legitimate_long_zero_replay_stress,prior_vs_alternative,63.440101999999996,58.6220675,-7.594619724917839,1.035497077049892,1.133665142044808,12,disjoint faster process ranges
+4,sarext/1000000,ordinary_sarext_no_negative_zero,prior_vs_alternative,10.9216645,10.9093075,-0.11314209477868431,0.9514077238691002,1.0392982173104897,7,overlapping process ranges
+4,grouped_sarext/100x10000,ordinary_sarext_no_negative_zero,prior_vs_alternative,14.3399945,14.179172999999999,-1.1214892725377346,0.889689990434147,1.0688163355166191,6,overlapping process ranges
+4,grouped_sarext/10000x100,ordinary_sarext_no_negative_zero,prior_vs_alternative,72.605682,66.65123299999999,-8.201078532669126,1.031057616809282,1.204337345357187,12,disjoint faster process ranges
+4,grouped_sarext/2000x100_interleaved,ordinary_sarext_no_negative_zero,prior_vs_alternative,13.549224500000001,12.463531,-8.012956756307354,1.0359232310702406,1.1783516085032164,12,disjoint faster process ranges
+4,sarext_reversal/1000000,ordinary_sarext_no_negative_zero,prior_vs_alternative,4.421774,4.4527295,0.7000697005319578,0.9093184282444248,1.0738599663153034,5,overlapping process ranges
+4,grouped_sarext_reversal/100x10000,ordinary_sarext_no_negative_zero,prior_vs_alternative,7.5129395,7.6039650000000005,1.2115830295186036,0.8783803056108965,1.0395745700352201,3,overlapping process ranges
+4,grouped_sarext_reversal/10000x100,ordinary_sarext_no_negative_zero,prior_vs_alternative,65.872941,58.971497,-10.476902799891686,1.0858006206729367,1.1646620452253165,12,disjoint faster process ranges
+4,grouped_sarext_reversal/2000x100_interleaved,ordinary_sarext_no_negative_zero,prior_vs_alternative,11.9511505,10.734745,-10.178145610332667,1.0180598806519803,1.2283056875947302,12,disjoint faster process ranges
+4,sarext_longzero/1000000,legitimate_long_zero_replay_stress,prior_vs_alternative,5.5586825,5.5716525,0.2333286709575555,0.9629602106209249,1.0703770341535552,7,overlapping process ranges
+4,grouped_sarext_longzero/10000x100,legitimate_long_zero_replay_stress,prior_vs_alternative,66.9126305,60.291372,-9.895379169109187,1.0449319170760774,1.177005483770269,12,disjoint faster process ranges

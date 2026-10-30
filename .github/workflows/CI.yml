@@ -46,9 +46,6 @@ jobs:
         with:
           components: rustfmt
       - uses: astral-sh/setup-uv@v8.2.0
-      - name: CMake (native hosts)
-        if: runner.os != 'Linux'
-        run: uv pip install --system 'cmake>=4.2,<5'
       - name: Build self-contained release wheel
         uses: PyO3/maturin-action@v1.46.0
         with:
@@ -57,14 +54,11 @@ jobs:
           args: --release --locked --out dist
           sccache: 'true'
           rust-toolchain: '1.90.0'
+          # maturin-action installs sccache with python3; the container's
+          # system Python has no pip, unlike the manylinux interpreter.
           before-script-linux: |
             if test -x /opt/python/cp312-cp312/bin/python; then
               export PATH=/opt/python/cp312-cp312/bin:$PATH
-            fi
-            if command -v apk >/dev/null; then
-              apk add --no-cache cmake make
-            else
-              python3 -m pip install 'cmake>=4.2,<5'
             fi
       - name: Test installed wheel (native)
         if: ${{ !startsWith(matrix.name, 'musl-') }}
@@ -111,7 +105,10 @@ jobs:
       fail-fast: false
       matrix:
         python: ['3.10', '3.11', '3.13', '3.14']
-        polars: ['1.20.0', '1.44.2', '2.0.0']
+        polars: ['1.20.0', '1.44.2', '2.0.0', '2.1.0']
+        exclude:
+          - python: '3.10'
+            polars: '2.1.0'
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v6
@@ -136,18 +133,17 @@ jobs:
         with:
           python-version: '3.12'
       - uses: astral-sh/setup-uv@v8.2.0
-      - run: uv pip install --system maturin 'cmake>=4.2,<5' pytest numpy 'TA-Lib==0.8.1' 'polars==1.44.2' pytest-benchmark
+      - run: uv pip install --system maturin pytest numpy 'TA-Lib==0.8.1' 'polars==1.44.2' pytest-benchmark
       - name: Check Python dependency lock
         run: uv lock --check
       - name: Check generated wrappers are current
         run: |
           python scripts/generate_indicators.py
           python scripts/generate_skill_reference.py
-          git diff --exit-code -- src/generated.rs talib/src/generated.rs python/polars_talib/_generated.py python/polars_talib/_param_types.py docs/indicators.md plugins/polars-talib/skills/polars-talib/reference/functions.md
+          python scripts/generate_usage_manifest.py
+          git diff --exit-code -- src/generated.rs python/polars_talib/__init__.py python/polars_talib/_generated.py python/polars_talib/_param_types.py scripts/public_api_coverage.json docs/indicators.md plugins/polars-talib/skills/polars-talib/reference/functions.md
       - name: Rust crate tests
-        run: cargo test --manifest-path talib/Cargo.toml
-      - name: Validate system-library overrides
-        run: python scripts/check_build_overrides.py
+        run: cargo test --lib --locked
       - name: Build source distribution and install it without system TA-Lib
         run: |
           maturin sdist --out dist
@@ -158,41 +154,260 @@ jobs:
           name: sdist
           path: dist/*.tar.gz
 
-  benchmark:
-    name: Release benchmark
+  migration-differential:
+    name: Native migration / original release differential
     needs: wheels
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6
+        with:
+          path: candidate-source
+      - uses: actions/checkout@v6
+        with:
+          ref: b2bbc26d41ec80823c8bffb0cc436a97f29911cc
+          path: baseline-source
       - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
+      - uses: dtolnay/rust-toolchain@1.90.0
+      - uses: astral-sh/setup-uv@v8.2.0
       - uses: actions/download-artifact@v7
         with:
           name: wheels-linux-x64
-          path: dist
-      - uses: astral-sh/setup-uv@v8.2.0
-      # Informational: shared runners are too noisy to gate a release on a
-      # fixed regression threshold. The comparison and raw samples are kept as
-      # a job summary and artifact for humans to judge.
-      - name: Compare release wheels on the same runner
+          path: candidate-dist
+      - name: Build original release from the fixed baseline
+        working-directory: baseline-source
         run: |
-          uv venv .benchmark-base
-          uv venv .benchmark-candidate
-          uv pip install --python .benchmark-base 'polars-talib==0.1.6' 'polars==1.44.2' 'numpy==2.5.3'
-          uv pip install --python .benchmark-candidate dist/*.whl 'polars==1.44.2' 'numpy==2.5.3'
-          .benchmark-base/bin/python scripts/benchmark.py --output baseline.json --repeats 51 --pin-cpus 4
-          .benchmark-candidate/bin/python scripts/benchmark.py --output candidate.json --repeats 51 --pin-cpus 4
-          python scripts/compare_benchmarks.py baseline.json candidate.json --output comparison.md --report-only
-          cat comparison.md >> "$GITHUB_STEP_SUMMARY"
+          uv venv --python 3.12 .venv
+          uv pip install --python .venv maturin 'cmake>=4.2,<5' 'polars==1.44.2' 'numpy==2.5.3'
+          export PATH="$PWD/.venv/bin:$PATH"
+          maturin build --release --locked --out ../baseline-dist
+          uv pip install --python .venv --no-deps ../baseline-dist/*.whl
+      - name: Compare every public indicator including grouped and missing data
+        run: |
+          uv venv --python 3.12 candidate-env
+          uv pip install --python candidate-env candidate-dist/*.whl 'polars==1.44.2' 'numpy==2.5.3'
+          baseline-source/.venv/bin/python candidate-source/scripts/migration_probe.py --capture baseline.npz
+          candidate-env/bin/python candidate-source/scripts/migration_probe.py --capture candidate.npz
+          candidate-env/bin/python candidate-source/scripts/migration_probe.py --compare baseline.npz candidate.npz --report differential.json
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: benchmark
+          name: migration-differential
           path: |
-            baseline.json
-            candidate.json
-            comparison.md
+            baseline.npz
+            candidate.npz
+            differential.json
+
+  benchmark:
+    name: Release benchmark / original vs delivered vs optimized adapter
+    runs-on: ubuntu-24.04
+    timeout-minutes: 330
+    env:
+      RUSTUP_TOOLCHAIN: '1.90.0'
+      CARGO_PROFILE_RELEASE_DEBUG: 'false'
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          path: candidate-source
+      - uses: actions/checkout@v6
+        with:
+          ref: b2bbc26d41ec80823c8bffb0cc436a97f29911cc
+          path: original-source
+      - uses: actions/checkout@v6
+        with:
+          ref: 56f6d5fb139031c20d86d7e818e7d267eb834295
+          path: prior-source
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - uses: dtolnay/rust-toolchain@1.90.0
+      - uses: astral-sh/setup-uv@v8.2.0
+      # All three builds are portable release wheels on this one runner. No
+      # published wheel, local timing or wheel built by another job is compared.
+      - name: Build all three release wheels sequentially
+        run: |
+          mkdir -p benchmark-results/controller
+          cp candidate-source/scripts/adapter_ci_benchmark.py candidate-source/scripts/migration_benchmark.py candidate-source/scripts/regression_inventory.py candidate-source/scripts/adapter_benchmark_cases.json benchmark-results/controller/
+          cp candidate-source/.github/workflows/CI.yml benchmark-results/controller/workflow.yml
+          for side in original prior candidate; do
+            uv venv --python 3.12 "$side-env"
+            uv pip install --python "$side-env" 'maturin==1.15.0' 'cmake==4.4.4' 'polars==1.44.2' 'numpy==2.5.3'
+          done
+          export PATH="$PWD/original-env/bin:$PATH"
+          for side in original prior candidate; do
+            (cd "$side-source" && maturin build --release --locked --out "../$side-dist") > "benchmark-results/$side-build.log" 2>&1
+            uv pip install --python "$side-env" --no-deps "$side-dist/"*.whl
+            uv pip freeze --python "$side-env" > "benchmark-results/$side-dependencies.txt"
+          done
+          sha256sum original-dist/*.whl prior-dist/*.whl candidate-dist/*.whl > benchmark-results/wheel-sha256.txt
+          rustc --version --verbose > benchmark-results/toolchain.txt
+          cc --version >> benchmark-results/toolchain.txt
+          cmake --version >> benchmark-results/toolchain.txt
+          lscpu > benchmark-results/lscpu.txt
+          cat /proc/meminfo > benchmark-results/meminfo.txt
+      - name: Original compatibility and exact delivered versus candidate corpus
+        run: |
+          mkdir -p benchmark-results/corpus
+          for side in original prior candidate; do
+            "$side-env/bin/python" candidate-source/scripts/migration_probe.py --capture "benchmark-results/corpus/$side.npz"
+          done
+          candidate-env/bin/python candidate-source/scripts/migration_probe.py --compare benchmark-results/corpus/original.npz benchmark-results/corpus/candidate.npz --report benchmark-results/corpus/original-vs-candidate.json
+          candidate-env/bin/python candidate-source/scripts/migration_probe.py --compare benchmark-results/corpus/prior.npz benchmark-results/corpus/candidate.npz --exact --report benchmark-results/corpus/prior-vs-candidate-exact.json
+      - name: Measure isolated Rust setup, preallocated kernel and full adapter
+        working-directory: candidate-source
+        env:
+          PYO3_PYTHON: ${{ github.workspace }}/candidate-env/bin/python
+        run: |
+          cargo test --release --lib --locked adapter_cost_probe -- --ignored --nocapture > ../benchmark-results/rust-cost-probe.log 2>&1
+      - name: Validate workloads and alternate fresh single-case three-build processes
+        run: |
+          candidate-env/bin/python candidate-source/scripts/adapter_ci_benchmark.py \
+            --original-python original-env/bin/python --original-source original-source \
+            --prior-python prior-env/bin/python --prior-source prior-source \
+            --candidate-python candidate-env/bin/python --candidate-source candidate-source \
+            --output benchmark-results --rounds 6 --repeats 51 --thread-counts 1 4
+          cat benchmark-results/comparison.md >> "$GITHUB_STEP_SUMMARY"
+          cat benchmark-results/regression-inventory.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: migration-adapter-benchmark
+          path: |
+            benchmark-results/
+            original-dist/*.whl
+            prior-dist/*.whl
+            candidate-dist/*.whl
+          if-no-files-found: error
+
+  upstream-mavp-evidence:
+    name: Upstream MAVP / same-runner correctness and performance
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          repository: Yvictor/ta-lib-native
+          ref: 7f395b820c2af5941542d1d2d5751c22d38663c2
+          path: candidate
+      - uses: actions/checkout@v7
+        with:
+          repository: TA-Lib/ta-lib
+          ref: 4334163d3a1f5019aa9051342316b936a4dfb994
+          path: baseline
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - uses: dtolnay/rust-toolchain@1.97.0
+        with:
+          components: clippy,rustfmt
+      - name: Install CMake runtime
+        run: python -m pip install cmake==4.4.4
+      - name: Verify regeneration, Rust contracts and C regression
+        working-directory: candidate
+        run: |
+          python scripts/quiet.py noisy mavp-ci --defer=60 -- python scripts/build.py regen-check
+          python scripts/quiet.py noisy mavp-ci --defer=60 -- cargo test --locked -p ta-lib --manifest-path ta_codegen/output/rust/Cargo.toml
+          python scripts/quiet.py noisy mavp-ci --defer=60 -- cargo clippy --locked -p ta-lib --all-targets --manifest-path ta_codegen/output/rust/Cargo.toml -- -D warnings
+          python scripts/quiet.py noisy mavp-ci --defer=60 -- python scripts/build.py ta_regtest
+          bin/ta_regtest
+      - name: Build both release libraries and identical thin-LTO harness
+        working-directory: candidate
+        run: |
+          python scripts/quiet.py noisy mavp-ci --defer=60 -- python scripts/bench_mavp_fixed.py \
+            --baseline ../baseline-bench --baseline-source ../baseline \
+            --candidate ../candidate-bench --candidate-source . --output ../mavp-results --build-only
+          lscpu > ../mavp-results/lscpu.txt
+          cat /proc/meminfo > ../mavp-results/meminfo.txt
+      - name: Compare full captures then alternate twelve fresh-process pairs
+        working-directory: candidate
+        run: |
+          python scripts/quiet.py measure mavp-ci 300 --queue=300 -- python scripts/bench_mavp_fixed.py \
+            --baseline ../baseline-bench --baseline-source ../baseline \
+            --candidate ../candidate-bench --candidate-source . --output ../mavp-results --pairs 12 --repeats 31
+          cat ../mavp-results/comparison.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: mavp-fixed-period-evidence
+          path: |
+            mavp-results/*.json
+            mavp-results/*.jsonl
+            mavp-results/*.md
+            mavp-results/*.log
+            mavp-results/*.txt
+            mavp-results/*.gz
+            baseline-bench
+            candidate-bench
+
+
+  upstream-loop-evidence:
+    name: Upstream Rust loop windows / correctness and performance
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          path: control-source
+      - uses: actions/checkout@v7
+        with:
+          repository: Yvictor/ta-lib-native
+          ref: 5bb1c74b25248f37a0764bc6d07dd673b4749cc6
+          path: candidate
+      - uses: actions/checkout@v7
+        with:
+          repository: TA-Lib/ta-lib
+          ref: 4334163d3a1f5019aa9051342316b936a4dfb994
+          path: baseline
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - uses: dtolnay/rust-toolchain@1.97.0
+        with:
+          components: clippy,rustfmt
+      - name: Verify regeneration, generator proofs and Rust contracts
+        working-directory: candidate
+        run: |
+          python -m pip install cmake==4.4.4
+          python scripts/quiet.py noisy loop-ci --defer=60 -- python scripts/build.py regen-check
+          python scripts/quiet.py noisy loop-ci --defer=60 -- cargo test --locked --manifest-path ta_codegen/generator/Cargo.toml
+          python scripts/quiet.py noisy loop-ci --defer=60 -- cargo test --locked -p ta-lib --manifest-path ta_codegen/output/rust/Cargo.toml
+          python scripts/quiet.py noisy loop-ci --defer=60 -- cargo clippy --locked --manifest-path ta_codegen/generator/Cargo.toml -- -D warnings
+          python scripts/quiet.py noisy loop-ci --defer=60 -- cargo clippy --locked -p ta-lib --all-targets --manifest-path ta_codegen/output/rust/Cargo.toml -- -D warnings
+          python scripts/quiet.py noisy loop-ci --defer=60 -- python scripts/build.py ta_regtest
+          bin/ta_regtest
+      - name: Build both immutable release libraries and identical harness
+        working-directory: candidate
+        run: |
+          python scripts/quiet.py noisy loop-ci --defer=60 -- python ../control-source/scripts/upstream_loop_benchmark.py \
+            --baseline-source ../baseline --candidate-source . --output ../loop-results --build-only \
+            --expected-baseline-commit 4334163d3a1f5019aa9051342316b936a4dfb994 \
+            --expected-candidate-commit 5bb1c74b25248f37a0764bc6d07dd673b4749cc6
+          lscpu > ../loop-results/lscpu.txt
+          cat /proc/meminfo > ../loop-results/meminfo.txt
+      - name: Verify full captures then alternate twelve fresh-process pairs
+        working-directory: candidate
+        run: |
+          python scripts/quiet.py measure loop-ci 900 --queue=300 -- python ../control-source/scripts/upstream_loop_benchmark.py \
+            --baseline-source ../baseline --candidate-source . --output ../loop-results --pairs 12 --repeats 31 \
+            --expected-baseline-commit 4334163d3a1f5019aa9051342316b936a4dfb994 \
+            --expected-candidate-commit 5bb1c74b25248f37a0764bc6d07dd673b4749cc6
+          cat ../loop-results/comparison.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: upstream-loop-window-evidence
+          path: |
+            loop-results/*.json
+            loop-results/*.jsonl
+            loop-results/*.md
+            loop-results/*.log
+            loop-results/*.txt
+            loop-results/*.gz
+            loop-results/bin/*
+            loop-results/target-baseline/release/libta_lib.rlib
+            loop-results/target-candidate/release/libta_lib.rlib
 
   release:
     name: Publish tested wheels
@@ -205,7 +420,7 @@ jobs:
     # native-plugins validates repository files with third-party CLIs fetched
     # from npm at run time; it is a required PR check but must not be able to
     # block wheel publication when npm or those CLI versions are unavailable.
-    needs: [wheels, compatibility, source]
+    needs: [wheels, compatibility, source, migration-differential]
     runs-on: ubuntu-24.04
     permissions:
       contents: write

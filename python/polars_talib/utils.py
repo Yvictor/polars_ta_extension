@@ -3,7 +3,7 @@ from __future__ import annotations
 from enum import IntEnum
 from numbers import Integral, Real
 from ._missing import WINDOW_BOUNDED
-from ._param_types import INTEGER_PARAMETERS
+from ._param_types import INTEGER_PARAMETERS, REAL_PARAMETERS
 from pathlib import Path
 import re
 from typing import Any, Sequence
@@ -49,6 +49,10 @@ def register_plugin(*, symbol: str, is_elementwise: bool,
                 if not -(2**31) <= value < 2**31:
                     raise ValueError(f"{symbol}: {key} must fit a signed 32-bit integer")
                 kwargs[key] = int(value)
+        for key in REAL_PARAMETERS.get(symbol, ()):
+            if key in kwargs and isinstance(kwargs[key], Real) and not isinstance(kwargs[key], bool):
+                # NumPy scalar pickles contain globals serde-pickle cannot resolve.
+                kwargs[key] = float(kwargs[key])
         kwargs = {key: int(value) if isinstance(value, IntEnum) else value
                   for key, value in kwargs.items()}
     # A null input is a missing observation; TA-Lib would see it as NaN, whose

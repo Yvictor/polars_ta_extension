@@ -1,0 +1,14 @@
+{
+  "reference_gzip_sha256": "3d45bbc3c2903b75438c76907c0138c3a1f75a47117c5510fd0d3da93a9359d6",
+  "files": {
+    "real-option-manifest.json": {
+      "sha256": "e3f4071f208119f004473c96e531292b17e36e85774cdcc4be9fdd477426eeb5",
+      "bytes": 58975
+    },
+    "real-option-inputs.npz": {
+      "sha256": "b4048c33aae517d687ae980a6adf36aca13ac6f91879a7889b8353b55f10ff72",
+      "bytes": 9783
+    }
+  },
+  "manifest_LF": true
+}

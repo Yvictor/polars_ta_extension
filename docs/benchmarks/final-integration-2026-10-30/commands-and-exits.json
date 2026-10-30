@@ -1,0 +1,220 @@
+{
+  "record_scope": "Exact existing completed stage commands/exits; no stage was rerun for this archive.",
+  "stages": {
+    "rust": {
+      "source_file": "/tmp/polars-recovery/final-integration-evidence/rust-exit.json",
+      "source_sha256": "427ad842ffa269a219754c8fd79a27646ab1619a056508fc8dd961d06660b909",
+      "returncode": 0,
+      "command": [
+        "/Users/ec666/.rustup/toolchains/1.90.0-aarch64-apple-darwin/bin/cargo",
+        "test",
+        "--release",
+        "--offline",
+        "--locked",
+        "--lib",
+        "--",
+        "--test-threads=1"
+      ]
+    },
+    "wheel": {
+      "source_file": "/tmp/polars-recovery/final-integration-evidence/wheel-exit.json",
+      "source_sha256": "f73d74419776719094bbe21638944a66f19e27530eb4fd8345e6481f2e235ed8",
+      "returncode": 0,
+      "command": [
+        "/tmp/polars-recovery/mavp-uniform-env/bin/python",
+        "-m",
+        "maturin",
+        "build",
+        "--release",
+        "--offline",
+        "--locked",
+        "--out",
+        "/tmp/polars-recovery/final-integration-evidence/wheels"
+      ]
+    },
+    "install-144": {
+      "source_file": "/tmp/polars-recovery/final-integration-evidence/install-144-exit.json",
+      "source_sha256": "ed5c2ccdee08f974484f3280e4c8be47285221b29ad5d2d5e50c93ac297bd415",
+      "command": [
+        "/Users/ec666/.local/bin/uv",
+        "pip",
+        "install",
+        "--python",
+        "/tmp/polars-recovery/mavp-uniform-env/bin/python",
+        "--no-index",
+        "--no-deps",
+        "--reinstall",
+        "/tmp/polars-recovery/final-integration-evidence/wheels/polars_talib-0.2.1-cp310-abi3-macosx_11_0_arm64.whl"
+      ],
+      "returncode": 0
+    },
+    "install-120": {
+      "source_file": "/tmp/polars-recovery/final-integration-evidence/install-120-exit.json",
+      "source_sha256": "836c095e77ad76ab8afddc87c3b50f3022ecd402f81d59a4c00e32d4e81ed476",
+      "command": [
+        "/Users/ec666/.local/bin/uv",
+        "pip",
+        "install",
+        "--python",
+        "/tmp/polars-recovery/mavp-uniform-polars120/bin/python",
+        "--no-index",
+        "--no-deps",
+        "--reinstall",
+        "/tmp/polars-recovery/final-integration-evidence/wheels/polars_talib-0.2.1-cp310-abi3-macosx_11_0_arm64.whl"
+      ],
+      "returncode": 0
+    },
+    "install-21": {
+      "source_file": "/tmp/polars-recovery/final-integration-evidence/install-21-exit.json",
+      "source_sha256": "a71ac6f8699ecf389dbfaf1080fadd69ef5951f6c5dacd00abcffbcae6ece641",
+      "command": [
+        "/Users/ec666/.local/bin/uv",
+        "pip",
+        "install",
+        "--python",
+        "/tmp/polars-recovery/mavp-uniform-polars21/bin/python",
+        "--no-index",
+        "--no-deps",
+        "--reinstall",
+        "/tmp/polars-recovery/final-integration-evidence/wheels/polars_talib-0.2.1-cp310-abi3-macosx_11_0_arm64.whl"
+      ],
+      "returncode": 0
+    },
+    "capture": {
+      "source_file": "/tmp/polars-recovery/final-integration-evidence/capture-exit.json",
+      "source_sha256": "7f429b98715d9ef98e5f47818ce1088151830c41eedd8b4ddb6c653e1838e7d9",
+      "command": [
+        "/tmp/polars-recovery/mavp-uniform-env/bin/python",
+        "/tmp/polars-recovery/consumer-integration/scripts/migration_probe.py",
+        "--capture",
+        "/tmp/polars-recovery/final-integration-evidence/candidate.npz"
+      ],
+      "returncode": 0
+    },
+    "original_C-comparison": {
+      "source_file": "/tmp/polars-recovery/final-integration-evidence/original_C-comparison-exit.json",
+      "source_sha256": "5cf3b127506aca07348fa095218735f5d931a55e406dc8fda395234b385f08aa",
+      "command": [
+        "/tmp/polars-recovery/mavp-uniform-env/bin/python",
+        "/tmp/polars-recovery/consumer-integration/scripts/migration_probe.py",
+        "--compare",
+        "/tmp/polars-recovery/engulf-consumer-evidence/final-window/original-mac.npz",
+        "/tmp/polars-recovery/final-integration-evidence/candidate.npz",
+        "--report",
+        "/tmp/polars-recovery/final-integration-evidence/original_C-comparison.json"
+      ],
+      "returncode": 0
+    },
+    "native0eb-comparison": {
+      "source_file": "/tmp/polars-recovery/final-integration-evidence/native0eb-comparison-exit.json",
+      "source_sha256": "cbf08c9f31c1ec8820a623b27c014057623fb4a130e20806f4f0e2c4358236a3",
+      "command": [
+        "/tmp/polars-recovery/mavp-uniform-env/bin/python",
+        "/tmp/polars-recovery/consumer-integration/scripts/migration_probe.py",
+        "--compare",
+        "/tmp/polars-recovery/integration-evidence/candidate.npz",
+        "/tmp/polars-recovery/final-integration-evidence/candidate.npz",
+        "--report",
+        "/tmp/polars-recovery/final-integration-evidence/native0eb-comparison.json",
+        "--exact"
+      ],
+      "returncode": 0
+    },
+    "native916-comparison": {
+      "source_file": "/tmp/polars-recovery/final-integration-evidence/native916-comparison-exit.json",
+      "source_sha256": "c9cc2979ba7eca8c3bdeb063086e7eeebe24ee8784d5db380ce88229ca7f3648",
+      "command": [
+        "/tmp/polars-recovery/mavp-uniform-env/bin/python",
+        "/tmp/polars-recovery/consumer-integration/scripts/migration_probe.py",
+        "--compare",
+        "/tmp/polars-recovery/mavp-uniform-evidence/candidate.npz",
+        "/tmp/polars-recovery/final-integration-evidence/candidate.npz",
+        "--report",
+        "/tmp/polars-recovery/final-integration-evidence/native916-comparison.json",
+        "--exact"
+      ],
+      "returncode": 0
+    },
+    "collect-144": {
+      "source_file": "/tmp/polars-recovery/final-integration-evidence/collect-144-exit.json",
+      "source_sha256": "e3ab247668c31d5ad04c429af1aeb0a55f83a00b3aad00940d4f7fb23b6b70c3",
+      "command": [
+        "/tmp/polars-recovery/mavp-uniform-env/bin/python",
+        "-m",
+        "pytest",
+        "--collect-only",
+        "-q",
+        "tests",
+        "-p",
+        "no:cacheprovider"
+      ],
+      "returncode": 0
+    },
+    "collect-120": {
+      "source_file": "/tmp/polars-recovery/final-integration-evidence/collect-120-exit.json",
+      "source_sha256": "960a4c4bcc2a55d7dc720bb8a00f4f40ae739a3f4acf28ef802fb7d43e91f56f",
+      "command": [
+        "/tmp/polars-recovery/mavp-uniform-polars120/bin/python",
+        "-m",
+        "pytest",
+        "--collect-only",
+        "-q",
+        "tests",
+        "-p",
+        "no:cacheprovider"
+      ],
+      "returncode": 0
+    },
+    "collect-21": {
+      "source_file": "/tmp/polars-recovery/final-integration-evidence/collect-21-exit.json",
+      "source_sha256": "084284d92ea6cd5c8c38178292df11ae827c3b0b61c7457e74b47db55c67f0ff",
+      "command": [
+        "/tmp/polars-recovery/mavp-uniform-polars21/bin/python",
+        "-m",
+        "pytest",
+        "--collect-only",
+        "-q",
+        "tests",
+        "-p",
+        "no:cacheprovider"
+      ],
+      "returncode": 0
+    },
+    "pytest-full-144": {
+      "source_file": "/tmp/polars-recovery/final-integration-evidence/pytest-full-144-exit.json",
+      "source_sha256": "215696e0eea8071a0eda2775e7c7d869368946acb4537afb2ac035b6bb5c035d",
+      "command": [
+        "/tmp/polars-recovery/mavp-uniform-env/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "tests"
+      ],
+      "returncode": 0
+    },
+    "pytest-full-120": {
+      "source_file": "/tmp/polars-recovery/final-integration-evidence/pytest-full-120-exit.json",
+      "source_sha256": "eb27cc753337336802c933e21b24e21dd795d5a8ab13690ca1d220629c4a4386",
+      "command": [
+        "/tmp/polars-recovery/mavp-uniform-polars120/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "tests"
+      ],
+      "returncode": 0
+    },
+    "pytest-full-21": {
+      "source_file": "/tmp/polars-recovery/final-integration-evidence/pytest-full-21-exit.json",
+      "source_sha256": "5aa34ab7fd27cf1223d305468bf1ebf960eb7dab8680ee0e0c987de134489a8d",
+      "command": [
+        "/tmp/polars-recovery/mavp-uniform-polars21/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "tests"
+      ],
+      "returncode": 0
+    }
+  }
+}

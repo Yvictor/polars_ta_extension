@@ -1,0 +1,257 @@
+{
+  "polars": "2.0.0",
+  "bare_column_meta_available": true,
+  "outcomes": [
+    {
+      "case": "interleaved_nullable/direct",
+      "status": "pass",
+      "calls": [
+        {
+          "dtype": "List(Float64)",
+          "list_rows": 1
+        }
+      ]
+    },
+    {
+      "case": "interleaved_nullable/over/group_to_rows",
+      "status": "pass",
+      "calls": [
+        {
+          "dtype": "List(Float64)",
+          "list_rows": 3
+        }
+      ]
+    },
+    {
+      "case": "interleaved_nullable/over/join",
+      "status": "pass",
+      "calls": [
+        {
+          "dtype": "List(Float64)",
+          "list_rows": 3
+        }
+      ]
+    },
+    {
+      "case": "interleaved_nullable/over/explode",
+      "status": "pass",
+      "calls": [
+        {
+          "dtype": "List(Float64)",
+          "list_rows": 3
+        }
+      ]
+    },
+    {
+      "case": "interleaved_nullable/group_by_agg",
+      "status": "pass",
+      "calls": [
+        {
+          "dtype": "List(Float64)",
+          "list_rows": 3
+        }
+      ]
+    },
+    {
+      "case": "empty/direct",
+      "status": "pass",
+      "calls": [
+        {
+          "dtype": "List(Float64)",
+          "list_rows": 1
+        }
+      ]
+    },
+    {
+      "case": "empty/over/group_to_rows",
+      "status": "pass",
+      "calls": []
+    },
+    {
+      "case": "empty/over/join",
+      "status": "pass",
+      "calls": []
+    },
+    {
+      "case": "empty/over/explode",
+      "status": "pass",
+      "calls": []
+    },
+    {
+      "case": "empty/group_by_agg",
+      "status": "pass",
+      "calls": [
+        {
+          "dtype": "List(Float64)",
+          "list_rows": 0
+        }
+      ]
+    },
+    {
+      "case": "one_group/direct",
+      "status": "pass",
+      "calls": [
+        {
+          "dtype": "List(Float64)",
+          "list_rows": 1
+        }
+      ]
+    },
+    {
+      "case": "one_group/over/group_to_rows",
+      "status": "pass",
+      "calls": [
+        {
+          "dtype": "List(Float64)",
+          "list_rows": 1
+        }
+      ]
+    },
+    {
+      "case": "one_group/over/join",
+      "status": "pass",
+      "calls": [
+        {
+          "dtype": "List(Float64)",
+          "list_rows": 1
+        }
+      ]
+    },
+    {
+      "case": "one_group/over/explode",
+      "status": "pass",
+      "calls": [
+        {
+          "dtype": "List(Float64)",
+          "list_rows": 1
+        }
+      ]
+    },
+    {
+      "case": "one_group/group_by_agg",
+      "status": "pass",
+      "calls": [
+        {
+          "dtype": "List(Float64)",
+          "list_rows": 1
+        }
+      ]
+    },
+    {
+      "case": "chunked/direct",
+      "status": "pass",
+      "calls": [
+        {
+          "dtype": "List(Float64)",
+          "list_rows": 1
+        }
+      ]
+    },
+    {
+      "case": "chunked/over/group_to_rows",
+      "status": "pass",
+      "calls": [
+        {
+          "dtype": "List(Float64)",
+          "list_rows": 3
+        }
+      ]
+    },
+    {
+      "case": "chunked/over/join",
+      "status": "pass",
+      "calls": [
+        {
+          "dtype": "List(Float64)",
+          "list_rows": 3
+        }
+      ]
+    },
+    {
+      "case": "chunked/over/explode",
+      "status": "pass",
+      "calls": [
+        {
+          "dtype": "List(Float64)",
+          "list_rows": 3
+        }
+      ]
+    },
+    {
+      "case": "chunked/group_by_agg",
+      "status": "pass",
+      "calls": [
+        {
+          "dtype": "List(Float64)",
+          "list_rows": 3
+        }
+      ]
+    },
+    {
+      "case": "ordered_over",
+      "status": "pass",
+      "calls": [
+        {
+          "dtype": "List(Float64)",
+          "list_rows": 3
+        }
+      ]
+    },
+    {
+      "case": "filter_before/selected",
+      "status": "pass",
+      "calls": [
+        {
+          "dtype": "List(Float64)",
+          "list_rows": 1
+        }
+      ]
+    },
+    {
+      "case": "filter_before/empty",
+      "status": "pass",
+      "calls": [
+        {
+          "dtype": "List(Float64)",
+          "list_rows": 1
+        }
+      ]
+    },
+    {
+      "case": "filter_after",
+      "status": "pass",
+      "calls": [
+        {
+          "dtype": "List(Float64)",
+          "list_rows": 1
+        }
+      ]
+    },
+    {
+      "case": "scalar/literal",
+      "status": "error",
+      "error": "ShapeError",
+      "message": "the length of the window expression did not match that of the group",
+      "calls": [
+        {
+          "dtype": "List(Float64)",
+          "list_rows": 1
+        }
+      ]
+    },
+    {
+      "case": "scalar/aggregate_scalar",
+      "status": "error",
+      "error": "ShapeError",
+      "message": "the length of the window expression did not match that of the group",
+      "calls": [
+        {
+          "dtype": "List(Float64)",
+          "list_rows": 3
+        }
+      ]
+    }
+  ],
+  "passed": 24,
+  "errors": 2
+}

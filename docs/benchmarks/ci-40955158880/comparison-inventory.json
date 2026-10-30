@@ -1,0 +1,116 @@
+{
+  "original_vs_prior": {
+    "all": {
+      "observations": 48,
+      "slower_medians": 39,
+      "faster_medians": 9,
+      "disjoint_faster": 4,
+      "disjoint_slower": 29,
+      "overlap": 15,
+      "latency_percent_minmax": [
+        -4.064000358811926,
+        60.9333370298683
+      ]
+    },
+    "targets": {
+      "observations": 24,
+      "slower_medians": 18,
+      "faster_medians": 6,
+      "disjoint_faster": 4,
+      "disjoint_slower": 11,
+      "overlap": 9,
+      "latency_percent_minmax": [
+        -4.064000358811926,
+        9.25226292547292
+      ]
+    },
+    "controls": {
+      "observations": 24,
+      "slower_medians": 21,
+      "faster_medians": 3,
+      "disjoint_faster": 0,
+      "disjoint_slower": 18,
+      "overlap": 6,
+      "latency_percent_minmax": [
+        -0.897619679446382,
+        60.9333370298683
+      ]
+    }
+  },
+  "prior_vs_candidate": {
+    "all": {
+      "observations": 48,
+      "slower_medians": 15,
+      "faster_medians": 33,
+      "disjoint_faster": 4,
+      "disjoint_slower": 0,
+      "overlap": 44,
+      "latency_percent_minmax": [
+        -3.938706720145013,
+        2.1323314616234823
+      ]
+    },
+    "targets": {
+      "observations": 24,
+      "slower_medians": 3,
+      "faster_medians": 21,
+      "disjoint_faster": 4,
+      "disjoint_slower": 0,
+      "overlap": 20,
+      "latency_percent_minmax": [
+        -3.938706720145013,
+        0.1663139994183993
+      ]
+    },
+    "controls": {
+      "observations": 24,
+      "slower_medians": 12,
+      "faster_medians": 12,
+      "disjoint_faster": 0,
+      "disjoint_slower": 0,
+      "overlap": 24,
+      "latency_percent_minmax": [
+        -1.1341058305977314,
+        2.1323314616234823
+      ]
+    }
+  },
+  "original_vs_candidate": {
+    "all": {
+      "observations": 48,
+      "slower_medians": 35,
+      "faster_medians": 13,
+      "disjoint_faster": 6,
+      "disjoint_slower": 29,
+      "overlap": 13,
+      "latency_percent_minmax": [
+        -5.405613152812783,
+        60.94810763812848
+      ]
+    },
+    "targets": {
+      "observations": 24,
+      "slower_medians": 14,
+      "faster_medians": 10,
+      "disjoint_faster": 6,
+      "disjoint_slower": 10,
+      "overlap": 8,
+      "latency_percent_minmax": [
+        -5.405613152812783,
+        8.798083511609999
+      ]
+    },
+    "controls": {
+      "observations": 24,
+      "slower_medians": 21,
+      "faster_medians": 3,
+      "disjoint_faster": 0,
+      "disjoint_slower": 19,
+      "overlap": 5,
+      "latency_percent_minmax": [
+        -0.6328344596422286,
+        60.94810763812848
+      ]
+    }
+  }
+}

@@ -1,0 +1,19 @@
+Traceback (most recent call last):
+  File "/tmp/polars-recovery/audit-sarext-typed/audit.py", line 304, in <module>
+    ap=argparse.ArgumentParser();ap.add_argument('artifact',type=Path);ap.add_argument('--output',type=Path,required=True);ap.add_argument('--trust',type=Path,default=HERE/'trusted.json');a=ap.parse_args();r=audit(a.artifact,js(a.trust));a.output.write_text(json.dumps(r,indent=2)+'\n');print(json.dumps({k:r[k]for k in('audit_pass','run','children','samples')},indent=2))
+                                                                                                                                                                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/polars-recovery/audit-sarext-typed/audit.py", line 279, in audit
+    whl=wheels(root,base,trust,p);graphs={s:fingerprints(base,s)for s in SIDES};elf=elf_proof(base,p,trust,whl);corpus=all_corpus(base,trust);word={a+'_vs_'+b:words_diagnostics(base/'corpus'/(a+'.npz'),base/'corpus'/(b+'.npz'))for a,b in PAIRS};eq(js(base/'corpus/word-diagnostics.json'),word,'all six full corpus raw word diagnostics')
+                                                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/polars-recovery/audit-sarext-typed/audit.py", line 264, in elf_proof
+    for path,h in row['files'].items():need(sha(remap(path,base,p))==h,'actual ELF diagnostic hash')
+                                                ^^^^^^^^^^^^^^^^^^
+  File "/tmp/polars-recovery/audit-sarext-typed/audit.py", line 222, in remap
+    ws=Path(p['flags']['environment']['CARGO_TARGET_DIR']).parent;path=Path(path);need(path.is_absolute()and path.is_relative_to(ws/'sarext-results'),'retained diagnostic path outside source-bound artifact');rel=path.relative_to(ws/'sarext-results');need('..'not in rel.parts,'unsafe diagnostic path');q=base/rel;need(q.is_file()and not q.is_symlink()and q.resolve().is_relative_to(base.resolve()),'missing/unsafe diagnostic');return q
+                                                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/polars-recovery/audit-sarext-typed/audit.py", line 8, in <lambda>
+    need=lambda ok,msg:None if ok else (_ for _ in ()).throw(ValueError(msg))
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/polars-recovery/audit-sarext-typed/audit.py", line 8, in <genexpr>
+    need=lambda ok,msg:None if ok else (_ for _ in ()).throw(ValueError(msg))
+ValueError: retained diagnostic path outside source-bound artifact

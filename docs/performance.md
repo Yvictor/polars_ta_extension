@@ -1,5 +1,10 @@
 # Performance measurements
 
+This page records the historical C-backed 0.2.0 release comparison. The current
+native Rust migration uses the same-runner CI rebuild methodology and results in
+[native-rust-migration.md](native-rust-migration.md); these historical numbers
+are not evidence for that migration.
+
 The measured release wheel improves the main long-series indicators while keeping
 native Polars execution. These are measurements on one Linux x86_64 machine, not
 a claim of a globally optimal implementation or identical speedups on every CPU.
@@ -107,7 +112,7 @@ The published wheels retain portable CPU settings. MSVC explicitly receives
 floating-point fast-math, native-only instruction sets, or approximations to
 improve a benchmark. The 201-indicator correctness suite remains the first gate.
 
-CI compares the published 0.1.6 and candidate wheels on the same runner and retains
+The historical 0.2.0 CI compared published 0.1.6 and candidate wheels on the same runner and retained
 both JSON reports and a job summary. Timing regressions above 25% in the selected
 long-series cases produce warnings with `--report-only`, not release failures:
 shared runners are noisy. Installation, execution, malformed data and incomparable

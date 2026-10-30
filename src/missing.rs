@@ -17,8 +17,8 @@
 //! a null never affects another partition. Inputs without nulls are detected
 //! from Polars' null counts, without reading their values.
 
-use std::ffi::{CStr, CString};
-
+use crate::generated::option_key;
+use crate::native::{bind_params, core, Param, Params};
 use polars::export::arrow::array::PrimitiveArray;
 use polars::export::arrow::bitmap::{Bitmap, MutableBitmap};
 use polars::prelude::*;
@@ -26,7 +26,7 @@ use pyo3::exceptions::PyValueError;
 use pyo3::types::PyDict;
 use pyo3::{pyfunction, PyResult};
 use serde::Deserialize;
-use talib_sys::*;
+use ta_lib::abstract_api::{get_func_handle, OptInputType};
 
 /// Upstream lookback of `name` for the given optional parameters, using the
 /// TA-Lib abstract interface. Parameter names follow the Python API
@@ -34,53 +34,30 @@ use talib_sys::*;
 #[pyfunction]
 pub fn lookback(name: &str, params: Option<&PyDict>) -> PyResult<i32> {
     let bad = |what: String| PyValueError::new_err(format!("{name}: {what}"));
-    let c_name = CString::new(name.to_uppercase()).map_err(|e| bad(e.to_string()))?;
-    unsafe {
-        let mut handle: *const TA_FuncHandle = std::ptr::null();
-        if TA_GetFuncHandle(c_name.as_ptr(), &mut handle) != TA_RetCode::TA_SUCCESS {
-            return Err(bad("unknown TA-Lib function".into()));
-        }
-        let mut info: *const TA_FuncInfo = std::ptr::null();
-        if TA_GetFuncInfo(handle, &mut info) != TA_RetCode::TA_SUCCESS {
-            return Err(bad("no function information".into()));
-        }
-        let mut holder: *mut TA_ParamHolder = std::ptr::null_mut();
-        if TA_ParamHolderAlloc(handle, &mut holder) != TA_RetCode::TA_SUCCESS {
-            return Err(bad("could not allocate parameters".into()));
-        }
-        let result = (|| -> PyResult<i32> {
-            for index in 0..(*info).nbOptInput {
-                let mut param: *const TA_OptInputParameterInfo = std::ptr::null();
-                if TA_GetOptInputParameterInfo(handle, index, &mut param) != TA_RetCode::TA_SUCCESS
-                {
-                    return Err(bad(format!("no information for parameter {index}")));
+    let id = get_func_handle(name).ok_or_else(|| bad("unknown TA-Lib function".into()))?;
+    let mut holder = id.new_call(core());
+    let mut values = Params::new();
+    for opt in id.info().opt_inputs {
+        let key = option_key(opt.param_name);
+        if let Some(value) = params.and_then(|p| p.get_item(key.as_ref()).ok().flatten()) {
+            let value = match opt.kind {
+                OptInputType::RealRange { .. } | OptInputType::RealList { .. } => {
+                    Param::Real(value.extract()?)
                 }
-                let raw = CStr::from_ptr((*param).paramName).to_string_lossy();
-                let key = raw.strip_prefix("optIn").unwrap_or(&raw).to_lowercase();
-                let Some(value) = params.and_then(|p| p.get_item(key.as_str()).ok().flatten())
-                else {
-                    continue;
-                };
-                let is_real = (*param).type_ == TA_OptInputParameterType_TA_OptInput_RealRange
-                    || (*param).type_ == TA_OptInputParameterType_TA_OptInput_RealList;
-                let code = if is_real {
-                    TA_SetOptInputParamReal(holder, index, value.extract::<f64>()?)
-                } else {
-                    TA_SetOptInputParamInteger(holder, index, value.extract::<i32>()?)
-                };
-                if code != TA_RetCode::TA_SUCCESS {
-                    return Err(bad(format!("invalid value for {key}: {code:?}")));
-                }
-            }
-            let mut out: TA_Integer = 0;
-            match TA_GetLookback(holder, &mut out) {
-                TA_RetCode::TA_SUCCESS => Ok(out),
-                code => Err(bad(format!("invalid parameters: {code:?}"))),
-            }
-        })();
-        TA_ParamHolderFree(holder);
-        result
+                _ => Param::Int(value.extract()?),
+            };
+            values.insert(key.into_owned(), value);
+        }
     }
+    if bind_params(&mut holder, &values).is_err() {
+        return Ok(-1);
+    }
+    // The original abstract API returned -1 for an invalid lookback; execution
+    // then raises a Polars ComputeError, including on empty inputs.
+    Ok(crate::compat::lookback(id, &values)
+        .unwrap_or_else(|| holder.lookback())
+        .map(|v| v as i32)
+        .unwrap_or(-1))
 }
 
 /// Plugin kwargs: the indicator's own parameters plus its missing-input policy,
@@ -93,10 +70,6 @@ pub struct Masked<K> {
     /// Whether a missing input affects every later row.
     pub recursive: bool,
 }
-
-/// Parameters of indicators that take none.
-#[derive(Deserialize)]
-pub struct NoParams {}
 
 impl<K> Masked<K> {
     /// Run the unmasked indicator, then null the rows that depend on null inputs.

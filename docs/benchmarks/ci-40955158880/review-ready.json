@@ -1,0 +1,22 @@
+{
+  "time_utc": "2026-10-29T22:20:29.798356+00:00",
+  "raw_result_access": true,
+  "files": {
+    "audit.py": "4bb7db2e8fcde263a04ffa5d3625268b4245b8aea795c26cee2bf6dbc7fb9e26",
+    "inputs.py": "30c92d28c273e414bf0dccfed78ac645c37a6eb616ae4d41cb1fa10589cabfdb",
+    "shared_core.py": "b8c0b004daac5d920835c7a316cf97919cc3a13633eeecd860fdd02ab669cba9",
+    "trusted.json": "7e2c84174bfdc32da277d4462d8df1da33ac129364b897205c61867733435317",
+    "test_inputs.py": "7f049e4b49846f91a5cebd392b8a0b0d6359377806250effca7da0de9d59c55f",
+    "test_ledger.py": "bae7dd682aba1f4457636aa1ce5136ac4629b1dfc99d1c845ca0fa24fce56ca9",
+    "test_boundaries.py": "d89495124f9c1107702b0343a00d8b45f44dac24fd011d0fb66376f0ed6ce89c"
+  },
+  "tests": {
+    "pytest_methods": 14,
+    "result": "PASS",
+    "command": "/tmp/polars-recovery/mavp-sma-windows-env/bin/python -m pytest -q test_inputs.py test_ledger.py test_boundaries.py"
+  },
+  "review_fix": "Tolerant C lane now rejects both-zero sign differences through a local wrapper at all three array-comparison call sites; ordinary zero/tiny finite rounding remains governed by1e-10 policy. Shared core unchanged.",
+  "timing_result_access": false,
+  "raw_access_scope": "source/build provenance, full correctness corpus, physical inputs only; failed physical-input gate before setting() timing ledger",
+  "input_oracle_correction": "Explicit globally unfused100+900*random(n) exactly reproduces measuredLinux uniform inputs; ARMGenerator.uniform fused differences explained by3DecimalIEEEexamples and16IPCfullbitchecks. No output/timing policy change. See INPUT-ORACLE-PORTABILITY.md."
+}

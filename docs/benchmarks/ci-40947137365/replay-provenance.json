@@ -1,0 +1,132 @@
+{
+  "run": 40947137365,
+  "job": 123705361043,
+  "controller": "79830084dd761c242ee9ee24b4eeb7f3559408c1",
+  "pins": {
+    "original": "b2bbc26d41ec80823c8bffb0cc436a97f29911cc",
+    "prior": "56f6d5fb139031c20d86d7e818e7d267eb834295",
+    "initialization": "1cf188bf417bc842a9c6227bb833542b7914d24e",
+    "candidate": "98d933f2e027458e1f87d6847d199f59e13c041c"
+  },
+  "artifact": 12934698552,
+  "zip_sha256": "9645ee3448c67f07bb0326a962855b13005924d98843817cca04182292aa2e65",
+  "zip_bytes": 875282481,
+  "extracted_files": 10563,
+  "sole_downloader": "parent; authenticated GitHub API origin supplied externally",
+  "independently_rehashed_local_zip": true,
+  "auditor_sha256": "6fd6e792747014ddcbdeec0c054feb04df47fd3d04ba5723dbbcd6131e5ae76a",
+  "original_approved_auditor_sha256": "ddbaa8599ae16b1c7f1b2e2359c84402f1dbd4d3a2149eea6851da5ab0aae03d",
+  "trust_sha256": "01779a7958ea38a20ea77dfeb3a4ffa4413d3e80645e15bd0175f71a835f3c37",
+  "correction": "Two LLVM CLI span flags from actual ELF symbol st_value/st_size; independent re-review and37tests/48subtests PASS; original source/failure preserved. No numerical, source, CFG or protocol waiver.",
+  "children": 2112,
+  "samples": 65472,
+  "corpus": {
+    "original-vs-prior": {
+      "cases": 10624,
+      "exact": false,
+      "checked": 2167654,
+      "different": 659,
+      "zero_sign_differences": 0,
+      "nan_values": 479626,
+      "infinite_values": 16123,
+      "max_abs": 2.5067947717616335e-11,
+      "errors": {
+        "ComputeError": 191
+      }
+    },
+    "original-vs-initialization": {
+      "cases": 10624,
+      "exact": false,
+      "checked": 2167654,
+      "different": 659,
+      "zero_sign_differences": 0,
+      "nan_values": 479626,
+      "infinite_values": 16123,
+      "max_abs": 2.5067947717616335e-11,
+      "errors": {
+        "ComputeError": 191
+      }
+    },
+    "original-vs-candidate": {
+      "cases": 10624,
+      "exact": false,
+      "checked": 2167654,
+      "different": 659,
+      "zero_sign_differences": 0,
+      "nan_values": 479626,
+      "infinite_values": 16123,
+      "max_abs": 2.5067947717616335e-11,
+      "errors": {
+        "ComputeError": 191
+      }
+    },
+    "prior-vs-initialization-exact": {
+      "cases": 10624,
+      "exact": true,
+      "checked": 2167654,
+      "different": 0,
+      "zero_sign_differences": 0,
+      "nan_values": 479626,
+      "infinite_values": 16123,
+      "max_abs": 0.0,
+      "errors": {
+        "ComputeError": 191
+      }
+    },
+    "prior-vs-candidate-exact": {
+      "cases": 10624,
+      "exact": true,
+      "checked": 2167654,
+      "different": 0,
+      "zero_sign_differences": 0,
+      "nan_values": 479626,
+      "infinite_values": 16123,
+      "max_abs": 0.0,
+      "errors": {
+        "ComputeError": 191
+      }
+    },
+    "initialization-vs-candidate-exact": {
+      "cases": 10624,
+      "exact": true,
+      "checked": 2167654,
+      "different": 0,
+      "zero_sign_differences": 0,
+      "nan_values": 479626,
+      "infinite_values": 16123,
+      "max_abs": 0.0,
+      "errors": {
+        "ComputeError": 191
+      }
+    }
+  },
+  "runtime": {
+    "1": {
+      "cpu": "AMD EPYC 7763 64-Core Processor",
+      "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+      "python": "3.12.15",
+      "polars": "1.44.2",
+      "numpy": "2.5.3",
+      "rust": "rustc 1.90.0 (1159e78c4 2025-09-14)",
+      "profile": "release (maturin --release --locked), portable CPU target",
+      "affinity": [
+        0
+      ]
+    },
+    "4": {
+      "cpu": "AMD EPYC 7763 64-Core Processor",
+      "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+      "python": "3.12.15",
+      "polars": "1.44.2",
+      "numpy": "2.5.3",
+      "rust": "rustc 1.90.0 (1159e78c4 2025-09-14)",
+      "profile": "release (maturin --release --locked), portable CPU target",
+      "affinity": [
+        0,
+        1,
+        2,
+        3
+      ]
+    }
+  }
+}

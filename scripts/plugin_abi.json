@@ -1,0 +1,1572 @@
+{
+  "ac": {
+    "order": [
+      0,
+      1
+    ],
+    "fields": []
+  },
+  "accbands": {
+    "order": [
+      0,
+      1,
+      2
+    ],
+    "fields": [
+      "upperband",
+      "middleband",
+      "lowerband"
+    ]
+  },
+  "acos": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "ad": {
+    "order": [
+      1,
+      2,
+      0,
+      3
+    ],
+    "fields": []
+  },
+  "add": {
+    "order": [
+      0,
+      1
+    ],
+    "fields": []
+  },
+  "adosc": {
+    "order": [
+      1,
+      2,
+      0,
+      3
+    ],
+    "fields": []
+  },
+  "adr": {
+    "order": [
+      0,
+      1
+    ],
+    "fields": []
+  },
+  "adx": {
+    "order": [
+      1,
+      2,
+      0
+    ],
+    "fields": []
+  },
+  "adxr": {
+    "order": [
+      1,
+      2,
+      0
+    ],
+    "fields": []
+  },
+  "ao": {
+    "order": [
+      0,
+      1
+    ],
+    "fields": []
+  },
+  "apo": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "aroon": {
+    "order": [
+      0,
+      1
+    ],
+    "fields": [
+      "aroondown",
+      "aroonup"
+    ]
+  },
+  "aroonosc": {
+    "order": [
+      0,
+      1
+    ],
+    "fields": []
+  },
+  "asin": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "atan": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "atr": {
+    "order": [
+      1,
+      2,
+      0
+    ],
+    "fields": []
+  },
+  "avgdev": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "avgprice": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "bbands": {
+    "order": [
+      0
+    ],
+    "fields": [
+      "upperband",
+      "middleband",
+      "lowerband"
+    ]
+  },
+  "beta": {
+    "order": [
+      0,
+      1
+    ],
+    "fields": []
+  },
+  "bop": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cci": {
+    "order": [
+      1,
+      2,
+      0
+    ],
+    "fields": []
+  },
+  "cdl2crows": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdl3blackcrows": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdl3inside": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdl3linestrike": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdl3outside": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdl3starsinsouth": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdl3whitesoldiers": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdlabandonedbaby": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdladvanceblock": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdlbelthold": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdlbreakaway": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdlclosingmarubozu": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdlconcealbabyswall": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdlcounterattack": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdldarkcloudcover": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdldoji": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdldojistar": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdldragonflydoji": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdlengulfing": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdleveningdojistar": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdleveningstar": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdlgapsidesidewhite": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdlgravestonedoji": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdlhammer": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdlhangingman": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdlharami": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdlharamicross": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdlhighwave": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdlhikkake": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdlhikkakemod": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdlhomingpigeon": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdlidentical3crows": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdlinneck": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdlinvertedhammer": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdlkicking": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdlkickingbylength": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdlladderbottom": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdllongleggeddoji": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdllongline": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdlmarubozu": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdlmatchinglow": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdlmathold": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdlmorningdojistar": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdlmorningstar": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdlonneck": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdlpiercing": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdlrickshawman": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdlrisefall3methods": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdlseparatinglines": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdlshootingstar": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdlshortline": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdlspinningtop": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdlstalledpattern": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdlsticksandwich": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdltakuri": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdltasukigap": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdlthrusting": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdltristar": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdlunique3river": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdlupsidegap2crows": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cdlxsidegap3methods": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "ceil": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "cmf": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "cmo": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "cmou": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "coppock": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "correl": {
+    "order": [
+      0,
+      1
+    ],
+    "fields": []
+  },
+  "cos": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "cosh": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "cumsum": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "cvi": {
+    "order": [
+      0,
+      1
+    ],
+    "fields": []
+  },
+  "dema": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "div": {
+    "order": [
+      0,
+      1
+    ],
+    "fields": []
+  },
+  "donchian": {
+    "order": [
+      0,
+      1
+    ],
+    "fields": [
+      "upperband",
+      "middleband",
+      "lowerband"
+    ]
+  },
+  "dpo": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "dx": {
+    "order": [
+      1,
+      2,
+      0
+    ],
+    "fields": []
+  },
+  "efi": {
+    "order": [
+      0,
+      1
+    ],
+    "fields": []
+  },
+  "ema": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "er": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "eri": {
+    "order": [
+      0,
+      1,
+      2
+    ],
+    "fields": [
+      "bullpower",
+      "bearpower"
+    ]
+  },
+  "exp": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "floor": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "fosc": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "fractal": {
+    "order": [
+      0,
+      1
+    ],
+    "fields": [
+      "swinghigh",
+      "swinglow"
+    ]
+  },
+  "ha": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": [
+      "haopen",
+      "hahigh",
+      "halow",
+      "haclose"
+    ]
+  },
+  "hma": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "ht_dcperiod": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "ht_dcphase": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "ht_phasor": {
+    "order": [
+      0
+    ],
+    "fields": [
+      "inphase",
+      "quadrature"
+    ]
+  },
+  "ht_sine": {
+    "order": [
+      0
+    ],
+    "fields": [
+      "sine",
+      "leadsine"
+    ]
+  },
+  "ht_trendline": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "ht_trendmode": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "imi": {
+    "order": [
+      0,
+      1
+    ],
+    "fields": []
+  },
+  "kama": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "kc": {
+    "order": [
+      0,
+      1,
+      2
+    ],
+    "fields": [
+      "upperband",
+      "middleband",
+      "lowerband"
+    ]
+  },
+  "kdj": {
+    "order": [
+      0,
+      1,
+      2
+    ],
+    "fields": [
+      "k",
+      "d",
+      "j"
+    ]
+  },
+  "linearreg": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "linearreg_angle": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "linearreg_intercept": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "linearreg_slope": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "ln": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "log10": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "ma": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "macd": {
+    "order": [
+      0
+    ],
+    "fields": [
+      "macd",
+      "macdsignal",
+      "macdhist"
+    ]
+  },
+  "macdext": {
+    "order": [
+      0
+    ],
+    "fields": [
+      "macd",
+      "macdsignal",
+      "macdhist"
+    ]
+  },
+  "macdfix": {
+    "order": [
+      0
+    ],
+    "fields": [
+      "macd",
+      "macdsignal",
+      "macdhist"
+    ]
+  },
+  "mama": {
+    "order": [
+      0
+    ],
+    "fields": [
+      "mama",
+      "fama"
+    ]
+  },
+  "marketfi": {
+    "order": [
+      0,
+      1,
+      2
+    ],
+    "fields": []
+  },
+  "massi": {
+    "order": [
+      0,
+      1
+    ],
+    "fields": []
+  },
+  "mavp": {
+    "order": [
+      0,
+      1
+    ],
+    "fields": []
+  },
+  "max": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "maxindex": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "medprice": {
+    "order": [
+      0,
+      1
+    ],
+    "fields": []
+  },
+  "mfi": {
+    "order": [
+      1,
+      2,
+      0,
+      3
+    ],
+    "fields": []
+  },
+  "midpoint": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "midprice": {
+    "order": [
+      0,
+      1
+    ],
+    "fields": []
+  },
+  "min": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "minindex": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "minmax": {
+    "order": [
+      0
+    ],
+    "fields": [
+      "min",
+      "max"
+    ]
+  },
+  "minmaxindex": {
+    "order": [
+      0
+    ],
+    "fields": [
+      "minidx",
+      "maxidx"
+    ]
+  },
+  "minus_di": {
+    "order": [
+      1,
+      2,
+      0
+    ],
+    "fields": []
+  },
+  "minus_dm": {
+    "order": [
+      0,
+      1
+    ],
+    "fields": []
+  },
+  "mom": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "mult": {
+    "order": [
+      0,
+      1
+    ],
+    "fields": []
+  },
+  "natr": {
+    "order": [
+      1,
+      2,
+      0
+    ],
+    "fields": []
+  },
+  "nvi": {
+    "order": [
+      0,
+      1
+    ],
+    "fields": []
+  },
+  "obv": {
+    "order": [
+      0,
+      1
+    ],
+    "fields": []
+  },
+  "percentile": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "percentrank": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "plus_di": {
+    "order": [
+      1,
+      2,
+      0
+    ],
+    "fields": []
+  },
+  "plus_dm": {
+    "order": [
+      0,
+      1
+    ],
+    "fields": []
+  },
+  "ppo": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "pvi": {
+    "order": [
+      0,
+      1
+    ],
+    "fields": []
+  },
+  "pvo": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "pvt": {
+    "order": [
+      0,
+      1
+    ],
+    "fields": []
+  },
+  "qstick": {
+    "order": [
+      0,
+      1
+    ],
+    "fields": []
+  },
+  "rma": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "roc": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "rocp": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "rocr": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "rocr100": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "rsi": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "rvi": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "rvol": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "sar": {
+    "order": [
+      0,
+      1
+    ],
+    "fields": []
+  },
+  "sarext": {
+    "order": [
+      0,
+      1
+    ],
+    "fields": []
+  },
+  "sin": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "sinh": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "sma": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "smi": {
+    "order": [
+      0,
+      1,
+      2
+    ],
+    "fields": [
+      "smi",
+      "smisignal"
+    ]
+  },
+  "sqrt": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "stddev": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "stoch": {
+    "order": [
+      1,
+      2,
+      0
+    ],
+    "fields": [
+      "slowk",
+      "slowd"
+    ]
+  },
+  "stochf": {
+    "order": [
+      1,
+      2,
+      0
+    ],
+    "fields": [
+      "fastk",
+      "fastd"
+    ]
+  },
+  "stochrsi": {
+    "order": [
+      0
+    ],
+    "fields": [
+      "fastk",
+      "fastd"
+    ]
+  },
+  "sub": {
+    "order": [
+      0,
+      1
+    ],
+    "fields": []
+  },
+  "sum": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "supertrend": {
+    "order": [
+      0,
+      1,
+      2
+    ],
+    "fields": [
+      "supertrend",
+      "trend"
+    ]
+  },
+  "t3": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "tan": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "tanh": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "tema": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "trange": {
+    "order": [
+      1,
+      2,
+      0
+    ],
+    "fields": []
+  },
+  "trima": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "trix": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "tsf": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "tsi": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "typprice": {
+    "order": [
+      1,
+      2,
+      0
+    ],
+    "fields": []
+  },
+  "ultosc": {
+    "order": [
+      1,
+      2,
+      0
+    ],
+    "fields": []
+  },
+  "var": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "vhf": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "vortex": {
+    "order": [
+      0,
+      1,
+      2
+    ],
+    "fields": [
+      "plusvi",
+      "minusvi"
+    ]
+  },
+  "vwap": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "fields": []
+  },
+  "vwma": {
+    "order": [
+      0,
+      1
+    ],
+    "fields": []
+  },
+  "wad": {
+    "order": [
+      0,
+      1,
+      2
+    ],
+    "fields": []
+  },
+  "wclprice": {
+    "order": [
+      1,
+      2,
+      0
+    ],
+    "fields": []
+  },
+  "willr": {
+    "order": [
+      1,
+      2,
+      0
+    ],
+    "fields": []
+  },
+  "wma": {
+    "order": [
+      0
+    ],
+    "fields": []
+  },
+  "zlema": {
+    "order": [
+      0
+    ],
+    "fields": []
+  }
+}

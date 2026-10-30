@@ -122,59 +122,26 @@ Windows wheels use MSVC; MinGW builds are not covered by the support matrix.
 current Polars runtime and the test dependency matrix do not support that set.
 CI status on the PR is the authority for whether a target has actually passed.
 
-Wheels statically include TA-Lib and require no system TA-Lib, libclang or
-separate Python TA-Lib installation. This replaces the dynamic linking behind the
-`_TA_ACOS` (macOS Intel, issue #24) and `TA_CDL3BLACKCROWS_Lookback` (Linux
-AArch64, issue #36) import failures of the 0.1.x wheels; a test checks that the
-extension module names no TA-Lib shared library. By default the build compiles
-the pinned, checksum-verified source so headers and library can never mismatch
-(issue #26).
-Packagers who must link a system TA-Lib 0.8.1 can set both `TA_LIBRARY_PATH`
-(directory with `libta-lib.a` / `ta-lib-static.lib`) and `TA_INCLUDE_PATH`
-(directory containing the five public headers under `ta-lib/`). Both variables
-are required together. The build checks those headers against the pinned archive;
-the extension also checks the linked library's version when imported. Use the
-matching static library, compiled with PIC on Unix. Official wheels always use
-the vendored build. `DEPS_PATH` is no longer used.
-
-For a source build install Rust (CI uses 1.90.0), a C/C++ build toolchain, CMake
-and Python. Upstream's CMake project needs CMake 3.18+ on Linux/macOS and 3.30+
-on Windows (Visual Studio 2026 requires CMake 4.2+). Then:
-
-```sh
-python -m pip install maturin
-maturin build --release --locked --out dist
-python -m pip install dist/*.whl
-```
-
-The upstream source archive is included in the sdist and Rust crate, together
-with its license. The build verifies SHA-256
-`ec59ccd88c0c77f618587d858787c8f9d06c40460a09d66751926f6fd670f985` and builds in
-Cargo's `OUT_DIR`. It never downloads TA-Lib or writes generated files into the
-source tree. Cargo/Python dependencies still need an available package cache or
-network access. Published wheels use portable CPU targets, not `-march=native`
-or `-ffast-math`.
+The native Rust migration replaces the C build with the pinned official `ta-lib`
+crate. See [native migration](native-rust-migration.md) for source-build commands,
+compatibility paths, ordinary `.over()` execution boundaries, and CI evidence.
+The release history and changes above describe the prior 0.2.x C releases.
 
 ## Maintaining the generated API
 
-`scripts/api.json` records all upstream batch signatures, groups, defaults and
-outputs. To regenerate it, compile upstream 0.8.1 as a shared library and run:
+`scripts/api.json` is the frozen 201-function public contract from TA-Lib 0.8.1.
+`scripts/plugin_abi.json` preserves each plugin's input permutation and Struct
+field names. The 0.8.3 crate contains more indicators; expanding this inventory
+is a separate API change. Regenerate stable wrappers and reference files with:
 
 ```sh
-python scripts/extract_api.py /path/to/ta-lib-0.8.1 /path/to/libta-lib.so
 python scripts/generate_indicators.py
 python scripts/generate_skill_reference.py
 ```
 
-The wrapper generator needs `rustfmt`. CI checks wrappers and the skill reference
-for drift. It generates the 43 added APIs; the 158 legacy APIs retain their
-existing Python signatures and Rust builder types. Migrating those public APIs
-to generation needs a separate compatibility review. Both paths share input
-broadcasting; the 201-function parity suite covers their behavior.
-For FFI bindings, install libclang and build
-`cargo build --manifest-path talib-sys/Cargo.toml --features regenerate-bindings`.
-Review and copy the resulting `OUT_DIR/bindings.rs` into
-`talib-sys/src/bindings.rs`; default builds use these portable checked-in bindings.
+The wrapper generator needs `rustfmt`. All plugin symbols now share the native
+adapter; Python signatures and defaults remain frozen. `scripts/extract_api.py`
+is retained only as a tool for auditing the historical C API, not for native builds.
 
 ## Publishing a release
 

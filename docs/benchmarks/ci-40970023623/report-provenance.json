@@ -1,0 +1,32 @@
+{
+  "run": 40970023623,
+  "controller": "5171ea5583f83766da05ef0d1f8bc69091063369",
+  "pins": {
+    "original": "b2bbc26d41ec80823c8bffb0cc436a97f29911cc",
+    "prior": "56f6d5fb139031c20d86d7e818e7d267eb834295",
+    "combined": "0eb91280cf5d13095cbfdc6f8bcc477cfbcd1498",
+    "candidate": "916b0de68369df410559b6dc651731cf4c36b94c"
+  },
+  "files": {
+    "audit-result.json": "91a8ffa42cd2152f01893005ff179ca7d8628b99b026c1cb1340ae854681699d",
+    "REPORT.md": "270278a7edbbe0689ef93016a9021c45af6345b02ef79b7bd02e2e4e91b729eb",
+    "all-384-comparisons.csv": "b6e751db6ab9baf9157880d5963b332468bd63838f34e9e84fc7e41a54a1c2cb",
+    "all-slower-medians.csv": "624b5c35479050d26efc75a552692daa2b1d7f912fb3f295f6193811199d1c5d",
+    "all-slower-medians.json": "b02cfcd821f3775e1ba75430b4c42e4e2a2944804b0b9aee956ac78ada6981d3",
+    "comparison-inventory.json": "2b1d89da72b95b17bd6bd491af0c448477bfc407c4ecf993e3ea4443cd63fd61",
+    "raw-replay-first.log": "83593398126757a68613428160f73e52d89e026e99be812618de589360f31074",
+    "raw-replay-first-exit.json": "500f2cfa688d2cb48753f20bea3c404018023d47c6d060fb11c8d7366434d94a"
+  },
+  "approved_audit": {
+    "reviewer": "/root/combined_review",
+    "approved_at_utc": "2026-10-29T23:10:45.490965+00:00",
+    "run": 40970023623,
+    "auditor_sha256": "c2bee85f744553ab3b9a1f96288b7c5de0e8dfc668dc2ae20e78f48d69b746a5",
+    "inputs_sha256": "c1199e1522ee04c0031b992d6b8b4d4eb6cc2468cdc9e37ec9097ad9266cf5e8",
+    "shared_core_sha256": "b8c0b004daac5d920835c7a316cf97919cc3a13633eeecd860fdd02ab669cba9",
+    "trust_sha256": "eebbfe55a7479a1cfb94477faca536dbbcd10538d067a6feed08a500bd84dac6",
+    "independent_tests": "19passed10.99s",
+    "uniform_raw_access": false,
+    "conditions": "Run only after root officialZIP/SHA/READY verification; no numerical/statistical/provenance rulechanges in response to measurements; preserve all384pairs/allslowercontrols and explicit limitations."
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "record_type": "Additive archive clarification; original local records preserved byte-identically",
+  "original_record": "local-gates/GATES_COMPLETE.json",
+  "original_sha256": "4646343a57014e732b152b007def7141b0eeb508e56ebc4ffeaf020838fad11f",
+  "original_field": "no_timing_invocations",
+  "original_value": true,
+  "correct_value": false,
+  "why": "The complete Mac pytest suites executed all five legacy pytest-benchmark nodes in tests/test_bench.py. Those fixtures invoke timers; the original true label was stale.",
+  "original_additive_correction": "local-gates/GATES_COMPLETE-ERRATA.json",
+  "local_evidence_scope": "Correctness, node accounting, source/wheel/installed module identity and allocation diagnostics only. No local latency number is used to accept this optimization. Full local logs retain the original benchmark tables.",
+  "acceptance_evidence": "REPORT.md and the controlled same-runner CI40970023623 raw audit, not the Mac timer tables.",
+  "historical_pending_labels": "The local erratum and immutable-candidate record predate CI acceptance. Their pending/local-only status is historical, preserved rather than rewritten. This archive records the later independently reviewed RETAIN decision.",
+  "counts": "Uniform916 before Windows3af:12476 full nodes each runtime,501 new over baseline0eb11975, five legacy benchmark nodes included. Windows reparametrization and any later combined head require separate gates.",
+  "no_performance_claim_from_local_timings": true
+}

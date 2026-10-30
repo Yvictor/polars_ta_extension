@@ -1,0 +1,25 @@
+threads,case,role,comparison,before_median_ms,after_median_ms,after_latency_percent,before_over_after_low,before_over_after_high,after_faster_rounds,status
+1,sarext_longzero/1000000,legitimate_long_zero_replay_stress,original_vs_prior,5.6828875,5.5633995,-2.1025930919800873,0.962648287125747,1.0975818119775733,10,overlapping process ranges
+1,grouped_sarext_longzero/10000x100,legitimate_long_zero_replay_stress,original_vs_prior,60.471665,63.440101999999996,4.908806463324589,0.911536485811339,0.990009878351696,0,disjoint slower process ranges
+1,sarext_longzero/1000000,legitimate_long_zero_replay_stress,original_vs_candidate,5.6828875,8.739988499999999,53.794853408588494,0.6149996780894849,0.7128144203215181,0,disjoint slower process ranges
+1,grouped_sarext_longzero/10000x100,legitimate_long_zero_replay_stress,original_vs_candidate,60.471665,61.285097,1.345145697575889,0.93684417837329,1.0232471161796084,1,overlapping process ranges
+1,sarext_longzero/1000000,legitimate_long_zero_replay_stress,original_vs_alternative,5.6828875,5.6407655000000005,-0.7412077047099563,0.9555027963979537,1.1047790529397905,7,overlapping process ranges
+1,grouped_sarext_longzero/10000x100,legitimate_long_zero_replay_stress,original_vs_alternative,60.471665,58.6220675,-3.058618445514938,0.9928580836213893,1.066989336576434,12,overlapping process ranges
+1,sarext_longzero/1000000,legitimate_long_zero_replay_stress,prior_vs_candidate,5.5633995,8.739988499999999,57.097984784303165,0.5965496068536243,0.6955050015067614,0,disjoint slower process ranges
+1,grouped_sarext_longzero/10000x100,legitimate_long_zero_replay_stress,prior_vs_candidate,63.440101999999996,61.285097,-3.3969128864263065,0.9770776149783371,1.0871894849790729,12,overlapping process ranges
+1,sarext_longzero/1000000,legitimate_long_zero_replay_stress,prior_vs_alternative,5.5633995,5.6407655000000005,1.3906245632728798,0.926837586825208,1.0779514765329055,4,overlapping process ranges
+1,grouped_sarext_longzero/10000x100,legitimate_long_zero_replay_stress,prior_vs_alternative,63.440101999999996,58.6220675,-7.594619724917839,1.035497077049892,1.133665142044808,12,disjoint faster process ranges
+1,sarext_longzero/1000000,legitimate_long_zero_replay_stress,candidate_vs_alternative,8.739988499999999,5.6407655000000005,-35.46026404954651,1.4271317315630128,1.6872986758508248,12,disjoint faster process ranges
+1,grouped_sarext_longzero/10000x100,legitimate_long_zero_replay_stress,candidate_vs_alternative,61.285097,58.6220675,-4.345313347550062,1.0018619344965323,1.1030405733647872,12,disjoint faster process ranges
+4,sarext_longzero/1000000,legitimate_long_zero_replay_stress,original_vs_prior,5.7442845,5.5586825,-3.231072555685577,0.9754778131735748,1.1254951619938893,11,overlapping process ranges
+4,grouped_sarext_longzero/10000x100,legitimate_long_zero_replay_stress,original_vs_prior,61.107954500000005,66.9126305,9.499051387818923,0.8692158292748812,0.9805345578093214,0,disjoint slower process ranges
+4,sarext_longzero/1000000,legitimate_long_zero_replay_stress,original_vs_candidate,5.7442845,8.6524325,50.62681000566738,0.617754768184701,0.7468702852705648,0,disjoint slower process ranges
+4,grouped_sarext_longzero/10000x100,legitimate_long_zero_replay_stress,original_vs_candidate,61.107954500000005,63.992673999999994,4.720693931916808,0.9243315900162467,1.0177586297349106,1,overlapping process ranges
+4,sarext_longzero/1000000,legitimate_long_zero_replay_stress,original_vs_alternative,5.7442845,5.5716525,-3.00528290337988,0.9967838004877618,1.1352857379724797,12,overlapping process ranges
+4,grouped_sarext_longzero/10000x100,legitimate_long_zero_replay_stress,original_vs_alternative,61.107954500000005,60.291372,-1.3362949335834817,0.9703343479994619,1.080278187983853,8,overlapping process ranges
+4,sarext_longzero/1000000,legitimate_long_zero_replay_stress,prior_vs_candidate,5.5586825,8.6524325,55.656173922507726,0.5967926659644023,0.7041688044747602,0,disjoint slower process ranges
+4,grouped_sarext_longzero/10000x100,legitimate_long_zero_replay_stress,prior_vs_candidate,66.9126305,63.992673999999994,-4.363834567824998,0.9953925493423746,1.1088879713365183,12,overlapping process ranges
+4,sarext_longzero/1000000,legitimate_long_zero_replay_stress,prior_vs_alternative,5.5586825,5.5716525,0.2333286709575555,0.9629602106209249,1.0703770341535552,7,overlapping process ranges
+4,grouped_sarext_longzero/10000x100,legitimate_long_zero_replay_stress,prior_vs_alternative,66.9126305,60.291372,-9.895379169109187,1.0449319170760774,1.177005483770269,12,disjoint faster process ranges
+4,sarext_longzero/1000000,legitimate_long_zero_replay_stress,candidate_vs_alternative,8.6524325,5.5716525,-35.605940872696785,1.4511315815086183,1.6901999018405722,12,disjoint faster process ranges
+4,grouped_sarext_longzero/10000x100,legitimate_long_zero_replay_stress,candidate_vs_alternative,63.992673999999994,60.291372,-5.783946456120881,1.006713994179452,1.1068233615368215,12,disjoint faster process ranges

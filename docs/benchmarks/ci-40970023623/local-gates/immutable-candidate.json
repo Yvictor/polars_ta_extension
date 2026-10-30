@@ -1,0 +1,18 @@
+{
+  "commit": "916b0de68369df410559b6dc651731cf4c36b94c",
+  "baseline": "0eb91280cf5d13095cbfdc6f8bcc477cfbcd1498",
+  "changed_files": {
+    "src/compat/mavp_sma.rs": "c90e922f7a2289e6408306409ce77edc582e5a25ee98d21138f74a2bbab23fd8",
+    "tests/test_mavp_uniform_prefix.py": "d8659d98d81b231ce4699c0f6bfed9a3921e94952f247cd7fe5fdc97bf0b91c4"
+  },
+  "full_rust": "46 passed;1 ignored",
+  "python_counts": {
+    "144": 12476,
+    "120": 12476,
+    "21": 12476
+  },
+  "corpus_cases": 10624,
+  "corpus_values": 2167654,
+  "independent_review": "combined_review approved source, installed binary identities and501 new public tests; evidence-binding and test-count findings fixed",
+  "publication": "Local commit only; not pushed or retained pending same-runner CI."
+}

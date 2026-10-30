@@ -35,7 +35,7 @@ def main():
         if before.get(key) != after.get(key):
             p.error(f"incomparable {key}: {before.get(key)} != {after.get(key)}")
     rows = [
-        "| Query / rows | 0.1.6 median ms | 0.2.0 median ms | Speedup |",
+        "| Query / rows | Baseline median ms | Candidate median ms | Speedup |",
         "| --- | ---: | ---: | ---: |",
     ]
     regressions = []

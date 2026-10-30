@@ -1,0 +1,351 @@
+{
+  "run": 40965216581,
+  "decision": "RETAIN B for final composition with remaining C regressions explicit",
+  "controller": "37a98e2326cdcdd3d8c3b8048b1b4143199e09c6",
+  "pins": {
+    "original": "b2bbc26d41ec80823c8bffb0cc436a97f29911cc",
+    "prior": "56f6d5fb139031c20d86d7e818e7d267eb834295",
+    "candidate": "8a4fc7feacc45b28929b2e7e6d1ae9919623bd2b",
+    "alternative": "f7d800398ecd6dc79c5b346e7e151cf917272327"
+  },
+  "artifact_zip_sha256": "2541f53a34e750d723799e80e734714d68b1a95a8e03185cebba9a70e90f583b",
+  "approved_result_sha256": "5d25f46fbe329bce2967b064c8526bfff81bd2faf95135693cde22dba4c0a2a0",
+  "approved_report_sha256": "30176b5bff9d6484695410758e91d03996c61ceba9837f1d942f2f988848f12a",
+  "auditor_sha256": "761c29f8242cebc41a89627ccb7e758b610336ac5fb3c5c4cc9a187ca86b7e33",
+  "trusted_sha256": "726880c2b4ad089767fc56c11563548a5f0fedc0025dbd61ba25e97190ab2e04",
+  "archive_file_count_excluding_manifest": 36,
+  "csv_rows": {
+    "all-replay-stress.csv": 24,
+    "B-vs56-targets-20.csv": 20,
+    "all28-four-arm-medians.csv": 28,
+    "all-slower-medians.csv": 82,
+    "all-controls.csv": 48,
+    "all-B-slower-C.csv": 11,
+    "B-vsC-targets-20.csv": 20,
+    "all168-pairwise-comparisons.csv": 168,
+    "all-Polars-controls.csv": 24,
+    "all168-distributions.csv": 168
+  },
+  "files": {
+    "B-vs56-targets-20.csv": {
+      "bytes": 4149,
+      "sha256": "5b47f15daa782f6fad44cd3b28f5d5c35d082c9ef9c2a3981baab1fd241deb54"
+    },
+    "B-vsC-targets-20.csv": {
+      "bytes": 4169,
+      "sha256": "ed3f3d4188667bebf5dfa5ca96cf71dffc0eab7d54ba58b7f82ff04ff9a2bfa9"
+    },
+    "README.md": {
+      "bytes": 6177,
+      "sha256": "2db616d5a583296a41abfa107321686a742f749066b9738974802767cfefc929"
+    },
+    "REPORT.md": {
+      "bytes": 11319,
+      "sha256": "30176b5bff9d6484695410758e91d03996c61ceba9837f1d942f2f988848f12a"
+    },
+    "RETENTION.json": {
+      "bytes": 25999,
+      "sha256": "e2c5f9ecdd8f242c08026f49ebac087885e1bd7f44001e0cf37dd5f956a09224"
+    },
+    "RETENTION.md": {
+      "bytes": 7018,
+      "sha256": "cedbad27452125b660a12f2a5c4d5a98031cedc75d64c8c108280bbb1829c775"
+    },
+    "all-B-slower-C.csv": {
+      "bytes": 2272,
+      "sha256": "9099080edde440fa2a733e37d749edd378e423c76d516d14b22b620611c4424b"
+    },
+    "all-Polars-controls.csv": {
+      "bytes": 4656,
+      "sha256": "7b4a8a662e44c054d5fb95f9e9df7d3df24346ea233eccf33a525cba60538117"
+    },
+    "all-controls.csv": {
+      "bytes": 9120,
+      "sha256": "a87303a0431d52c2651c37f661c949ff60aa9aad484a8d6f1596e1ab755ee9df"
+    },
+    "all-replay-stress.csv": {
+      "bytes": 4984,
+      "sha256": "46d0e15c85465a7fe607e4ccf5a3e5115321dab5f8977600cad7637e16292257"
+    },
+    "all-slower-medians.csv": {
+      "bytes": 15855,
+      "sha256": "d5b61507e88ece559428310974894f4209b529c1bedf1149ce1f46c94d43dab0"
+    },
+    "all168-distributions.csv": {
+      "bytes": 121804,
+      "sha256": "b8569e25b0c16b55173fe3cd45ad6fe514eff67edffa541b4d61dcef97f8a310"
+    },
+    "all168-pairwise-comparisons.csv": {
+      "bytes": 32902,
+      "sha256": "1194de44ea8ec36763862818a69f7e453e7a3bcfcbc9b1bca6e495980ee8db65"
+    },
+    "all28-four-arm-medians.csv": {
+      "bytes": 2232,
+      "sha256": "5d921bbcb284e50bf1a27ddf7f949dbf1060d058cc90a0cea993fdaf5ca5ba88"
+    },
+    "audit/README.md": {
+      "bytes": 4201,
+      "sha256": "743434903a68bd12c5ac5acf114ff9112cbde27a6f33d7aabdc881228b6086a3"
+    },
+    "audit/STATE.json": {
+      "bytes": 2538,
+      "sha256": "9457fc2afaba22a1c836702b3c5b62c7afbeeae7a196b329d06acc030655a671"
+    },
+    "audit/all-tests-path-fix.log": {
+      "bytes": 99,
+      "sha256": "2ff158e0598d4e92245e9df28474438ab9988395c696e6ab3d61327663a2cf7b"
+    },
+    "audit/audit-v1-approved.py": {
+      "bytes": 38512,
+      "sha256": "0a08f54ee3304ed7e5bb085dc7ef6a0e58e4b1b08889545235b80599f496e98b"
+    },
+    "audit/audit.py": {
+      "bytes": 39067,
+      "sha256": "761c29f8242cebc41a89627ccb7e758b610336ac5fb3c5c4cc9a187ca86b7e33"
+    },
+    "audit/bundle-manifest.json": {
+      "bytes": 4074,
+      "sha256": "699871d1c4d0cd2142ad6471cdc7e8f4d9f00856dd05cbea7c295811c3551608"
+    },
+    "audit/inputs.py": {
+      "bytes": 5235,
+      "sha256": "4fd0d2ab84a13af79f16c727d5b6191f87ffe6344e4ad35f8f06c7ab22265cc1"
+    },
+    "audit/path-fix-review.json": {
+      "bytes": 949,
+      "sha256": "011495b1c991b5f88814845ec5a6327759c06cc7f9d242ed1ed36841e0066105"
+    },
+    "audit/path-fix.diff.json": {
+      "bytes": 5170,
+      "sha256": "384768c172b2ef7d6f60c8897ce1935626fcb85190d8f6ba27d41b65a11b1b05"
+    },
+    "audit/prepare_trust.py": {
+      "bytes": 3944,
+      "sha256": "f13c73a2ef45ecfbf3b444826e118981c5945475b54c6729bba4af8637053368"
+    },
+    "audit/replay-v1-path-stop-exit.json": {
+      "bytes": 538,
+      "sha256": "7b03941e7176359dc10d84c5b87d7848b551c251601132113258003aa33cf1fb"
+    },
+    "audit/replay-v1-path-stop.log": {
+      "bytes": 2686,
+      "sha256": "02f07cfbf842e4733a022e0da4db0930d23e6ad3c3f376feaf95ea8348683652"
+    },
+    "audit/replay-v2-exit.json": {
+      "bytes": 196,
+      "sha256": "14e0096290522baad5c8ac855a6bc7bbf20c5164bc885a8d05e93585cc1f84a1"
+    },
+    "audit/replay-v2.log": {
+      "bytes": 87,
+      "sha256": "57b3f2120ecbc9def2f4e47aca8e5438b3f7e392d5e6b7e7ea6720d10a7206d1"
+    },
+    "audit/report.py": {
+      "bytes": 5354,
+      "sha256": "89cb3af75f31a89f9d4b944d2b1c5fc5ecb240acfa27f29837e0b4ba5644e347"
+    },
+    "audit/review-ready-v1-approved.json": {
+      "bytes": 947,
+      "sha256": "48d6587d9cb9ef3d0bb8ade9037eacf61d7cf0db23525ac89fac89c4d7c93b6b"
+    },
+    "audit/shared_core.py": {
+      "bytes": 31665,
+      "sha256": "b8c0b004daac5d920835c7a316cf97919cc3a13633eeecd860fdd02ab669cba9"
+    },
+    "audit/test_audit.py": {
+      "bytes": 16316,
+      "sha256": "e765fa996f08c9fbae387628353e3ff0d426c62d62148920d3dfe811e5059604"
+    },
+    "audit/trusted.json": {
+      "bytes": 118537,
+      "sha256": "726880c2b4ad089767fc56c11563548a5f0fedc0025dbd61ba25e97190ab2e04"
+    },
+    "audit/unit-tests-path-fix.log": {
+      "bytes": 2326,
+      "sha256": "d06f4d1a826f1f2ce3dddb8f0d50e8761718db9d7b5e81003d39744b86f8ba37"
+    },
+    "provenance.json": {
+      "bytes": 12956,
+      "sha256": "361df3de2dd6dfa9ac09394113d05947a1e7d24f8e41a0e2452b4cad409c8a4a"
+    },
+    "result.json": {
+      "bytes": 1457197,
+      "sha256": "5d25f46fbe329bce2967b064c8526bfff81bd2faf95135693cde22dba4c0a2a0"
+    }
+  },
+  "source_copies": {
+    "REPORT.md": {
+      "source": "/tmp/polars-recovery/audit-sarext-typed/report/REPORT.md",
+      "sha256": "30176b5bff9d6484695410758e91d03996c61ceba9837f1d942f2f988848f12a",
+      "copy": "byte-identical"
+    },
+    "all168-pairwise-comparisons.csv": {
+      "source": "/tmp/polars-recovery/audit-sarext-typed/report/all168-pairwise-comparisons.csv",
+      "sha256": "1194de44ea8ec36763862818a69f7e453e7a3bcfcbc9b1bca6e495980ee8db65",
+      "copy": "byte-identical"
+    },
+    "all28-four-arm-medians.csv": {
+      "source": "/tmp/polars-recovery/audit-sarext-typed/report/all28-four-arm-medians.csv",
+      "sha256": "5d921bbcb284e50bf1a27ddf7f949dbf1060d058cc90a0cea993fdaf5ca5ba88",
+      "copy": "byte-identical"
+    },
+    "all-slower-medians.csv": {
+      "source": "/tmp/polars-recovery/audit-sarext-typed/report/all-slower-medians.csv",
+      "sha256": "d5b61507e88ece559428310974894f4209b529c1bedf1149ce1f46c94d43dab0",
+      "copy": "byte-identical"
+    },
+    "all-Polars-controls.csv": {
+      "source": "/tmp/polars-recovery/audit-sarext-typed/report/all-Polars-controls.csv",
+      "sha256": "7b4a8a662e44c054d5fb95f9e9df7d3df24346ea233eccf33a525cba60538117",
+      "copy": "byte-identical"
+    },
+    "all-replay-stress.csv": {
+      "source": "/tmp/polars-recovery/audit-sarext-typed/report/all-replay-stress.csv",
+      "sha256": "46d0e15c85465a7fe607e4ccf5a3e5115321dab5f8977600cad7637e16292257",
+      "copy": "byte-identical"
+    },
+    "RETENTION.md": {
+      "source": "/tmp/polars-recovery/audit-sarext-typed/RETENTION.md",
+      "sha256": "cedbad27452125b660a12f2a5c4d5a98031cedc75d64c8c108280bbb1829c775",
+      "copy": "byte-identical"
+    },
+    "RETENTION.json": {
+      "source": "/tmp/polars-recovery/audit-sarext-typed/RETENTION.json",
+      "sha256": "e2c5f9ecdd8f242c08026f49ebac087885e1bd7f44001e0cf37dd5f956a09224",
+      "copy": "byte-identical"
+    },
+    "result.json": {
+      "source": "/tmp/polars-recovery/audit-sarext-typed/result.json",
+      "sha256": "5d25f46fbe329bce2967b064c8526bfff81bd2faf95135693cde22dba4c0a2a0",
+      "copy": "byte-identical"
+    },
+    "audit/audit.py": {
+      "source": "/tmp/polars-recovery/audit-sarext-typed/audit.py",
+      "sha256": "761c29f8242cebc41a89627ccb7e758b610336ac5fb3c5c4cc9a187ca86b7e33",
+      "copy": "byte-identical"
+    },
+    "audit/inputs.py": {
+      "source": "/tmp/polars-recovery/audit-sarext-typed/inputs.py",
+      "sha256": "4fd0d2ab84a13af79f16c727d5b6191f87ffe6344e4ad35f8f06c7ab22265cc1",
+      "copy": "byte-identical"
+    },
+    "audit/shared_core.py": {
+      "source": "/tmp/polars-recovery/audit-sarext-typed/shared_core.py",
+      "sha256": "b8c0b004daac5d920835c7a316cf97919cc3a13633eeecd860fdd02ab669cba9",
+      "copy": "byte-identical"
+    },
+    "audit/trusted.json": {
+      "source": "/tmp/polars-recovery/audit-sarext-typed/trusted.json",
+      "sha256": "726880c2b4ad089767fc56c11563548a5f0fedc0025dbd61ba25e97190ab2e04",
+      "copy": "byte-identical"
+    },
+    "audit/prepare_trust.py": {
+      "source": "/tmp/polars-recovery/audit-sarext-typed/prepare_trust.py",
+      "sha256": "f13c73a2ef45ecfbf3b444826e118981c5945475b54c6729bba4af8637053368",
+      "copy": "byte-identical"
+    },
+    "audit/test_audit.py": {
+      "source": "/tmp/polars-recovery/audit-sarext-typed/test_audit.py",
+      "sha256": "e765fa996f08c9fbae387628353e3ff0d426c62d62148920d3dfe811e5059604",
+      "copy": "byte-identical"
+    },
+    "audit/report.py": {
+      "source": "/tmp/polars-recovery/audit-sarext-typed/report.py",
+      "sha256": "89cb3af75f31a89f9d4b944d2b1c5fc5ecb240acfa27f29837e0b4ba5644e347",
+      "copy": "byte-identical"
+    },
+    "audit/README.md": {
+      "source": "/tmp/polars-recovery/audit-sarext-typed/README.md",
+      "sha256": "743434903a68bd12c5ac5acf114ff9112cbde27a6f33d7aabdc881228b6086a3",
+      "copy": "byte-identical"
+    },
+    "audit/STATE.json": {
+      "source": "/tmp/polars-recovery/audit-sarext-typed/STATE.json",
+      "sha256": "9457fc2afaba22a1c836702b3c5b62c7afbeeae7a196b329d06acc030655a671",
+      "copy": "byte-identical"
+    },
+    "audit/replay-v2.log": {
+      "source": "/tmp/polars-recovery/audit-sarext-typed/replay-v2.log",
+      "sha256": "57b3f2120ecbc9def2f4e47aca8e5438b3f7e392d5e6b7e7ea6720d10a7206d1",
+      "copy": "byte-identical"
+    },
+    "audit/replay-v2-exit.json": {
+      "source": "/tmp/polars-recovery/audit-sarext-typed/replay-v2-exit.json",
+      "sha256": "14e0096290522baad5c8ac855a6bc7bbf20c5164bc885a8d05e93585cc1f84a1",
+      "copy": "byte-identical"
+    },
+    "audit/audit-v1-approved.py": {
+      "source": "/tmp/polars-recovery/audit-sarext-typed/audit-v1-approved.py",
+      "sha256": "0a08f54ee3304ed7e5bb085dc7ef6a0e58e4b1b08889545235b80599f496e98b",
+      "copy": "byte-identical"
+    },
+    "audit/review-ready-v1-approved.json": {
+      "source": "/tmp/polars-recovery/audit-sarext-typed/review-ready-v1-approved.json",
+      "sha256": "48d6587d9cb9ef3d0bb8ade9037eacf61d7cf0db23525ac89fac89c4d7c93b6b",
+      "copy": "byte-identical"
+    },
+    "audit/replay-v1-path-stop.log": {
+      "source": "/tmp/polars-recovery/audit-sarext-typed/replay-v1-path-stop.log",
+      "sha256": "02f07cfbf842e4733a022e0da4db0930d23e6ad3c3f376feaf95ea8348683652",
+      "copy": "byte-identical"
+    },
+    "audit/replay-v1-path-stop-exit.json": {
+      "source": "/tmp/polars-recovery/audit-sarext-typed/replay-v1-path-stop-exit.json",
+      "sha256": "7b03941e7176359dc10d84c5b87d7848b551c251601132113258003aa33cf1fb",
+      "copy": "byte-identical"
+    },
+    "audit/path-fix-review.json": {
+      "source": "/tmp/polars-recovery/audit-sarext-typed/path-fix-review.json",
+      "sha256": "011495b1c991b5f88814845ec5a6327759c06cc7f9d242ed1ed36841e0066105",
+      "copy": "byte-identical"
+    },
+    "audit/all-tests-path-fix.log": {
+      "source": "/tmp/polars-recovery/audit-sarext-typed/all-tests-path-fix.log",
+      "sha256": "2ff158e0598d4e92245e9df28474438ab9988395c696e6ab3d61327663a2cf7b",
+      "copy": "byte-identical"
+    },
+    "audit/unit-tests-path-fix.log": {
+      "source": "/tmp/polars-recovery/audit-sarext-typed/unit-tests-path-fix.log",
+      "sha256": "d06f4d1a826f1f2ce3dddb8f0d50e8761718db9d7b5e81003d39744b86f8ba37",
+      "copy": "byte-identical"
+    },
+    "audit/bundle-manifest.json": {
+      "source": "/tmp/polars-recovery/audit-sarext-typed/bundle-manifest.json",
+      "sha256": "699871d1c4d0cd2142ad6471cdc7e8f4d9f00856dd05cbea7c295811c3551608",
+      "copy": "byte-identical"
+    },
+    "audit/path-fix.diff.json": {
+      "source": "/tmp/polars-recovery/audit-sarext-typed/path-fix.diff",
+      "copy": "Lossless UTF-8 JSON encoding to preserve original patch context whitespace without repository trailing-whitespace warnings",
+      "decoded_source_sha256": "0ccda82d74a37bc4bc5f608c852668f389d14b31b8ff2a6b9871c74c26dae4ee"
+    }
+  },
+  "derived_tables": {
+    "all-controls.csv": {
+      "source": "all168-pairwise-comparisons.csv",
+      "selection": "Exact row subset; no numeric reformatting",
+      "rows": 48
+    },
+    "all-B-slower-C.csv": {
+      "source": "all168-pairwise-comparisons.csv",
+      "selection": "Exact row subset; no numeric reformatting",
+      "rows": 11
+    },
+    "B-vsC-targets-20.csv": {
+      "source": "all168-pairwise-comparisons.csv",
+      "selection": "Exact row subset; no numeric reformatting",
+      "rows": 20
+    },
+    "B-vs56-targets-20.csv": {
+      "source": "all168-pairwise-comparisons.csv",
+      "selection": "Exact row subset; no numeric reformatting",
+      "rows": 20
+    },
+    "all168-distributions.csv": {
+      "source": "result.json",
+      "source_sha256": "5d25f46fbe329bce2967b064c8526bfff81bd2faf95135693cde22dba4c0a2a0",
+      "selection": "All168 pairwise comparison records, with12 process medians/paired ratios and sample p10/p90 arrays JSON-encoded losslessly in CSV cells",
+      "rows": 168
+    }
+  },
+  "validation": "Copied files byte-identical; patch text losslessly JSON encoded and decoded source hash verified; allCSVparsed rows/complete distributions preserved, LF-only; allrelativeMarkdownlinksresolve; gitdiff --no-index --check produced no whitespace diagnostics for every new file."
+}

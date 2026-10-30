@@ -1,0 +1,27 @@
+{
+  "decision": "REJECT BOTH PERFORMANCE VARIANTS",
+  "fused": "98d933f2e027458e1f87d6847d199f59e13c041c",
+  "initialization_only": "1cf188bf417bc842a9c6227bb833542b7914d24e",
+  "no_product_code_cherrypicked": true,
+  "auditor_sha256": "6fd6e792747014ddcbdeec0c054feb04df47fd3d04ba5723dbbcd6131e5ae76a",
+  "trusted_sha256": "01779a7958ea38a20ea77dfeb3a4ffa4413d3e80645e15bd0175f71a835f3c37",
+  "files": {
+    "all264-pairwise-comparisons.csv": "17a96e3ab8038fe208baa25a8ca302604ce9a870c1dfb0b057bfbc2c2763c8d3",
+    "all-slower-pairwise-medians.csv": "9a5690aab08b204d098668ccc9d81551de4f7766a0c29c9e8844f439cb2c0e46",
+    "replay-provenance.json": "5a7dec51e9dc17564b2b6d57981f6b8e7632e20cb0878c0820e0f75b409f04f5",
+    "all-controls.csv": "070f7986c988992062562c233ee73a1f69d64d6ea54bd20f87eb4547140d52c0",
+    "README.md": "da79e2a1ef2617e5b6ca04ed9644f82a0fdbfb8ccb895bf22f22aa36619917ff",
+    "all-C-slower-arms.csv": "8057a5a4d167533d4f1ea7a92142046bb7a3f59fc20f812ef0b799718db9a00c",
+    "static-provenance.json": "336d2b3734cc56daad3098a2782bda8addae90c900bab93d95483ee073e99777",
+    "counts.json": "c9c18fa6ce7fba73da74e54b3eaa732a09b8fa07f067cc7fb146120719335b33",
+    "all44-observations.csv": "47df5921cc9a9e23913be6283ef095b926a78cec61d242708ed63de5e1c2747a"
+  },
+  "source_csv_sha256_before_LF_normalization": {
+    "all264-pairwise-comparisons.csv": "83517a770847c2688c1d3cffa98a4365b0bc0efb9dc188337ecb7ac9975db14b",
+    "all-slower-pairwise-medians.csv": "ab39d48b95bf753dd133e5d89af5594260d5ac14c44ccf2cf97fc47b16c7f526",
+    "all-controls.csv": "e37f39127aeb90351b19e1322ae0c602e14c3b75fd4c8cba53c118a4c6a0c7d0",
+    "all-C-slower-arms.csv": "3901a0de5dd0520ae11a0660b081bff835565791d43367d2ca2c4fe2b8946e74",
+    "all44-observations.csv": "4652fe508a614aa343e39067556fc5645869c5141ccab2c8428e125efc13cbfe"
+  },
+  "archival_line_endings": "LF; parsed CSV records unchanged from the independently audited source tables."
+}

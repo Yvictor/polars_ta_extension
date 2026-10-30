@@ -1,0 +1,268 @@
+{
+  "decision": "RETAIN B for final composition; preserve remaining C gaps",
+  "isolated_component_comparison": true,
+  "not_evidence_for_later_combined_head": true,
+  "run": 40965216581,
+  "run_url": "https://github.com/Yvictor/polars_ta_extension/actions/runs/40965216581",
+  "controller": "37a98e2326cdcdd3d8c3b8048b1b4143199e09c6",
+  "job": 123767857523,
+  "artifact": 12939942104,
+  "artifact_url": "https://github.com/Yvictor/polars_ta_extension/actions/runs/40965216581/artifacts/12939942104",
+  "artifact_bytes": 587018936,
+  "artifact_zip_sha256": "2541f53a34e750d723799e80e734714d68b1a95a8e03185cebba9a70e90f583b",
+  "extracted_files": 8297,
+  "pins": {
+    "original": "b2bbc26d41ec80823c8bffb0cc436a97f29911cc",
+    "prior": "56f6d5fb139031c20d86d7e818e7d267eb834295",
+    "candidate": "8a4fc7feacc45b28929b2e7e6d1ae9919623bd2b",
+    "alternative": "f7d800398ecd6dc79c5b346e7e151cf917272327"
+  },
+  "runtime": {
+    "1": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+      "python": "3.12.15",
+      "polars": "1.44.2",
+      "numpy": "2.5.3",
+      "rust": "rustc 1.90.0 (1159e78c4 2025-09-14)",
+      "profile": "release (maturin --release --locked), portable CPU target",
+      "affinity": [
+        0
+      ]
+    },
+    "4": {
+      "cpu": "AMD EPYC 9V45 96-Core Processor",
+      "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+      "python": "3.12.15",
+      "polars": "1.44.2",
+      "numpy": "2.5.3",
+      "rust": "rustc 1.90.0 (1159e78c4 2025-09-14)",
+      "profile": "release (maturin --release --locked), portable CPU target",
+      "affinity": [
+        0,
+        1,
+        2,
+        3
+      ]
+    }
+  },
+  "protocol": {
+    "cases": 14,
+    "target_observations": 20,
+    "control_observations": 8,
+    "arms": 4,
+    "thread_settings": [
+      1,
+      4
+    ],
+    "rounds": 12,
+    "order": "Four Williams orders repeated three times",
+    "samples": 31,
+    "warmups": 5,
+    "children": 1344,
+    "raw_samples": 41664,
+    "physical_IPC_files": 10,
+    "own_arm_query_goldens": 8,
+    "full_corpus_cases_per_arm": 10624,
+    "checked_corpus_values_per_comparison": 2167654,
+    "pairwise_comparisons": 6
+  },
+  "auditor": {
+    "approved_before_data_sha256": "0a08f54ee3304ed7e5bb085dc7ef6a0e58e4b1b08889545235b80599f496e98b",
+    "approved_replay_sha256": "761c29f8242cebc41a89627ccb7e758b610336ac5fb3c5c4cc9a187ca86b7e33",
+    "trusted_sha256": "726880c2b4ad089767fc56c11563548a5f0fedc0025dbd61ba25e97190ab2e04",
+    "shared_core_sha256": "b8c0b004daac5d920835c7a316cf97919cc3a13633eeecd860fdd02ab669cba9",
+    "synthetic_tests": 18,
+    "path_fix": "Only documented relative/absolute producer path normalization with arm/area/traversal/symlink binding; no numerical/statistical/ELF gate relaxation",
+    "first_stop_before_numerical_timing_access": true,
+    "original_source_and_failure_preserved": true,
+    "independent_reviewer": "combined_review",
+    "final_review": "Independently recomputed all168 CSV rows directly from all1344 raw children/41664 samples and verified target/control/noise counts, rawNaNsign limits and retention rationale"
+  },
+  "source_files": {
+    "REPORT.md": {
+      "source": "/tmp/polars-recovery/audit-sarext-typed/report/REPORT.md",
+      "sha256": "30176b5bff9d6484695410758e91d03996c61ceba9837f1d942f2f988848f12a",
+      "copy": "byte-identical"
+    },
+    "all168-pairwise-comparisons.csv": {
+      "source": "/tmp/polars-recovery/audit-sarext-typed/report/all168-pairwise-comparisons.csv",
+      "sha256": "1194de44ea8ec36763862818a69f7e453e7a3bcfcbc9b1bca6e495980ee8db65",
+      "copy": "byte-identical"
+    },
+    "all28-four-arm-medians.csv": {
+      "source": "/tmp/polars-recovery/audit-sarext-typed/report/all28-four-arm-medians.csv",
+      "sha256": "5d921bbcb284e50bf1a27ddf7f949dbf1060d058cc90a0cea993fdaf5ca5ba88",
+      "copy": "byte-identical"
+    },
+    "all-slower-medians.csv": {
+      "source": "/tmp/polars-recovery/audit-sarext-typed/report/all-slower-medians.csv",
+      "sha256": "d5b61507e88ece559428310974894f4209b529c1bedf1149ce1f46c94d43dab0",
+      "copy": "byte-identical"
+    },
+    "all-Polars-controls.csv": {
+      "source": "/tmp/polars-recovery/audit-sarext-typed/report/all-Polars-controls.csv",
+      "sha256": "7b4a8a662e44c054d5fb95f9e9df7d3df24346ea233eccf33a525cba60538117",
+      "copy": "byte-identical"
+    },
+    "all-replay-stress.csv": {
+      "source": "/tmp/polars-recovery/audit-sarext-typed/report/all-replay-stress.csv",
+      "sha256": "46d0e15c85465a7fe607e4ccf5a3e5115321dab5f8977600cad7637e16292257",
+      "copy": "byte-identical"
+    },
+    "RETENTION.md": {
+      "source": "/tmp/polars-recovery/audit-sarext-typed/RETENTION.md",
+      "sha256": "cedbad27452125b660a12f2a5c4d5a98031cedc75d64c8c108280bbb1829c775",
+      "copy": "byte-identical"
+    },
+    "RETENTION.json": {
+      "source": "/tmp/polars-recovery/audit-sarext-typed/RETENTION.json",
+      "sha256": "e2c5f9ecdd8f242c08026f49ebac087885e1bd7f44001e0cf37dd5f956a09224",
+      "copy": "byte-identical"
+    },
+    "result.json": {
+      "source": "/tmp/polars-recovery/audit-sarext-typed/result.json",
+      "sha256": "5d25f46fbe329bce2967b064c8526bfff81bd2faf95135693cde22dba4c0a2a0",
+      "copy": "byte-identical"
+    },
+    "audit/audit.py": {
+      "source": "/tmp/polars-recovery/audit-sarext-typed/audit.py",
+      "sha256": "761c29f8242cebc41a89627ccb7e758b610336ac5fb3c5c4cc9a187ca86b7e33",
+      "copy": "byte-identical"
+    },
+    "audit/inputs.py": {
+      "source": "/tmp/polars-recovery/audit-sarext-typed/inputs.py",
+      "sha256": "4fd0d2ab84a13af79f16c727d5b6191f87ffe6344e4ad35f8f06c7ab22265cc1",
+      "copy": "byte-identical"
+    },
+    "audit/shared_core.py": {
+      "source": "/tmp/polars-recovery/audit-sarext-typed/shared_core.py",
+      "sha256": "b8c0b004daac5d920835c7a316cf97919cc3a13633eeecd860fdd02ab669cba9",
+      "copy": "byte-identical"
+    },
+    "audit/trusted.json": {
+      "source": "/tmp/polars-recovery/audit-sarext-typed/trusted.json",
+      "sha256": "726880c2b4ad089767fc56c11563548a5f0fedc0025dbd61ba25e97190ab2e04",
+      "copy": "byte-identical"
+    },
+    "audit/prepare_trust.py": {
+      "source": "/tmp/polars-recovery/audit-sarext-typed/prepare_trust.py",
+      "sha256": "f13c73a2ef45ecfbf3b444826e118981c5945475b54c6729bba4af8637053368",
+      "copy": "byte-identical"
+    },
+    "audit/test_audit.py": {
+      "source": "/tmp/polars-recovery/audit-sarext-typed/test_audit.py",
+      "sha256": "e765fa996f08c9fbae387628353e3ff0d426c62d62148920d3dfe811e5059604",
+      "copy": "byte-identical"
+    },
+    "audit/report.py": {
+      "source": "/tmp/polars-recovery/audit-sarext-typed/report.py",
+      "sha256": "89cb3af75f31a89f9d4b944d2b1c5fc5ecb240acfa27f29837e0b4ba5644e347",
+      "copy": "byte-identical"
+    },
+    "audit/README.md": {
+      "source": "/tmp/polars-recovery/audit-sarext-typed/README.md",
+      "sha256": "743434903a68bd12c5ac5acf114ff9112cbde27a6f33d7aabdc881228b6086a3",
+      "copy": "byte-identical"
+    },
+    "audit/STATE.json": {
+      "source": "/tmp/polars-recovery/audit-sarext-typed/STATE.json",
+      "sha256": "9457fc2afaba22a1c836702b3c5b62c7afbeeae7a196b329d06acc030655a671",
+      "copy": "byte-identical"
+    },
+    "audit/replay-v2.log": {
+      "source": "/tmp/polars-recovery/audit-sarext-typed/replay-v2.log",
+      "sha256": "57b3f2120ecbc9def2f4e47aca8e5438b3f7e392d5e6b7e7ea6720d10a7206d1",
+      "copy": "byte-identical"
+    },
+    "audit/replay-v2-exit.json": {
+      "source": "/tmp/polars-recovery/audit-sarext-typed/replay-v2-exit.json",
+      "sha256": "14e0096290522baad5c8ac855a6bc7bbf20c5164bc885a8d05e93585cc1f84a1",
+      "copy": "byte-identical"
+    },
+    "audit/audit-v1-approved.py": {
+      "source": "/tmp/polars-recovery/audit-sarext-typed/audit-v1-approved.py",
+      "sha256": "0a08f54ee3304ed7e5bb085dc7ef6a0e58e4b1b08889545235b80599f496e98b",
+      "copy": "byte-identical"
+    },
+    "audit/review-ready-v1-approved.json": {
+      "source": "/tmp/polars-recovery/audit-sarext-typed/review-ready-v1-approved.json",
+      "sha256": "48d6587d9cb9ef3d0bb8ade9037eacf61d7cf0db23525ac89fac89c4d7c93b6b",
+      "copy": "byte-identical"
+    },
+    "audit/replay-v1-path-stop.log": {
+      "source": "/tmp/polars-recovery/audit-sarext-typed/replay-v1-path-stop.log",
+      "sha256": "02f07cfbf842e4733a022e0da4db0930d23e6ad3c3f376feaf95ea8348683652",
+      "copy": "byte-identical"
+    },
+    "audit/replay-v1-path-stop-exit.json": {
+      "source": "/tmp/polars-recovery/audit-sarext-typed/replay-v1-path-stop-exit.json",
+      "sha256": "7b03941e7176359dc10d84c5b87d7848b551c251601132113258003aa33cf1fb",
+      "copy": "byte-identical"
+    },
+    "audit/path-fix-review.json": {
+      "source": "/tmp/polars-recovery/audit-sarext-typed/path-fix-review.json",
+      "sha256": "011495b1c991b5f88814845ec5a6327759c06cc7f9d242ed1ed36841e0066105",
+      "copy": "byte-identical"
+    },
+    "audit/all-tests-path-fix.log": {
+      "source": "/tmp/polars-recovery/audit-sarext-typed/all-tests-path-fix.log",
+      "sha256": "2ff158e0598d4e92245e9df28474438ab9988395c696e6ab3d61327663a2cf7b",
+      "copy": "byte-identical"
+    },
+    "audit/unit-tests-path-fix.log": {
+      "source": "/tmp/polars-recovery/audit-sarext-typed/unit-tests-path-fix.log",
+      "sha256": "d06f4d1a826f1f2ce3dddb8f0d50e8761718db9d7b5e81003d39744b86f8ba37",
+      "copy": "byte-identical"
+    },
+    "audit/bundle-manifest.json": {
+      "source": "/tmp/polars-recovery/audit-sarext-typed/bundle-manifest.json",
+      "sha256": "699871d1c4d0cd2142ad6471cdc7e8f4d9f00856dd05cbea7c295811c3551608",
+      "copy": "byte-identical"
+    },
+    "audit/path-fix.diff.json": {
+      "source": "/tmp/polars-recovery/audit-sarext-typed/path-fix.diff",
+      "copy": "Lossless UTF-8 JSON encoding to preserve original patch context whitespace without repository trailing-whitespace warnings",
+      "decoded_source_sha256": "0ccda82d74a37bc4bc5f608c852668f389d14b31b8ff2a6b9871c74c26dae4ee"
+    }
+  },
+  "derived_tables": {
+    "all-controls.csv": {
+      "source": "all168-pairwise-comparisons.csv",
+      "selection": "Exact row subset; no numeric reformatting",
+      "rows": 48
+    },
+    "all-B-slower-C.csv": {
+      "source": "all168-pairwise-comparisons.csv",
+      "selection": "Exact row subset; no numeric reformatting",
+      "rows": 11
+    },
+    "B-vsC-targets-20.csv": {
+      "source": "all168-pairwise-comparisons.csv",
+      "selection": "Exact row subset; no numeric reformatting",
+      "rows": 20
+    },
+    "B-vs56-targets-20.csv": {
+      "source": "all168-pairwise-comparisons.csv",
+      "selection": "Exact row subset; no numeric reformatting",
+      "rows": 20
+    },
+    "all168-distributions.csv": {
+      "source": "result.json",
+      "source_sha256": "5d25f46fbe329bce2967b064c8526bfff81bd2faf95135693cde22dba4c0a2a0",
+      "selection": "All168 pairwise comparison records, with12 process medians/paired ratios and sample p10/p90 arrays JSON-encoded losslessly in CSV cells",
+      "rows": 168
+    }
+  },
+  "source_csv_line_endings": "LF copied byte-identically; additional CSVs use LF and exact parsed row subsets/lossless arrays",
+  "limits": [
+    "Trust frozen before raw artifact access, after CI measurements began.",
+    "Raw physical IPC inputs and all four own-arm golden arrays are replayed independently. All four arms\u2019 query golden arrays are retained at both thread settings and independently replayed. Timed final arrays are not duplicated: exact source-bound final checks/hashes are bound to each arm golden. All four complete corpus arrays are independently replayed.",
+    "C corpus uses historical tolerance1e-10, integer outputs exact; native corpus requires exact finite/signed-zero/masks/NaN positions. NaN sign/payload not a public guarantee.",
+    "Shared-target Cargo metadata/fingerprints/dependency edges/portable flags are inspected but are not a unique cryptographic ELF-to-linked-rlib bridge; source/wheel binding includes exact actual compile logs and immutable workflow execution.",
+    "Twelve process rounds and correlated inner samples are descriptive, not formal multiple-comparison significance; no pooling thread settings/runners.",
+    "Fault counters cover engine/Python/allocator activity across query threads, not allocator-only events.",
+    "SAREXT numerical outputs are compared against retained immutable original C/public native goldens; no separate reimplementation of the SAR kernel is executed by this auditor. Physical inputs, grouping, warmups, C-target zero boundary, pure Polars controls and all distributions are independently reconstructed.",
+    "Timed final output arrays are not duplicated; immutable child source performs exact final checks against own-arm goldens, with retained pre-timer output hashes and final_output_checked flag. No timing-loop instrumentation or allocator-only attribution."
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "baseline": "/tmp/polars-recovery/integration-evidence/candidate.npz",
+  "candidate": "/tmp/polars-recovery/mavp-uniform-evidence/candidate.npz",
+  "baseline_sha256": "e902065788fdbf90c54a9c39c5968a58e25ae5e432539c8def4f00bb95483abf",
+  "candidate_sha256": "e902065788fdbf90c54a9c39c5968a58e25ae5e432539c8def4f00bb95483abf",
+  "baseline_runtime": {
+    "python": "3.12.14",
+    "polars": "1.44.2",
+    "numpy": "2.5.3",
+    "talib": "0.8.3 (native Rust; polars-talib compatibility)"
+  },
+  "candidate_runtime": {
+    "python": "3.12.14",
+    "polars": "1.44.2",
+    "numpy": "2.5.3",
+    "talib": "0.8.3 (native Rust; polars-talib compatibility)"
+  },
+  "require_exact": true,
+  "rtol": 0.0,
+  "atol": 0.0,
+  "tiny_case_atol": 0.0,
+  "cases": 10624,
+  "checked_values": 2167654,
+  "api_signatures_match": true,
+  "api_call_contract_match": true,
+  "annotation_changed_functions": [],
+  "fields_with_bit_differences": 0,
+  "max_absolute_difference": 0.0
+}
+failures: 0
+[]
