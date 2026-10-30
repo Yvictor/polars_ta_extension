@@ -1,0 +1,32 @@
+{
+  "description": "Original C081 b2 / delivered56 / final e79 / reviewed CMOU checked-window zip candidate; ordinary native over only.",
+  "cases": [
+    "cmou/1000000",
+    "cmou/1000",
+    "grouped_cmou/100x10000",
+    "grouped_cmou/1000x1000",
+    "grouped_cmou/10000x100",
+    "grouped_cmou/2000x100_interleaved",
+    "cmo/1000000",
+    "grouped_cmo/100x10000",
+    "grouped_cmo/10000x100",
+    "grouped_cmo/2000x100_interleaved",
+    "control_cumsum_dense/1000000",
+    "control_cumsum/10000x100"
+  ],
+  "integer_families": [],
+  "checked_values": 9401000,
+  "timed_children": 1152,
+  "timed_samples": 35712,
+  "measurement_budget_seconds": 7200,
+  "child_timeout_seconds": 120,
+  "fixtures": {
+    "price": "Historical default_rng(260126): close=100+cumsum(normal(0,.1)); identical full OHLCV and constant period14 arrays for queries with the same layout",
+    "dense": "symbol all zero; distinct physical input from grouped 1000x1000",
+    "groups": "Contiguous chronological groups before optional interleaving; ordinary over(symbol)",
+    "interleave": "Stable sort by within-group bar then symbol; per-group chronological prices preserved",
+    "deduplicated_IPC_inputs": 6,
+    "controls": "CMO source/kernel unchanged; Polars cum_sum only; code-layout and host effects possible",
+    "warmup": "14 NaNs per indicator group, then finite values; no nulls"
+  }
+}

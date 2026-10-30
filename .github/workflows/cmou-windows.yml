@@ -1,0 +1,156 @@
+name: Focused native CMOU checked windows
+
+on:
+  push:
+    branches: [codex/cmou-windows-ci]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cmou-windows-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  PYO3_USE_ABI3_FORWARD_COMPATIBILITY: '1'
+  RUSTUP_TOOLCHAIN: '1.90.0'
+  CARGO_BUILD_JOBS: '4'
+  CARGO_TERM_COLOR: 'never'
+  CARGO_PROFILE_RELEASE_DEBUG: 'false'
+  CARGO_PROFILE_RELEASE_OPT_LEVEL: '3'
+  CARGO_PROFILE_RELEASE_LTO: 'false'
+  CARGO_PROFILE_RELEASE_CODEGEN_UNITS: '16'
+  CARGO_TARGET_DIR: ${{ github.workspace }}/cmou-windows-target
+  CARGO_BUILD_BUILD_DIR: ${{ github.workspace }}/cmou-windows-target
+  CFLAGS: ''
+  CXXFLAGS: ''
+  RUSTFLAGS: ''
+  CARGO_ENCODED_RUSTFLAGS: ''
+  CMAKE: ${{ github.workspace }}/envs/prior/bin/cmake
+  POLARS_MAX_THREADS: '4'
+  PRIOR_COMMIT: 56f6d5fb139031c20d86d7e818e7d267eb834295
+  COMBINED_COMMIT: e79ac0785436bbf3ba4c411d80936f8dd4ecfa24
+  CANDIDATE_COMMIT: 36a6f5dfded2330fe6df550ac3570546882e01ca
+  CANDIDATE_HELPER_SHA256: eee8484a6079f910db657a3645b205edd78c9e0b0f17c7cfb0aadb771cceabaf
+  PUBLIC_PROBE_SHA256: 3766b64d0c9dc6fcc55d4648824b2b679ecbc96cc09f3d5ec086cba71e63398c
+  ORIGINAL_COMMIT: b2bbc26d41ec80823c8bffb0cc436a97f29911cc
+
+jobs:
+  focused-cmou-windows:
+    name: Original C / delivered56 / finale79 / checked-windows candidate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          path: control-source
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12.15'
+      - name: Preserve controller and require immutable product pins
+        run: |
+          mkdir -p cmou-windows-results/controller
+          cp control-source/scripts/cmou_windows* control-source/scripts/migration_probe.py control-source/scripts/migration_ci_benchmark.py control-source/scripts/api.json control-source/scripts/CMOU_WINDOWS_CI.md cmou-windows-results/controller/
+          cp control-source/tests/test_cmou_windows_benchmark.py cmou-windows-results/controller/
+          cp control-source/.github/workflows/cmou-windows.yml cmou-windows-results/workflow.yml
+          git -C control-source rev-parse HEAD > cmou-windows-results/controller-commit.txt
+          python - <<'PY'
+          import os,re,sys
+          sys.path.insert(0,'control-source/scripts')
+          from cmou_windows_benchmark import workflow_pins
+          workflow_pins(os.environ)
+          for key in ('ORIGINAL_COMMIT','PRIOR_COMMIT','COMBINED_COMMIT','CANDIDATE_COMMIT'):
+              if not re.fullmatch('[0-9a-f]{40}',os.environ[key]):
+                  raise SystemExit(key+' must be frozen before this workflow can run')
+          for key in ('CANDIDATE_HELPER_SHA256','PUBLIC_PROBE_SHA256'):
+              if not re.fullmatch('[0-9a-f]{64}',os.environ[key]):
+                  raise SystemExit(key+' must be reviewed and frozen before any product build')
+          if len({os.environ[k] for k in ('ORIGINAL_COMMIT','PRIOR_COMMIT','COMBINED_COMMIT','CANDIDATE_COMMIT')}) != 4:
+              raise SystemExit('four distinct immutable source pins are required')
+          PY
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ env.PRIOR_COMMIT }}
+          path: sources/prior
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ env.COMBINED_COMMIT }}
+          path: sources/combined
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ env.CANDIDATE_COMMIT }}
+          path: sources/candidate
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ env.ORIGINAL_COMMIT }}
+          path: sources/original
+      - uses: dtolnay/rust-toolchain@1.90.0
+      - uses: astral-sh/setup-uv@v8.2.0
+      - name: Build four portable wheels and preserve actual wheel-time Cargo fingerprints
+        run: |
+          mkdir -p wheels
+          for side in prior combined candidate original; do
+            uv venv --python 3.12.15 "envs/$side"
+            uv pip install --python "envs/$side" 'maturin==1.15.0' 'cmake==4.4.4' 'polars==1.44.2' 'numpy==2.5.3' 'TA-Lib==0.8.1' pytest
+            mkdir -p "wheels/$side"
+            python -c 'import json,sys; print(json.dumps({"side":sys.argv[1],"command":sys.argv[2:]}))' "$side" "$PWD/envs/$side/bin/python" -m maturin build --release --locked --interpreter "$PWD/envs/$side/bin/python" --out "$PWD/wheels/$side" >> cmou-windows-results/build-commands.jsonl
+            # Force the product crate to recompile even if a shared Cargo cache saw newer source mtimes.
+            # Only mtime changes; immutable source bytes and Git cleanliness are checked later.
+            touch "sources/$side/src/lib.rs"
+            (cd "sources/$side" && "$GITHUB_WORKSPACE/envs/$side/bin/python" -m maturin build --release --locked --interpreter "$GITHUB_WORKSPACE/envs/$side/bin/python" --out "$GITHUB_WORKSPACE/wheels/$side") > "cmou-windows-results/$side-build.log" 2>&1
+            python control-source/scripts/cmou_windows_provenance.py \
+              --compile-log "cmou-windows-results/$side-build.log" --source "sources/$side" >> cmou-windows-results/product-compile-proof.jsonl
+            uv pip install --python "envs/$side" --no-deps "wheels/$side/"*.whl
+            uv pip freeze --python "envs/$side" > "cmou-windows-results/$side-dependencies.txt"
+            mkdir -p "cmou-windows-results/product-fingerprints/$side"
+            cp -a "$CARGO_TARGET_DIR/release/.fingerprint/." "cmou-windows-results/product-fingerprints/$side/"
+          done
+          rustc --version --verbose > cmou-windows-results/toolchain.txt
+          cc --version >> cmou-windows-results/toolchain.txt
+          "$CMAKE" --version >> cmou-windows-results/toolchain.txt
+          lscpu > cmou-windows-results/lscpu.txt
+          cat /proc/meminfo > cmou-windows-results/meminfo.txt
+          df -h > cmou-windows-results/disk-after-build.txt
+          du -sh "$CARGO_TARGET_DIR" wheels >> cmou-windows-results/disk-after-build.txt
+      - name: Define fixed campaign arguments
+        run: |
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          args=[]
+          for side in ('original','prior','combined','candidate'):
+              args += ['--'+side+'-python','envs/'+side+'/bin/python','--'+side+'-source','sources/'+side]
+          args += ['--candidate-commit',os.environ['CANDIDATE_COMMIT'],'--wheel-dir','wheels','--output','cmou-windows-results']
+          Path('cmou-windows-results/arguments.json').write_text(json.dumps(args))
+          PY
+          cat > run-cmou-windows-campaign.py <<'PY'
+          import json,subprocess,sys
+          args=json.load(open('cmou-windows-results/arguments.json'))
+          subprocess.run(['envs/prior/bin/python','control-source/scripts/'+sys.argv[1],*args,*sys.argv[2:]],check=True)
+          PY
+      - name: Controller protocol gates and native contracts
+        run: |
+          envs/prior/bin/python -m pytest --noconftest control-source/tests/test_cmou_windows_benchmark.py -q
+          python run-cmou-windows-campaign.py cmou_windows_benchmark.py --record-build
+          for side in prior combined candidate; do
+            PYO3_PYTHON="$GITHUB_WORKSPACE/envs/$side/bin/python" cargo test --release --lib --locked --manifest-path "sources/$side/Cargo.toml" > "cmou-windows-results/$side-rust-tests.log" 2>&1
+          done
+      - name: Full10624-case and1984CMOU-case all6comparisons and8own-arm goldens before timers
+        run: python run-cmou-windows-campaign.py cmou_windows_benchmark.py --validate-only
+      - name: Twelve four-arm Williams fresh-single-case rounds at one and four threads
+        run: |
+          python run-cmou-windows-campaign.py cmou_windows_benchmark.py
+          cat cmou-windows-results/comparison.md >> "$GITHUB_STEP_SUMMARY"
+          cat cmou-windows-results/negative-cases.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: consumer-cmou-windows-evidence
+          include-hidden-files: true
+          path: |
+            cmou-windows-results/
+            wheels/
+            cmou-windows-target/release/build/talib-sys-*/out/lib/libta-lib.a
+            cmou-windows-target/release/build/jemalloc-sys-*/out/lib/*.a
+          if-no-files-found: error
