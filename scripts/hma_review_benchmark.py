@@ -66,6 +66,60 @@ GENERATED_CONFIG = 'ta_codegen/output/rust/.cargo/config.toml'
 GENERATED_CONFIG_SHA = 'f55101801e5ff8e55fe1b9eea838587b1ceb9e33fcf66f7acfec3bca65e70e0e'
 
 
+C_CONFIG_HEADER = 'include/ta_config.h'
+C_CONFIG_TEMPLATE = 'include/ta_config.h.cmake'
+C_CONFIG_WRITER = 'configure_file("${CMAKE_CURRENT_SOURCE_DIR}/include/ta_config.h.cmake" "${CMAKE_CURRENT_SOURCE_DIR}/include/ta_config.h")'
+
+
+def read_cmake_cache(path):
+    settings={}
+    for line in Path(path).read_text().splitlines():
+        if not line or line.startswith(('#','//'))or '='not in line:continue
+        name,value=line.split('=',1)
+        if name in settings:raise ValueError('duplicate CMake cache setting')
+        settings[name]=value
+    return settings
+
+
+def generated_c_config(root,tree):
+    # This sole ignored C header is an exact configure_file product of pinned
+    # source plus recorded feature-test results; arbitrary generated files reject.
+    inputs={}
+    for name in ('CMakeLists.txt',C_CONFIG_TEMPLATE):
+        data=(root/name).read_bytes();blob=hashlib.sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest()
+        if name not in tree or tree[name][0]!='100644'or blob!=tree[name][1]:raise ValueError('generated C header requires pinned template/writer')
+        inputs[name]={'git_blob':blob,'sha256':hashlib.sha256(data).hexdigest()}
+    writer=(root/'CMakeLists.txt').read_text()
+    if writer.splitlines().count(C_CONFIG_WRITER)!=1:raise ValueError('generated C header writer changed')
+    for name,result in (('PTRDIFF_T','HAVE_PTRDIFF_T'),('SIZE_T','HAVE_SIZE_T')):
+        lines=['if(HAVE_SIZEOF_'+name+')','set('+result+' 1)','else()','set('+result+' 0)']
+        if name=='SIZE_T':lines.append('set(size_t "unsigned")')
+        lines.append('endif()')
+        normalized='\n'.join(line.strip()for line in writer.splitlines()if line.strip())
+        if normalized.count('\n'.join(lines))!=1:raise ValueError('generated C header derived type logic changed')
+    cache_path=root/'cmake-build/CMakeCache.txt';cache=read_cmake_cache(cache_path);values={};output=[]
+    def boolean(name):
+        value=cache.get(name+':INTERNAL')
+        if value not in ('1','0','TRUE','FALSE',''):raise ValueError('missing/nonboolean C header feature result: '+name)
+        return value,value not in ('0','FALSE','')
+    for line in (root/C_CONFIG_TEMPLATE).read_text().splitlines(keepends=True):
+        if not line.strip():output.append(line);continue
+        match=re.fullmatch(r'#cmakedefine ([A-Za-z_][A-Za-z_0-9]*) \$\{\1\}\n',line)
+        if match is None:raise ValueError('unsupported pinned C header template shape')
+        name=match[1]
+        if name in values:raise ValueError('duplicate C header template feature')
+        if name in ('HAVE_PTRDIFF_T','HAVE_SIZE_T'):
+            _,enabled=boolean('HAVE_SIZEOF_'+('PTRDIFF_T'if name=='HAVE_PTRDIFF_T'else'SIZE_T'));value='1'if enabled else'0'
+        elif name=='size_t':
+            _,has_size=boolean('HAVE_SIZEOF_SIZE_T');enabled=not has_size;value='unsigned'if enabled else''
+        else:value,enabled=boolean(name)
+        values[name]=value
+        output.append('#define '+name+' '+value+'\n'if enabled else'/* #undef '+name+' */\n')
+    expected=''.join(output).encode();actual=(root/C_CONFIG_HEADER).read_bytes()
+    if actual!=expected:raise ValueError('generated C header differs from pinned template/cache')
+    return {'header':C_CONFIG_HEADER,'header_sha256':hashlib.sha256(actual).hexdigest(),'inputs':inputs,'cache_sha256':sha256(cache_path),'values':values}
+
+
 def git_record(root,expected,old_c=False):
     root=Path(root).resolve()
     commit=subprocess.check_output(['git','-C',str(root),'rev-parse','HEAD'],text=True).strip()
@@ -86,21 +140,24 @@ def git_record(root,expected,old_c=False):
                 if path.is_file() and not {'target','.git','bin','obj'}.intersection(rel.parts) and path.suffix in ('.rs','.toml','.lock','.c','.h','.yaml','.yml','.cs','.java','.csproj','.json'):
                     paths.add(rel.as_posix())
         paths.update(('ta_codegen/generator/Cargo.toml','ta_codegen/generator/Cargo.lock'))
+        if (root/'cmake-build/CMakeCache.txt').is_file()and C_CONFIG_TEMPLATE in tree and C_CONFIG_HEADER not in paths:raise ValueError('configured C header missing')
+        if C_CONFIG_TEMPLATE in tree:paths.add(C_CONFIG_TEMPLATE)
         paths.update(n for n in ('global.json','CMakeLists.txt') if n in tree)
-    generated={};files={}
+    generated={};c_config={};files={}
     for name in sorted(paths):
         path=root/name
         if path.is_symlink():raise ValueError('compiled source cannot be a symlink')
         data=path.read_bytes();digest=hashlib.sha256(data).hexdigest()
         if name not in tree:
-            if name!=GENERATED_CONFIG or digest!=GENERATED_CONFIG_SHA:raise ValueError('untracked compiled source/config: '+name)
-            generated[name]=digest
+            if name==C_CONFIG_HEADER:c_config=generated_c_config(root,tree)
+            elif name==GENERATED_CONFIG and digest==GENERATED_CONFIG_SHA:generated[name]=digest
+            else:raise ValueError('untracked compiled source/config: '+name)
         else:
             blob=hashlib.sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest()
             if tree[name][0]not in ('100644','100755')or blob!=tree[name][1]:raise ValueError('working source differs from pinned Git blob: '+name)
-        files[name]=digest
+        if name in tree:files[name]=digest
     if not old_c and not {'ta_codegen/input/hma/hma.c','ta_codegen/output/rust/Cargo.toml','ta_codegen/output/rust/library/Cargo.toml'}<=files.keys():raise ValueError('missing HMA/compiled Rust source')
-    return {'commit':commit,'clean':True,'source_files':files,'generated_empty_config':generated,
+    return {'commit':commit,'clean':True,'source_files':files,'generated_empty_config':generated,'generated_c_config':c_config,
             'source_sha256':hashlib.sha256(json.dumps(files,sort_keys=True,separators=(',',':')).encode()).hexdigest()}
 
 
@@ -251,6 +308,10 @@ def build(args):
         for name,digest in sources[side]['generated_empty_config'].items():
             preserved=archives/(side+'-generated-config.toml');shutil.copy2(root/name,preserved)
             generated_configs[str(preserved)]=digest
+        header=sources[side]['generated_c_config']
+        if header:
+            preserved=archives/(side+'-generated-ta_config.h');shutil.copy2(root/header['header'],preserved)
+            generated_configs[str(preserved)]=header['header_sha256']
         out=args.output/('target-'+side);binary=args.output/'bin'/side;binary.parent.mkdir(exist_ok=True)
         metadata=json.loads(subprocess.check_output(['cargo','metadata','--locked','--no-deps','--format-version=1','--manifest-path',str(root/'ta_codegen/output/rust/Cargo.toml')],text=True))
         package=next(p for p in metadata['packages'] if p['name']=='ta-lib')
@@ -298,12 +359,7 @@ def build_public_c_library(root,pin,output):
     root=Path(root);output=Path(output)
     source=git_record(root,pin)
     cache=root/'cmake-build/CMakeCache.txt'
-    settings={}
-    for line in cache.read_text().splitlines():
-        if not line or line.startswith(('#','//'))or '='not in line:continue
-        name,value=line.split('=',1)
-        if name in settings:raise ValueError('duplicate CMake cache setting')
-        settings[name]=value
+    settings=read_cmake_cache(cache)
     if settings.get('CMAKE_BUILD_TYPE:STRING')!='Release'or settings.get('BUILD_SHARED_LIBS:BOOL')!='ON':raise ValueError('public C contracts require configured Release shared target')
     # ta_regtest and the language servers depend on ta-lib-static, not ta-lib.
     # Build the declared shared target explicitly rather than assuming all targets ran.

@@ -466,3 +466,66 @@ def test_shared_build_rejects_wrong_cache_missing_product_and_source_drift(monke
     (build/'libta-lib.so').write_bytes(b'fake fixture library')
     states=iter([{'pin':'old'},{'pin':'changed'}]);monkeypatch.setattr(m,'git_record',lambda r,p:next(states))
     with pytest.raises(ValueError,match='source changed'):m.build_public_c_library(root,m.CANDIDATE,output)
+
+
+def configured_header_fixture(tmp_path,has_types=True):
+    root=tmp_path/'source';root.mkdir();template=root/m.C_CONFIG_TEMPLATE;template.parent.mkdir()
+    names=('HAVE_FLOAT_H','HAVE_FLOOR','HAVE_PTRDIFF_T','HAVE_SIZE_T','size_t')
+    template.write_text('\n'+''.join('#cmakedefine '+n+' ${'+n+'}\n'for n in names))
+    cmake='cmake_minimum_required(VERSION 3.20)\nproject(HeaderProof NONE)\nset(HAVE_FLOAT_H 1 CACHE INTERNAL "")\nset(HAVE_FLOOR "" CACHE INTERNAL "")\n'
+    for name in ('HAVE_SIZEOF_PTRDIFF_T','HAVE_SIZEOF_SIZE_T'):cmake+='set('+name+(' TRUE'if has_types else' FALSE')+' CACHE INTERNAL "")\n'
+    cmake+='if(HAVE_SIZEOF_PTRDIFF_T)\nset(HAVE_PTRDIFF_T 1)\nelse()\nset(HAVE_PTRDIFF_T 0)\nendif()\nif(HAVE_SIZEOF_SIZE_T)\nset(HAVE_SIZE_T 1)\nelse()\nset(HAVE_SIZE_T 0)\nset(size_t "unsigned")\nendif()\n'+m.C_CONFIG_WRITER+'\n'
+    (root/'CMakeLists.txt').write_text(cmake)
+    (root/'.gitignore').write_text('/cmake-build/\n/include/ta_config.h\n/include/*.generated.h\n')
+    for name in ('ta_codegen/input/hma/hma.c','ta_codegen/output/rust/Cargo.toml','ta_codegen/output/rust/library/Cargo.toml','ta_codegen/generator/Cargo.toml','ta_codegen/generator/Cargo.lock'):
+        path=root/name;path.parent.mkdir(parents=True,exist_ok=True);path.write_text('fixture')
+    subprocess.run(['git','init','-q',str(root)],check=True);subprocess.run(['git','-C',str(root),'add','.'],check=True)
+    subprocess.run(['git','-C',str(root),'-c','user.name=Header Test','-c','user.email=header@example.invalid','commit','-qm','fixture'],check=True)
+    pin=subprocess.check_output(['git','-C',str(root),'rev-parse','HEAD'],text=True).strip()
+    subprocess.run(['cmake','-S',str(root),'-B',str(root/'cmake-build')],check=True,capture_output=True)
+    return root,pin
+
+
+@pytest.mark.parametrize('has_types',[True,False])
+def test_actual_configure_file_generated_header_exact_derivation(tmp_path,has_types):
+    root,pin=configured_header_fixture(tmp_path,has_types);record=m.git_record(root,pin);proof=record['generated_c_config']
+    assert proof['header_sha256']==m.sha256(root/m.C_CONFIG_HEADER)
+    assert proof['cache_sha256']==m.sha256(root/'cmake-build/CMakeCache.txt')
+    assert proof['values']['HAVE_FLOAT_H']=='1'and proof['values']['HAVE_FLOOR']==''
+    assert proof['values']['HAVE_PTRDIFF_T']==('1'if has_types else'0')
+    assert proof['values']['HAVE_SIZE_T']==('1'if has_types else'0')
+    assert proof['values']['size_t']==(''if has_types else'unsigned')
+    assert set(proof['inputs'])=={'CMakeLists.txt',m.C_CONFIG_TEMPLATE}
+    assert m.C_CONFIG_TEMPLATE in record['source_files']
+    assert m.C_CONFIG_HEADER not in record['source_files']
+
+
+def test_generated_header_rejects_bytes_cache_unknown_and_missing(tmp_path):
+    root,pin=configured_header_fixture(tmp_path);header=root/m.C_CONFIG_HEADER;cache=root/'cmake-build/CMakeCache.txt'
+    good_header=header.read_bytes();good_cache=cache.read_text()
+    for bad in (good_header+b'#define EXTRA 1\n',good_header.replace(b'#define HAVE_FLOAT_H 1',b'#define HAVE_FLOAT_H 0'),good_header.replace(b'/* #undef HAVE_FLOOR */',b'#define HAVE_FLOOR 1')):
+        header.write_bytes(bad)
+        with pytest.raises(ValueError,match='differs'):m.git_record(root,pin)
+    header.write_bytes(good_header)
+    for bad in (good_cache.replace('HAVE_FLOAT_H:INTERNAL=1','HAVE_FLOAT_H:INTERNAL=0'),good_cache.replace('HAVE_FLOAT_H:INTERNAL=1','HAVE_FLOAT_H:INTERNAL=injected'),good_cache+'\nHAVE_FLOAT_H:INTERNAL=1\n'):
+        cache.write_text(bad)
+        with pytest.raises(ValueError):m.git_record(root,pin)
+    cache.write_text(good_cache)
+    other=root/'include/unexpected.generated.h';other.write_text('arbitrary')
+    with pytest.raises(ValueError,match='untracked'):m.git_record(root,pin)
+    other.unlink();header.unlink()
+    with pytest.raises(ValueError,match='missing'):m.git_record(root,pin)
+
+
+def test_generated_header_template_and_writer_require_git_binding(tmp_path):
+    root,pin=configured_header_fixture(tmp_path)
+    tree={}
+    for name in ('CMakeLists.txt',m.C_CONFIG_TEMPLATE):
+        blob=subprocess.check_output(['git','-C',str(root),'rev-parse',pin+':'+name],text=True).strip();tree[name]=('100644',blob)
+    assert m.generated_c_config(root,tree)['header_sha256']
+    for name in ('CMakeLists.txt',m.C_CONFIG_TEMPLATE):
+        path=root/name;good=path.read_bytes();path.write_bytes(good+b'#tampered\n')
+        with pytest.raises(ValueError,match='pinned'):m.generated_c_config(root,tree)
+        path.write_bytes(good)
+    wrong=dict(tree);wrong[m.C_CONFIG_TEMPLATE]=('100644','0'*40)
+    with pytest.raises(ValueError,match='pinned'):m.generated_c_config(root,wrong)
