@@ -150,6 +150,16 @@ def normal_elf(binary,out):
     return {'binary_sha256':sha(binary),'files':inventory(out),'scoped_symbols':roles,'role':'actual normal timed product; static mechanism diagnostic, no throughput inference'}
 
 
+def fingerprint_directory(target,version):
+    need(version in ('1.90.0','1.97.0'),'unknown Cargo fingerprint layout')
+    base=target if version=='1.90.0' else target/'build-dir'
+    directory=base/'release/.fingerprint'
+    need(directory.is_dir(),'expected Cargo fingerprint directory missing')
+    metadata=list(directory.glob('ta-lib-*/lib-ta_lib.json'))
+    need(metadata and all(p.stat().st_size>0 for p in metadata),'ta-lib library fingerprint metadata missing/empty')
+    return directory
+
+
 def build(args):
     out=args.output;out.mkdir(parents=True,exist_ok=True)
     need(args.candidate_commit==CANDIDATE,'candidate pin differs')
@@ -174,7 +184,7 @@ def build(args):
             env=os.environ.copy();env['CARGO_BUILD_BUILD_DIR']=str(target/'build-dir')
             command(['cargo','build','--release','--locked','-vv','-p','ta-lib','--manifest-path',getattr(args,arm+'_source')/'ta_codegen/output/rust/Cargo.toml','--target-dir',target],out/(arm+'-cargo.log'),env=env)
             retained=out/'libraries'/arm;retained.mkdir(parents=True);lib=target/'release/libta_lib.rlib';shutil.copyfile(lib,retained/'libta_lib.rlib')
-            shutil.copytree(target/'release/.fingerprint',retained/'fingerprints')
+            shutil.copytree(fingerprint_directory(target,args.rust_version),retained/'fingerprints')
             # Keep library normal objects/provenance as well as timed executable.
             c=common+['-L','dependency='+str(target/'release/deps'),'-L','dependency='+str(target/'build-dir/release/deps'),'--extern','ta_lib='+str(retained/'libta_lib.rlib'),'-o',str(binary)]
         command(c,out/(arm+'-harness.log'))

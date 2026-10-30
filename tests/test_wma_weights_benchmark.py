@@ -124,6 +124,29 @@ class Protocol(unittest.TestCase):
                 write(r)
                 with self.subTest(bad=bad),self.assertRaises(ValueError):m.gate_record(out)
 
+    def test_exact_cargo_fingerprint_layouts(self):
+        with tempfile.TemporaryDirectory() as d:
+            target=Path(d)
+            legacy=target/'release/.fingerprint'
+            modern=target/'build-dir/release/.fingerprint'
+            # No fallback: metadata in the other compiler layout cannot satisfy a missing product.
+            for version in ('1.90.0','1.97.0','1.96.0'):
+                with self.assertRaises(ValueError):m.fingerprint_directory(target,version)
+            for folder in (legacy,modern):
+                (folder/'unrelated-123').mkdir(parents=True)
+                (folder/'unrelated-123/lib-unrelated.json').write_text('{}')
+            for version in ('1.90.0','1.97.0'):
+                with self.assertRaises(ValueError):m.fingerprint_directory(target,version)
+            for version,folder in (('1.90.0',legacy),('1.97.0',modern)):
+                package=folder/'ta-lib-123';package.mkdir();metadata=package/'lib-ta_lib.json';metadata.write_text('{}')
+                self.assertEqual(m.fingerprint_directory(target,version),folder)
+                metadata.write_bytes(b'')
+                with self.assertRaises(ValueError):m.fingerprint_directory(target,version)
+                metadata.write_text('{}')
+            shutil.rmtree(modern)
+            with self.assertRaises(ValueError):m.fingerprint_directory(target,'1.97.0')
+            self.assertEqual(m.fingerprint_directory(target,'1.90.0'),legacy)
+
     def test_reviewed_freeze(self):
         f=json.loads((m.PROOF/'source-freeze.json').read_text())
         self.assertEqual(f['commit'],m.CANDIDATE);self.assertEqual(f['base'],m.BASELINE);self.assertEqual(len(f['files']),12)
