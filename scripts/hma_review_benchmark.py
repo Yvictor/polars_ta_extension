@@ -294,15 +294,35 @@ def c_contract_capture(path):
     return {'sha256':sha256(path),'bytes':Path(path).stat().st_size,'cases':len(keys),'written':written}
 
 
+def build_public_c_library(root,pin,output):
+    root=Path(root);output=Path(output)
+    source=git_record(root,pin)
+    cache=root/'cmake-build/CMakeCache.txt'
+    settings={}
+    for line in cache.read_text().splitlines():
+        if not line or line.startswith(('#','//'))or '='not in line:continue
+        name,value=line.split('=',1)
+        if name in settings:raise ValueError('duplicate CMake cache setting')
+        settings[name]=value
+    if settings.get('CMAKE_BUILD_TYPE:STRING')!='Release'or settings.get('BUILD_SHARED_LIBS:BOOL')!='ON':raise ValueError('public C contracts require configured Release shared target')
+    # ta_regtest and the language servers depend on ta-lib-static, not ta-lib.
+    # Build the declared shared target explicitly rather than assuming all targets ran.
+    command=['cmake','--build',str(root/'cmake-build'),'--target','ta-lib','--parallel','4']
+    side='baseline'if pin==BASELINE else 'candidate'
+    log=output/(side+'-public-c-shared-build.log');run(command,log)
+    library=root/'cmake-build/libta-lib.so'
+    if not library.is_file():raise ValueError('declared shared target did not produce public C library')
+    if git_record(root,pin)!=source:raise ValueError('source changed during shared C build')
+    shutil.copy2(cache,output/(side+'-public-c-CMakeCache.txt'))
+    return {'source':source,'library':str(library),'cmake_cache_sha256':sha256(cache),'shared_build_command':command,'shared_build_log_sha256':sha256(log)}
+
+
 def c_contracts(args):
     records={};driver=Path(__file__).with_name('check_hma_review.c')
     for side in SIDES:
-        root=getattr(args,side+'_source');binary=args.output/'bin'/('public-c-'+side);library=root/'cmake-build/libta-lib.so'
-        if not library.is_file():raise ValueError('full upstream C build must precede public-C probe')
-        cache=root/'cmake-build/CMakeCache.txt'
-        if 'CMAKE_BUILD_TYPE:STRING=Release'not in cache.read_text():raise ValueError('public C contracts require actual Release build')
-        shutil.copy2(cache,args.output/(side+'-public-c-CMakeCache.txt'))
-        source=git_record(root,BASELINE if side=='baseline'else CANDIDATE)
+        root=getattr(args,side+'_source');binary=args.output/'bin'/('public-c-'+side)
+        c_build=build_public_c_library(root,BASELINE if side=='baseline'else CANDIDATE,args.output)
+        library=Path(c_build['library']);source=c_build['source']
         command=['cc','-std=c11','-O2','-Wall','-Wextra','-Werror',str(driver),'-I'+str(root/'include'),'-L'+str(library.parent),'-Wl,-rpath,'+str(library.parent),'-lta-lib','-lm','-o',str(binary)]
         binary.parent.mkdir(exist_ok=True);run(command,args.output/(side+'-c-contract-build.log'))
         env=os.environ.copy();env['LD_LIBRARY_PATH']=str(library.parent)
@@ -313,7 +333,7 @@ def c_contracts(args):
         (args.output/(side+'-c-contract.jsonl')).write_text(result.stdout);(args.output/(side+'-c-contract.stderr.log')).write_text(result.stderr)
         expected={'format':1,'cases':168,'inplace_checks':168,'nonempty':168,'padding_checked':True,'maximum_period':100000}
         if strict_json(result.stdout)!=expected:raise ValueError('public C contract checks incomplete')
-        records[side]={'source':source,'command':command,'run_command':[str(binary),str(capture)],'environment':{'LD_LIBRARY_PATH':env['LD_LIBRARY_PATH']},'resolved_library':str(resolved[0]),'cmake_cache_sha256':sha256(cache),'binary_sha256':sha256(binary),'library':str(library),'library_sha256':sha256(library),'capture':c_contract_capture(capture),'driver_sha256':sha256(driver)}
+        records[side]={'source':source,'command':command,'run_command':[str(binary),str(capture)],'environment':{'LD_LIBRARY_PATH':env['LD_LIBRARY_PATH']},'resolved_library':str(resolved[0]),'cmake_cache_sha256':c_build['cmake_cache_sha256'],'shared_build_command':c_build['shared_build_command'],'shared_build_log_sha256':c_build['shared_build_log_sha256'],'binary_sha256':sha256(binary),'library':str(library),'library_sha256':sha256(library),'capture':c_contract_capture(capture),'driver_sha256':sha256(driver)}
     if records['baseline']['capture']!=records['candidate']['capture']:raise ValueError('new C source contract differs from parent; no waiver')
     (args.output/'public-c-contracts.json').write_text(json.dumps({'passed_before_any_timing':True,'products':records},indent=2)+'\n')
     return records
@@ -433,6 +453,7 @@ def verify(args,p):
             if sha256(path)!=digest:raise ValueError('generated empty config evidence changed')
     for side,record in p['public_c_contracts'].items():
         if sha256(record['library'])!=record['library_sha256']:raise ValueError('public C library changed')
+        if sha256(args.output/(side+'-public-c-shared-build.log'))!=record['shared_build_log_sha256']or sha256(args.output/(side+'-public-c-CMakeCache.txt'))!=record['cmake_cache_sha256']:raise ValueError('shared C build evidence changed')
     if sha256(Path(__file__).with_name('check_hma_review.c'))!=p['public_c_contracts']['candidate']['driver_sha256']:raise ValueError('C contract driver changed')
     if git_record(args.c_source,C_COMMIT,True)!=p['old_c']['source']:raise ValueError('old C source changed')
     for path,digest in ((p['input']['path'],p['input']['sha256']),(p['old_c']['library'],p['old_c']['library_sha256']),(p['registry_library'],p['registry_library_sha256'])):

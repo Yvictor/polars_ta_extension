@@ -427,3 +427,42 @@ def test_protocol_workflow_pins_and_correctness_dependency():
     assert 'java,csharp'in workflow and 'managed-libraries.log'in workflow
     assert 'libta_lib.rlib'in workflow and 'dev-integration/'in workflow
     assert '--pairs 12 --repeats 31'in workflow
+
+
+def test_explicit_cmake_shared_target_after_static_regtest_reproduces_failure(monkeypatch,tmp_path):
+    # Tiny real CMake graph reproduces the upstream target-dependency omission;
+    # it does not compile TA-Lib or run any benchmark.
+    import shutil
+    if shutil.which('cmake')is None:pytest.fail('CMake is a declared CI dependency for this real target regression')
+    root=tmp_path/'source';root.mkdir();output=tmp_path/'evidence';output.mkdir()
+    (root/'value.c').write_text('int value(void) { return 7; }\n')
+    (root/'main.c').write_text('int value(void); int main(void) { return value()==7 ? 0 : 1; }\n')
+    (root/'CMakeLists.txt').write_text('cmake_minimum_required(VERSION 3.20)\nproject(CISharedTarget C)\noption(BUILD_SHARED_LIBS "shared" ON)\nadd_library(ta-lib SHARED value.c)\nset_target_properties(ta-lib PROPERTIES SUFFIX ".so")\nadd_library(ta-lib-static STATIC value.c)\nadd_executable(ta_regtest main.c)\ntarget_link_libraries(ta_regtest PRIVATE ta-lib-static)\n')
+    build=root/'cmake-build'
+    subprocess.run(['cmake','-S',str(root),'-B',str(build),'-DCMAKE_BUILD_TYPE=Release','-DBUILD_SHARED_LIBS=ON'],check=True,capture_output=True)
+    subprocess.run(['cmake','--build',str(build),'--target','ta_regtest','--parallel','2'],check=True,capture_output=True)
+    assert not (build/'libta-lib.so').exists()
+    monkeypatch.setattr(m,'git_record',lambda r,p:{'pin':p,'clean':True})
+    result=m.build_public_c_library(root,m.BASELINE,output)
+    assert Path(result['library']).is_file()
+    assert result['shared_build_command']==['cmake','--build',str(build),'--target','ta-lib','--parallel','4']
+    assert m.sha256(output/'baseline-public-c-shared-build.log')==result['shared_build_log_sha256']
+    assert (output/'baseline-public-c-CMakeCache.txt').read_bytes()==(build/'CMakeCache.txt').read_bytes()
+
+
+def test_shared_build_rejects_wrong_cache_missing_product_and_source_drift(monkeypatch,tmp_path):
+    root=tmp_path/'source';build=root/'cmake-build';build.mkdir(parents=True);cache=build/'CMakeCache.txt'
+    output=tmp_path/'output';output.mkdir();calls=[]
+    monkeypatch.setattr(m,'git_record',lambda r,p:{'pin':p,'clean':True})
+    def fake(command,log):calls.append(command);Path(log).write_text('mock CMake log')
+    monkeypatch.setattr(m,'run',fake)
+    for text in ('CMAKE_BUILD_TYPE:STRING=Debug\nBUILD_SHARED_LIBS:BOOL=ON\n','CMAKE_BUILD_TYPE:STRING=Release\nBUILD_SHARED_LIBS:BOOL=OFF\n','CMAKE_BUILD_TYPE:STRING=Debug\nBUILD_SHARED_LIBS:BOOL=ON\n#CMAKE_BUILD_TYPE:STRING=Release\n','CMAKE_BUILD_TYPE:STRING=Release\nBUILD_SHARED_LIBS:BOOL=OFF\n//BUILD_SHARED_LIBS:BOOL=ON\n'):
+        cache.write_text(text)
+        with pytest.raises(ValueError,match='configured Release shared'):m.build_public_c_library(root,m.CANDIDATE,output)
+        assert not calls
+    cache.write_text('CMAKE_BUILD_TYPE:STRING=Release\nBUILD_SHARED_LIBS:BOOL=ON\n')
+    with pytest.raises(ValueError,match='did not produce'):m.build_public_c_library(root,m.CANDIDATE,output)
+    assert calls[-1][-4:]==['--target','ta-lib','--parallel','4']
+    (build/'libta-lib.so').write_bytes(b'fake fixture library')
+    states=iter([{'pin':'old'},{'pin':'changed'}]);monkeypatch.setattr(m,'git_record',lambda r,p:next(states))
+    with pytest.raises(ValueError,match='source changed'):m.build_public_c_library(root,m.CANDIDATE,output)
