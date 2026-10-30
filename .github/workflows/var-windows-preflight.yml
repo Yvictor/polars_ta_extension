@@ -1,0 +1,186 @@
+name: VAR checked-window source and actual Linux static preflight
+on:
+  push:
+    branches: [codex/var-windows-ci]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: var-windows-preflight-${{ github.ref }}
+  cancel-in-progress: false
+env:
+  BASELINE_COMMIT: b0a97ddb1fa26fc8ed8b58832442db9319c40296
+  CANDIDATE_COMMIT: 4f73a88c554e8482fc566c2f351bca94b45946ab
+  ORIGINAL_COMMIT: 62021c1d14ef5499505af5547384cab509adf3fc
+  CARGO_BUILD_JOBS: '2'
+  CARGO_INCREMENTAL: '0'
+  CARGO_TERM_COLOR: never
+  CARGO_PROFILE_RELEASE_OPT_LEVEL: '3'
+  CARGO_PROFILE_RELEASE_LTO: thin
+  CARGO_PROFILE_RELEASE_CODEGEN_UNITS: '1'
+  CARGO_PROFILE_RELEASE_DEBUG: 'false'
+  RUSTFLAGS: ''
+  CARGO_ENCODED_RUSTFLAGS: ''
+  CFLAGS: ''
+  CXXFLAGS: ''
+  OMP_NUM_THREADS: '1'
+  OPENBLAS_NUM_THREADS: '1'
+  MKL_NUM_THREADS: '1'
+jobs:
+  source-gates:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 150
+    env:
+      RUSTUP_TOOLCHAIN: '1.97.0'
+    steps:
+      - name: Block unreviewed source pins and all timing
+        run: |
+          python3 - <<'PY'
+          import os,re
+          p=[os.environ[k] for k in ('ORIGINAL_COMMIT','BASELINE_COMMIT','CANDIDATE_COMMIT')]
+          assert all(re.fullmatch('[0-9a-f]{40}',v) for v in p), 'UNSET immutable pin; no source build or timers'
+          assert len(set(p))==3
+          PY
+      - uses: actions/checkout@v6
+        with:
+          path: control-source
+      - uses: actions/checkout@v6
+        with:
+          repository: Yvictor/ta-lib-native
+          ref: ${{ env.CANDIDATE_COMMIT }}
+          path: sources/candidate
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12.15'
+      - uses: dtolnay/rust-toolchain@1.97.0
+        with:
+          components: clippy
+      - name: Fixed tools and source gate archive
+        run: |
+          python -m venv evidence-env
+          evidence-env/bin/python -m pip install 'numpy==2.5.3' 'cmake==4.4.4'
+          echo "$PWD/evidence-env/bin" >> "$GITHUB_PATH"
+          mkdir -p var-source-gates/controller
+          cp control-source/scripts/*var_windows* control-source/scripts/VAR_WINDOWS_CI.md var-source-gates/controller/
+          cp control-source/tests/test_var_windows_preflight.py var-source-gates/controller/
+          cp control-source/tests/data/var-windows/source-freeze.json var-source-gates/controller/
+          cp control-source/.github/workflows/var-windows-preflight.yml var-source-gates/workflow.yml
+          git -C control-source rev-parse HEAD > var-source-gates/controller-commit.txt
+      - name: Protocol refusal tests without kernel timers
+        run: evidence-env/bin/python -m unittest discover -s control-source/tests -p test_var_windows_preflight.py -v > var-source-gates/protocol-tests.log 2>&1
+      - name: Generator unit integration and strict Clippy
+        run: |
+          set -euo pipefail
+          export CARGO_TARGET_DIR="$PWD/target-generator" CARGO_BUILD_BUILD_DIR="$PWD/build-generator"
+          cargo test --locked --manifest-path sources/candidate/ta_codegen/generator/Cargo.toml > var-source-gates/generator-tests.log 2>&1
+          cargo clippy --locked --all-targets --manifest-path sources/candidate/ta_codegen/generator/Cargo.toml -- -D warnings > var-source-gates/generator-clippy.log 2>&1
+      - name: Native full library docs and strict Clippy
+        run: |
+          set -euo pipefail
+          export CARGO_TARGET_DIR="$PWD/target-library" CARGO_BUILD_BUILD_DIR="$PWD/build-library"
+          RUSTDOCFLAGS="-D warnings" cargo test --release --locked -p ta-lib --manifest-path sources/candidate/ta_codegen/output/rust/Cargo.toml > var-source-gates/library-tests-and-docs.log 2>&1
+          RUSTDOCFLAGS="-D warnings" cargo doc --release --locked --no-deps -p ta-lib --manifest-path sources/candidate/ta_codegen/output/rust/Cargo.toml >> var-source-gates/library-tests-and-docs.log 2>&1
+          cargo clippy --release --locked --all-targets -p ta-lib --manifest-path sources/candidate/ta_codegen/output/rust/Cargo.toml -- -D warnings > var-source-gates/library-clippy.log 2>&1
+      - name: Two source-bound full regenerations and universal C Rust237
+        run: |
+          set -euo pipefail
+          export CARGO_TARGET_DIR="$PWD/target-generator" CARGO_BUILD_BUILD_DIR="$PWD/build-generator"
+          (cd sources/candidate && cargo run --locked --manifest-path ta_codegen/generator/Cargo.toml -- generate && cargo run --locked --manifest-path ta_codegen/generator/Cargo.toml -- generate) > var-source-gates/regen-check.log 2>&1
+          git -C sources/candidate diff --exit-code
+          export CARGO_TARGET_DIR="$PWD/target-server" CARGO_BUILD_BUILD_DIR="$PWD/build-server"
+          (cd sources/candidate && python scripts/build.py servers --language=c,rust) > var-source-gates/server-build.log 2>&1
+          (cd sources/candidate/bin && ./ta_regtest --codegen --language=c,rust) > var-source-gates/all-indicator-regtests.log 2>&1
+          git -C sources/candidate status --porcelain > var-source-gates/candidate-status.txt
+          test ! -s var-source-gates/candidate-status.txt
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          d=Path('var-source-gates');root=Path('sources/candidate');freeze=json.loads(Path('control-source/tests/data/var-windows/source-freeze.json').read_text())
+          assert freeze['commit']==os.environ['CANDIDATE_COMMIT'] and freeze['base']==os.environ['BASELINE_COMMIT']
+          assert len(freeze['files'])==8
+          assert all(hashlib.sha256((root/n).read_bytes()).hexdigest()==h for n,h in freeze['files'].items())
+          logs={p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in d.glob('*.log')};assert len(logs)==8
+          (d/'source-gates.json').write_text(json.dumps({'complete':True,'candidate':os.environ['CANDIDATE_COMMIT'],'baseline':os.environ['BASELINE_COMMIT'],'source_files':freeze['files'],'logs':logs,'timing_enabled':False},indent=2))
+          PY
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: var-windows-source-gates
+          path: var-source-gates/
+          include-hidden-files: true
+          if-no-files-found: error
+  normal-linux-preflight:
+    needs: source-gates
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - rust: '1.90.0'
+            lto: 'false'
+            cgu: '16'
+          - rust: '1.97.0'
+            lto: thin
+            cgu: '1'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    env:
+      RUSTUP_TOOLCHAIN: ${{ matrix.rust }}
+      CARGO_PROFILE_RELEASE_LTO: ${{ matrix.lto }}
+      CARGO_PROFILE_RELEASE_CODEGEN_UNITS: ${{ matrix.cgu }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          path: control-source
+      - uses: actions/checkout@v6
+        with:
+          repository: TA-Lib/ta-lib
+          ref: ${{ env.BASELINE_COMMIT }}
+          path: sources/baseline
+      - uses: actions/checkout@v6
+        with:
+          repository: Yvictor/ta-lib-native
+          ref: ${{ env.CANDIDATE_COMMIT }}
+          path: sources/candidate
+          fetch-depth: 0
+      - uses: actions/checkout@v6
+        with:
+          repository: TA-Lib/ta-lib
+          ref: ${{ env.ORIGINAL_COMMIT }}
+          path: sources/original
+      - uses: actions/download-artifact@v6
+        with:
+          name: var-windows-source-gates
+          path: var-windows-results/source-gates
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12.15'
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: ${{ matrix.rust }}
+      - name: Exact tools and actual runner hardware
+        run: |
+          python -m venv evidence-env
+          evidence-env/bin/python -m pip install 'numpy==2.5.3' 'cmake==4.4.4'
+          echo "$PWD/evidence-env/bin" >> "$GITHUB_PATH"
+          mkdir -p var-windows-results/controller
+          cp control-source/scripts/*var_windows* control-source/scripts/VAR_WINDOWS_CI.md var-windows-results/controller/
+          cp control-source/tests/test_var_windows_preflight.py var-windows-results/controller/
+          cp control-source/tests/data/var-windows/source-freeze.json var-windows-results/controller/
+          cp control-source/.github/workflows/var-windows-preflight.yml var-windows-results/workflow.yml
+          git -C control-source rev-parse HEAD > var-windows-results/controller-commit.txt
+          lscpu > var-windows-results/lscpu.txt
+          rustc --version --verbose > var-windows-results/rustc.txt
+          cc --version > var-windows-results/cc.txt
+      - name: Three normal releases full public contracts605C goldens and48 selected outputs NO TIMERS
+        run: |
+          evidence-env/bin/python control-source/scripts/var_windows_preflight.py --original-source sources/original --baseline-source sources/baseline --candidate-source sources/candidate --rust-version "$RUSTUP_TOOLCHAIN" --output var-windows-results
+          echo 'Source/static preflight only; actual fast-loop/fallback/reseed proof still requires independent review. No timers ran.' >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: var-windows-preflight-${{ matrix.rust }}
+          path: var-windows-results/
+          include-hidden-files: true
+          if-no-files-found: error
+          compression-level: 6

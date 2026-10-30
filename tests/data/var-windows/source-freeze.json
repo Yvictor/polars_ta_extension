@@ -1,0 +1,17 @@
+{
+  "status": "Source review84bda22f passed; baseb0/candidate4f published; controller review and actual Linux proof pending; timers disabled",
+  "base": "b0a97ddb1fa26fc8ed8b58832442db9319c40296",
+  "commit": "4f73a88c554e8482fc566c2f351bca94b45946ab",
+  "files": {
+    "ta_codegen/output/rust/library/tests/data/var-checked-windows-provenance.json": "63877a9fdf14295d32789c2e68208065c29fdcf208d2b9c0d005aa0835b56caa",
+    "ta_codegen/output/rust/library/tests/data/var-checked-windows.bin": "df8ce79b3e7dbfcc4258c713188d7065c15210545bb7656bc0d2086a05ef12bb",
+    "ta_codegen/output/rust/library/tests/data/var-checked-windows.tsv": "6b666632edea216ae6bc5031085e62b59628d3640ecea5926ed04a4742e00449",
+    "ta_codegen/output/rust/library/tests/var_checked_windows.rs": "d04f520aeb34459e7cf6440649e8e2a74e0f9a951cbdf080276fe515b0f5ccbf",
+    "ta_codegen/generator/src/backends/rust_lang.rs": "01436b6efe51bad2ee62e9613865b558a37d39986fd679c486aa68a8961b8d1c",
+    "ta_codegen/generator/src/backends/rust_window.rs": "1211b690f439b36ccc0564fd07e6c63e3eaf06a86e95bff02ce5ef312a942c7e",
+    "ta_codegen/generator/tests/all/rust_render_statement_suite.rs": "578e4d5cebb07f9cc76664ae49d3a1d23e8681990a31fa2a4d81b8879b0e34cf",
+    "ta_codegen/output/rust/library/src/ta_func/var.rs": "09d3161187facba7b612c5fa233c1e442a5bccca620a805da9d38069bf630827"
+  },
+  "original_proof_freeze": "ea0cc8ae13ca1b58dd219a60301006e16818478cb0871c8eede7b0d8a899e688",
+  "normal_Linux_fastloop_proof": "UNSET; static-only stage cannot time"
+}

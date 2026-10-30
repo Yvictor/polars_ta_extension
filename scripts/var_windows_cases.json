@@ -1,0 +1,180 @@
+{
+  "version": 1,
+  "original_C083_commit": "62021c1d14ef5499505af5547384cab509adf3fc",
+  "baseline_current_dev_commit": "b0a97ddb1fa26fc8ed8b58832442db9319c40296",
+  "candidate_commit": "4f73a88c554e8482fc566c2f351bca94b45946ab",
+  "profiles": [
+    {
+      "rust": "1.90.0",
+      "lto": "false",
+      "codegen_units": 16
+    },
+    {
+      "rust": "1.97.0",
+      "lto": "thin",
+      "codegen_units": 1
+    }
+  ],
+  "cases": [
+    {
+      "name": "var_typed_2_1000000_wave",
+      "function": "var",
+      "api": "typed",
+      "period": 2,
+      "rows": 1000000,
+      "pattern": "wave",
+      "iterations": 1
+    },
+    {
+      "name": "var_typed_5_1000000_wave",
+      "function": "var",
+      "api": "typed",
+      "period": 5,
+      "rows": 1000000,
+      "pattern": "wave",
+      "iterations": 1
+    },
+    {
+      "name": "var_typed_200_1000000_wave",
+      "function": "var",
+      "api": "typed",
+      "period": 200,
+      "rows": 1000000,
+      "pattern": "wave",
+      "iterations": 1
+    },
+    {
+      "name": "stddev_typed_2_1000000_wave",
+      "function": "stddev",
+      "api": "typed",
+      "period": 2,
+      "rows": 1000000,
+      "pattern": "wave",
+      "iterations": 1
+    },
+    {
+      "name": "stddev_typed_5_1000000_wave",
+      "function": "stddev",
+      "api": "typed",
+      "period": 5,
+      "rows": 1000000,
+      "pattern": "wave",
+      "iterations": 1
+    },
+    {
+      "name": "stddev_typed_200_1000000_wave",
+      "function": "stddev",
+      "api": "typed",
+      "period": 200,
+      "rows": 1000000,
+      "pattern": "wave",
+      "iterations": 1
+    },
+    {
+      "name": "var_typed_5_100_wave",
+      "function": "var",
+      "api": "typed",
+      "period": 5,
+      "rows": 100,
+      "pattern": "wave",
+      "iterations": 1000
+    },
+    {
+      "name": "var_typed_5_10000_wave",
+      "function": "var",
+      "api": "typed",
+      "period": 5,
+      "rows": 10000,
+      "pattern": "wave",
+      "iterations": 10
+    },
+    {
+      "name": "stddev_typed_5_100_wave",
+      "function": "stddev",
+      "api": "typed",
+      "period": 5,
+      "rows": 100,
+      "pattern": "wave",
+      "iterations": 1000
+    },
+    {
+      "name": "stddev_typed_5_10000_wave",
+      "function": "stddev",
+      "api": "typed",
+      "period": 5,
+      "rows": 10000,
+      "pattern": "wave",
+      "iterations": 10
+    },
+    {
+      "name": "var_abstract_5_1000000_wave",
+      "function": "var",
+      "api": "abstract",
+      "period": 5,
+      "rows": 1000000,
+      "pattern": "wave",
+      "iterations": 1
+    },
+    {
+      "name": "stddev_abstract_5_1000000_wave",
+      "function": "stddev",
+      "api": "abstract",
+      "period": 5,
+      "rows": 1000000,
+      "pattern": "wave",
+      "iterations": 1
+    },
+    {
+      "name": "var_typed_5_1000000_flat",
+      "function": "var",
+      "api": "typed",
+      "period": 5,
+      "rows": 1000000,
+      "pattern": "flat",
+      "iterations": 1
+    },
+    {
+      "name": "stddev_typed_5_1000000_highoffset",
+      "function": "stddev",
+      "api": "typed",
+      "period": 5,
+      "rows": 1000000,
+      "pattern": "highoffset",
+      "iterations": 1
+    },
+    {
+      "name": "ema_typed_14_1000000_wave",
+      "function": "ema",
+      "api": "typed",
+      "period": 14,
+      "rows": 1000000,
+      "pattern": "wave",
+      "iterations": 1
+    },
+    {
+      "name": "add_typed_0_1000000_wave",
+      "function": "add",
+      "api": "typed",
+      "period": 0,
+      "rows": 1000000,
+      "pattern": "wave",
+      "iterations": 1
+    }
+  ],
+  "rounds": 12,
+  "orders": "all six three-arm permutations repeated twice",
+  "samples": 31,
+  "warmups": 5,
+  "children_per_profile": 576,
+  "samples_per_profile": 17856,
+  "single_affinity_CPU": true,
+  "timing_gate": "UNSET actual normal Linux fast-path proof; no timing until independently reviewed",
+  "public_contracts": 43324,
+  "persistent_C_goldens": 605,
+  "limitations": [
+    "C0.8.3 upstream reference, distinct from consumer original C0.8.1.",
+    "Profiles run separately on possibly different CPUs; no pooling or compiler attribution.",
+    "Standalone typed/abstract calls only; no Polars over or query-speed inference.",
+    "Output checks before warmup and after final sample only; all serialization outside timer."
+  ]
+}
