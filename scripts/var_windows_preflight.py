@@ -1,4 +1,4 @@
-"""Source/static-only VAR campaign. No subprocess kernel timer is enabled here."""
+"""Build and validate the enabled VAR binary without invoking its timing mode."""
 import argparse
 import hashlib
 import itertools
@@ -43,12 +43,12 @@ def sha(path):
     return h.hexdigest()
 
 
-def command(argv, log, cwd=None, env=None):
+def command(argv, log, cwd=None, env=None, timeout=1800):
     argv = list(map(str, argv))
     Path(str(log) + '.command.json').write_text(json.dumps(argv, indent=2) + '\n')
     with Path(log).open('w') as f:
         subprocess.run(argv, cwd=cwd, env=env, stdout=f, stderr=subprocess.STDOUT,
-                       check=True, timeout=1800)
+                       check=True, timeout=timeout)
 
 
 def specification():
@@ -117,7 +117,7 @@ def gate_record(out, expected):
     need((d / 'candidate-status.txt').read_bytes() == b'', 'source gate candidate dirty')
     commit = subprocess.check_output(['git','-C',HERE.parent,'rev-parse','HEAD'],text=True).strip()
     need((d / 'controller-commit.txt').read_text().strip() == commit, 'source gate controller differs')
-    sources = [p for p in HERE.glob('*var_windows*') if p.is_file()] + [HERE / 'VAR_WINDOWS_CI.md', HERE.parent / 'tests/test_var_windows_preflight.py', HERE.parent / 'tests/data/var-windows/source-freeze.json']
+    sources = [p for p in HERE.glob('*var_windows*') if p.is_file()] + [HERE / 'VAR_WINDOWS_CI.md', HERE.parent / 'tests/test_var_windows_preflight.py', HERE.parent / 'tests/data/var-windows/source-freeze.json', HERE.parent / 'tests/data/var-windows/normal-codegen-reference.json', HERE.parent / 'tests/test_var_windows_codegen.py']
     for p in sources:
         need(sha(d / 'controller' / p.name) == sha(p), 'source gate controller bytes differ')
     workflow = HERE.parent / '.github/workflows/var-windows-preflight.yml'
@@ -231,7 +231,7 @@ def main():
         command(argv, out / (arm + '-build.log'))
         test = out / (arm + '-harness-tests');command(argv[:-2] + ['--test', '-o', test], out / (arm + '-harness-test-build.log'));command([test, '--test-threads=1'], out / (arm + '-harness-tests.log'))
         description = read_json(subprocess.check_output([binary, '--describe'], text=True))
-        need(description['timing_enabled'] is False and description['cases'] == 16 and description['c_reference'] is (arm == 'original'), 'timing enabled or implementation differs')
+        need(description['timing_enabled'] is True and description['opaque_fnptr'] is True and type(description['pointer_bytes']) is int and description['pointer_bytes'] == 8 and description['cases'] == 16 and description['c_reference'] is (arm == 'original'), 'enabled-body/explicit pointer route or implementation differs')
         if arm == 'original':need(description['version'].startswith('0.8.3'), 'wrong C oracle version')
         bins[arm] = dict(path=str(binary), sha256=sha(binary), description=description, command=list(map(str, argv)), elf=elf_scope(binary, out / ('normal-elf-' + arm), arm))
     command([sys.executable, HERE / 'var_windows_contract.py', '--baseline', out / 'baseline-contracts', '--candidate', out / 'candidate-contracts', '--C083-library', shared, '--output', out / 'public-contracts.json'], out / 'public-contracts.log')
@@ -253,11 +253,11 @@ def main():
         subprocess.run(['git','-C',roots[arm],'archive','--format=tar.gz','-o',archives / (arm + '.tar.gz'),'HEAD'],check=True)
     result = dict(source_archives={p.name:sha(p) for p in archives.iterdir()}, pins=expected, sources=records, runtime=rt, source_gates=gates, affinity_cpu=cpu, builds=builds, binaries=bins, inputs=inputs,
                   goldens={p.name:sha(p) for p in sorted(goldens.iterdir())}, public_contracts=read_json((out / 'public-contracts.json').read_text()),
-                  controller={p.name:sha(p) for p in HERE.glob('*var_windows*') if p.is_file()}, timing_enabled=False,
+                  controller={p.name:sha(p) for p in HERE.glob('*var_windows*') if p.is_file()}, timing_enabled=False, timer_body_compiled=True, timings_collected=False,
                   prospective_children=576, prospective_samples=17856, static_status='UNREVIEWED: actual fast-loop/fallback/reseed proof required before timers',
                   limits=['No timings collected.', 'C083 upstream oracle differs from consumer C081.', 'Actual normal ELF retained; symbol extraction alone proves no hot-loop guard removal.', 'Private targets/builds and retained rlib/fingerprints; ELF-to-rlib linkage is command/hash/source provenance, not independent linker reconstruction.'])
     (out / 'preflight.json').write_text(json.dumps(result, indent=2) + '\n')
-    print('SOURCE_STATIC_PREFLIGHT_PASS_TIMING_DISABLED', flush=True)
+    print('ENABLED_BINARY_PREFLIGHT_PASS_NO_TIMERS_EXECUTED', flush=True)
 
 
 if __name__ == '__main__':

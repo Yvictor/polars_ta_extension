@@ -1,4 +1,4 @@
-name: VAR checked-window source and actual Linux static preflight
+name: VAR controlled opaque-call comparison with actual enabled ELF gate
 on:
   push:
     branches: [codex/var-windows-ci]
@@ -63,12 +63,12 @@ jobs:
           echo "$PWD/evidence-env/bin" >> "$GITHUB_PATH"
           mkdir -p var-source-gates/controller
           cp control-source/scripts/*var_windows* control-source/scripts/VAR_WINDOWS_CI.md var-source-gates/controller/
-          cp control-source/tests/test_var_windows_preflight.py var-source-gates/controller/
-          cp control-source/tests/data/var-windows/source-freeze.json var-source-gates/controller/
+          cp control-source/tests/test_var_windows*.py var-source-gates/controller/
+          cp control-source/tests/data/var-windows/*.json var-source-gates/controller/
           cp control-source/.github/workflows/var-windows-preflight.yml var-source-gates/workflow.yml
           git -C control-source rev-parse HEAD > var-source-gates/controller-commit.txt
       - name: Protocol refusal tests without kernel timers
-        run: evidence-env/bin/python -m unittest discover -s control-source/tests -p test_var_windows_preflight.py -v > var-source-gates/protocol-tests.log 2>&1
+        run: evidence-env/bin/python -m unittest discover -s control-source/tests -p 'test_var_windows*.py' -v > var-source-gates/protocol-tests.log 2>&1
       - name: Generator unit integration and strict Clippy
         run: |
           set -euo pipefail
@@ -198,21 +198,27 @@ jobs:
           echo "$PWD/evidence-env/bin" >> "$GITHUB_PATH"
           mkdir -p var-windows-results/controller
           cp control-source/scripts/*var_windows* control-source/scripts/VAR_WINDOWS_CI.md var-windows-results/controller/
-          cp control-source/tests/test_var_windows_preflight.py var-windows-results/controller/
-          cp control-source/tests/data/var-windows/source-freeze.json var-windows-results/controller/
+          cp control-source/tests/test_var_windows*.py var-windows-results/controller/
+          cp control-source/tests/data/var-windows/*.json var-windows-results/controller/
           cp control-source/.github/workflows/var-windows-preflight.yml var-windows-results/workflow.yml
           git -C control-source rev-parse HEAD > var-windows-results/controller-commit.txt
           lscpu > var-windows-results/lscpu.txt
           rustc --version --verbose > var-windows-results/rustc.txt
           cc --version > var-windows-results/cc.txt
-      - name: Three normal releases full public contracts605C goldens and48 selected outputs NO TIMERS
+      - name: Build enabled normal releases and verify all public contracts and48 goldens without clock mode
         run: |
           evidence-env/bin/python control-source/scripts/var_windows_preflight.py --original-source sources/original --baseline-source sources/baseline --candidate-source sources/candidate --rust-version "$RUSTUP_TOOLCHAIN" --output var-windows-results
-          echo 'Source/static preflight only; actual fast-loop/fallback/reseed proof still requires independent review. No timers ran.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Enabled executables built and correctness checked; no timers invoked yet.' >> "$GITHUB_STEP_SUMMARY"
+      - name: Gate actual enabled timer-root intended-call ownership and normal reseed fallback code
+        run: evidence-env/bin/python control-source/scripts/var_windows_codegen.py --output var-windows-results --rust-version "$RUSTUP_TOOLCHAIN"
+      - name: Twelve balanced fresh-process rounds only after actual enabled ELF gate
+        run: |
+          evidence-env/bin/python control-source/scripts/var_windows_timed.py --original-source sources/original --baseline-source sources/baseline --candidate-source sources/candidate --rust-version "$RUSTUP_TOOLCHAIN" --output var-windows-results
+          cat var-windows-results/comparison.md >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: var-windows-preflight-${{ matrix.rust }}
+          name: var-windows-controlled-${{ matrix.rust }}
           path: var-windows-results/
           include-hidden-files: true
           if-no-files-found: error

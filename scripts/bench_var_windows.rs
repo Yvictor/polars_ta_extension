@@ -1,9 +1,13 @@
-//! Frozen16-case source/static preflight. Timers deliberately disabled pending actual Linux proof.
+//! Frozen16-case matched public function-pointer route. Controller gates the enabled ELF before timing.
 use std::{env,fs,hint::black_box,path::Path,time::Instant};
 #[cfg(not(c_reference))]
 use ta_lib::Core;
 const POISON:u64=0x7ff8_0000_0000_55aa;
-const TIMING_ENABLED:bool=false;
+const TIMING_ENABLED:bool=true;
+#[cfg(not(c_reference))]
+type VarianceFn = fn(&Core,usize,usize,&[f64],i32,f64,&mut[f64])->Result<ta_lib::OutRange,ta_lib::RetCode>;
+#[cfg(c_reference)]
+type CVarianceFn = unsafe extern "C" fn(i32,i32,*const f64,i32,f64,*mut i32,*mut i32,*mut f64)->i32;
 #[derive(Clone,Copy,Debug,PartialEq,Eq)]
 struct Case {kind:&'static str,api:&'static str,p:i32,n:usize,pattern:&'static str}
 const CASES:[Case;16]=[
@@ -76,8 +80,8 @@ impl Engine {
     let code=capi::TA_CallFunc(holder,0,(c.n-1)as i32,&mut b,&mut n);
     assert_eq!(capi::TA_ParamHolderFree(holder),0);code
    }else{match c.kind {
-    "var"=>black_box(capi::TA_VAR)(0,(c.n-1)as i32,x.as_ptr(),c.p,1.0,&mut b,&mut n,out.as_mut_ptr()),
-    "stddev"=>black_box(capi::TA_STDDEV)(0,(c.n-1)as i32,x.as_ptr(),c.p,1.0,&mut b,&mut n,out.as_mut_ptr()),
+    "var"=>black_box(capi::TA_VAR as CVarianceFn)(0,(c.n-1)as i32,x.as_ptr(),c.p,1.0,&mut b,&mut n,out.as_mut_ptr()),
+    "stddev"=>black_box(capi::TA_STDDEV as CVarianceFn)(0,(c.n-1)as i32,x.as_ptr(),c.p,1.0,&mut b,&mut n,out.as_mut_ptr()),
     "ema"=>capi::TA_EMA(0,(c.n-1)as i32,x.as_ptr(),c.p,&mut b,&mut n,out.as_mut_ptr()),
     "add"=>capi::TA_ADD(0,(c.n-1)as i32,x.as_ptr(),second.as_ptr(),&mut b,&mut n,out.as_mut_ptr()),
     _=>panic!("kind")
@@ -90,8 +94,8 @@ impl Engine {
    }else{match c.kind {
     // Public function pointers keep the actual ordinary typed Core body on the measured route.
     // The matched C calls also use black-box function pointers; no product annotations are changed.
-    "var"=>black_box(Core::var)(&self.0,0,c.n-1,x,c.p,1.0,out),
-    "stddev"=>black_box(Core::stddev)(&self.0,0,c.n-1,x,c.p,1.0,out),
+    "var"=>black_box(Core::var as VarianceFn)(&self.0,0,c.n-1,x,c.p,1.0,out),
+    "stddev"=>black_box(Core::stddev as VarianceFn)(&self.0,0,c.n-1,x,c.p,1.0,out),
     "ema"=>self.0.ema(0,c.n-1,x,c.p,out),
     "add"=>self.0.add(0,c.n-1,x,second,out),
     _=>panic!("kind")
@@ -110,28 +114,40 @@ fn capture(c:Case,r:(i32,usize,usize),out:&[f64])->Vec<u8> {
  let mut bytes=b"VAROUT01".to_vec();for v in [c.n,r.1,r.2]{bytes.extend((v as u64).to_le_bytes())}for v in out {bytes.extend(v.to_bits().to_le_bytes())}bytes
 }
 fn sample(engine:&Engine,c:Case,x:&[f64],second:&[f64],out:&mut[f64])->(u128,(i32,usize,usize)) {
- assert!(TIMING_ENABLED,"Timing blocked pending independent actual Linux fast-loop proof");
+ assert!(TIMING_ENABLED,"Timer body not compiled");
  out.fill(f64::from_bits(POISON));let mut r=(0,0,0);let start=Instant::now();
  for _ in 0..c.iters(){r=engine.batch(c,black_box(x),black_box(second),black_box(out));black_box(&r);}
  (start.elapsed().as_nanos(),r)
 }
+type SampleFn = fn(&Engine,Case,&[f64],&[f64],&mut[f64])->(u128,(i32,usize,usize));
 fn main() {
  let a:Vec<_>=env::args().collect();if a.len()==2&&a[1]=="--describe" {
   #[cfg(c_reference)] let version=unsafe{std::ffi::CStr::from_ptr(capi::TA_GetVersionString())}.to_str().unwrap();
   #[cfg(not(c_reference))] let version="Rust public Core and official ParamHolder";
-  println!("{{\"version\":{:?},\"c_reference\":{},\"cases\":16,\"timing_enabled\":{}}}",version,cfg!(c_reference),TIMING_ENABLED);return
+  println!("{{\"version\":{:?},\"c_reference\":{},\"cases\":16,\"opaque_fnptr\":true,\"pointer_bytes\":{},\"timing_enabled\":{}}}",version,cfg!(c_reference),std::mem::size_of::<usize>(),TIMING_ENABLED);return
  }
  assert!(a.len()==5||a.len()==6,"case input output --capture-only | --golden path");let c=selected(&a[1]);let(x,second)=load(Path::new(&a[2]),c);let engine=Engine::new();let mut out=vec![f64::from_bits(POISON);c.n+8];let r=engine.batch(c,&x,&second,&mut out);let before=capture(c,r,&out);
  if a.len()==5 {assert_eq!(a[4],"--capture-only");fs::write(&a[3],before).unwrap();return}
- assert_eq!(a[4],"--golden");assert!(TIMING_ENABLED,"Timing blocked pending independent actual Linux fast-loop proof");let golden=fs::read(&a[5]).unwrap();assert_eq!(before,golden);
- for _ in 0..5 {black_box(sample(&engine,c,&x,&second,&mut out));}
- let mut times=Vec::new();let mut last=r;for _ in 0..31 {let(ns,result)=sample(&engine,c,&x,&second,&mut out);times.push(ns as f64/1000000.0);last=result;}
+ assert_eq!(a[4],"--golden");assert!(TIMING_ENABLED,"Timer body not compiled");let golden=fs::read(&a[5]).unwrap();assert_eq!(before,golden);
+ for _ in 0..5 {let invoke=black_box(sample as SampleFn);black_box(invoke(&engine,c,&x,&second,&mut out));}
+ let mut times=Vec::new();let mut last=r;for _ in 0..31 {let invoke=black_box(sample as SampleFn);let(ns,result)=invoke(&engine,c,&x,&second,&mut out);times.push(ns as f64/1000000.0);last=result;}
  let final_bytes=capture(c,last,&out);assert_eq!(final_bytes,golden);fs::write(&a[3],final_bytes).unwrap();println!("{{\"case\":{:?},\"n\":{},\"iterations\":{},\"repeats\":31,\"warmups\":5,\"checked_values\":{},\"samples_ms\":{:?}}}",c.name(),c.n,c.iters(),c.range().1,times);
 }
 #[cfg(test)] mod tests {
  use super::*;
  #[test] fn fixed_scope(){let names:std::collections::HashSet<_>=CASES.into_iter().map(Case::name).collect();assert_eq!(names.len(),16);for c in CASES{assert!(c.range().1>0);assert_eq!(c.n*c.iters(),if c.n==1000000{1000000}else{100000});}}
- #[test] fn timing_disabled(){assert!(!TIMING_ENABLED);}
+ #[test] fn timer_body_compiled(){assert!(TIMING_ENABLED);}
+ #[test] fn explicit_function_pointer_types(){
+  let timer=black_box(sample as SampleFn);assert_eq!(std::mem::size_of_val(&timer),std::mem::size_of::<usize>());
+  #[cfg(not(c_reference))] {
+   let incoming=black_box(Core::var as VarianceFn);let deviation=black_box(Core::stddev as VarianceFn);
+   assert_eq!(std::mem::size_of_val(&incoming),std::mem::size_of::<usize>());assert_eq!(std::mem::size_of_val(&deviation),std::mem::size_of::<usize>());
+  }
+  #[cfg(c_reference)] {
+   let incoming=black_box(capi::TA_VAR as CVarianceFn);let deviation=black_box(capi::TA_STDDEV as CVarianceFn);
+   assert_eq!(std::mem::size_of_val(&incoming),std::mem::size_of::<usize>());assert_eq!(std::mem::size_of_val(&deviation),std::mem::size_of::<usize>());
+  }
+ }
  #[test] #[should_panic(expected="unknown case")]fn unknown(){selected("var_typed_14_1000000_wave");}
  #[test] #[should_panic]fn changed_tail(){let c=CASES[0];let out=vec![0.0;c.n+8];capture(c,(0,c.range().0,c.range().1),&out);}
 }

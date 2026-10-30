@@ -4,6 +4,7 @@ import importlib.util
 import json
 from pathlib import Path
 import struct
+import sys
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -12,8 +13,10 @@ ROOT = Path(__file__).resolve().parents[1]
 def load(name):
     spec = importlib.util.spec_from_file_location(name, ROOT / 'scripts' / (name + '.py'))
     module = importlib.util.module_from_spec(spec);spec.loader.exec_module(module);return module
+sys.path.insert(0,str(ROOT/'scripts'))
 P = load('var_windows_preflight')
 C = load('var_windows_contract')
+T = load('var_windows_timed')
 
 
 class Protocol(unittest.TestCase):
@@ -109,7 +112,7 @@ class Protocol(unittest.TestCase):
         freeze=json.loads((ROOT/'tests/data/var-windows/source-freeze.json').read_text())
         record=dict(complete=True,timing_enabled=False,candidate='a'*40,baseline='b'*40,source_files=freeze['files'],logs={n:P.sha(d/n) for n in names})
         f=d/'source-gates.json';f.write_text(json.dumps(record));(d/'candidate-status.txt').write_bytes(b'');(d/'controller-commit.txt').write_text('c'*40+'\n')
-        sources=[p for p in (ROOT/'scripts').glob('*var_windows*') if p.is_file()]+[ROOT/'scripts/VAR_WINDOWS_CI.md',ROOT/'tests/test_var_windows_preflight.py',ROOT/'tests/data/var-windows/source-freeze.json']
+        sources=[p for p in (ROOT/'scripts').glob('*var_windows*') if p.is_file()]+[ROOT/'scripts/VAR_WINDOWS_CI.md',ROOT/'tests/test_var_windows_preflight.py',ROOT/'tests/data/var-windows/source-freeze.json',ROOT/'tests/data/var-windows/normal-codegen-reference.json',ROOT/'tests/test_var_windows_codegen.py']
         for source in sources:shutil.copyfile(source,d/'controller'/source.name)
         shutil.copyfile(ROOT/'.github/workflows/var-windows-preflight.yml',d/'workflow.yml')
         expected=dict(candidate='a'*40,baseline='b'*40)
@@ -261,18 +264,67 @@ class Protocol(unittest.TestCase):
         self.assertNotIn('export CARGO_TARGET_DIR="$PWD/target-server"',workflow)
         self.assertIn('export CARGO_TARGET_DIR="$PWD/target-generator"',workflow);self.assertIn('export CARGO_TARGET_DIR="$PWD/target-library"',workflow)
 
-    def test_timer_disabled_in_actual_source(self):
+    def test_explicit_pointer_and_gate_before_clock_source(self):
         text=(ROOT/'scripts/bench_var_windows.rs').read_text()
-        self.assertEqual(text.count('const TIMING_ENABLED:bool=false;'),1)
-        self.assertIn('assert!(TIMING_ENABLED,"Timing blocked',text)
-        self.assertIn('black_box(Core::var)',text);self.assertIn('black_box(capi::TA_VAR)',text)
+        self.assertEqual(text.count('const TIMING_ENABLED:bool=true;'),1)
+        for target,kind in [('Core::var','VarianceFn'),('Core::stddev','VarianceFn'),('capi::TA_VAR','CVarianceFn'),('capi::TA_STDDEV','CVarianceFn')]:
+            self.assertIn('black_box('+target+' as '+kind+')',text)
+        self.assertEqual(text.count('let invoke=black_box(sample as SampleFn);'),2)
         self.assertIn('if a.len()==5 {assert_eq!(a[4],"--capture-only")',text)
+        preflight=(ROOT/'scripts/var_windows_preflight.py').read_text()
+        self.assertNotIn("'--golden',",preflight)
+        self.assertIn('timings_collected=False',preflight)
+        workflow=(ROOT/'.github/workflows/var-windows-preflight.yml').read_text()
+        self.assertLess(workflow.index('run: evidence-env/bin/python control-source/scripts/var_windows_codegen.py'),workflow.index('evidence-env/bin/python control-source/scripts/var_windows_timed.py'))
 
-    def test_no_prospective_protocol_is_current_measurement(self):
-        text=(ROOT/'scripts/var_windows_preflight.py').read_text()
-        self.assertNotIn("'--golden',",text)
-        self.assertIn('timing_enabled=False',text)
-        self.assertIn("description['timing_enabled'] is False",text)
+    def test_samples_strict_and_orders(self):
+        c=self.spec['cases'][0]
+        row=dict(case=c['name'],n=c['rows'],iterations=c['iterations'],repeats=31,warmups=5,checked_values=c['rows']-c['period']+1,samples_ms=[1.]*31)
+        T.sample_record(row,c)
+        for key,value in [('n',True),('iterations',True),('samples_ms',[1.]*30),('samples_ms',[True]*31),('samples_ms',[float('nan')]*31),('samples_ms',[0.]*31),('checked_values',0)]:
+            bad=copy.deepcopy(row);bad[key]=value
+            with self.assertRaises(ValueError):T.sample_record(bad,c)
+        from collections import Counter
+        self.assertEqual(len(T.ORDERS),12);self.assertEqual(set(Counter(T.ORDERS).values()),{2})
+        self.assertEqual(12*16*3,576);self.assertEqual(576*31,17856)
+
+    def test_complete_lossless_child_bytes(self):
+        import gzip
+        p=self.base/'child.bin';raw=b'VAROUT01'+bytes(range(256))*2;p.write_bytes(raw)
+        record=T.compress_complete(p,raw)
+        self.assertFalse(p.exists());self.assertEqual(gzip.decompress(Path(record['path']).read_bytes()),raw)
+        p.write_bytes(raw)
+        with self.assertRaises(ValueError):T.compress_complete(p,raw)
+        p.write_bytes(raw+b'changed')
+        with self.assertRaises(ValueError):T.compress_complete(p,raw)
+
+    def test_all48_process_distributions_and_losses(self):
+        records=[]
+        for i,order in enumerate(T.ORDERS):
+            for c in self.spec['cases']:
+                for arm in order:records.append(dict(case=c['name'],arm=arm,round=i,samples_ms=[{'original':1.,'baseline':2.,'candidate':3.}[arm]]*31))
+        rows=T.comparisons(records,self.spec);self.assertEqual(len(rows),48)
+        for row in rows:
+            self.assertEqual(row['slower_pairs'],12);self.assertEqual(row['faster_pairs'],0)
+            self.assertEqual(row['numerator_process_distribution_ms']['count'],12)
+            self.assertEqual(row['numerator_pooled_sample_ms']['count'],372)
+            self.assertEqual(len(row['numerator_process_medians_ms']),12)
+            self.assertEqual(row['description'],'paired-ratio p10>1.03')
+            self.assertEqual(row['duration_unit'],'whole iteration-batch milliseconds')
+        with self.assertRaises(ValueError):T.comparisons(records[:-1],self.spec)
+
+    def test_actual_gate_rejects_all_identity_changes_before_clock(self):
+        out=self.base;binary=out/'binary';binary.write_bytes(b'actual product');proof=out/'proof';proof.write_bytes(b'actual scoped proof')
+        (out/'preflight.json').write_text('preflight')
+        p=dict(pins={'a':'source'},runtime={'profile':'release'},timer_body_compiled=True,timings_collected=False,binaries={a:dict(path=str(binary),sha256=P.sha(binary),description=dict(timing_enabled=True,opaque_fnptr=True,pointer_bytes=8))for a in T.ARMS})
+        g=dict(timing_allowed=True,rust_version='1.90.0',preflight_sha256=P.sha(out/'preflight.json'),source_commits=p['pins'],profile='release',binary_sha256={a:P.sha(binary)for a in T.ARMS},codegen_module_sha256=P.sha(ROOT/'scripts/var_windows_codegen.py'),reference_sha256=P.sha(ROOT/'tests/data/var-windows/normal-codegen-reference.json'),files={'proof':P.sha(proof)})
+        path=out/'enabled-elf-gate.json';path.write_text(json.dumps(g));T.require_gate(out,'1.90.0',p)
+        changes=[lambda v:v.update(timing_allowed=False),lambda v:v.update(timing_allowed=1),lambda v:v.update(rust_version='1.97.0'),lambda v:v.update(preflight_sha256='bad'),lambda v:v.update(profile='different'),lambda v:v.update(source_commits={}),lambda v:v.update(binary_sha256={}),lambda v:v.update(codegen_module_sha256='bad'),lambda v:v.update(reference_sha256='bad'),lambda v:v.update(files={}),lambda v:v.update(files={'../escape':'bad'}),lambda v:v.update(files={'proof':'bad'})]
+        for change in changes:
+            bad=copy.deepcopy(g);change(bad);path.write_text(json.dumps(bad))
+            with self.assertRaises(ValueError):T.require_gate(out,'1.90.0',p)
+        path.write_text(json.dumps(g));binary.write_bytes(b'changed')
+        with self.assertRaises(ValueError):T.require_gate(out,'1.90.0',p)
 
 
 if __name__=='__main__':unittest.main()
