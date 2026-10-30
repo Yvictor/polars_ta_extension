@@ -35,6 +35,35 @@ def records(folder):
  assert (folder/'outputs.bin').stat().st_size==offset*8
  return rows,np.memmap(folder/'outputs.bin',dtype='<u8',mode='r'),offset
 
+class RawCWriter:
+ """Lossless untimed C buffers plus native/C metadata; never infer from a summary."""
+ fields=('native_id','input_rows','input_shape','period','start','end','capacity',
+         'function','native_api','devbits_u64_decimal','native_code','native_beg',
+         'native_count','native_word_offset','C_code','C_beg','C_count','C_word_offset')
+ def __init__(self,directory):
+  self.directory=Path(directory);self.directory.mkdir()
+  self.index=self.directory.joinpath('index.tsv').open('x')
+  self.words=self.directory.joinpath('outputs.bin').open('xb')
+  self.rows=0;self.offset=0;self.closed=False
+ def append(self,native_row,code,beg,count,out):
+  assert not self.closed and len(native_row)==14
+  assert all(type(v)is int for v in native_row) and all(type(v)is int for v in (code,beg,count))
+  assert out.ndim==1 and out.dtype==np.dtype('<u8') and out.flags.c_contiguous
+  assert len(out)==native_row[6]
+  metadata=[*native_row,code,beg,count,self.offset]
+  self.words.write(out.tobytes(order='C'))
+  self.index.write('\t'.join(map(str,metadata))+'\n')
+  self.offset+=len(out);self.rows+=1
+ def finish(self):
+  assert not self.closed
+  self.words.close();self.index.close();self.closed=True
+  words=self.directory/'outputs.bin';index=self.directory/'index.tsv'
+  assert words.stat().st_size==self.offset*8
+  return {'directory':str(self.directory),'fields':self.fields,'rows':self.rows,
+          'buffer_words':self.offset,'index_sha256':sha(index),'outputs_sha256':sha(words),
+          'word_format':'little-endian uint64 raw IEEE754 bits, full physical capacity including untouched canaries',
+          'scope':'All C array calls admitted by independent lookback/input/capacity/range proof; metadata recorded before numerical assertions. Rejected native calls are not sent to C.'}
+
 def checked_C_call(lib,name,data,period,dev,start,end,cap,beg,count):
  # Lookback has no array arguments. Its independent result must prove C pointer
  # capacity BEFORE allocating/calling outputs; tested native metadata is not proof.
@@ -63,6 +92,7 @@ def compare(base,new,libpath,destination):
  for name in('TA_VAR','TA_STDDEV'):
   function=getattr(lib,name);function.argtypes=[c.c_int,c.c_int,D,c.c_int,c.c_double,I,I,D];function.restype=c.c_int
   lookback=getattr(lib,name+'_Lookback');lookback.argtypes=[c.c_int,c.c_double];lookback.restype=c.c_int
+ raw_C=RawCWriter(destination.parent/'C083-public-raw')
  checked=elements=nan_deltas=0;failures=[];inputs={};tails=0
  for row in b:
   id,n,shape,period,start,end,cap,function,api,devbits,code,beg,count,offset=row
@@ -77,6 +107,7 @@ def compare(base,new,libpath,destination):
   data=inputs[key]
   dev=struct.unpack('<d',struct.pack('<Q',devbits))[0]
   ret,Cbeg,Ccount,out=checked_C_call(lib,'TA_VAR'if function==0 else'TA_STDDEV',data,period,dev,start,end,cap,beg,count)
+  raw_C.append(row,ret,Cbeg,Ccount,out)
   assert ret==code and(Cbeg,Ccount)==(beg,count),('C status/range',id,ret,Cbeg,Ccount)
   am=np.isnan(actual[:count].view('<f8'));cm=np.isnan(out[:count].view('<f8'));assert np.array_equal(am,cm),('C NaN positions',id)
   delta=actual[:count]!=out[:count];bad=np.flatnonzero(delta&~am)
@@ -84,8 +115,10 @@ def compare(base,new,libpath,destination):
   nan_deltas+=int((delta&am).sum());assert np.array_equal(actual[count:],out[count:]),('C raw canary tail',id)
   checked+=1;elements+=count;tails+=cap-count
  lib.TA_Shutdown()
+ live_C_raw=raw_C.finish()
  assert (checked,elements,tails)==(10894,2282098,79460),('C successful inventory',checked,elements,tails)
- result={'PASS':not failures,'native_calls':len(a),'native_output_buffer_words':words,'native_finite_signedzero_Inf_word_differences':finite_changed,'native_NaN_positions_exact':True,'native_NaN_word_differences_diagnostic':nan_changed,'C083_successful_public_calls':checked,'C083_written_values':elements,'physical_canary_words':tails,'C083_NaN_word_differences_diagnostic':nan_deltas,'C083_finite_signedzero_Inf_failures':failures,'C083_library_sha256':sha(libpath),'baseline_index_sha256':sha(base/'index.tsv'),'baseline_outputs_sha256':sha(base/'outputs.bin'),'candidate_index_sha256':sha(new/'index.tsv'),'candidate_outputs_sha256':sha(new/'outputs.bin'),'policy':'Native ranges/errors/metadata and NaN positions exact; finite/±0/Inf words exact; writtenNaN representation diagnostic only. Rejected/tailpoison words rawexact. C comparison onlysuccessfulRust calls withprovedrawCbufferbounds; all errors/shortbuffers checked versuscurrentdevnative. Untimed.'}
+ assert live_C_raw['rows']==checked and live_C_raw['buffer_words']==elements+tails
+ result={'live_C_raw':live_C_raw,'PASS':not failures,'native_calls':len(a),'native_output_buffer_words':words,'native_finite_signedzero_Inf_word_differences':finite_changed,'native_NaN_positions_exact':True,'native_NaN_word_differences_diagnostic':nan_changed,'C083_successful_public_calls':checked,'C083_written_values':elements,'physical_canary_words':tails,'C083_NaN_word_differences_diagnostic':nan_deltas,'C083_finite_signedzero_Inf_failures':failures,'C083_library_sha256':sha(libpath),'baseline_index_sha256':sha(base/'index.tsv'),'baseline_outputs_sha256':sha(base/'outputs.bin'),'candidate_index_sha256':sha(new/'index.tsv'),'candidate_outputs_sha256':sha(new/'outputs.bin'),'policy':'Native ranges/errors/metadata and NaN positions exact; finite/±0/Inf words exact; writtenNaN representation diagnostic only. Rejected/tailpoison words rawexact. C comparison onlysuccessfulRust calls withprovedrawCbufferbounds; all errors/shortbuffers checked versuscurrentdevnative. Untimed.'}
  destination.write_text(json.dumps(result,indent=2)+'\n');print(json.dumps(result,indent=2));assert result['PASS'];return result
 
 if __name__=='__main__':

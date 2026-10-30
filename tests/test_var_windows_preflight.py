@@ -172,6 +172,95 @@ class Protocol(unittest.TestCase):
             lib=self.fake_C();ret,b,n,out=C.checked_C_call(lib,name,data,p,dev,start,end,cap,beg,count)
             self.assertEqual((ret,b,n,len(out)),(0,beg,count,cap));self.assertEqual(lib.array_calls,1)
 
+    def test_lossless_live_C_full_buffers_and_metadata(self):
+        import numpy as np
+        directory=self.base/'live';writer=C.RawCWriter(directory)
+        first=[0,3,7,2,0,2,3,0,1,0x3ff0000000000000,0,1,2,17]
+        second=[1,2,9,1,0,1,2,0,0,0x3ff0000000000000,0,0,2,20]
+        values=np.array([0x8000000000000000,0x7ff8000000001234,P.POISON],dtype='<u8')
+        writer.append(first,0,1,2,values)
+        more=np.array([0x7ff0000000000000,0xfff0000000000000],dtype='<u8')
+        writer.append(second,0,0,2,more);record=writer.finish()
+        rows=[list(map(int,line.split('\t')))for line in (directory/'index.tsv').read_text().splitlines()]
+        self.assertEqual(rows,[first+[0,1,2,0],second+[0,0,2,3]])
+        self.assertEqual(tuple(record['fields']),C.RawCWriter.fields);self.assertEqual(len(record['fields']),18)
+        self.assertEqual((record['rows'],record['buffer_words']),(2,5))
+        expected=struct.pack('<5Q',0x8000000000000000,0x7ff8000000001234,P.POISON,0x7ff0000000000000,0xfff0000000000000)
+        self.assertEqual((directory/'outputs.bin').read_bytes(),expected)
+        self.assertEqual(record['outputs_sha256'],P.sha(directory/'outputs.bin'));self.assertEqual(record['index_sha256'],P.sha(directory/'index.tsv'))
+        with self.assertRaises(AssertionError):writer.append(first,0,1,2,values)
+        with self.assertRaises(AssertionError):writer.finish()
+        with self.assertRaises(FileExistsError):C.RawCWriter(directory)
+
+    def test_live_C_writer_rejects_invalid_physical_schema_before_write(self):
+        import numpy as np
+        writer=C.RawCWriter(self.base/'invalid-live');row=[0,2,0,1,0,1,2,0,0,0x3ff0000000000000,0,0,2,0]
+        for values in (np.array([1.0,2.0]),np.array([1],dtype='<u8'),np.zeros((1,2),dtype='<u8'),np.zeros(4,dtype='<u8')[::2]):
+            with self.assertRaises(AssertionError):writer.append(row,0,0,2,values)
+        bad=list(row);bad[0]=True
+        with self.assertRaises(AssertionError):writer.append(bad,0,0,2,np.zeros(2,dtype='<u8'))
+        self.assertEqual((writer.rows,writer.offset),(0,0));record=writer.finish();self.assertEqual(record['buffer_words'],0)
+
+    def workflow_server_binding(self):
+        import ast,hashlib,re,textwrap,tomllib
+        workflow=(ROOT/'.github/workflows/var-windows-preflight.yml').read_text()
+        blocks=re.findall(r"          python - <<'PY'\n(.*?)\n          PY",workflow,re.S)
+        target=[textwrap.dedent(b) for b in blocks if 'def server_binding(' in b]
+        self.assertEqual(len(target),1);tree=ast.parse(target[0]);functions=[n for n in tree.body if isinstance(n,ast.FunctionDef)and n.name=='server_binding'];self.assertEqual(len(functions),1)
+        namespace=dict(Path=Path,re=re,hashlib=hashlib,tomllib=tomllib)
+        exec(compile(ast.Module(body=functions,type_ignores=[]),'workflow-server-binding','exec'),namespace)
+        calls=[n for n in ast.walk(tree) if isinstance(n,ast.Call)and isinstance(n.func,ast.Name)and n.func.id=='server_binding'];self.assertEqual(len(calls),1)
+        return namespace['server_binding']
+
+    def server_fixture(self):
+        root=(self.base/'server-source').resolve();logs=self.base/'server-logs';logs.mkdir()
+        lines=[]
+        for relative,name,version in [('ta_codegen/generator','ta-codegen','0.1.0'),('ta_codegen/output/rust/library','ta-lib','0.8.4'),('ta_codegen/output/rust/tools','ta-lib-tools','0.8.4')]:
+            path=root/relative;path.mkdir(parents=True);(path/'Cargo.toml').write_text(f'[package]\nname="{name}"\nversion="{version}"\n')
+            lines.append(f'   Compiling {name} v{version} ({path})')
+        source=root/'ta_codegen/generator/src/main.rs';source.parent.mkdir();source.write_text('let src = rust_dir.join("target/release/ta_codegen_serve");\n')
+        paths=['ta_codegen/generator/target/release/ta_codegen','ta_codegen/output/rust/target/release/ta_codegen_serve','bin/ta_codegen_serve_rust','bin/ta_codegen_serve_c','bin/ta_regtest']
+        for n in paths:
+            p=root/n;p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(b'\x7fELF'+(b'RUST'if 'serve_rust' in n or n.endswith('/ta_codegen_serve')else n.encode()))
+        (logs/'server-build.log').write_text('\n'.join(lines)+'\n')
+        (logs/'all-indicator-regtests.log').write_text('All 2 language(s) passed codegen verification\n│ C │ 237 │ 0 │ 123 │\n│ Rust │ 237 │ 0 │ 456 │\n* All tests succeeded. Enjoy the library. *\n')
+        return root,logs
+
+    def test_actual_workflow_server_copy_binding(self):
+        function=self.workflow_server_binding();root,logs=self.server_fixture();commit='4f73a88c554e8482fc566c2f351bca94b45946ab';rust='rustc 1.97.0 (fixture)\nhost: x86_64-unknown-linux-gnu\n'
+        result=function(root,logs,commit,commit,rust,'cc fixture')
+        self.assertEqual(result['binaries']['Rust_built']['sha256'],result['binaries']['Rust_installed']['sha256']);self.assertEqual(result['runtime_counts'],{'C':[237,0],'Rust':[237,0]})
+        self.assertEqual(result['command'][:5],['env','-u','CARGO_TARGET_DIR','-u','CARGO_BUILD_BUILD_DIR'])
+        # Exact same source workflow function rejects stale/missing/wrong copies.
+        for relative in ['bin/ta_codegen_serve_rust','ta_codegen/output/rust/target/release/ta_codegen_serve','bin/ta_regtest']:
+            p=root/relative;old=p.read_bytes();p.write_bytes(b'WRONG')
+            with self.assertRaises(AssertionError):function(root,logs,commit,commit,rust,'cc')
+            p.write_bytes(old)
+        p=root/'bin/ta_codegen_serve_rust';old=p.read_bytes();p.write_bytes(b'\x7fELFDIFFERENT')
+        with self.assertRaises(AssertionError):function(root,logs,commit,commit,rust,'cc')
+        p.write_bytes(old)
+        for actual,version in [('0'*40,rust),(commit,rust.replace('1.97.0','1.90.0')),(commit,rust.replace('x86_64-unknown-linux-gnu','aarch64-apple-darwin'))]:
+            with self.assertRaises(AssertionError):function(root,logs,commit,actual,version,'cc')
+        p=root/'ta_codegen/generator/src/main.rs';p.write_text('wrong copy contract')
+        with self.assertRaises(AssertionError):function(root,logs,commit,commit,rust,'cc')
+
+    def test_workflow_runtime_and_fresh_compile_negatives(self):
+        function=self.workflow_server_binding();root,logs=self.server_fixture();commit='4f73a88c554e8482fc566c2f351bca94b45946ab';rust='rustc 1.97.0 (fixture)\nhost: x86_64-unknown-linux-gnu\n'
+        p=logs/'server-build.log';old=p.read_text()
+        for bad in [old.replace(str(root),'/wrong/source'),old.replace('ta-lib v0.8.4','ta-lib v9.9.9'),old+old.splitlines()[0]+'\n','\n'.join(old.splitlines()[1:]),'\x1b[1G'+old]:
+            p.write_text(bad)
+            with self.assertRaises(AssertionError):function(root,logs,commit,commit,rust,'cc')
+        p.write_text('\x1b[32m'+old+'\x1b[0m');self.assertEqual(function(root,logs,commit,commit,rust,'cc')['runtime_counts']['C'],[237,0]);p.write_text(old)
+        p=logs/'all-indicator-regtests.log';old=p.read_text()
+        for bad in [old.replace('│ C │ 237','│ C │ 236'),old.replace('│ Rust │ 237 │ 0','│ Rust │ 237 │ 1'),old+'│ Rust │ 237 │ 0 │ 456 │\n',old+'│ Rust │ 237 │ 1 │ 456 │\n',old+'│ C │ malformed │ row │\n',old.replace('All 2 language(s) passed codegen verification','missing'),old.replace('All tests succeeded. Enjoy the library.','missing')]:
+            p.write_text(bad)
+            with self.assertRaises(AssertionError):function(root,logs,commit,commit,rust,'cc')
+        p.write_text(old)
+        workflow=(ROOT/'.github/workflows/var-windows-preflight.yml').read_text()
+        self.assertEqual(workflow.count('env -u CARGO_TARGET_DIR -u CARGO_BUILD_BUILD_DIR python scripts/build.py servers --language=c,rust'),1)
+        self.assertNotIn('export CARGO_TARGET_DIR="$PWD/target-server"',workflow)
+        self.assertIn('export CARGO_TARGET_DIR="$PWD/target-generator"',workflow);self.assertIn('export CARGO_TARGET_DIR="$PWD/target-library"',workflow)
+
     def test_timer_disabled_in_actual_source(self):
         text=(ROOT/'scripts/bench_var_windows.rs').read_text()
         self.assertEqual(text.count('const TIMING_ENABLED:bool=false;'),1)

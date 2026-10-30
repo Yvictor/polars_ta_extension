@@ -88,20 +88,53 @@ jobs:
           export CARGO_TARGET_DIR="$PWD/target-generator" CARGO_BUILD_BUILD_DIR="$PWD/build-generator"
           (cd sources/candidate && cargo run --locked --manifest-path ta_codegen/generator/Cargo.toml -- generate && cargo run --locked --manifest-path ta_codegen/generator/Cargo.toml -- generate) > var-source-gates/regen-check.log 2>&1
           git -C sources/candidate diff --exit-code
-          export CARGO_TARGET_DIR="$PWD/target-server" CARGO_BUILD_BUILD_DIR="$PWD/build-server"
-          (cd sources/candidate && python scripts/build.py servers --language=c,rust) > var-source-gates/server-build.log 2>&1
+          # The upstream builder copies from each fresh workspace's default target.
+          # Scope unsets to this one command; earlier generator/library targets stay private.
+          (cd sources/candidate && env -u CARGO_TARGET_DIR -u CARGO_BUILD_BUILD_DIR python scripts/build.py servers --language=c,rust) > var-source-gates/server-build.log 2>&1
           (cd sources/candidate/bin && ./ta_regtest --codegen --language=c,rust) > var-source-gates/all-indicator-regtests.log 2>&1
           git -C sources/candidate status --porcelain > var-source-gates/candidate-status.txt
           test ! -s var-source-gates/candidate-status.txt
           python - <<'PY'
-          import hashlib,json,os
+          import hashlib,json,os,re,subprocess,tomllib
           from pathlib import Path
+          def server_binding(root,logs,expected,actual,rustc,cc):
+              root=root.resolve()
+              assert re.fullmatch("[0-9a-f]{40}",expected) and actual==expected
+              assert rustc.startswith("rustc 1.97.0 ") and "host: x86_64-unknown-linux-gnu" in rustc
+              digest=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+              builder=root/"ta_codegen/generator/src/main.rs"
+              assert 'let src = rust_dir.join("target/release/ta_codegen_serve");' in builder.read_text()
+              text=re.sub(r"\x1b\[[0-9;]*m","",(logs/"server-build.log").read_text())
+              packages={}
+              for relative in ("ta_codegen/generator","ta_codegen/output/rust/library","ta_codegen/output/rust/tools"):
+                  path=root/relative;package=tomllib.loads((path/"Cargo.toml").read_text())["package"]
+                  pattern=r"(?m)^\s*Compiling "+re.escape(package["name"])+r" v"+re.escape(package["version"])+r" \("+re.escape(str(path))+r"\)"
+                  assert len(re.findall(pattern,text))==1,("fresh primary source compile",relative)
+                  packages[relative]={"name":package["name"],"version":package["version"],"manifest_sha256":digest(path/"Cargo.toml")}
+              paths={"generator":root/"ta_codegen/generator/target/release/ta_codegen",
+                     "Rust_built":root/"ta_codegen/output/rust/target/release/ta_codegen_serve",
+                     "Rust_installed":root/"bin/ta_codegen_serve_rust",
+                     "C_server":root/"bin/ta_codegen_serve_c","C_regtest":root/"bin/ta_regtest"}
+              assert all(p.is_file() and p.read_bytes()[:4]==b"\x7fELF" for p in paths.values())
+              hashes={k:{"path":str(p),"sha256":digest(p)} for k,p in paths.items()}
+              assert hashes["Rust_built"]["sha256"]==hashes["Rust_installed"]["sha256"],"actual built/copied server differs"
+              raw=(logs/"all-indicator-regtests.log").read_text();plain=re.sub(r"\x1b\[[0-9;]*m","",raw)
+              prefixes=re.findall(r"^\s*│\s*(?:C|Rust)\s*│",plain,re.M)
+              rows=re.findall(r"^\s*│\s*(C|Rust)\s*│\s*([0-9]+)\s*│\s*([0-9]+)\s*│",plain,re.M)
+              assert len(prefixes)==2 and sorted(rows)==[("C","237","0"),("Rust","237","0")],"exact C/Rust237/0 runtime inventory"
+              assert "All 2 language(s) passed codegen verification" in plain and "All tests succeeded. Enjoy the library." in plain
+              return {"source_commit":actual,"builder_source_sha256":digest(builder),"packages":packages,
+                      "command":["env","-u","CARGO_TARGET_DIR","-u","CARGO_BUILD_BUILD_DIR","python","scripts/build.py","servers","--language=c,rust"],
+                      "cwd":str(root),"rustc":rustc,"cc":cc,"binaries":hashes,"runtime_counts":{"C":[237,0],"Rust":[237,0]},
+                      "server_build_log_sha256":digest(logs/"server-build.log"),"regtest_log_sha256":digest(logs/"all-indicator-regtests.log")}
           d=Path('var-source-gates');root=Path('sources/candidate');freeze=json.loads(Path('control-source/tests/data/var-windows/source-freeze.json').read_text())
           assert freeze['commit']==os.environ['CANDIDATE_COMMIT'] and freeze['base']==os.environ['BASELINE_COMMIT']
           assert len(freeze['files'])==8
           assert all(hashlib.sha256((root/n).read_bytes()).hexdigest()==h for n,h in freeze['files'].items())
           logs={p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in d.glob('*.log')};assert len(logs)==8
-          (d/'source-gates.json').write_text(json.dumps({'complete':True,'candidate':os.environ['CANDIDATE_COMMIT'],'baseline':os.environ['BASELINE_COMMIT'],'source_files':freeze['files'],'logs':logs,'timing_enabled':False},indent=2))
+          actual=subprocess.check_output(['git','-C',str(root),'rev-parse','HEAD'],text=True).strip()
+          binding=server_binding(root,d,os.environ['CANDIDATE_COMMIT'],actual,subprocess.check_output(['rustc','--version','--verbose'],text=True),subprocess.check_output(['cc','--version'],text=True))
+          (d/'source-gates.json').write_text(json.dumps({'complete':True,'candidate':os.environ['CANDIDATE_COMMIT'],'baseline':os.environ['BASELINE_COMMIT'],'source_files':freeze['files'],'logs':logs,'server_binding':binding,'timing_enabled':False},indent=2))
           PY
       - uses: actions/upload-artifact@v7
         if: always()
