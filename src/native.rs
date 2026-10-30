@@ -8,8 +8,6 @@ use ta_lib::{
     Core, RetCode,
 };
 
-mod add_output;
-
 static CORE: OnceLock<Core> = OnceLock::new();
 pub fn core() -> &'static Core {
     CORE.get_or_init(Core::new)
@@ -131,25 +129,39 @@ pub fn compute<const INPUTS: usize, const OUTPUTS: usize>(
     order: &[usize],
     names: &[&str],
 ) -> PolarsResult<Series> {
-    let prepared = prepare_inputs::<INPUTS, OUTPUTS>(id, inputs, order)?;
-    let mut slices = prepared_slices(&prepared)?;
-    let len = checked_input_len(&slices)?;
+    polars_ensure!(inputs.len() == order.len(), ShapeMismatch: "indicator input count differs");
+    let aligned = broadcast_inputs(inputs)?;
+    // Series clones share Arrow storage; only casts, rechunks and null fills
+    // materialize numeric input buffers. Keep owners alive through the call.
+    // Arity is frozen by the generated plugin entry point. Keep the owners and
+    // borrowed slice descriptors on the stack instead of allocating two Vecs
+    // for every partition of a native Polars `.over()` expression.
+    polars_ensure!(order.len() == INPUTS && id.info().outputs.len() == OUTPUTS,
+        ShapeMismatch: "indicator metadata arity differs");
+    let mut prepared: [Option<Series>; INPUTS] = std::array::from_fn(|_| None);
+    for (slot, &i) in prepared.iter_mut().zip(order) {
+        let s = cast_series_to_f64(&aligned[i])?;
+        *slot = Some(if s.null_count() == 0 {
+            s
+        } else {
+            s.f64()?.fill_null_with_values(f64::NAN)?.into_series()
+        });
+    }
+    let mut slices: [&[f64]; INPUTS] = [&[]; INPUTS];
+    for (slice, s) in slices.iter_mut().zip(&prepared) {
+        *slice = s.as_ref().unwrap().f64()?.cont_slice()?;
+    }
+    let len = slices.first().map_or(0, |s| s.len());
+    polars_ensure!(len <= Core::INDEX_MAX + 1, ComputeError: "indicator input too long");
     let mut holder = id.new_call(core());
     bind_params(&mut holder, params).map_err(error)?;
     let lookback = crate::compat::lookback(id, params)
         .unwrap_or_else(|| holder.lookback())
         .map_err(error)?;
-    let begin = first_usable(&slices, len);
+    let begin = (0..len)
+        .find(|&row| slices.iter().all(|s| !s[row].is_nan()))
+        .unwrap_or(len);
     let offset = begin.saturating_add(lookback).min(len);
-    // ADD writes each produced value once. Build that initialized Vec directly
-    // after the same metadata/parameter/input checks, keeping the skipped prefix.
-    if id == FuncId::ADD && lookback == 0 && OUTPUTS == 1 {
-        if let [left, right] = slices.as_slice() {
-            if let Some(values) = add_output::try_build(left, right, begin) {
-                return Ok(Series::from_vec(names.first().copied().unwrap_or(""), values));
-            }
-        }
-    }
     let mut outputs: [Output; OUTPUTS] = std::array::from_fn(|i| match id.info().outputs[i].kind {
         // Use initialized NaNs rather than the allocator's zeroed/calloc path.
         // Zeroed allocations can have different page-fault costs in grouped calls.
