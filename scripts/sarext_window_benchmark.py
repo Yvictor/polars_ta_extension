@@ -19,7 +19,7 @@ import time
 
 BASELINE = 'ccd3172940ed1d9daa4e7197f2265810852e8910'
 WINDOW = 'da9dd99bc1780f569dfc24f35c09d4a25063162c'
-CANDIDATE = 'UNSET'
+CANDIDATE = '414e9ef3e61ba62bcfa69d51b4613d8ab2fbe3ad'
 ORIGINAL = '62021c1d14ef5499505af5547384cab509adf3fc'
 ARMS = ('original', 'baseline', 'window', 'candidate')
 MODES = ('typed',)
