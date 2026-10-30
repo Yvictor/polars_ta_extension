@@ -175,51 +175,61 @@ impl CompatCore {
         }
         // Slide the window forward one bar at a time.
         today += 1;
-        while today <= endIdx {
-            // Drop the oldest change: inReal[trailingIdx] - inReal[trailingIdx-1].
-            // inReal[trailingIdx-1] comes from the cache (already overwritten when
-            // outReal == inReal); inReal[trailingIdx] is read here, before this
-            // iteration writes outReal[outIdx], so it is still the original price.
-            tempReal = inReal[trailingIdx];
-            diff = tempReal - trailingValue;
-            trailingValue = tempReal;
-            trailingIdx += 1;
-            if diff > 0.0 {
-                upSum -= diff;
-            } else if diff < 0.0 {
-                downSum += diff;
+        if today <= endIdx {
+            let remaining = endIdx - today + 1;
+            let trailing_inputs = &inReal[trailingIdx..][..remaining];
+            let current_inputs = &inReal[today..][..remaining];
+            let output_values = &mut outReal[outIdx..][..remaining];
+            for ((&trailing_input, &current_input), output) in trailing_inputs
+                .iter()
+                .zip(current_inputs)
+                .zip(output_values)
+            {
+                // Drop the oldest change: inReal[trailingIdx] - inReal[trailingIdx-1].
+                // inReal[trailingIdx-1] comes from the cache (already overwritten when
+                // outReal == inReal); inReal[trailingIdx] is read here, before this
+                // iteration writes outReal[outIdx], so it is still the original price.
+                tempReal = trailing_input;
+                diff = tempReal - trailingValue;
+                trailingValue = tempReal;
+                trailingIdx += 1;
+                if diff > 0.0 {
+                    upSum -= diff;
+                } else if diff < 0.0 {
+                    downSum += diff;
+                }
+                // Add the newest change: inReal[today] - inReal[today-1].
+                tempReal = current_input;
+                diff = tempReal - prevValue;
+                prevValue = tempReal;
+                if diff > 0.0 {
+                    upSum += diff;
+                } else if diff < 0.0 {
+                    downSum -= diff;
+                }
+                // Once a whole period of flat bars has gone by, every change in the
+                // window is exactly zero, so both sums are known to be exactly zero and
+                // the residue can be dropped.
+                if diff == 0.0 {
+                    nullRun += 1;
+                } else {
+                    nullRun = 0;
+                }
+                if nullRun >= ((optInTimePeriod) as usize) {
+                    nullRun = (optInTimePeriod) as usize;
+                    upSum = 0.0;
+                    downSum = 0.0;
+                }
+                sum = upSum + downSum;
+                if sum > 0.0 {
+                    *output = 100.0 * (upSum - downSum) / sum;
+                    outIdx += 1;
+                } else {
+                    *output = 0.0;
+                    outIdx += 1;
+                }
+                today += 1;
             }
-            // Add the newest change: inReal[today] - inReal[today-1].
-            tempReal = inReal[today];
-            diff = tempReal - prevValue;
-            prevValue = tempReal;
-            if diff > 0.0 {
-                upSum += diff;
-            } else if diff < 0.0 {
-                downSum -= diff;
-            }
-            // Once a whole period of flat bars has gone by, every change in the
-            // window is exactly zero, so both sums are known to be exactly zero and
-            // the residue can be dropped.
-            if diff == 0.0 {
-                nullRun += 1;
-            } else {
-                nullRun = 0;
-            }
-            if nullRun >= ((optInTimePeriod) as usize) {
-                nullRun = (optInTimePeriod) as usize;
-                upSum = 0.0;
-                downSum = 0.0;
-            }
-            sum = upSum + downSum;
-            if sum > 0.0 {
-                outReal[outIdx] = 100.0 * (upSum - downSum) / sum;
-                outIdx += 1;
-            } else {
-                outReal[outIdx] = 0.0;
-                outIdx += 1;
-            }
-            today += 1;
         }
         (*outBegIdx) = startIdx;
         (*outNBElement) = outIdx;
@@ -273,6 +283,165 @@ impl CompatCore {
                 count: outNBElement,
             }),
             e => Err(e),
+        }
+    }
+}
+
+#[cfg(test)]
+mod checked_window_tests {
+    use super::*;
+
+    mod reference {
+        pub struct CompatCore;
+        include!(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/tests/fixtures/cmou_56.rs"
+        ));
+    }
+
+    const CANARY: u64 = 0x7ff8_dead_beef_1234;
+
+    fn compare(input: &[f64], start: usize, end: usize, period: i32, capacity: usize) -> usize {
+        let mut old = vec![f64::from_bits(CANARY); capacity];
+        let mut new = old.clone();
+        let before = reference::CompatCore.cmou(start, end, input, period, &mut old);
+        let after = CompatCore.cmou(start, end, input, period, &mut new);
+        let count = match (before, after) {
+            (Ok(a), Ok(b)) => {
+                assert_eq!((a.beg_idx, a.count), (b.beg_idx, b.count));
+                a.count
+            }
+            (Err(a), Err(b)) => {
+                assert_eq!(a, b);
+                0
+            }
+            pair => panic!("range/error differs: {pair:?}"),
+        };
+        for (i, (&a, &b)) in old.iter().zip(&new).enumerate() {
+            if i < count && a.is_nan() && b.is_nan() {
+                continue;
+            }
+            assert_eq!(
+                a.to_bits(),
+                b.to_bits(),
+                "period={period} range={start}..={end} row={i}"
+            );
+            if i >= count {
+                assert_eq!(b.to_bits(), CANARY, "write outside returned range");
+            }
+        }
+        count
+    }
+
+    fn data(kind: usize, len: usize) -> Vec<f64> {
+        let mut state = 0x26_10_29_u64;
+        let mut values: Vec<f64> = (0..len)
+            .map(|i| {
+                state = state.wrapping_mul(6364136223846793005).wrapping_add(1);
+                match kind {
+                    0 => 100. + ((state >> 32) as f64 / u32::MAX as f64 - 0.5),
+                    1 => 0.,
+                    2 => -0.,
+                    3 => {
+                        if i % 2 == 0 {
+                            -0.
+                        } else {
+                            0.
+                        }
+                    }
+                    4 => 3.3,
+                    5 => i as f64 * 0.25,
+                    6 => {
+                        if i < len / 2 {
+                            1.
+                        } else {
+                            i as f64 * 0.25
+                        }
+                    }
+                    7 => {
+                        if i < len / 2 {
+                            i as f64 * 0.25
+                        } else {
+                            1.
+                        }
+                    }
+                    8 => {
+                        if i % 2 == 0 {
+                            1e-310
+                        } else {
+                            -1e-310
+                        }
+                    }
+                    9 => 1e12 + (i % 7) as f64 * 0.25,
+                    10 => {
+                        if i % 2 == 0 {
+                            f64::MAX * 0.75
+                        } else {
+                            -f64::MAX * 0.75
+                        }
+                    }
+                    11 => f64::NAN,
+                    _ => 100. + (i % 11) as f64 * 0.125,
+                }
+            })
+            .collect();
+        if len > 0 {
+            match kind {
+                12 => values[0] = f64::NAN,
+                13 => values[len / 2] = f64::NAN,
+                14 => values[len / 2] = f64::INFINITY,
+                15 => values[len / 2] = f64::NEG_INFINITY,
+                _ => (),
+            }
+        }
+        values
+    }
+
+    #[test]
+    fn exact_pinned_56_ranges_values_errors_and_tails() {
+        let mut cases = 0;
+        let mut written = 0;
+        for len in [0, 1, 2, 3, 13, 14, 15, 16, 31, 64, 129, 257] {
+            for kind in 0..16 {
+                let input = data(kind, len);
+                for period in [Core::INTEGER_DEFAULT, -1, 0, 1, 2, 3, 14, 30, 128, 100000] {
+                    for (start, end) in [
+                        (0, len.saturating_sub(1)),
+                        (1, len.saturating_sub(1)),
+                        (len / 2, len.saturating_sub(1)),
+                        (0, len / 2),
+                        (len, len),
+                        (2, 1),
+                    ] {
+                        for capacity in [0, len.saturating_sub(15), len + 3] {
+                            written += compare(&input, start, end, period, capacity);
+                            cases += 1;
+                        }
+                    }
+                }
+            }
+        }
+        assert!(written > 100000);
+        eprintln!("CMOU_WINDOW_EXACT cases={cases} written_values={written}");
+    }
+
+    #[test]
+    fn exact_single_tail_bar_nonzero_start_and_maximum_period() {
+        let input = data(0, 100033);
+        for period in [2, 14, 128, 100000] {
+            let start = period as usize;
+            for end in [start, start + 1, input.len() - 1] {
+                for anchor in [0, start, start + 1] {
+                    compare(&input, anchor, end, period, input.len() + 5);
+                }
+            }
+        }
+        for (start, end) in [
+            (Core::INDEX_MAX + 1, 0),
+            (0, Core::INDEX_MAX + 1),
+            (Core::INDEX_MAX, Core::INDEX_MAX),
+        ] {
+            compare(&[1., 2., 3.], start, end, 2, 4);
         }
     }
 }
