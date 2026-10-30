@@ -1,0 +1,200 @@
+name: HMA maintainer follow-up evidence
+
+on:
+  push:
+    branches: [codex/hma-review-ci]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: hma-review-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  RUSTUP_TOOLCHAIN: '1.97.0'
+  CARGO_BUILD_JOBS: '4'
+  RUSTFLAGS: ''
+  CARGO_ENCODED_RUSTFLAGS: ''
+  CARGO_PROFILE_RELEASE_DEBUG: 'false'
+  CARGO_PROFILE_RELEASE_LTO: thin
+  CARGO_PROFILE_RELEASE_CODEGEN_UNITS: '1'
+  OMP_NUM_THREADS: '1'
+  OPENBLAS_NUM_THREADS: '1'
+  MKL_NUM_THREADS: '1'
+  CFLAGS: ''
+  CXXFLAGS: ''
+  CMAKE: cmake
+
+jobs:
+  dev-context-correctness:
+    name: Frozen PR565 dev merge / all four runtime correctness only
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          path: control-source
+      - uses: actions/checkout@v6
+        with:
+          repository: TA-Lib/ta-lib
+          ref: 6a4099c876bc1b4f28959df3f005bb9c9de10f35
+          path: integration
+      - uses: actions/checkout@v6
+        with:
+          repository: Yvictor/ta-lib-native
+          ref: a4665da81c8df9a42cb956de8ba7edf063276a21
+          path: production-source
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12.15'
+      - uses: dtolnay/rust-toolchain@1.97.0
+        with:
+          components: clippy,rustfmt
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: actions/setup-dotnet@v5
+        with:
+          global-json-file: integration/global.json
+      - name: Freeze exact dev/source context before runtime gates
+        run: |
+          mkdir -p hma-review-dev
+          python -m pip install cmake==4.4.4
+          python -c 'import json; assert json.load(open("integration/global.json"))["sdk"]["version"] == "10.0.112"'
+          java -version > hma-review-dev/java-version.txt 2>&1
+          dotnet --info > hma-review-dev/dotnet-info.txt
+          python control-source/scripts/hma_review_benchmark.py --integration-root integration --production-root production-source --integration-output hma-review-dev
+          git -C integration archive --format=tar.gz HEAD > hma-review-dev/dev-merge-source.tar.gz
+      - name: Actual frozen dev-merge regeneration and all-four language runtimes
+        working-directory: integration
+        run: |
+          set -o pipefail
+          python scripts/build.py regen-check 2>&1 | tee ../hma-review-dev/regenerate.log
+          cargo test --locked --manifest-path ta_codegen/generator/Cargo.toml 2>&1 | tee ../hma-review-dev/generator-tests.log
+          cargo test --locked -p ta-lib --manifest-path ta_codegen/output/rust/Cargo.toml 2>&1 | tee ../hma-review-dev/rust-tests.log
+          cargo test --locked -p ta-lib --doc --manifest-path ta_codegen/output/rust/Cargo.toml 2>&1 | tee ../hma-review-dev/rust-doc-tests.log
+          cargo clippy --locked --all-targets --manifest-path ta_codegen/generator/Cargo.toml -- -D warnings 2>&1 | tee ../hma-review-dev/generator-clippy.log
+          cargo clippy --locked -p ta-lib --all-targets --manifest-path ta_codegen/output/rust/Cargo.toml -- -D warnings 2>&1 | tee ../hma-review-dev/rust-clippy.log
+          python scripts/build.py libraries --language=java,csharp 2>&1 | tee ../hma-review-dev/managed-libraries.log
+          python scripts/build.py servers --language=c,rust,java,csharp 2>&1 | tee ../hma-review-dev/regression-build.log
+          (cd bin && ./ta_regtest --codegen --language=c,rust,java,csharp) 2>&1 | tee ../hma-review-dev/full-four-language-regression.log
+          dotnet build-server shutdown
+          git diff --exit-code
+      - name: Seal unchanged library identity and actual runtime evidence
+        run: python control-source/scripts/hma_review_benchmark.py --integration-root integration --production-root production-source --integration-output hma-review-dev --complete
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: hma-review-dev-integration
+          path: hma-review-dev/
+          if-no-files-found: error
+
+  hma-review:
+    needs: dev-context-correctness
+    name: HMA parent5da / maintainera466 / correctness-first batch evidence
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          path: control-source
+      - uses: actions/checkout@v6
+        with:
+          repository: Yvictor/ta-lib-native
+          ref: 5da9e8d43333c13b5f46f30efe8460de12b1f68b
+          path: baseline
+      - uses: actions/checkout@v6
+        with:
+          repository: Yvictor/ta-lib-native
+          ref: a4665da81c8df9a42cb956de8ba7edf063276a21
+          path: candidate
+      - uses: actions/checkout@v6
+        with:
+          ref: b2bbc26d41ec80823c8bffb0cc436a97f29911cc
+          path: original-c
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12.15'
+      - uses: dtolnay/rust-toolchain@1.97.0
+        with:
+          components: clippy,rustfmt
+      - uses: actions/download-artifact@v8
+        with:
+          name: hma-review-dev-integration
+          path: hma-review-results/dev-integration
+      - name: Initialize evidence before controller gates
+        run: |
+          mkdir -p hma-review-results
+          git -C control-source rev-parse HEAD > hma-review-results/controller-commit.txt
+          cp control-source/scripts/hma_review_benchmark.py control-source/scripts/bench_hma_review.rs control-source/scripts/check_hma_review.c hma-review-results/
+          cp control-source/.github/workflows/hma-review.yml hma-review-results/workflow.yml
+      - name: Install pinned evidence dependencies and test standalone controller gates
+        run: |
+          python -m pip install cmake==4.4.4 numpy==2.5.3 pytest==8.4.2
+          python -m pip freeze > hma-review-results/python-dependencies.txt
+          python -m pytest --noconftest control-source/tests/test_hma_review_benchmark.py -q
+      - name: Regenerate and validate Rust contracts before any timing
+        working-directory: candidate
+        run: |
+          set -o pipefail
+          python scripts/build.py regen-check 2>&1 | tee ../hma-review-results/regenerate.log
+          cargo test --locked --manifest-path ta_codegen/generator/Cargo.toml 2>&1 | tee ../hma-review-results/generator-tests.log
+          cargo test --locked -p ta-lib --manifest-path ta_codegen/output/rust/Cargo.toml 2>&1 | tee ../hma-review-results/rust-tests.log
+          cargo test --locked -p ta-lib --doc --manifest-path ta_codegen/output/rust/Cargo.toml 2>&1 | tee ../hma-review-results/rust-doc-tests.log
+          cargo clippy --locked --all-targets --manifest-path ta_codegen/generator/Cargo.toml -- -D warnings 2>&1 | tee ../hma-review-results/generator-clippy.log
+          cargo clippy --locked -p ta-lib --all-targets --manifest-path ta_codegen/output/rust/Cargo.toml -- -D warnings 2>&1 | tee ../hma-review-results/rust-clippy.log
+          python scripts/build.py servers --language=c,rust 2>&1 | tee ../hma-review-results/regression-build.log
+          (cd bin && ./ta_regtest --codegen --language=c,rust) 2>&1 | tee ../hma-review-results/full-c-rust-regression.log
+          git diff --exit-code
+      - name: Build baseline C for untimed alias and boundary contract
+        working-directory: baseline
+        run: |
+          set -o pipefail
+          python scripts/build.py ta_regtest 2>&1 | tee ../hma-review-results/baseline-c-build.log
+          git diff --exit-code
+      - name: Build identical primary harnesses with pinned registry and original C references
+        run: |
+          python control-source/scripts/hma_review_benchmark.py \
+            --baseline-source baseline --candidate-source candidate --c-source original-c \
+            --output hma-review-results --build-only
+          lscpu > hma-review-results/lscpu.txt
+          cat /proc/meminfo > hma-review-results/meminfo.txt
+      - name: Full captures and stream contracts then isolated17case three-backend AB/BA pairs
+        run: |
+          python control-source/scripts/hma_review_benchmark.py \
+            --baseline-source baseline --candidate-source candidate --c-source original-c \
+            --output hma-review-results --pairs 12 --repeats 31
+          cat hma-review-results/comparison.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: upstream-hma-review-evidence
+          if-no-files-found: error
+          path: |
+            hma-review-results/dev-integration/
+            hma-review-results/*.json
+            hma-review-results/*.jsonl
+            hma-review-results/*.md
+            hma-review-results/*.log
+            hma-review-results/*.txt
+            candidate/cmake-build/libta-lib.so*
+            baseline/cmake-build/libta-lib.so*
+            hma-review-results/*.yml
+            hma-review-results/*.rs
+            hma-review-results/*.c
+            hma-review-results/*.py
+            hma-review-results/*.gz
+            hma-review-results/*.bin
+            hma-review-results/goldens/*
+            hma-review-results/bin/*
+            hma-review-results/archives/*
+            hma-review-results/registry-helper/Cargo.*
+            hma-review-results/registry-helper/lib.rs
+            hma-review-results/target-baseline/release/libta_lib.rlib
+            hma-review-results/target-candidate/release/libta_lib.rlib
+            hma-review-results/target-registry/release/deps/*.rlib
+            hma-review-results/target-registry/release/deps/*.so
+            hma-review-results/old-c-install/lib/libta-lib.a
