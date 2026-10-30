@@ -27,7 +27,7 @@ class Protocol(unittest.TestCase):
         with tempfile.TemporaryDirectory()as d,patch.object(b,'build')as build,patch.object(b,'CANDIDATE','UNSET'):
             target=Path(d)/'new'
             with self.assertRaisesRegex(ValueError,'unset'):
-                b.main(['--rust-version','1.97.0','--original-source',d,'--baseline-source',d,'--candidate-source',d,'--candidate-commit','a'*40,'--output',str(target),'--codegen-proof',d,'--build-only'])
+                b.main(['--rust-version','1.97.0','--original-source',d,'--baseline-source',d,'--window-source',d,'--candidate-source',d,'--candidate-commit','a'*40,'--output',str(target),'--codegen-proof',d,'--build-only'])
             self.assertFalse(target.exists());build.assert_not_called()
 
     def test_preserved_library_is_accepted_by_real_extern_loader(self):
@@ -36,7 +36,7 @@ class Protocol(unittest.TestCase):
             lib=root/'libfixture.rlib'
             b.subprocess.run(['rustc','--crate-name','fixture','--crate-type','rlib',str(source),'-o',str(lib)],check=True,capture_output=True)
             client=root/'client.rs';client.write_text('extern crate fixture; fn main(){fixture::probe();}\n')
-            for arm in ('baseline','candidate'):
+            for arm in ('baseline','window','candidate'):
                 retained=b.retain_library(lib,root/'retained',arm)
                 self.assertEqual(b.sha(retained),b.sha(lib))
                 command=['rustc','--edition=2021',str(client),'--extern','fixture='+str(retained),'--emit=metadata','-o',str(root/(arm+'.rmeta'))]
@@ -90,9 +90,9 @@ class Protocol(unittest.TestCase):
 
     def test_inventory_and_balance(self):
         self.assertEqual(len(b.CASES),15);self.assertEqual(len(set(b.CASES)),15);self.assertEqual(b.MODES,('typed',))
-        self.assertEqual(len(b.ORDERS),12);self.assertEqual(set(collections.Counter(b.ORDERS).values()),{2})
-        for arm in b.ARMS:self.assertEqual(collections.Counter(o.index(arm)for o in b.ORDERS),{0:4,1:4,2:4})
-        self.assertEqual(15*3*12,540);self.assertEqual(540*31,16740)
+        self.assertEqual(len(b.ORDERS),12);self.assertEqual(set(collections.Counter(b.ORDERS).values()),{3})
+        for arm in b.ARMS:self.assertEqual(collections.Counter(o.index(arm)for o in b.ORDERS),{0:3,1:3,2:3,3:3})
+        self.assertEqual(15*4*12,720);self.assertEqual(720*31,22320)
         self.assertEqual(b.ORIGINAL,'62021c1d14ef5499505af5547384cab509adf3fc');self.assertEqual(b.BASELINE,'ccd3172940ed1d9daa4e7197f2265810852e8910')
 
     def test_json_and_types(self):
@@ -144,13 +144,37 @@ class Protocol(unittest.TestCase):
 
     def fake_context(self,d):return types.SimpleNamespace(output=Path(d)),{'arms':{a:{'binary':a}for a in b.ARMS},'inputs':{f'{f}/{n}':{'path':'input'}for _,f,n in b.CASES}}
 
-    def test_actual_controller_all45_preflights_before540_mock_children(self):
+    def test_actual_controller_all60_preflights_before720_mock_children(self):
         with tempfile.TemporaryDirectory()as d:
             args,p=self.fake_context(d);self.events=[]
             with patch.object(b,'execute',self.fake_execute),patch.object(b,'capture',self.fake_capture),patch.object(b,'check_hits',return_value={}),patch.object(b,'compare_c_written',return_value=[]):
                 v=b.prepare(args,p);r=b.measure(args,p,v)
-            self.assertEqual(len(self.events),45+540);self.assertTrue(all(not x[0]for x in self.events[:45]));self.assertTrue(all(x[0]for x in self.events[45:]));self.assertEqual(r['children'],540);self.assertEqual(r['samples'],16740);self.assertEqual(len(r['results']),15)
-            for k,case in enumerate(b.CASES):self.assertEqual([(a,c)for _,a,c in self.events[45+k*36:45+(k+1)*36]],[(a,(*case,'typed'))for order in b.ORDERS for a in order])
+            self.assertEqual(len(self.events),60+720);self.assertTrue(all(not x[0]for x in self.events[:60]));self.assertTrue(all(x[0]for x in self.events[60:]));self.assertEqual(r['children'],720);self.assertEqual(r['samples'],22320);self.assertEqual(len(r['results']),15)
+            for k,case in enumerate(b.CASES):self.assertEqual([(a,c)for _,a,c in self.events[60+k*48:60+(k+1)*48]],[(a,(*case,'typed'))for order in b.ORDERS for a in order])
+
+    def test_each_extra_native_arm_full_raw_must_match_ccd(self):
+        for corrupt in ('window','candidate'):
+            with tempfile.TemporaryDirectory()as d:
+                args,p=self.fake_context(d);self.events=[]
+                def capture(path,*rest):
+                    result=self.fake_capture(path,*rest)
+                    if str(path).endswith('__'+corrupt+'.bin'):result['sha256']='0'*64
+                    return result
+                with patch.object(b,'execute',self.fake_execute),patch.object(b,'capture',capture),patch.object(b,'check_hits',return_value={}),patch.object(b,'compare_c_written',return_value=[]),self.assertRaisesRegex(ValueError,'RAW capture mismatch'):
+                    b.prepare(args,p)
+                self.assertTrue(all(not timed for timed,_,_ in self.events))
+
+    def test_cold_workflow_matches_four_immutable_arms_and_source_freeze(self):
+        text=(Path(__file__).parents[1]/'.github/workflows/sarext-cold.yml').read_text()
+        for name,commit in [('ORIGINAL',b.ORIGINAL),('BASELINE',b.BASELINE),('WINDOW',b.WINDOW),('CANDIDATE',b.CANDIDATE)]:
+            self.assertIn(name+'_COMMIT: '+commit,text)
+        self.assertIn("for side in ('original','baseline','window','candidate')",text)
+        self.assertIn('for side in baseline window candidate;',text)
+        self.assertIn('sarext-cold-freeze.json',text);self.assertIn('All60 full captures before720',text)
+        self.assertLess(text.index('b.cold_freeze()'),text.index('cargo test --locked --manifest-path sources/candidate'))
+        self.assertIn("rust: ['1.90.0', '1.97.0']",text)
+        for key,value in b.PROFILE.items():
+            if value:self.assertIn(key+': '+("'"+value+"'" if key in ('CARGO_PROFILE_RELEASE_OPT_LEVEL','CARGO_PROFILE_RELEASE_CODEGEN_UNITS','CARGO_PROFILE_RELEASE_DEBUG') else value),text)
 
     def test_missing_gate_round_and_golden_fail_closed(self):
         with tempfile.TemporaryDirectory()as d:
@@ -169,18 +193,65 @@ class Protocol(unittest.TestCase):
 
     def test_every_negative_including_add_control_retained(self):
         rows=[{'key':'/'.join(map(str,(*c,'typed'))),'arm':a,'round':r,'samples_ns':[100+len(a)]*31}for c in b.CASES for r in range(1,13)for a in b.ARMS]
-        results,negative=b.summarize(rows);self.assertEqual(len(results),15);self.assertTrue(any(x['is_add_control']for x in negative));self.assertEqual(sum(len(v)for v in results.values()),45)
+        results,negative=b.summarize(rows);self.assertEqual(len(results),15);self.assertTrue(any(x['is_add_control']for x in negative));self.assertEqual(sum(len(v)for v in results.values()),90)
 
     def test_source_static_manifest_is_exact_and_qualified(self):
-        proof=Path(__file__).parent/'data/sarext-window-codegen';m=b.read_json((proof/'manifest.json').read_text());f=b.read_json((proof/'prefix-final-freeze.json').read_text());sources={'candidate':{'source_files':f}}
-        with patch.object(b,'CANDIDATE',m['candidate_commit']):b.check_codegen_proof(proof,sources)
-        bad={'candidate':{'source_files':dict(f)}};bad['candidate']['source_files'][next(iter(f))]='0'*64
-        with patch.object(b,'CANDIDATE',m['candidate_commit']),self.assertRaises(ValueError):b.check_codegen_proof(proof,bad)
+        proof=Path(__file__).parent/'data/sarext-window-codegen';m=b.read_json((proof/'manifest.json').read_text());f=b.read_json((proof/'prefix-final-freeze.json').read_text());sources={'window':{'source_files':f}}
+        with patch.object(b,'WINDOW',m['candidate_commit']):b.check_codegen_proof(proof,sources)
+        bad={'window':{'source_files':dict(f)}};bad['window']['source_files'][next(iter(f))]='0'*64
+        with patch.object(b,'WINDOW',m['candidate_commit']),self.assertRaises(ValueError):b.check_codegen_proof(proof,bad)
 
     def test_exact_source_footprint_and_add_control(self):
         keys=['ta_codegen/generator/src/backends/rust_window.rs','ta_codegen/generator/src/backends/rust_lang.rs','ta_codegen/output/rust/library/src/ta_func/sar.rs','ta_codegen/output/rust/library/src/ta_func/sarext.rs'];add='ta_codegen/output/rust/library/src/ta_func/add.rs'
-        sources={a:{'source_files':{**{k:a for k in keys},add:'same'}}for a in ['baseline','candidate']};b.check_control_sources(sources);sources['candidate']['source_files'][add]='changed'
-        with self.assertRaises(ValueError):b.check_control_sources(sources)
+        sources={a:{'source_files':{**{k:a for k in keys},add:'same'}}for a in ['baseline','window']}
+        sources['candidate']={'source_files':{**sources['window']['source_files'],**{k:'cold'for k in b.COLD_FILES}}}
+        with patch.object(b,'cold_freeze',return_value={k:'cold'for k in b.COLD_FILES}):
+            b.check_control_sources(sources)
+            for arm in ('window','candidate'):
+                sources[arm]['source_files'][add]='changed'
+                with self.assertRaises(ValueError):b.check_control_sources(sources)
+                sources[arm]['source_files'][add]='same'
+            key=keys[0];sources['candidate']['source_files'][key]='unreviewed'
+            with self.assertRaises(ValueError):b.check_control_sources(sources)
+            sources['candidate']['source_files'][key]=sources['window']['source_files'][key]
+            sources['candidate']['source_files'][next(iter(b.COLD_FILES))]='wrong-frozen'
+            with self.assertRaises(ValueError):b.check_control_sources(sources)
+
+    def test_reviewed_candidate_cannot_build_with_unset_source_hashes(self):
+        with patch.object(b,'CANDIDATE','a'*40),patch.object(b,'read_json',return_value={k:'UNSET'for k in b.COLD_FILES}),self.assertRaisesRegex(ValueError,'hashes unset'):
+            b.pins(types.SimpleNamespace(candidate_commit='a'*40))
+
+    def test_source_gate_exact_eight_nonempty_logs(self):
+        with tempfile.TemporaryDirectory()as d:
+            folder=Path(d);frozen={k:'0'*64 for k in b.COLD_FILES}
+            for name in b.SOURCE_GATE_LOGS:(folder/name).write_text('passed\n')
+            g={'complete':True,'candidate':b.CANDIDATE,'toolchain':'1.97.0','library_msrv':'1.88','source_files':frozen,'logs':{n:b.sha(folder/n)for n in b.SOURCE_GATE_LOGS}}
+            record=folder/'source-gates.json'
+            def write(value):record.write_text(json.dumps(value))
+            write(g)
+            with patch.object(b,'cold_freeze',return_value=frozen):
+                b.source_gate_record(folder)
+                for bad in ({},dict(list(g['logs'].items())[1:]),{**g['logs'],'substituted.log':'0'*64}):
+                    write({**g,'logs':bad})
+                    with self.assertRaisesRegex(ValueError,'inventory'):b.source_gate_record(folder)
+                write(g);name='generator-tests.log';(folder/name).write_bytes(b'')
+                write({**g,'logs':{**g['logs'],name:b.sha(folder/name)}})
+                with self.assertRaisesRegex(ValueError,'empty'):b.source_gate_record(folder)
+                (folder/name).write_text('passed\n');write(g);(folder/name).unlink()
+                with self.assertRaises(ValueError):b.source_gate_record(folder)
+                (folder/name).write_text('passed\n');(folder/'extra.log').write_text('passed\n')
+                with self.assertRaisesRegex(ValueError,'inventory'):b.source_gate_record(folder)
+
+    def test_four_arm_williams_direct_control_and_six_pairs(self):
+        transitions=collections.Counter((a,c)for order in b.ORDERS for a,c in zip(order,order[1:]))
+        self.assertEqual(set(transitions),{(a,c)for a in b.ARMS for c in b.ARMS if a!=c});self.assertEqual(set(transitions.values()),{3})
+        rows=[{'key':'/'.join(map(str,(*c,'typed'))),'arm':a,'round':r,'samples_ns':[100+len(a)]*31}for c in b.CASES for r in range(1,13)for a in b.ARMS]
+        results,_=b.summarize(rows)
+        self.assertTrue(all(len(pairs)==6 and 'window_vs_candidate'in pairs for pairs in results.values()))
+        self.assertEqual(b.WINDOW,'da9dd99bc1780f569dfc24f35c09d4a25063162c')
+        with patch.object(b,'read_json',return_value={k:'UNSET'for k in b.COLD_FILES}),self.assertRaisesRegex(ValueError,'unset'):b.cold_freeze()
+
+
 
 
 class CFG(unittest.TestCase):

@@ -1,4 +1,4 @@
-"""Three-arm selected kernel comparison; candidate must be reviewed before activation."""
+"""Four-arm selected cold-fallback comparison; candidate must be reviewed before activation."""
 import argparse
 import hashlib
 import itertools
@@ -18,12 +18,16 @@ import tarfile
 import time
 
 BASELINE = 'ccd3172940ed1d9daa4e7197f2265810852e8910'
-CANDIDATE = 'da9dd99bc1780f569dfc24f35c09d4a25063162c'
+WINDOW = 'da9dd99bc1780f569dfc24f35c09d4a25063162c'
+CANDIDATE = 'UNSET'
 ORIGINAL = '62021c1d14ef5499505af5547384cab509adf3fc'
-ARMS = ('original', 'baseline', 'candidate')
+ARMS = ('original', 'baseline', 'window', 'candidate')
 MODES = ('typed',)
 CASES = (*itertools.product(('sar','sarext'),('default','reversal'),(100,10000,1000000)), *((('add','default',n) for n in (100,10000,1000000))))
-ORDERS = tuple(itertools.permutations(ARMS)) * 2
+ORDERS = (('original','baseline','window','candidate'),
+          ('baseline','candidate','original','window'),
+          ('candidate','window','baseline','original'),
+          ('window','original','candidate','baseline')) * 3
 EDGES = ((0,0),(0,1),(0,2),(1,5),(2,5),(3,10),(17,63),(42,48),(63,63),(0,63))
 CANARY = 0x7ff80000000055aa
 IEEE_SHAPES = 17
@@ -88,8 +92,9 @@ def pins(args):
     import re
     need(re.fullmatch('[0-9a-f]{40}',CANDIDATE) is not None,'candidate source is unset; builds and timing are blocked')
     need(args.candidate_commit==CANDIDATE,'candidate must match the reviewed full pin')
-    need(CANDIDATE!=BASELINE,'candidate and baseline must differ')
-    return {'original':ORIGINAL,'baseline':BASELINE,'candidate':CANDIDATE}
+    need(len({ORIGINAL,BASELINE,WINDOW,CANDIDATE})==4,'all four source pins must differ')
+    cold_freeze()
+    return {'original':ORIGINAL,'baseline':BASELINE,'window':WINDOW,'candidate':CANDIDATE}
 
 
 def source_record(root, pin, original=False):
@@ -178,7 +183,7 @@ def command_run(command, log, cwd=None):
 
 
 def retain_library(source,output,arm):
-    need(arm in ('baseline','candidate'),'only native arm libraries can be retained')
+    need(arm in ('baseline','window','candidate'),'only native arm libraries can be retained')
     destination=Path(output)/'libraries'/arm/'libta_lib.rlib'
     destination.parent.mkdir(parents=True,exist_ok=True)
     shutil.copyfile(source,destination)
@@ -193,31 +198,51 @@ def file_inventory(folder):
     return result
 
 
+COLD_FILES={'ta_codegen/generator/src/backends/rust_lang.rs',
+            'ta_codegen/output/rust/library/src/ta_func/sar.rs',
+            'ta_codegen/output/rust/library/src/ta_func/sarext.rs'}
+
+
+def cold_freeze():
+    import re
+    frozen=read_json((HERE.parent/'tests/data/sarext-cold-freeze.json').read_text())
+    need(set(frozen)==COLD_FILES and all(type(v)is str and re.fullmatch('[0-9a-f]{64}',v) for v in frozen.values()),'cold source hashes unset or footprint differs; build/timing blocked')
+    return frozen
+
+
 def check_control_sources(sources):
     key='ta_codegen/output/rust/library/src/ta_func/add.rs'
-    need(sources['baseline']['source_files'][key]==sources['candidate']['source_files'][key],'ADD control source changed')
-    a=sources['baseline']['source_files'];b=sources['candidate']['source_files']
+    need(len({sources[a]['source_files'][key] for a in ('baseline','window','candidate')})==1,'ADD control source changed')
+    a=sources['baseline']['source_files'];b=sources['window']['source_files'];c=sources['candidate']['source_files']
     changed={k for k in set(a)|set(b) if a.get(k)!=b.get(k)}
-    need(changed=={'ta_codegen/generator/src/backends/rust_window.rs','ta_codegen/generator/src/backends/rust_lang.rs','ta_codegen/output/rust/library/src/ta_func/sar.rs','ta_codegen/output/rust/library/src/ta_func/sarext.rs'},'source footprint differs from reviewed four files')
+    need(changed=={'ta_codegen/generator/src/backends/rust_window.rs','ta_codegen/generator/src/backends/rust_lang.rs','ta_codegen/output/rust/library/src/ta_func/sar.rs','ta_codegen/output/rust/library/src/ta_func/sarext.rs'},'window source footprint differs from reviewed four files')
+    need({k for k in set(b)|set(c) if b.get(k)!=c.get(k)}==COLD_FILES,'cold hint source footprint differs')
+    need(all(c[k]==h for k,h in cold_freeze().items()),'cold frozen source bytes differ')
 
 
 def check_codegen_proof(proof,sources):
     need(proof.is_dir(),'annotated source/static proof must be retained')
     manifest=read_json((proof/'manifest.json').read_text())
-    need(manifest['baseline_commit']==BASELINE and manifest['candidate_commit']==CANDIDATE,'proof pins differ')
+    need(manifest['baseline_commit']==BASELINE and manifest['candidate_commit']==WINDOW,'proof pins differ')
     need(set(manifest['files'])=={p.relative_to(proof).as_posix() for p in proof.rglob('*') if p.is_file() and p.name!='manifest.json'},'proof inventory differs')
     for name,digest in manifest['files'].items():need(sha(proof/name)==digest,'proof bytes differ')
     frozen=read_json((proof/'prefix-final-freeze.json').read_text())
-    need(len(frozen)==4 and all(sources['candidate']['source_files'][k]==v for k,v in frozen.items()),'frozen source footprint differs')
+    need(len(frozen)==4 and all(sources['window']['source_files'][k]==v for k,v in frozen.items()),'frozen source footprint differs')
     need(manifest['library_msrv']=='1.88' and manifest['development_toolchain']=='1.97.0','MSRV/toolchain qualification changed')
 
+
+
+SOURCE_GATE_LOGS={'protocol-tests.log','generator-tests.log','generator-clippy.log',
+                  'library-tests-and-docs.log','library-clippy.log','regen-check.log',
+                  'server-build.log','all-indicator-regtests.log'}
 
 
 def source_gate_record(folder):
     folder=Path(folder);p=folder/'source-gates.json';need(p.is_file(),'full source gates missing')
     g=read_json(p.read_text());need(g.get('complete')is True and g.get('candidate')==CANDIDATE and g.get('toolchain')=='1.97.0' and g.get('library_msrv')=='1.88','source gate identity/qualification differs')
-    need(g.get('logs') and all(sha(folder/name)==digest for name,digest in g['logs'].items()),'source gate logs changed')
-    frozen=read_json((HERE.parent/'tests/data/sarext-window-codegen/prefix-final-freeze.json').read_text())
+    need(type(g.get('logs'))is dict and set(g['logs'])==SOURCE_GATE_LOGS and {p.name for p in folder.glob('*.log')}==SOURCE_GATE_LOGS,'source gate log inventory differs')
+    need(all((folder/name).is_file() and (folder/name).stat().st_size>0 and sha(folder/name)==digest for name,digest in g['logs'].items()),'source gate logs missing/empty/changed')
+    frozen=cold_freeze()
     need(g['source_files']==frozen,'source gate footprint differs')
     return {'record':g,'sha256':sha(p)}
 
@@ -242,14 +267,14 @@ def build(args):
             command=common+['--cfg','c_reference','-L','native='+str(c_lib.parent),'-l','static=ta-lib','-l','m','-o',str(binary)]
             cargo=None;lib=None
         else:
-            target=out.parent/('sarext-window-targets-'+args.rust_version)/a;cargo=['cargo','build','--release','--locked','-vv','-p','ta-lib','--manifest-path',str(getattr(args,a+'_source')/'ta_codegen/output/rust/Cargo.toml'),'--target-dir',str(target)]
+            target=out.parent/('sarext-cold-targets-'+args.rust_version)/a;cargo=['cargo','build','--release','--locked','-vv','-p','ta-lib','--manifest-path',str(getattr(args,a+'_source')/'ta_codegen/output/rust/Cargo.toml'),'--target-dir',str(target)]
             command_run(cargo,out/(a+'-cargo.log'));lib=target/'release/libta_lib.rlib'
             retained=retain_library(lib,out,a)
             command=common+['-L','dependency='+str(target/'release/deps'),'--extern','ta_lib='+str(retained),'-o',str(binary)]
         command_run(command,out/(a+'-harness-build.log'))
         test_binary=bins/(a+'-cli-tests');test_command=command[:-2]+['--test','-o',str(test_binary)]
         command_run(test_command,out/(a+'-cli-build.log'));command_run([test_binary,'--test-threads=1'],out/(a+'-cli-tests.log'))
-        codegen=inspect_normal_elf(binary,out/'normal-codegen'/a,args.rust_version,a=='candidate')
+        codegen=inspect_normal_elf(binary,out/'normal-codegen'/a,args.rust_version,a in ('window','candidate'))
         records[a]={'normal_codegen':codegen,'source':sources[a],'binary':str(binary),'binary_sha256':sha(binary),'cargo_command':cargo,'rustc_command':command,'test_command':test_command,'test_binary':str(test_binary),'test_binary_sha256':sha(test_binary)}
         if lib is not None:
             fp=out/'product-fingerprints'/a;fp.parent.mkdir(exist_ok=True);shutil.copytree(target/'release/.fingerprint',fp)
@@ -408,13 +433,13 @@ def prepare(args,p):
                 changes=compare_c_written(c_reference,path,indicator,n,selection)
                 deltas.extend({'native_arm':arm,**row} for row in changes)
                 if arm=='baseline':native_reference=(cap['sha256'],cap['bytes'])
-                else:need((cap['sha256'],cap['bytes'])==native_reference,'full native before/candidate RAW capture mismatch')
+                else:need((cap['sha256'],cap['bytes'])==native_reference,'full native CCD/window/cold RAW capture mismatch')
             need(cap['selected']==selected_reference,'timed finite selected capture must be RAW C/native exact')
             cap.pop('selected');proofs.append({'arm':arm,'selection':selection,'command':c,'stdout':parsed,'capture':cap,'coverage':coverage,'whole_child_faults':faults})
-    need(len(proofs)==45,'all45 global edge/main captures required')
+    need(len(proofs)==60,'all60 global edge/main captures required')
     (args.output/'C-NaN-representation-deltas.json').write_text(json.dumps(deltas,indent=2)+'\n')
     record={'completed_before_any_timing':True,'checks':proofs,'goldens':goldens,'C_nan_representation_deltas':len(deltas),
-            'C_policy':'written NaN positions exact; all nonNaN bits and all physical tails raw exact; native before/candidate fully raw exact',
+            'C_policy':'written NaN positions exact; all nonNaN bits and all physical tails raw exact; native CCD/window/cold fully raw exact',
             'hardware_fma':hardware}
     (args.output/'capture-validation.json').write_text(json.dumps(record,indent=2)+'\n');return record
 
@@ -437,7 +462,7 @@ def summarize(rows):
 
 
 def measure(args,p,validation):
-    need(validation['completed_before_any_timing'] and len(validation['checks'])==45,'all correctness gates must precede timing')
+    need(validation['completed_before_any_timing'] and len(validation['checks'])==60,'all correctness gates must precede timing')
     folder=args.output/'children';folder.mkdir();rows=[];started=time.monotonic()
     for indicator,fixture,n in CASES:
         for mode in MODES:
@@ -449,8 +474,8 @@ def measure(args,p,validation):
                     proof={'key':key,'arm':arm,'round':index,'command':c,'capture':cap,'golden':golden,'whole_child_faults':faults,'samples_ns':r['samples_ns']};Path(str(stem)+'-proof.json').write_text(json.dumps(proof,indent=2)+'\n');path.unlink();proof['duplicate_deleted_after_proof']=True;rows.append(proof)
                     with (args.output/'completed-children.jsonl').open('a') as ledger:ledger.write(json.dumps(proof)+'\n')
     need(time.monotonic()-started<=600,'600s measurement budget exceeded')
-    need(len(rows)==540 and sum(len(r['samples_ns'])for r in rows)==16740,'complete540children/16740samples required');results,negatives=summarize(rows)
-    return {'rows':rows,'results':results,'negative_cases':negatives,'orders':ORDERS,'children':540,'samples':16740,'elapsed_seconds':time.monotonic()-started,'limits':['This job alone compares C0.8.3 with development Rust0.8.4 baseline CCD/candidate at its recorded compiler/profile. No ratios are pooled across1.90/1.97 jobs.','Library MSRV1.88 performance is unverified; root development toolchain pin1.97 is not an MSRV claim.','Public typed calls only; no abstract/Python/Polars adapter arm is measured.','Normal runtime hardware dispatch is preserved; no private scalar/FMA entry or force knob is used. Scalar codegen evidence is not a scalar runtime speed claim.','All calls include selected driver dispatch and range assertions. Fresh selected processes isolate sibling workloads, not allocator/golden I/O history.','C/native written NaN positions are strict; payload/sign deltas are all retained. NonNaN bits, signedzero/Inf/ranges/tails and ALL native before/candidate bits remain exact.','One-CPU sampled envelopes are descriptive, not confidence intervals; inner samples correlate and shared-runner effects remain.','Whole-child faults include startup/fixtures/golden I/O/warmups, not allocator-only events.','All slower medians, ADD controls and both toolchain outcomes remain reportable; no automatic publication or retention.']}
+    need(len(rows)==720 and sum(len(r['samples_ns'])for r in rows)==22320,'complete720children/22320samples required');results,negatives=summarize(rows)
+    return {'rows':rows,'results':results,'negative_cases':negatives,'orders':ORDERS,'children':720,'samples':22320,'elapsed_seconds':time.monotonic()-started,'limits':['This job alone compares C0.8.3 with development Rust0.8.4 CCD, da9 window and cold-hint candidate at its recorded compiler/profile. No ratios are pooled across1.90/1.97 jobs.','Library MSRV1.88 performance is unverified; root development toolchain pin1.97 is not an MSRV claim.','Public typed calls only; no abstract/Python/Polars adapter arm is measured.','Normal runtime hardware dispatch is preserved; no private scalar/FMA entry or force knob is used. Scalar codegen evidence is not a scalar runtime speed claim.','All calls include selected driver dispatch and range assertions. Fresh selected processes isolate sibling workloads, not allocator/golden I/O history.','C/native written NaN positions are strict; payload/sign deltas are all retained. NonNaN bits, signedzero/Inf/ranges/tails and ALL native CCD/window/cold bits remain exact.','One-CPU sampled envelopes are descriptive, not confidence intervals; inner samples correlate and shared-runner effects remain.','Whole-child faults include startup/fixtures/golden I/O/warmups, not allocator-only events.','All slower medians, ADD controls and both toolchain outcomes remain reportable; no automatic publication or retention.']}
 
 
 def write_report(output,report):
