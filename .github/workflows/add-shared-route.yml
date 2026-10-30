@@ -90,18 +90,36 @@ jobs:
           path: sources/original
       - uses: dtolnay/rust-toolchain@1.90.0
       - uses: astral-sh/setup-uv@v8.2.0
+      - name: Create pinned environments and bind target NumPy uniform mode before any wheel
+        run: |
+          for side in prior combined candidate original; do
+            uv venv --python 3.12.15 "envs/$side"
+            uv pip install --python "envs/$side" 'maturin==1.15.0' 'cmake==4.4.4' 'polars==1.44.2' 'numpy==2.5.3' 'TA-Lib==0.8.1' 'pytest-benchmark==5.3.0' 'pytest==8.4.2'
+            python -c 'import json,sys; print(json.dumps({"side":sys.argv[1],"command":sys.argv[2:]}))' "$side" "$GITHUB_WORKSPACE/envs/$side/bin/python" "$GITHUB_WORKSPACE/control-source/scripts/add_shared_route_numpy_uniform_probe.py" --side "$side" --workspace "$GITHUB_WORKSPACE" --output "$GITHUB_WORKSPACE/add-shared-route-results/$side-uniform-probe.json" --module-dir "$GITHUB_WORKSPACE/add-shared-route-results/uniform-native/$side" >> add-shared-route-results/uniform-probe-commands.jsonl
+            "$GITHUB_WORKSPACE/envs/$side/bin/python" "$GITHUB_WORKSPACE/control-source/scripts/add_shared_route_numpy_uniform_probe.py" --side "$side" --workspace "$GITHUB_WORKSPACE" --output "$GITHUB_WORKSPACE/add-shared-route-results/$side-uniform-probe.json" --module-dir "$GITHUB_WORKSPACE/add-shared-route-results/uniform-native/$side"
+          done
+          python - <<'PYUNIFORM'
+          import json,sys
+          from pathlib import Path
+          from types import SimpleNamespace
+          sys.path.insert(0,'control-source/scripts')
+          from add_shared_route_benchmark import numpy_uniform_probe
+          proof=numpy_uniform_probe(SimpleNamespace(original_source=Path('sources/original'),output=Path('add-shared-route-results')))
+          Path('add-shared-route-results/uniform-before-wheel.json').write_text(json.dumps(proof,indent=2)+'\n')
+          PYUNIFORM
       - name: Build four portable wheels and preserve actual wheel-time Cargo fingerprints
         run: |
           mkdir -p wheels
           for side in prior combined candidate original; do
-            uv venv --python 3.12.15 "envs/$side"
-            uv pip install --python "envs/$side" 'maturin==1.15.0' 'cmake==4.4.4' 'polars==1.44.2' 'numpy==2.5.3' 'TA-Lib==0.8.1' 'pytest-benchmark==5.3.0' pytest
+            export CARGO_TARGET_DIR="$GITHUB_WORKSPACE/add-shared-route-target/$side"
+            export CARGO_BUILD_BUILD_DIR="$CARGO_TARGET_DIR"
+            export PYO3_PYTHON="$GITHUB_WORKSPACE/envs/$side/bin/python"
             mkdir -p "wheels/$side"
-            python -c 'import json,sys; print(json.dumps({"side":sys.argv[1],"command":sys.argv[2:]}))' "$side" "$PWD/envs/$side/bin/python" -m maturin build --release --locked --interpreter "$PWD/envs/$side/bin/python" --out "$PWD/wheels/$side" >> add-shared-route-results/build-commands.jsonl
+            python -c 'import json,sys; print(json.dumps({"side":sys.argv[1],"command":sys.argv[2:],"environment":{k:__import__("os").environ[k] for k in ("CARGO_TARGET_DIR","CARGO_BUILD_BUILD_DIR","PYO3_PYTHON")}}))' "$side" "$PWD/envs/$side/bin/python" -m maturin build --config "build.build-dir=\"$CARGO_BUILD_BUILD_DIR\"" --target-dir "$CARGO_TARGET_DIR" --release --locked --interpreter "$PWD/envs/$side/bin/python" --out "$PWD/wheels/$side" >> add-shared-route-results/build-commands.jsonl
             # Force the product crate to recompile even if a shared Cargo cache saw newer source mtimes.
             # Only mtime changes; immutable source bytes and Git cleanliness are checked later.
             touch "sources/$side/src/lib.rs"
-            (cd "sources/$side" && "$GITHUB_WORKSPACE/envs/$side/bin/python" -m maturin build --release --locked --interpreter "$GITHUB_WORKSPACE/envs/$side/bin/python" --out "$GITHUB_WORKSPACE/wheels/$side") > "add-shared-route-results/$side-build.log" 2>&1
+            (cd "sources/$side" && "$GITHUB_WORKSPACE/envs/$side/bin/python" -m maturin build --config "build.build-dir=\"$CARGO_BUILD_BUILD_DIR\"" --target-dir "$CARGO_TARGET_DIR" --release --locked --interpreter "$GITHUB_WORKSPACE/envs/$side/bin/python" --out "$GITHUB_WORKSPACE/wheels/$side") > "add-shared-route-results/$side-build.log" 2>&1
             python control-source/scripts/add_shared_route_provenance.py \
               --compile-log "add-shared-route-results/$side-build.log" --source "sources/$side" >> add-shared-route-results/product-compile-proof.jsonl
             uv pip install --python "envs/$side" --no-deps "wheels/$side/"*.whl
@@ -115,7 +133,7 @@ jobs:
           lscpu > add-shared-route-results/lscpu.txt
           cat /proc/meminfo > add-shared-route-results/meminfo.txt
           df -h > add-shared-route-results/disk-after-build.txt
-          du -sh "$CARGO_TARGET_DIR" wheels >> add-shared-route-results/disk-after-build.txt
+          du -sh "$GITHUB_WORKSPACE/add-shared-route-target" wheels >> add-shared-route-results/disk-after-build.txt
       - name: Define fixed campaign arguments
         run: |
           python - <<'PY'
@@ -136,9 +154,17 @@ jobs:
         run: |
           envs/prior/bin/python -m pytest --noconftest control-source/tests/test_add_shared_route_benchmark.py -q
           python run-add-shared-route-campaign.py add_shared_route_benchmark.py --record-build
+          run_contract() {
+            side="$1"; label="$2"; shift 2
+            export CARGO_TARGET_DIR="$GITHUB_WORKSPACE/add-shared-route-target/$side"
+            export CARGO_BUILD_BUILD_DIR="$CARGO_TARGET_DIR"
+            export PYO3_PYTHON="$GITHUB_WORKSPACE/envs/$side/bin/python"
+            python -c 'import json,os,sys; print(json.dumps({"side":sys.argv[1],"label":sys.argv[2],"command":sys.argv[3:],"environment":{k:os.environ[k] for k in ("CARGO_TARGET_DIR","CARGO_BUILD_BUILD_DIR","PYO3_PYTHON")}}))' "$side" "$label" cargo --config "build.build-dir=\"$CARGO_BUILD_BUILD_DIR\"" test --release --lib --locked --target-dir "$CARGO_TARGET_DIR" --manifest-path "$GITHUB_WORKSPACE/sources/$side/Cargo.toml" "$@" >> add-shared-route-results/contract-build-commands.jsonl
+            cargo --config "build.build-dir=\"$CARGO_BUILD_BUILD_DIR\"" test --release --lib --locked --target-dir "$CARGO_TARGET_DIR" --manifest-path "$GITHUB_WORKSPACE/sources/$side/Cargo.toml" "$@" > "add-shared-route-results/$label.log" 2>&1
+          }
           for side in combined candidate; do
-            PYO3_PYTHON="$GITHUB_WORKSPACE/envs/$side/bin/python" cargo test --release --lib --locked --manifest-path "sources/$side/Cargo.toml" -- --list > "add-shared-route-results/$side-cold-list.log" 2>&1
-            PYO3_PYTHON="$GITHUB_WORKSPACE/envs/$side/bin/python" cargo test --release --lib --locked --manifest-path "sources/$side/Cargo.toml" -- sarext_legacy::tests::cold_parallel_dispatch_matches_portable_scalar_without_shared_mutable_inputs --exact --nocapture --test-threads=1 > "add-shared-route-results/$side-cold.log" 2>&1
+            run_contract "$side" "$side-cold-list" -- --list
+            run_contract "$side" "$side-cold" -- sarext_legacy::tests::cold_parallel_dispatch_matches_portable_scalar_without_shared_mutable_inputs --exact --nocapture --test-threads=1
             python - "$side" <<'PYCODE'
           import json,sys
           from pathlib import Path
@@ -150,7 +176,7 @@ jobs:
           PYCODE
           done
           for side in prior combined candidate; do
-            PYO3_PYTHON="$GITHUB_WORKSPACE/envs/$side/bin/python" cargo test --release --lib --locked --manifest-path "sources/$side/Cargo.toml" > "add-shared-route-results/$side-rust-tests.log" 2>&1
+            run_contract "$side" "$side-rust-tests"
           done
           (cd sources/candidate && "$GITHUB_WORKSPACE/envs/candidate/bin/python" -m pytest -q tests --benchmark-disable -p no:cacheprovider) > add-shared-route-results/candidate-public-tests.log 2>&1
           python - <<'PYCODE'
@@ -174,6 +200,6 @@ jobs:
           path: |
             add-shared-route-results/
             wheels/
-            add-shared-route-target/release/build/talib-sys-*/out/lib/libta-lib.a
-            add-shared-route-target/release/build/jemalloc-sys-*/out/lib/*.a
+            add-shared-route-target/*/release/build/talib-sys-*/out/lib/libta-lib.a
+            add-shared-route-target/*/release/build/jemalloc-sys-*/out/lib/*.a
           if-no-files-found: error

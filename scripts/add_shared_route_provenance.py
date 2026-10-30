@@ -158,6 +158,28 @@ def require_public_test_dependencies(workflow):
     if len(lines)!=1:
         raise ValueError('one reviewed fresh-arm dependency installation is required')
     tokens=set(shlex.split(lines[0]))
-    if not {'pytest','pytest-benchmark==5.3.0','numpy==2.5.3','TA-Lib==0.8.1'}.issubset(tokens):
+    if not {'pytest==8.4.2','pytest-benchmark==5.3.0','numpy==2.5.3','TA-Lib==0.8.1'}.issubset(tokens):
         raise ValueError('full public tests require the pinned benchmark fixture plugin and C oracle')
     return True
+
+
+def require_private_arm_commands(records,workspace,*,contracts=False):
+    """Bind actual recorded command/env paths to one private arm ownership."""
+    workspace=Path(workspace).resolve()
+    expected=[('combined','combined-cold-list'),('combined','combined-cold'),('candidate','candidate-cold-list'),('candidate','candidate-cold'),('prior','prior-rust-tests'),('combined','combined-rust-tests'),('candidate','candidate-rust-tests')]if contracts else[(s,None)for s in ('prior','combined','candidate','original')]
+    actual=[(row.get('side'),row.get('label'))for row in records]
+    if actual!=expected:raise ValueError('exact private arm command inventory/order required')
+    for row,(side,label)in zip(records,expected):
+        target=workspace/'add-shared-route-target'/side;python=workspace/'envs'/side/'bin/python'
+        env=row.get('environment',{});wanted={'CARGO_TARGET_DIR':str(target),'CARGO_BUILD_BUILD_DIR':str(target),'PYO3_PYTHON':str(python)}
+        if env!=wanted:raise ValueError('wheel/contract environment is not private to the requested arm')
+        command=row['command'];config='build.build-dir="'+str(target)+'"'
+        if contracts:
+            expected_command=['cargo','--config',config,'test','--release','--lib','--locked','--target-dir',str(target),'--manifest-path',str(workspace/'sources'/side/'Cargo.toml')]
+            if label.endswith('-cold-list'):expected_command+=['--','--list']
+            elif label.endswith('-cold'):expected_command+=['--',COLD_TEST,'--exact','--nocapture','--test-threads=1']
+        else:
+            expected_command=[str(python),'-m','maturin','build','--config',config,'--target-dir',str(target),'--release','--locked','--interpreter',str(python),'--out',str(workspace/'wheels'/side)]
+        if command!=expected_command:
+            raise ValueError('actual wheel/contract full argv differs from its private arm/profile/filter')
+    return {'commands':len(records),'private_per_arm':True,'records':records}

@@ -22,6 +22,7 @@ import time
 from migration_ci_benchmark import percentile, summarize
 from add_shared_route_inputs import validate as validate_input_snapshots
 from add_shared_route_contract import contract
+from add_shared_route_numpy_uniform_probe import validate_records as validate_uniform_records, file_sha as uniform_file_sha, elf_header as uniform_elf_header
 
 SIDES = ('original', 'prior', 'combined', 'candidate')
 COMBINED_COMMIT = 'e79ac0785436bbf3ba4c411d80936f8dd4ecfa24'
@@ -37,7 +38,7 @@ CHECKED_VALUES = 27_200_000
 CANDIDATE_COMMIT = "76e9803832f6726bb0499c2fd45f2222c5505349"
 CHILD_TIMEOUT_SECONDS = 120
 MEASUREMENT_BUDGET_SECONDS = 7200
-from add_shared_route_provenance import sha256, source_record, identity, wheel_record, flags_record, validate_identities, elf_record
+from add_shared_route_provenance import sha256, source_record, identity, wheel_record, flags_record, validate_identities, elf_record, require_private_arm_commands
 ORDERS = (
     ('original','prior','combined','candidate'),
     ('prior','candidate','original','combined'),
@@ -201,7 +202,7 @@ def run_all_settings(args, affinity):
 
 def script_records():
     files = ('add_shared_route_benchmark.py','add_shared_route_provenance.py','add_shared_route_query.py',
-             'add_shared_route_cases.json','add_shared_route_inputs.py','add_shared_route_contract.py','ADD_SHARED_ROUTE_CI.md','migration_probe.py','migration_ci_benchmark.py','api.json')
+             'add_shared_route_cases.json','add_shared_route_inputs.py','add_shared_route_contract.py','add_shared_route_numpy_uniform_probe.py','ADD_SHARED_ROUTE_CI.md','migration_probe.py','migration_ci_benchmark.py','api.json')
     records={name:sha256(Path(__file__).with_name(name))for name in files}
     for relative in('tests/test_add_shared_route_benchmark.py','.github/workflows/add-shared-route.yml'):
         records[relative]=sha256(Path(__file__).resolve().parents[1]/relative)
@@ -252,8 +253,34 @@ def workflow_pins(environment):
         raise ValueError('workflow helper/probe pins differ from frozen controller')
     return pins
 
+def numpy_uniform_probe(args):
+    workspace=Path(args.original_source).resolve().parents[1]
+    commands=[json.loads(line)for line in(args.output/'uniform-probe-commands.jsonl').read_text().splitlines()if line]
+    sides=('prior','combined','candidate','original')
+    if len(commands)!=4:raise ValueError('exact four actual-arm uniform probe commands required')
+    records={}
+    for side,row in zip(sides,commands):
+        expected=[str(workspace/'envs'/side/'bin/python'),str(workspace/'control-source/scripts/add_shared_route_numpy_uniform_probe.py'),'--side',side,'--workspace',str(workspace),'--output',str(workspace/'add-shared-route-results'/(side+'-uniform-probe.json')),'--module-dir',str(workspace/'add-shared-route-results/uniform-native'/side)]
+        if set(row)!={'side','command'}or row['side']!=side or row['command']!=expected:
+            raise ValueError('uniform probe must run once in each actual arm Python before builds')
+        records[side]=json.loads((args.output/(side+'-uniform-probe.json')).read_text())
+    proof=validate_uniform_records(records,workspace)
+    for row in records.values():
+        module=row['generator_module']
+        for key in('path','retained_path'):
+            path=Path(module[key])
+            if path.is_symlink()or path.resolve()!=path or not path.is_file()or path.stat().st_size!=module['bytes']or uniform_file_sha(path)!=module['sha256']:
+                raise ValueError('actual NumPy generator module or retained ELF changed')
+            with path.open('rb')as stream:header=stream.read(64)
+            uniform_elf_header(header)
+            if header.hex()!=module['header64_hex']:raise ValueError('actual NumPy generator ELF/header differs')
+    return proof
+
+
 def record_build(args):
     pins=fixed_pins(args.candidate_commit)
+    uniform=numpy_uniform_probe(args)
+    if json.loads((args.output/'uniform-before-wheel.json').read_text())!=uniform:raise ValueError('uniform target proof must be completed before any wheel')
     identities = {side: identity(getattr(args, side+'_python')) for side in SIDES}
     runtime = validate_identities(identities)
     builds = {side: {'source': source_record(getattr(args,side+'_source'), pins[side]),
@@ -268,7 +295,9 @@ def record_build(args):
             retained[str(destination)]=digest
         build['retained_native_files']=retained
         build['product_elf']=[elf_record(path) for path in retained]
-    result = {'builds':builds,'runtime':runtime,'flags':flags_record(),'scripts':script_records(),
+    wheel_commands=[json.loads(line)for line in(args.output/'build-commands.jsonl').read_text().splitlines()if line]
+    ownership=require_private_arm_commands(wheel_commands,Path(args.original_source).resolve().parents[1])
+    result = {'numpy_uniform_probe':uniform,'wheel_build_ownership':ownership,'builds':builds,'runtime':runtime,'flags':flags_record(),'scripts':script_records(),
               'native_source_boundary':native_source_boundary(args),
               'cases':requested_inventory(),'orders':ORDERS,'rounds':12,
               'release_flags':'maturin build --release --locked; sequential portable builds, identical environment',
@@ -280,6 +309,9 @@ def record_build(args):
 
 def verify_build(args):
     result = json.loads((args.output/'build-provenance.json').read_text())
+    if result['numpy_uniform_probe']!=numpy_uniform_probe(args)or json.loads((args.output/'uniform-before-wheel.json').read_text())!=result['numpy_uniform_probe']:raise ValueError('target NumPy uniform runtime/prewheel binding changed')
+    wheel_commands=[json.loads(line)for line in(args.output/'build-commands.jsonl').read_text().splitlines()if line]
+    if result['wheel_build_ownership']!=require_private_arm_commands(wheel_commands,Path(args.original_source).resolve().parents[1]):raise ValueError('wheel build ownership changed')
     if result['native_source_boundary']!=native_source_boundary(args):
         raise ValueError('native routing source boundary changed')
     if result['scripts'] != script_records() or result['flags'] != flags_record():
@@ -384,6 +416,8 @@ def validate_report(row, side, threads, provenance, selected=None):
 
 def validate_all(args):
     provenance = verify_build(args); folder=args.output/'corpus';folder.mkdir(exist_ok=True)
+    contract_commands=[json.loads(line)for line in(args.output/'contract-build-commands.jsonl').read_text().splitlines()if line]
+    contract_ownership=require_private_arm_commands(contract_commands,Path(args.original_source).resolve().parents[1],contracts=True)
     probe = Path(__file__).with_name('migration_probe.py').resolve()
     with (folder/'commands.jsonl').open('w') as commands:
         def execute(command, label):
@@ -413,7 +447,7 @@ def validate_all(args):
     snapshots=prepared['1']['source_validations']['original']['input_snapshots']
     dedup=validate_input_snapshots(args.output/'raw-inputs',snapshots,expected)
     if dedup!=7:raise ValueError('fixed physical input deduplication differs')
-    record={'raw_input_snapshots':snapshots,'raw_input_fixture_sha256':expected,'raw_input_dedup':dedup,'all_checks_completed_before_any_timing':True,'corpus':reports,
+    record={'raw_input_snapshots':snapshots,'raw_input_fixture_sha256':expected,'raw_input_dedup':dedup,'all_checks_completed_before_any_timing':True,'corpus':reports,'contract_build_ownership':contract_ownership,
             'prepared_sha256':{str(t):sha256(args.output/f'threads-{t}'/'prepared-validation.json') for t in (1,4)},
             'build_provenance_sha256':sha256(args.output/'build-provenance.json'),
             'cases':requested_inventory(),'checked_values_per_setting':CHECKED_VALUES}
@@ -424,6 +458,8 @@ def validate_all(args):
 def verify_validation(args):
     provenance=verify_build(args); corpus_gate(args.output)
     record=json.loads((args.output/'validation-complete.json').read_text())
+    contract_commands=[json.loads(line)for line in(args.output/'contract-build-commands.jsonl').read_text().splitlines()if line]
+    if record['contract_build_ownership']!=require_private_arm_commands(contract_commands,Path(args.original_source).resolve().parents[1],contracts=True):raise ValueError('contract build ownership changed')
     if (not record['all_checks_completed_before_any_timing'] or record['cases'] != requested_inventory()
             or record['checked_values_per_setting'] != CHECKED_VALUES
             or record['build_provenance_sha256'] != sha256(args.output/'build-provenance.json')):

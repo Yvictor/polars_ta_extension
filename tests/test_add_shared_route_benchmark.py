@@ -492,7 +492,7 @@ def test_public_test_dependency_gate_rejects_fresh_environment_without_plugin(ch
     assert prov.require_public_test_dependencies(text)
     if change=='missing_plugin':text=text.replace("'pytest-benchmark==5.3.0'",'')
     elif change=='unpinned_plugin':text=text.replace('pytest-benchmark==5.3.0','pytest-benchmark>=5')
-    elif change=='missing_pytest':text=text.replace("'pytest-benchmark==5.3.0' pytest","'pytest-benchmark==5.3.0'")
+    elif change=='missing_pytest':text=text.replace("'pytest==8.4.2'",'')
     else:text=text.replace("'pytest-benchmark==5.3.0'",'')+'\n# pytest-benchmark==5.3.0\n'
     with pytest.raises(ValueError):prov.require_public_test_dependencies(text)
 
@@ -501,3 +501,190 @@ def test_public_test_dependency_gate_rejects_fresh_environment_without_plugin(ch
 def test_protocol_integer_metadata_rejects_booleans(key,value):
     row=run();row[key]=value
     with pytest.raises(ValueError):bench.validate_report(row,'prior',1,provenance(),bench.CASES[0])
+
+@pytest.mark.parametrize('value',['pytest','pytest==9.2.0','pytest>=8'])
+def test_public_dependency_gate_rejects_unvalidated_pytest_pair(value):
+    text=(Path(__file__).parents[1]/'.github/workflows/add-shared-route.yml').read_text()
+    assert prov.require_public_test_dependencies(text)
+    with pytest.raises(ValueError):prov.require_public_test_dependencies(text.replace('pytest==8.4.2',value))
+
+
+def private_build_commands(workspace,contracts=False):
+    order=[('combined','combined-cold-list'),('combined','combined-cold'),('candidate','candidate-cold-list'),('candidate','candidate-cold'),('prior','prior-rust-tests'),('combined','combined-rust-tests'),('candidate','candidate-rust-tests')]if contracts else[(s,None)for s in ('prior','combined','candidate','original')]
+    records=[]
+    for side,label in order:
+        target=workspace/'add-shared-route-target'/side;py=workspace/'envs'/side/'bin/python'
+        opts=['--config','build.build-dir="'+str(target)+'"','--target-dir',str(target)]
+        command=(['cargo','--config',opts[1],'test','--release','--lib','--locked','--target-dir',str(target),'--manifest-path',str(workspace/'sources'/side/'Cargo.toml')]if contracts else[str(py),'-m','maturin','build',*opts,'--release','--locked','--interpreter',str(py),'--out',str(workspace/'wheels'/side)])
+        if contracts and label.endswith('-cold-list'):command+=['--','--list']
+        elif contracts and label.endswith('-cold'):command+=['--',prov.COLD_TEST,'--exact','--nocapture','--test-threads=1']
+        row={'side':side,'command':command,'environment':{'CARGO_TARGET_DIR':str(target),'CARGO_BUILD_BUILD_DIR':str(target),'PYO3_PYTHON':str(py)}}
+        if label is not None:row['label']=label
+        records.append(row)
+    return records
+
+
+@pytest.mark.parametrize('contracts',[False,True])
+@pytest.mark.parametrize('change',['missing','wrong_arm','shared_target','wrong_build','wrong_python','command_target','command_build','wrong_source','duplicate'])
+def test_private_arm_ownership_rejects_shared_wrong_or_incomplete_paths(tmp_path,contracts,change):
+    rows=private_build_commands(tmp_path,contracts);assert prov.require_private_arm_commands(rows,tmp_path,contracts=contracts)['private_per_arm']
+    if change=='missing':rows.pop()
+    elif change=='wrong_arm':rows[0]['side']='candidate'
+    elif change=='shared_target':rows[0]['environment']['CARGO_TARGET_DIR']=str(tmp_path/'add-shared-route-target')
+    elif change=='wrong_build':rows[0]['environment']['CARGO_BUILD_BUILD_DIR']=str(tmp_path/'candidate')
+    elif change=='wrong_python':rows[0]['environment']['PYO3_PYTHON']=str(tmp_path/'envs/candidate/bin/python')
+    elif change=='command_target':rows[0]['command'][rows[0]['command'].index('--target-dir')+1]=str(tmp_path/'wrong')
+    elif change=='command_build':rows[0]['command'][rows[0]['command'].index('--config')+1]='build.build-dir="/wrong"'
+    elif change=='wrong_source':
+        if contracts:rows[0]['command'][rows[0]['command'].index('--manifest-path')+1]=str(tmp_path/'sources/candidate/Cargo.toml')
+        else:rows[0]['command'][0]=str(tmp_path/'envs/candidate/bin/python')
+    else:rows.append(copy.deepcopy(rows[0]))
+    with pytest.raises(ValueError):prov.require_private_arm_commands(rows,tmp_path,contracts=contracts)
+
+
+@pytest.mark.parametrize('alter_actual',['none','target','python'])
+def test_actual_contract_shell_overrides_previous_arm_build_environment(tmp_path,alter_actual):
+    import os,subprocess,textwrap,shlex
+    text=(Path(__file__).parents[1]/'.github/workflows/add-shared-route.yml').read_text()
+    assert 'run_contract "$side" "$side-cold-list" -- --list'in text
+    assert 'run_contract "$side" "$side-cold" -- '+prov.COLD_TEST+' --exact --nocapture --test-threads=1'in text
+    assert 'run_contract "$side" "$side-rust-tests"'in text
+    a=text.index('          run_contract() {');b=text.index('          }\n',a)+len('          }\n')
+    function=textwrap.dedent(text[a:b])
+    if alter_actual!='none':
+        parts=function.splitlines()
+        for i,line in enumerate(parts):
+            if line.lstrip().startswith('cargo --config'):
+                if alter_actual=='target':parts[i]=line.replace('--target-dir "$CARGO_TARGET_DIR"','--target-dir "$GITHUB_WORKSPACE/wrong"')
+                else:parts[i]=line.replace('cargo --config','PYO3_PYTHON=/wrong/actual-python cargo --config',1)
+        function='\n'.join(parts)+'\n'
+    bin=tmp_path/'bin';bin.mkdir();fake=bin/'cargo'
+    observer=tmp_path/'actual-cargo.jsonl'
+    fake.write_text('#!'+sys.executable+'\nimport os,sys,json\nfrom pathlib import Path\nrow={"command":["cargo",*sys.argv[1:]],"environment":{k:os.environ[k]for k in("CARGO_TARGET_DIR","CARGO_BUILD_BUILD_DIR","PYO3_PYTHON")},"cwd":os.getcwd()}\nwith Path(os.environ["OBSERVED_CARGO_FILE"]).open("a")as f:f.write(json.dumps(row)+"\\n")\n')
+    fake.chmod(0o755);(tmp_path/'add-shared-route-results').mkdir()
+    expected=private_build_commands(tmp_path,True);calls=[]
+    for row in expected:
+        tail=row['command'][row['command'].index('--manifest-path')+2:]
+        calls.append(shlex.join(['run_contract',row['side'],row['label'],*tail]))
+    env=os.environ.copy();env.update(GITHUB_WORKSPACE=str(tmp_path),PATH=str(bin)+os.pathsep+str(Path(sys.executable).parent)+os.pathsep+env['PATH'],CARGO_TARGET_DIR='/wrong/candidate',CARGO_BUILD_BUILD_DIR='/wrong/candidate',PYO3_PYTHON='/wrong/candidate/python',OBSERVED_CARGO_FILE=str(observer))
+    subprocess.run(['bash','-e','-c',function+'\n'+'\n'.join(calls)],cwd=tmp_path,env=env,check=True,capture_output=True,text=True)
+    logged=[json.loads(x)for x in(tmp_path/'add-shared-route-results/contract-build-commands.jsonl').read_text().splitlines()]
+    actual=[json.loads(x)for x in observer.read_text().splitlines()]
+    assert len(logged)==len(actual)==7
+    def actual_matches_log():
+        for record,observed in zip(logged,actual):
+            assert record['command']==observed['command']and record['environment']==observed['environment']
+            assert observed['cwd']==str(tmp_path)
+    if alter_actual=='none':actual_matches_log()
+    else:
+        with pytest.raises(AssertionError):actual_matches_log()
+        observed_rows=[{**record,'command':observed['command'],'environment':observed['environment']}for record,observed in zip(logged,actual)]
+        with pytest.raises(ValueError):prov.require_private_arm_commands(observed_rows,tmp_path,contracts=True)
+    assert prov.require_private_arm_commands(logged,tmp_path,contracts=True)['commands']==7
+
+
+@pytest.mark.parametrize('kind',['interpreter','out','extra_interpreter','missing_release','missing_locked'])
+def test_wheel_full_argv_rejects_override_output_and_profile_changes(tmp_path,kind):
+    rows=private_build_commands(tmp_path);cmd=rows[0]['command']
+    assert prov.require_private_arm_commands(rows,tmp_path)['commands']==4
+    if kind in('interpreter','out'):cmd[cmd.index('--'+kind)+1]=str(tmp_path/'other-arm')
+    elif kind=='extra_interpreter':cmd+=['--interpreter',str(tmp_path/'other/python')]
+    else:cmd.remove('--'+kind.removeprefix('missing_'))
+    with pytest.raises(ValueError):prov.require_private_arm_commands(rows,tmp_path)
+
+
+@pytest.mark.parametrize('change',['cold_filter','no_exact','missing_release','missing_lib','missing_locked','extra_profile'])
+def test_contract_full_argv_rejects_filter_and_profile_changes(tmp_path,change):
+    rows=private_build_commands(tmp_path,True);cmd=rows[1]['command']
+    assert prov.require_private_arm_commands(rows,tmp_path,contracts=True)['commands']==7
+    if change=='cold_filter':cmd[cmd.index(prov.COLD_TEST)]='unrelated::test'
+    elif change=='no_exact':cmd.remove('--exact')
+    elif change=='extra_profile':cmd+=['--profile','dev']
+    else:cmd.remove('--'+change.removeprefix('missing_'))
+    with pytest.raises(ValueError):prov.require_private_arm_commands(rows,tmp_path,contracts=True)
+
+def uniform_probe_fixture(workspace):
+    import hashlib
+    uniform=importlib.import_module('add_shared_route_numpy_uniform_probe');workspace=workspace.resolve()
+    output=workspace/'add-shared-route-results';output.mkdir();records={};commands=[];name='_generator.cpython-312-x86_64-linux-gnu.so';binary=bytes(elf_header());digest=hashlib.sha256(binary).hexdigest()
+    for side in uniform.SIDES:
+        source=workspace/'envs'/side/'lib/python3.12/site-packages/numpy/random'/name;source.parent.mkdir(parents=True);source.write_bytes(binary)
+        retained=output/'uniform-native'/side/name;retained.parent.mkdir(parents=True);retained.write_bytes(binary)
+        row={'side':side,'mode':uniform.MODE,'python_executable':str(workspace/'envs'/side/'bin/python'),'python':'3.12.15','system':'Linux','machine':'x86_64','byteorder':'little','numpy':'2.5.3','bit_generator':'PCG64','seed':260126,'normal_draws':1000,'normal_loc':0,'normal_scale':.1,'uniform_draws':32,'uniform_low':100,'uniform_high':1000,'words_u64_hex':list(uniform.EXPECTED_WORDS),'generator_module':{'path':str(source),'sha256':digest,'bytes':len(binary),'header64_hex':binary.hex(),'retained_path':str(retained)}}
+        (output/(side+'-uniform-probe.json')).write_text(json.dumps(row));records[side]=row
+        command=[str(workspace/'envs'/side/'bin/python'),str(workspace/'control-source/scripts/add_shared_route_numpy_uniform_probe.py'),'--side',side,'--workspace',str(workspace),'--output',str(output/(side+'-uniform-probe.json')),'--module-dir',str(output/'uniform-native'/side)]
+        commands.append({'side':side,'command':command})
+    (output/'uniform-probe-commands.jsonl').write_text(''.join(json.dumps(row)+'\n'for row in commands))
+    return SimpleNamespace(original_source=workspace/'sources/original',output=output),records,commands
+
+
+def test_target_uniform_probe_is_bytefrozen_and_predetermined_before_data(tmp_path):
+    uniform=importlib.import_module('add_shared_route_numpy_uniform_probe');p=Path(uniform.__file__)
+    assert bench.sha256(p)=='c4b34240f16535ee7dda7c3027c1d4278aa5fc685ee8c2b8a10d13cb7f486a5e'
+    assert bench.script_records()[p.name]==bench.sha256(p)
+    args,records,_=uniform_probe_fixture(tmp_path)
+    proof=bench.numpy_uniform_probe(args)
+    assert proof['mode']=='numpy-2.5.3-linux-x86_64-unfused-uniform'and list(proof['records'])==['prior','combined','candidate','original']
+    assert len(uniform.EXPECTED_WORDS)==32 and len(set(uniform.EXPECTED_WORDS))==32
+    assert all(r['normal_draws']==1000 and r['uniform_draws']==32 for r in records.values())
+
+
+@pytest.mark.parametrize('change',['arm','python','system','machine','byteorder','numpy','bit_generator','mode','vector','normal_draws','uniform_draws','boolean_seed','missing_command','command_interpreter','command_module_dir','source_bytes','copy_bytes','copy_symlink','copy_parent_symlink','header'])
+def test_target_uniform_probe_rejects_unknown_fused_runtime_scope_or_changed_ELF(tmp_path,change):
+    args,records,commands=uniform_probe_fixture(tmp_path);side='prior';row=records[side];module=row['generator_module']
+    if change in('python','system','machine','byteorder','numpy','bit_generator','mode'):
+        row[change]={'python':'3.12.14','system':'Darwin','machine':'aarch64','byteorder':'big','numpy':'2.5.4','bit_generator':'PCG64DXSM','mode':'fused'}[change]
+    elif change=='arm':row['side']='candidate'
+    elif change=='vector':row['words_u64_hex'][0]='0000000000000000'
+    elif change=='normal_draws':row['normal_draws']=32
+    elif change=='uniform_draws':row['uniform_draws']=31
+    elif change=='boolean_seed':row['seed']=True
+    elif change=='missing_command':commands.pop()
+    elif change=='command_interpreter':commands[0]['command'][0]=str(tmp_path/'envs/candidate/bin/python')
+    elif change=='command_module_dir':commands[0]['command'][-1]=str(tmp_path/'other')
+    elif change=='source_bytes':Path(module['path']).write_bytes(b'corrupt source')
+    elif change=='copy_bytes':Path(module['retained_path']).write_bytes(b'corrupt copy')
+    elif change=='copy_symlink':
+        p=Path(module['retained_path']);p.unlink();p.symlink_to(Path(module['path']))
+    elif change=='copy_parent_symlink':
+        p=Path(module['retained_path']).parent;other=tmp_path/'outside';p.rename(other);p.symlink_to(other,target_is_directory=True)
+    else:row['generator_module']['header64_hex']='00'*64
+    (args.output/(side+'-uniform-probe.json')).write_text(json.dumps(row))
+    (args.output/'uniform-probe-commands.jsonl').write_text(''.join(json.dumps(r)+'\n'for r in commands))
+    with pytest.raises(ValueError):bench.numpy_uniform_probe(args)
+
+
+def test_actual_probe_workflow_calls_each_arm_interpreter_before_any_wheel(tmp_path):
+    import os,subprocess,textwrap
+    text=(Path(__file__).parents[1]/'.github/workflows/add-shared-route.yml').read_text()
+    start=text.index('      - name: Create pinned environments and bind target NumPy uniform mode before any wheel')
+    end=text.index('      - name: Build four portable wheels',start)
+    body=text[start:end].split('        run: |\n',1)[1];body=textwrap.dedent(body)
+    assert '-m maturin build'not in body
+    assert end<text.index('      - name: Full10624-case')<text.index('      - name: Twelve four-arm')
+    bin=tmp_path/'bin';bin.mkdir();uv=bin/'uv';uv.write_text('#!/bin/sh\nexit 0\n');uv.chmod(0o755)
+    (tmp_path/'add-shared-route-results').mkdir();observed=tmp_path/'actual-probes.jsonl'
+    controller=tmp_path/'control-source/scripts';controller.mkdir(parents=True)
+    (controller/'add_shared_route_benchmark.py').write_text('def numpy_uniform_probe(args):\n import json,os\n from pathlib import Path\n assert len(Path(os.environ["OBSERVED_PROBES"]).read_text().splitlines())==4\n return {"prewheel_after_all4":True}\n')
+    for side in ('prior','combined','candidate','original'):
+        py=tmp_path/'envs'/side/'bin/python';py.parent.mkdir(parents=True)
+        py.write_text('#!'+sys.executable+'\nimport json,os,sys\nfrom pathlib import Path\nwith Path(os.environ["OBSERVED_PROBES"]).open("a")as f:f.write(json.dumps({"side":Path(sys.argv[0]).parents[1].name,"command":sys.argv})+"\\n")\n');py.chmod(0o755)
+    env=os.environ.copy();env.update(GITHUB_WORKSPACE=str(tmp_path),PATH=str(bin)+os.pathsep+str(Path(sys.executable).parent)+os.pathsep+env['PATH'],OBSERVED_PROBES=str(observed))
+    subprocess.run(['bash','-e','-c',body],cwd=tmp_path,env=env,check=True,capture_output=True,text=True)
+    actual=[json.loads(x)for x in observed.read_text().splitlines()];logged=[json.loads(x)for x in(tmp_path/'add-shared-route-results/uniform-probe-commands.jsonl').read_text().splitlines()]
+    assert actual==logged and [r['side']for r in actual]==['prior','combined','candidate','original']
+    assert json.loads((tmp_path/'add-shared-route-results/uniform-before-wheel.json').read_text())=={'prewheel_after_all4':True}
+    for row in actual:
+        assert row['command'][0]==str(tmp_path/'envs'/row['side']/'bin/python')and row['command'][2:4]==['--side',row['side']]
+
+@pytest.mark.parametrize('entry',['validate_all','run_all_settings'])
+def test_changed_uniform_module_aborts_before_any_capture_or_timing(tmp_path,monkeypatch,entry):
+    args,records,_=uniform_probe_fixture(tmp_path);proof=bench.numpy_uniform_probe(args)
+    (args.output/'build-provenance.json').write_text(json.dumps({'numpy_uniform_probe':proof}))
+    (args.output/'uniform-before-wheel.json').write_text(json.dumps(proof))
+    Path(records['original']['generator_module']['retained_path']).write_bytes(b'changed after builds')
+    calls=[];monkeypatch.setattr(bench.subprocess,'run',lambda *a,**k:calls.append(a));monkeypatch.setattr(bench,'run_setting',lambda *a,**k:calls.append(a))
+    with pytest.raises(ValueError,match='generator module or retained ELF changed'):
+        if entry=='validate_all':bench.validate_all(args)
+        else:bench.run_all_settings(args,None)
+    assert not calls
