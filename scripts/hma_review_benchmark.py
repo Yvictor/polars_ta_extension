@@ -43,6 +43,8 @@ VALIDATION |= {f'validation/stream/{pat}/p{period}/n{min(1000000, max(1000, 10*p
 TIMED_KEYS = {(backend,name) for backend in BACKENDS for name in CASES}
 VALIDATION_KEYS = {(backend,name) for backend in BACKENDS for name in VALIDATION}
 KEYS = TIMED_KEYS | VALIDATION_KEYS
+HISTORY_BAD_BITS = (0x7ff8000000000000, 0x7ff0000000000000, 0xfff0000000000000)
+OPENING_KEYS = {(backend,name,bits)for backend in BACKENDS[:2] for name in VALIDATION if name.startswith('validation/stream/') for bits in HISTORY_BAD_BITS}
 CANARY = 0x7ff80000000055aa
 
 FLAGS = {'RUSTFLAGS':'', 'CARGO_ENCODED_RUSTFLAGS':'', 'CARGO_PROFILE_RELEASE_LTO':'thin',
@@ -427,8 +429,40 @@ def expected_range(name):
     return case['n'],case['beg'],case['count']
 
 
+def opening_observation(row):
+    expected={'kind','case','backend','history_len','bad_index','bad_bits','open','fill','fill_bits','policy'}
+    if type(row)is not dict or set(row)!=expected:raise ValueError('opening observation exact schema')
+    key=(row.get('backend'),row.get('case'),row.get('bad_bits'))
+    if type(row['bad_bits'])is not int or key not in OPENING_KEYS:raise ValueError('opening observation inventory')
+    case=expected_case(key[1]);lb=case['beg'];history=min(case['n'],lb+26)
+    fixed={'kind':'opening_history_observation','history_len':history,'bad_index':history//2,'policy':'undefined-opening-history-observation-only'}
+    if any(type(row.get(k))is not type(v)or row[k]!=v for k,v in fixed.items()):raise ValueError('opening observation fixture/policy')
+    def word(value):return type(value)is int and 0<=value<2**64
+    for name in ('open','fill'):
+        result=row[name]
+        if type(result)is not dict:raise ValueError('opening result schema')
+        if result.get('status')=='error':
+            if set(result)!={'status','error'}or type(result['error'])is not str or not 1<=len(result['error'])<=200:raise ValueError('opening error observation')
+        elif result.get('status')=='ok':
+            keys={'status','beg','count','value_bits','state_value_bits'}if name=='open'else{'status','beg','count','state_beg','state_count','state_value_bits'}
+            if set(result)!=keys or not all(word(result[k])for k in keys-{'status'}):raise ValueError('opening successful observation')
+        else:raise ValueError('opening result status')
+    if type(row['fill_bits'])is not list or len(row['fill_bits'])!=history-lb+8 or not all(word(v)for v in row['fill_bits']):raise ValueError('opening physical fill-word observation')
+    return key
+
+
+def opening_key(key):
+    return key[0]+'/'+key[1]+'/'+format(key[2],'016x')
+
+
+def compare_opening_observations(before,after):
+    if set(before)!=set(after)or set(before)!={opening_key(k)for k in OPENING_KEYS}:raise ValueError('complete opening observation comparison inventory')
+    differences={key:{'baseline':before[key],'candidate':after[key]}for key in sorted(before)if not typed_equal(before[key],after[key])}
+    return {'policy':'Undefined opening-history observations only; differences are retained and are not a finite-input compatibility or performance gate.','records_per_source':len(OPENING_KEYS),'identical':not differences,'differences':differences,'baseline':before,'candidate':after}
+
+
 def parse_records(content,capture_only,expected_os="linux"):
-    metadata=None;parity={};validation={};cases={};seen_timing=False
+    metadata=None;parity={};validation={};cases={};observations={};seen_timing=False
     for line in content.splitlines():
         if not line.strip():continue
         row=strict_json(line)
@@ -438,6 +472,11 @@ def parse_records(content,capture_only,expected_os="linux"):
             if metadata is not None:raise ValueError('duplicate metadata')
             metadata=row;continue
         if metadata is None:raise ValueError('metadata must precede validation/parity/timing')
+        if kind=='opening_history_observation':
+            if seen_timing:raise ValueError('opening observations must precede timing')
+            obs_key=opening_observation(row)
+            if obs_key in observations:raise ValueError('duplicate opening observation')
+            observations[obs_key]=row;continue
         key=(row.get('backend'),row.get('case'))
         if key not in KEYS:raise ValueError('unexpected fixed case/backend')
         case=expected_case(key[1]);n,beg,count=(case[k] for k in ('n','beg','count'))
@@ -463,11 +502,11 @@ def parse_records(content,capture_only,expected_os="linux"):
             if not isinstance(samples,list) or len(samples)!=31 or any(type(x)not in (int,float) or not math.isfinite(x) or x<=0 for x in samples):raise ValueError('31 positive finite samples required')
             cases[key]=row
         else:raise ValueError('unknown record kind')
-    expected={'format':1,'cases':len(CASES),'validation_cases':len(VALIDATION),'backends':list(BACKENDS),'canary_bits':'7ff80000000055aa','output_prefix':1,'warmups':5,'repeats':31,'capture_only':capture_only,'capture_written':capture_only,'registry_version':'0.8.3','current_version':'0.8.4','capture_records':len(KEYS),'tolerance_relative':4e-15,'tolerance_floor':'max_abs_finite_input'}
+    expected={'format':1,'cases':len(CASES),'validation_cases':len(VALIDATION),'opening_history_observations':len(OPENING_KEYS),'backends':list(BACKENDS),'canary_bits':'7ff80000000055aa','output_prefix':1,'warmups':5,'repeats':31,'capture_only':capture_only,'capture_written':capture_only,'registry_version':'0.8.3','current_version':'0.8.4','capture_records':len(KEYS),'tolerance_relative':4e-15,'tolerance_floor':'max_abs_finite_input'}
     if metadata is None or any(type(metadata.get(k))is not type(v) or metadata[k]!=v for k,v in expected.items()):raise ValueError('metadata/runtime/fixed inventory mismatch')
     if metadata.get('os')!=expected_os or type(metadata.get('arch'))is not str or not metadata['arch'] or type(metadata.get('c_version'))is not str or not (metadata['c_version']=='0.8.1' or metadata['c_version'].startswith('0.8.1 (')):raise ValueError('unexpected platform or C runtime')
-    if set(parity)!=TIMED_KEYS or set(validation)!=VALIDATION_KEYS or set(cases)!=(set() if capture_only else TIMED_KEYS):raise ValueError('complete fixed backend/case inventories required')
-    return {'metadata':metadata,'validation':{b+'/'+c:v for (b,c),v in validation.items()},'parity':{b+'/'+c:v for (b,c),v in parity.items()},'cases':{b+'/'+c:v for (b,c),v in cases.items()}}
+    if set(observations)!=OPENING_KEYS or set(parity)!=TIMED_KEYS or set(validation)!=VALIDATION_KEYS or set(cases)!=(set() if capture_only else TIMED_KEYS):raise ValueError('complete fixed backend/case inventories required')
+    return {'metadata':metadata,'opening_history_observations':{opening_key(k):v for k,v in observations.items()},'validation':{b+'/'+c:v for (b,c),v in validation.items()},'parity':{b+'/'+c:v for (b,c),v in parity.items()},'cases':{b+'/'+c:v for (b,c),v in cases.items()}}
 
 
 def capture_record(path):
@@ -631,6 +670,8 @@ def measure(args):
             metadata=current
         first,last=[validations[s]['capture']for s in SIDES]
         if not first['bytes']or first['bytes']!=last['bytes']or first['sha256']!=last['sha256']:raise ValueError('full primary captures differ; no waiver')
+        opening=compare_opening_observations(*[validations[s]['records']['opening_history_observations']for s in SIDES])
+        (args.output/'opening-history-observations.json').write_text(json.dumps(opening,indent=2)+'\n')
         goldens=split_goldens(args.output/'baseline.bin',args.output/'goldens')
         gate={'completed_before_any_timing':True,'primary_exact':True,'validation':validations,'goldens':goldens}
         (args.output/'capture-validation.json').write_text(json.dumps(gate,indent=2)+'\n')
@@ -652,8 +693,8 @@ def measure(args):
     for side in SIDES:
         for pair in range(12):runs[side].append({'cases':{key:rows[pair]['cases'][key]for key,rows in selected[side].items()}})
     rows=summarize(runs);negatives={k:v for k,v in rows.items()if v['candidate_latency_percent']>0}
-    report={'run_url':f"https://github.com/{os.environ.get('GITHUB_REPOSITORY','local')}/actions/runs/{os.environ.get('GITHUB_RUN_ID','local')}",'build_provenance':p,'pairs':12,'samples_per_process':31,'warmups':5,'affinity':affinity,'order':ledger,'children':len(ledger),'samples':len(ledger)*31,'harness_metadata':metadata,'capture_validation':validations,'goldens':goldens,'results':rows,'negative_cases':negatives,
-        'source_scope':'HMA parent5da vs maintainera466: on-demand departing reads, sqrt(n)ring, subHalf local and unlikely reseeds. Private stream storage changes. Stream checks are validation-only.',
+    report={'run_url':f"https://github.com/{os.environ.get('GITHUB_REPOSITORY','local')}/actions/runs/{os.environ.get('GITHUB_RUN_ID','local')}",'build_provenance':p,'pairs':12,'samples_per_process':31,'warmups':5,'affinity':affinity,'order':ledger,'children':len(ledger),'samples':len(ledger)*31,'harness_metadata':metadata,'opening_history_observations':opening,'capture_validation':validations,'goldens':goldens,'results':rows,'negative_cases':negatives,
+        'source_scope':'HMA parent5da vs maintainera466: on-demand departing reads, sqrt(n)ring, subHalf local and unlikely reseeds. Private stream storage changes. Stream finite-input checks are validation-only; undefined opening-history records are retained as observations, not rejection guarantees.',
         'limitations':'Fresh process per selected batch case/backend/build/round. Twelve matched AB/BA pairs,31 inner correlated samples after5warmups. Envelopes are descriptive, not confidence intervals. Unchanged registry083/C081 arms are negative controls across the two linked-source binaries. No cross-backend ratio is presented as a counterbalanced comparison; no Polars/consumer claim or reuse/pooling of the old433→5da results. Actual C# stream performance remains tracked in upstream567; this job does not measure it.'}
     if len(ledger)!=1224:raise ValueError('complete17x3x2x12 children required')
     (args.output/'summary.json').write_text(json.dumps(report,indent=2)+'\n');(args.output/'negative-cases.json').write_text(json.dumps(negatives,indent=2)+'\n')

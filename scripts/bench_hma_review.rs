@@ -244,7 +244,7 @@ fn validation_case(n: usize, period: i32, start: usize, pattern: Pattern) -> Cas
 }
 
 macro_rules! stream_contract {
-    ($core:expr, $case:expr, $price:expr, $out:expr) => {{
+    ($core:expr, $case:expr, $price:expr, $out:expr, $backend:expr, $lib:ident) => {{
         let core = $core;
         let case = $case;
         let price = $price;
@@ -262,6 +262,7 @@ macro_rules! stream_contract {
         assert_eq!(state.out_range().beg_idx, lb);
         assert_eq!(state.out_range().count, 1);
         assert_eq!(first.to_bits(), batch[1].to_bits());
+        assert_eq!(state.value().to_bits(), first.to_bits());
         out[1] = first;
         for i in lb + 1..case.n {
             let before = state.out_range();
@@ -269,8 +270,8 @@ macro_rules! stream_contract {
             // Rejections and peeks must leave every observable state usable.
             if i == lb + 1 || i + 1 == case.n || i % (8 * case.period as usize) <= 1 {
                 for bad in [f64::NAN, f64::INFINITY, f64::NEG_INFINITY] {
-                    assert!(state.update(bad).is_err());
-                    assert!(state.peek(bad).is_err());
+                    assert_eq!(state.update(bad).err(), Some($lib::RetCode::BadParam));
+                    assert_eq!(state.peek(bad).err(), Some($lib::RetCode::BadParam));
                     assert_eq!(state.out_range(), before);
                     assert_eq!(state.value().to_bits(), value);
                 }
@@ -307,6 +308,7 @@ macro_rules! stream_contract {
             .unwrap();
         assert_eq!((range.beg_idx, range.count), (lb, history - lb));
         assert_eq!(from_fill.out_range(), range);
+        assert_eq!(from_fill.value().to_bits(), batch[history - lb].to_bits());
         assert_eq!(
             filled[..1 + range.count]
                 .iter()
@@ -326,22 +328,50 @@ macro_rules! stream_contract {
                 batch[1 + i - lb].to_bits()
             );
         }
-        // Rejected history and undersized output leave the output canaries untouched.
-        for bad in [f64::NAN, f64::INFINITY, f64::NEG_INFINITY] {
+        // Opening arrays are caller-owned finite-input preconditions, not scanned
+        // rejection contracts. Preserve the old nonfinite-seed scenario as raw
+        // observations only; update/peek rejections above remain strict.
+        for bad_bits in [0x7ff8_0000_0000_0000_u64, f64::INFINITY.to_bits(), f64::NEG_INFINITY.to_bits()] {
             let mut invalid = price[..history].to_vec();
-            invalid[history / 2] = bad;
+            let bad_index = history / 2;
+            invalid[bad_index] = f64::from_bits(bad_bits);
+            let opened = match core.hma_open(&invalid, case.period) {
+                Ok((state, value)) => {
+                    let r = state.out_range();
+                    format!(r#"{{"status":"ok","beg":{},"count":{},"value_bits":{},"state_value_bits":{}}}"#, r.beg_idx, r.count, value.to_bits(), state.value().to_bits())
+                }
+                Err(error) => format!(r#"{{"status":"error","error":{:?}}}"#, format!("{error:?}")),
+            };
+            let mut observed = vec![f64::from_bits(CANARY); history - lb + 8];
+            let filled = match core.hma_open_and_fill(&invalid, case.period, &mut observed[1..]) {
+                Ok((state, range)) => {
+                    let r = state.out_range();
+                    format!(r#"{{"status":"ok","beg":{},"count":{},"state_beg":{},"state_count":{},"state_value_bits":{}}}"#, range.beg_idx, range.count, r.beg_idx, r.count, state.value().to_bits())
+                }
+                Err(error) => format!(r#"{{"status":"error","error":{:?}}}"#, format!("{error:?}")),
+            };
+            let bits: Vec<u64> = observed.iter().map(|v| v.to_bits()).collect();
+            println!(r#"{{"kind":"opening_history_observation","case":{:?},"backend":{:?},"history_len":{},"bad_index":{},"bad_bits":{},"open":{},"fill":{},"fill_bits":{:?},"policy":"undefined-opening-history-observation-only"}}"#, case.name, $backend, history, bad_index, bad_bits, opened, filled, bits);
+        }
+        // Documented parameter/history/short-output failures retain no-write checks.
+        for invalid_period in [0, -1, 100_001, i32::MAX] {
             let mut poison = vec![f64::from_bits(CANARY); history + 8];
-            assert!(core.hma_open(&invalid, case.period).is_err());
-            assert!(core
-                .hma_open_and_fill(&invalid, case.period, &mut poison[1..])
-                .is_err());
+            assert_eq!(core.hma_open(&price[..history], invalid_period).err(), Some($lib::RetCode::BadParam));
+            assert_eq!(core.hma_open_and_fill(&price[..history], invalid_period, &mut poison[1..]).err(), Some($lib::RetCode::BadParam));
             assert!(poison.iter().all(|v| v.to_bits() == CANARY));
         }
-        let mut short = vec![f64::from_bits(CANARY); history - lb - 1];
-        assert!(core
-            .hma_open_and_fill(&price[..history], case.period, &mut short)
-            .is_err());
-        assert!(short.iter().all(|v| v.to_bits() == CANARY));
+        for insufficient in [&price[..0], &price[..lb]] {
+            let mut poison = vec![f64::from_bits(CANARY); history + 8];
+            let expected = if insufficient.is_empty() { $lib::RetCode::OutOfRangeStartIndex } else { $lib::RetCode::InsufficientHistory };
+            assert_eq!(core.hma_open(insufficient, case.period).err(), Some(expected));
+            assert_eq!(core.hma_open_and_fill(insufficient, case.period, &mut poison[1..]).err(), Some(expected));
+            assert!(poison.iter().all(|v| v.to_bits() == CANARY));
+        }
+        for short_len in [0, history - lb - 1] {
+            let mut short = vec![f64::from_bits(CANARY); short_len + 2];
+            assert_eq!(core.hma_open_and_fill(&price[..history], case.period, &mut short[1..1 + short_len]).err(), Some($lib::RetCode::BadParam));
+            assert!(short.iter().all(|v| v.to_bits() == CANARY));
+        }
         case.range()
     }};
 }
@@ -360,7 +390,7 @@ fn call(
     match backend {
         0 => {
             if case.stream {
-                return stream_contract!(current, case, price, out);
+                return stream_contract!(current, case, price, out, "current", ta_lib);
             }
             let r = if case.sma_control {
                 current.sma(
@@ -384,7 +414,14 @@ fn call(
         }
         1 => {
             if case.stream {
-                return stream_contract!(registry, case, price, out);
+                return stream_contract!(
+                    registry,
+                    case,
+                    price,
+                    out,
+                    "registry083",
+                    ta_lib_registry
+                );
             }
             let r = if case.sma_control {
                 registry.sma(
@@ -670,7 +707,7 @@ fn main() {
     let current = ta_lib::Core::new();
     let registry = ta_lib_registry::Core::new();
     let cases = cases();
-    println!("{{\"kind\":\"metadata\",\"format\":1,\"cases\":17,\"validation_cases\":659,\"backends\":[\"current\",\"registry083\",\"originalc081\"],\"canary_bits\":\"7ff80000000055aa\",\"output_prefix\":{OUTPUT_PREFIX},\"warmups\":{WARMUPS},\"repeats\":{REPEATS},\"capture_only\":{capture_only},\"capture_written\":{capture_written},\"arch\":{:?},\"os\":{:?},\"registry_version\":\"0.8.3\",\"current_version\":\"0.8.4\",\"c_version\":{version:?},\"capture_records\":2028,\"tolerance_relative\":4e-15,\"tolerance_floor\":\"max_abs_finite_input\"}}",env::consts::ARCH,env::consts::OS);
+    println!("{{\"kind\":\"metadata\",\"format\":1,\"cases\":17,\"validation_cases\":659,\"opening_history_observations\":336,\"backends\":[\"current\",\"registry083\",\"originalc081\"],\"canary_bits\":\"7ff80000000055aa\",\"output_prefix\":{OUTPUT_PREFIX},\"warmups\":{WARMUPS},\"repeats\":{REPEATS},\"capture_only\":{capture_only},\"capture_written\":{capture_written},\"arch\":{:?},\"os\":{:?},\"registry_version\":\"0.8.3\",\"current_version\":\"0.8.4\",\"c_version\":{version:?},\"capture_records\":2028,\"tolerance_relative\":4e-15,\"tolerance_floor\":\"max_abs_finite_input\"}}",env::consts::ARCH,env::consts::OS);
     if let Some(selection) = &options.selected {
         selected_run(selection, &close, &current, &registry);
         return;
@@ -797,6 +834,7 @@ mod tests {
         let names: std::collections::BTreeSet<_> = cases.iter().map(|c| &c.name).collect();
         assert_eq!(names.len(), 676);
         assert_eq!(cases.iter().filter(|c| c.stream).count(), 56);
+        assert_eq!(cases.iter().filter(|c| c.stream).count() * 2 * 3, 336);
         for p in [4, 5, 6, 7, 8, 2600, 2601] {
             assert!(cases.iter().any(|c| c.stream && c.period == p));
         }

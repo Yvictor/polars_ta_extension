@@ -13,8 +13,13 @@ spec=importlib.util.spec_from_file_location('hma_review_benchmark',Path(__file__
 m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
 
 
+def observation_row(key):
+    backend,name,bits=key;c=m.expected_case(name);history=min(c['n'],c['beg']+26);count=history-c['beg'];word=struct.unpack('<Q',struct.pack('<d',100.))[0]
+    return {'kind':'opening_history_observation','case':name,'backend':backend,'history_len':history,'bad_index':history//2,'bad_bits':bits,'open':{'status':'ok','beg':c['beg'],'count':count,'value_bits':word,'state_value_bits':word},'fill':{'status':'ok','beg':c['beg'],'count':count,'state_beg':c['beg'],'state_count':count,'state_value_bits':word},'fill_bits':[m.CANARY]+[word]*count+[m.CANARY]*7,'policy':'undefined-opening-history-observation-only'}
+
+
 def records(timed=False):
-    result=[{'kind':'metadata','format':1,'cases':len(m.CASES),'validation_cases':len(m.VALIDATION),'backends':list(m.BACKENDS),
+    result=[{'kind':'metadata','format':1,'cases':len(m.CASES),'validation_cases':len(m.VALIDATION),'opening_history_observations':len(m.OPENING_KEYS),'backends':list(m.BACKENDS),
              'canary_bits':'7ff80000000055aa','output_prefix':1,'warmups':5,'repeats':31,'capture_only':not timed,
              'registry_version':'0.8.3','current_version':'0.8.4','c_version':'0.8.1 (reference)',
              'os':'linux','arch':'x86_64','capture_written':not timed,'capture_records':len(m.KEYS),
@@ -24,6 +29,7 @@ def records(timed=False):
             n,beg,count=m.expected_range(name)
             result.append({'kind':kind,'backend':backend,'case':name,'count':count,'exact':count,
                            'within_tolerance':0,'nonfinite_same':0,'signed_zero':0,'max_abs':0.,'max_scaled':0.})
+    result.extend(observation_row(k)for k in sorted(m.OPENING_KEYS))
     if timed:
         for backend,name in sorted(m.TIMED_KEYS):
             case=m.expected_case(name);n,beg,count=(case[k] for k in ('n','beg','count'))
@@ -37,7 +43,7 @@ def encoded(rows):return '\n'.join(json.dumps(r) for r in rows)
 
 
 def test_fixed_workload_scope():
-    assert len(m.CASES)==17 and len(m.VALIDATION)==659 and len(m.KEYS)==2028
+    assert len(m.CASES)==17 and len(m.VALIDATION)==659 and len(m.KEYS)==2028 and len(m.OPENING_KEYS)==336
     assert m.expected_range('hma/p20/20')==(20,0,0)
     assert m.expected_range('hma/p20/100')==(100,22,78)
     assert m.expected_range('sma_control/p20/20')==(20,19,1)
@@ -529,3 +535,40 @@ def test_generated_header_template_and_writer_require_git_binding(tmp_path):
         path.write_bytes(good)
     wrong=dict(tree);wrong[m.C_CONFIG_TEMPLATE]=('100644','0'*40)
     with pytest.raises(ValueError,match='pinned'):m.generated_c_config(root,wrong)
+
+
+def test_opening_history_observations_complete_and_non_gating_differences():
+    before={m.opening_key(k):observation_row(k)for k in m.OPENING_KEYS};after=copy.deepcopy(before)
+    result=m.compare_opening_observations(before,after)
+    assert result['records_per_source']==336 and result['identical']and not result['differences']
+    key=next(iter(after));after[key]['open']['state_value_bits']=0x8000000000000000
+    after[key]['fill_bits'][1]=0x7ff8000000001234
+    result=m.compare_opening_observations(before,after)
+    assert not result['identical']and set(result['differences'])=={key}
+    assert result['differences'][key]['baseline']==before[key]and result['differences'][key]['candidate']==after[key]
+    after.pop(key)
+    with pytest.raises(ValueError,match='inventory'):m.compare_opening_observations(before,after)
+
+
+@pytest.mark.parametrize('mutation',['missing','duplicate','policy','case','boolean_bits','length','status','extra','error_shape'])
+def test_opening_history_observation_schema_is_not_a_blanket_exception(mutation):
+    rows=records();index=next(i for i,r in enumerate(rows)if r.get('kind')=='opening_history_observation')
+    row=rows[index]
+    if mutation=='missing':rows.pop(index)
+    elif mutation=='duplicate':rows.append(copy.deepcopy(row))
+    elif mutation=='policy':row['policy']='must-reject-nonfinite-history'
+    elif mutation=='case':row['case']='hma/p20/100'
+    elif mutation=='boolean_bits':row['fill_bits'][0]=True
+    elif mutation=='length':row['fill_bits'].pop()
+    elif mutation=='status':row['open']['status']='unchecked'
+    elif mutation=='extra':row['allow_failures']=True
+    else:row['open']={'status':'error','error':False}
+    with pytest.raises(ValueError):m.parse_records(encoded(rows),True)
+
+
+def test_opening_error_observation_and_timed_child_separation():
+    key=next(iter(m.OPENING_KEYS));row=observation_row(key)
+    row['open']={'status':'error','error':'BadParam'};row['fill']={'status':'error','error':'BadParam'}
+    assert m.opening_observation(row)==key
+    selected=selected_rows();selected.append(row)
+    with pytest.raises(ValueError):m.selected_records(encoded(selected),('current','hma/p20/100'),m.stable_metadata(selected[0]))
