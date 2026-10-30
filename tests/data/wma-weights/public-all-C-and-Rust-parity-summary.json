@@ -1,130 +1,78 @@
 {
-  "PASS": true,
-  "comparisons": {
-    "C083-vs-CCD": {
-      "cases": 1966,
-      "elements_including_canaries_and_stream_events": 8169346,
-      "mode_counts": {
-        "wma": 928,
-        "ma": 928,
-        "mavp": 30,
-        "stream": 70,
-        "bank": 10
-      },
-      "failures": [],
-      "NaN_representation_deltas": [],
-      "finite_signed_zero_infinity_words_exact": true,
-      "NaN_positions_exact": true,
-      "all_canary_tail_words_raw_exact": true,
-      "stream_error_codes_ranges_and_peek_no_mutation_checked": true
-    },
-    "CCD-vs-candidate": {
-      "cases": 1966,
-      "elements_including_canaries_and_stream_events": 8169346,
-      "mode_counts": {
-        "wma": 928,
-        "ma": 928,
-        "mavp": 30,
-        "stream": 70,
-        "bank": 10
-      },
-      "failures": [],
-      "NaN_representation_deltas": [],
-      "finite_signed_zero_infinity_words_exact": true,
-      "NaN_positions_exact": true,
-      "all_canary_tail_words_raw_exact": true,
-      "stream_error_codes_ranges_and_peek_no_mutation_checked": true
-    },
-    "C083-vs-candidate": {
-      "cases": 1966,
-      "elements_including_canaries_and_stream_events": 8169346,
-      "mode_counts": {
-        "wma": 928,
-        "ma": 928,
-        "mavp": 30,
-        "stream": 70,
-        "bank": 10
-      },
-      "failures": [],
-      "NaN_representation_deltas": [],
-      "finite_signed_zero_infinity_words_exact": true,
-      "NaN_positions_exact": true,
-      "all_canary_tail_words_raw_exact": true,
-      "stream_error_codes_ranges_and_peek_no_mutation_checked": true
-    },
-    "C083-vs-candidate-C": {
-      "cases": 1966,
-      "elements_including_canaries_and_stream_events": 8169346,
-      "mode_counts": {
-        "wma": 928,
-        "ma": 928,
-        "mavp": 30,
-        "stream": 70,
-        "bank": 10
-      },
-      "failures": [],
-      "NaN_representation_deltas": [],
-      "finite_signed_zero_infinity_words_exact": true,
-      "NaN_positions_exact": true,
-      "all_canary_tail_words_raw_exact": true,
-      "stream_error_codes_ranges_and_peek_no_mutation_checked": true
-    },
-    "candidate-vs-candidate-C": {
-      "cases": 1966,
-      "elements_including_canaries_and_stream_events": 8169346,
-      "mode_counts": {
-        "wma": 928,
-        "ma": 928,
-        "mavp": 30,
-        "stream": 70,
-        "bank": 10
-      },
-      "failures": [],
-      "NaN_representation_deltas": [],
-      "finite_signed_zero_infinity_words_exact": true,
-      "NaN_positions_exact": true,
-      "all_canary_tail_words_raw_exact": true,
-      "stream_error_codes_ranges_and_peek_no_mutation_checked": true
-    },
-    "C083-vs-CCD-C": {
-      "cases": 1966,
-      "elements_including_canaries_and_stream_events": 8169346,
-      "mode_counts": {
-        "wma": 928,
-        "ma": 928,
-        "mavp": 30,
-        "stream": 70,
-        "bank": 10
-      },
-      "failures": [],
-      "NaN_representation_deltas": [],
-      "finite_signed_zero_infinity_words_exact": true,
-      "NaN_positions_exact": true,
-      "all_canary_tail_words_raw_exact": true,
-      "stream_error_codes_ranges_and_peek_no_mutation_checked": true
-    },
-    "CCD-C-vs-candidate-C": {
-      "cases": 1966,
-      "elements_including_canaries_and_stream_events": 8169346,
-      "mode_counts": {
-        "wma": 928,
-        "ma": 928,
-        "mavp": 30,
-        "stream": 70,
-        "bank": 10
-      },
-      "failures": [],
-      "NaN_representation_deltas": [],
-      "finite_signed_zero_infinity_words_exact": true,
-      "NaN_positions_exact": true,
-      "all_canary_tail_words_raw_exact": true,
-      "stream_error_codes_ranges_and_peek_no_mutation_checked": true
-    }
+  "C083": {
+    "cases": 1966,
+    "words": 8169346,
+    "events": 86920,
+    "NaN_representation_deltas": 0,
+    "finite_zero_Inf_tolerance": 0
   },
-  "source_commit": "ccd3172940ed1d9daa4e7197f2265810852e8910",
-  "C083_commit": "62021c1d14ef5499505af5547384cab509adf3fc",
-  "input_manifest_sha256": "af44a2f442be1ac2d750643f12fc1122c5642a413d8320c34ca4d53ccbbc250e",
-  "baseline_index_sha256": "cda5366eb1aa45d0033b75406ed9e57ec999748472b0d7ffad0152bc220a4220",
-  "candidate_index_sha256": "cda5366eb1aa45d0033b75406ed9e57ec999748472b0d7ffad0152bc220a4220",
-  "policy": "Only NaN representation excluded; no finite tolerance and signed zero exact; raw canaries always exact."
+  "RustCCD": {
+    "cases": 1966,
+    "words": 8169346,
+    "events": 86920,
+    "NaN_representation_deltas": 0,
+    "finite_zero_Inf_tolerance": 0
+  },
+  "CCCD": {
+    "cases": 1966,
+    "words": 8169346,
+    "events": 86920,
+    "NaN_representation_deltas": 0,
+    "finite_zero_Inf_tolerance": 0
+  },
+  "Rust220": {
+    "cases": 1966,
+    "words": 8169346,
+    "events": 86920,
+    "NaN_representation_deltas": 0,
+    "finite_zero_Inf_tolerance": 0
+  },
+  "C220": {
+    "cases": 1966,
+    "words": 8169346,
+    "events": 86920,
+    "NaN_representation_deltas": 0,
+    "finite_zero_Inf_tolerance": 0
+  },
+  "signedC": {
+    "cases": 1966,
+    "words": 8169346,
+    "events": 86920,
+    "NaN_representation_deltas": 0,
+    "finite_zero_Inf_tolerance": 0
+  },
+  "C081-direct-WMA": {
+    "cases": 928,
+    "words": 3899188,
+    "NaN_representation_deltas": 0,
+    "version": "0.8.1 (Oct 30 2026 02:16:29)",
+    "wrapper_sha256": "ff49d29177ce405eb6eca9ebbdd6b251af5a0bb57961b30b9bf89ab8e8ba9908",
+    "large_periods": [
+      {
+        "id": "c01850",
+        "period": 46340,
+        "n": 417063,
+        "beg": 46339,
+        "count": 370724,
+        "sha256": "9d6bb6a534a757b97bba8b941411fe7e76a18160c0eda27a0ae3d1d080fb7737"
+      },
+      {
+        "id": "c01852",
+        "period": 46341,
+        "n": 417072,
+        "beg": 46340,
+        "count": 370732,
+        "sha256": "4faea54ba7156677c57635a32e8aaddf0a44446d5465e6c1fd7894923a55a626"
+      },
+      {
+        "id": "c01854",
+        "period": 100000,
+        "n": 900003,
+        "beg": 99999,
+        "count": 800004,
+        "sha256": "ce9705ae18046544d84f996455178e7c93c53cc7c2bd9075335c031f8201c13d"
+      }
+    ],
+    "scope": "fresh direct WMA only; newer public stream API not exposed by this wrapper; exact finite/zero/Inf and NaNpositions/tails"
+  }
 }

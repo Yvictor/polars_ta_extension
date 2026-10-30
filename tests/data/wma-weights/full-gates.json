@@ -1,182 +1,662 @@
-[
-  {
-    "label": "generator-tests",
-    "returncode": 0,
-    "command": [
-      "cargo",
-      "test",
-      "--offline",
-      "--manifest-path",
-      "ta_codegen/generator/Cargo.toml"
+{
+  "candidate_commit": "6208b650ccd2b980e38269d4df19f0b4b1f6d028",
+  "toolchain": "1.97.0",
+  "generator_unit": 514,
+  "generator_integration": 628,
+  "library_and_integration_tests": 103,
+  "library_doc_tests": 721,
+  "frozen_golden_cases": 48,
+  "strict_generator_clippy": "PASS",
+  "strict_library_workspace_clippy": "PASS",
+  "cargo_doc": "PASS",
+  "regeneration_runs": 2,
+  "idempotent_diff_sha256": "4bf35c96c539037c15919e2e202d67463da2a883ff059b451cf5fa09c97faae8",
+  "C_indicator_regtests": 237,
+  "Rust_indicator_regtests": 237,
+  "correctness_scope": "LocalMac source gates; freshLinux gates required before timing",
+  "recovered_environment_issues": [
+    "Negativefixture initiallyusedTA_WMA instead ofcanonicalwma; correctedbeforefullgates",
+    "Supportedserverbuild initiallyused externalCARGO_TARGET_DIR, copiedpathfailed; supportedbuildrerunwithnewworktree expectedtargetsuccess",
+    "Contractharness compileinitiallylackednormalproductrlib aftercargo-test-only; cargo build materializedproduct; capturespass",
+    "OldC081subset has rawbinfileswithoutindex; freshimmutablewrapper replay validates928shapes/outputs"
+  ],
+  "commands": {
+    "phase1-commands.json": [
+      {
+        "label": "focused-tests",
+        "command": [
+          "python3",
+          "scripts/quiet.py",
+          "noisy",
+          "codex-wma-signed-focused-tests",
+          "--defer=60",
+          "--",
+          "cargo",
+          "test",
+          "--offline",
+          "--manifest-path",
+          "ta_codegen/generator/Cargo.toml",
+          "signed_weight_cast"
+        ],
+        "returncode": 0,
+        "environment": {
+          "CARGO_HOME": "/tmp/polars-recovery/engulf-evidence/cargo-home",
+          "CARGO_TARGET_DIR": "/tmp/polars-recovery/wma-signed-cast-evidence/target",
+          "CARGO_BUILD_BUILD_DIR": "/tmp/polars-recovery/wma-signed-cast-evidence/build",
+          "CARGO_BUILD_JOBS": "2",
+          "RUSTUP_TOOLCHAIN": "1.97.0",
+          "RUSTC": "/Users/ec666/.rustup/toolchains/1.97.0-aarch64-apple-darwin/bin/rustc"
+        },
+        "fresh_process_check": "no active compiler/build/regtest process"
+      },
+      {
+        "label": "regenerate-1",
+        "command": [
+          "python3",
+          "scripts/quiet.py",
+          "noisy",
+          "codex-wma-signed-regenerate-1",
+          "--defer=60",
+          "--",
+          "cargo",
+          "run",
+          "--offline",
+          "--manifest-path",
+          "ta_codegen/generator/Cargo.toml",
+          "--",
+          "generate"
+        ],
+        "returncode": 0,
+        "environment": {
+          "CARGO_HOME": "/tmp/polars-recovery/engulf-evidence/cargo-home",
+          "CARGO_TARGET_DIR": "/tmp/polars-recovery/wma-signed-cast-evidence/target",
+          "CARGO_BUILD_BUILD_DIR": "/tmp/polars-recovery/wma-signed-cast-evidence/build",
+          "CARGO_BUILD_JOBS": "2",
+          "RUSTUP_TOOLCHAIN": "1.97.0",
+          "RUSTC": "/Users/ec666/.rustup/toolchains/1.97.0-aarch64-apple-darwin/bin/rustc"
+        },
+        "fresh_process_check": "no active compiler/build/regtest process"
+      },
+      {
+        "label": "regenerate-2",
+        "command": [
+          "python3",
+          "scripts/quiet.py",
+          "noisy",
+          "codex-wma-signed-regenerate-2",
+          "--defer=60",
+          "--",
+          "cargo",
+          "run",
+          "--offline",
+          "--manifest-path",
+          "ta_codegen/generator/Cargo.toml",
+          "--",
+          "generate"
+        ],
+        "returncode": 0,
+        "environment": {
+          "CARGO_HOME": "/tmp/polars-recovery/engulf-evidence/cargo-home",
+          "CARGO_TARGET_DIR": "/tmp/polars-recovery/wma-signed-cast-evidence/target",
+          "CARGO_BUILD_BUILD_DIR": "/tmp/polars-recovery/wma-signed-cast-evidence/build",
+          "CARGO_BUILD_JOBS": "2",
+          "RUSTUP_TOOLCHAIN": "1.97.0",
+          "RUSTC": "/Users/ec666/.rustup/toolchains/1.97.0-aarch64-apple-darwin/bin/rustc"
+        },
+        "fresh_process_check": "no active compiler/build/regtest process"
+      }
     ],
-    "environment": {
-      "CARGO_HOME": "/tmp/polars-recovery/engulf-evidence/cargo-home",
-      "CARGO_TARGET_DIR": "/tmp/polars-recovery/upstream-mavp-profile/source/ta_codegen/output/rust/target",
-      "CARGO_BUILD_BUILD_DIR": "/tmp/polars-recovery/upstream-mavp-profile/gate-build",
-      "CARGO_BUILD_JOBS": "2",
-      "RUSTUP_TOOLCHAIN": "1.97.0",
-      "RUSTC": "/Users/ec666/.rustup/toolchains/1.97.0-aarch64-apple-darwin/bin/rustc"
-    }
+    "phase2-commands.json": [
+      {
+        "label": "generator-tests",
+        "command": [
+          "python3",
+          "/tmp/polars-recovery/upstream-wma-signed-cast/scripts/quiet.py",
+          "noisy",
+          "codex-wma-signed-generator-tests",
+          "--defer=60",
+          "--",
+          "cargo",
+          "test",
+          "--offline",
+          "--locked",
+          "--manifest-path",
+          "ta_codegen/generator/Cargo.toml"
+        ],
+        "returncode": 0,
+        "cwd": "/tmp/polars-recovery/upstream-wma-signed-cast",
+        "environment": {
+          "CARGO_HOME": "/tmp/polars-recovery/engulf-evidence/cargo-home",
+          "CARGO_TARGET_DIR": "/tmp/polars-recovery/wma-signed-cast-evidence/target",
+          "CARGO_BUILD_BUILD_DIR": "/tmp/polars-recovery/wma-signed-cast-evidence/build",
+          "CARGO_BUILD_JOBS": "2",
+          "RUSTUP_TOOLCHAIN": "1.97.0",
+          "RUSTC": "/Users/ec666/.rustup/toolchains/1.97.0-aarch64-apple-darwin/bin/rustc"
+        },
+        "fresh_process_check": "no active compiler/build/regtest process",
+        "performance": "No timing claim; incidental regtest timing columns not used"
+      },
+      {
+        "label": "generator-clippy",
+        "command": [
+          "python3",
+          "/tmp/polars-recovery/upstream-wma-signed-cast/scripts/quiet.py",
+          "noisy",
+          "codex-wma-signed-generator-clippy",
+          "--defer=60",
+          "--",
+          "cargo",
+          "clippy",
+          "--offline",
+          "--locked",
+          "--all-targets",
+          "--manifest-path",
+          "ta_codegen/generator/Cargo.toml",
+          "--",
+          "-D",
+          "warnings"
+        ],
+        "returncode": 0,
+        "cwd": "/tmp/polars-recovery/upstream-wma-signed-cast",
+        "environment": {
+          "CARGO_HOME": "/tmp/polars-recovery/engulf-evidence/cargo-home",
+          "CARGO_TARGET_DIR": "/tmp/polars-recovery/wma-signed-cast-evidence/target",
+          "CARGO_BUILD_BUILD_DIR": "/tmp/polars-recovery/wma-signed-cast-evidence/build",
+          "CARGO_BUILD_JOBS": "2",
+          "RUSTUP_TOOLCHAIN": "1.97.0",
+          "RUSTC": "/Users/ec666/.rustup/toolchains/1.97.0-aarch64-apple-darwin/bin/rustc"
+        },
+        "fresh_process_check": "no active compiler/build/regtest process",
+        "performance": "No timing claim; incidental regtest timing columns not used"
+      },
+      {
+        "label": "library-tests-and-docs",
+        "command": [
+          "python3",
+          "/tmp/polars-recovery/upstream-wma-signed-cast/scripts/quiet.py",
+          "noisy",
+          "codex-wma-signed-library-tests-and-docs",
+          "--defer=60",
+          "--",
+          "cargo",
+          "test",
+          "--offline",
+          "--release",
+          "--locked",
+          "-p",
+          "ta-lib",
+          "--manifest-path",
+          "ta_codegen/output/rust/Cargo.toml"
+        ],
+        "returncode": 0,
+        "cwd": "/tmp/polars-recovery/upstream-wma-signed-cast",
+        "environment": {
+          "CARGO_HOME": "/tmp/polars-recovery/engulf-evidence/cargo-home",
+          "CARGO_TARGET_DIR": "/tmp/polars-recovery/wma-signed-cast-evidence/target",
+          "CARGO_BUILD_BUILD_DIR": "/tmp/polars-recovery/wma-signed-cast-evidence/build",
+          "CARGO_BUILD_JOBS": "2",
+          "RUSTUP_TOOLCHAIN": "1.97.0",
+          "RUSTC": "/Users/ec666/.rustup/toolchains/1.97.0-aarch64-apple-darwin/bin/rustc"
+        },
+        "fresh_process_check": "no active compiler/build/regtest process",
+        "performance": "No timing claim; incidental regtest timing columns not used"
+      },
+      {
+        "label": "library-doc",
+        "command": [
+          "python3",
+          "/tmp/polars-recovery/upstream-wma-signed-cast/scripts/quiet.py",
+          "noisy",
+          "codex-wma-signed-library-doc",
+          "--defer=60",
+          "--",
+          "cargo",
+          "doc",
+          "--offline",
+          "--no-deps",
+          "--locked",
+          "-p",
+          "ta-lib",
+          "--manifest-path",
+          "ta_codegen/output/rust/Cargo.toml"
+        ],
+        "returncode": 0,
+        "cwd": "/tmp/polars-recovery/upstream-wma-signed-cast",
+        "environment": {
+          "CARGO_HOME": "/tmp/polars-recovery/engulf-evidence/cargo-home",
+          "CARGO_TARGET_DIR": "/tmp/polars-recovery/wma-signed-cast-evidence/target",
+          "CARGO_BUILD_BUILD_DIR": "/tmp/polars-recovery/wma-signed-cast-evidence/build",
+          "CARGO_BUILD_JOBS": "2",
+          "RUSTUP_TOOLCHAIN": "1.97.0",
+          "RUSTC": "/Users/ec666/.rustup/toolchains/1.97.0-aarch64-apple-darwin/bin/rustc"
+        },
+        "fresh_process_check": "no active compiler/build/regtest process",
+        "performance": "No timing claim; incidental regtest timing columns not used"
+      },
+      {
+        "label": "library-clippy",
+        "command": [
+          "python3",
+          "/tmp/polars-recovery/upstream-wma-signed-cast/scripts/quiet.py",
+          "noisy",
+          "codex-wma-signed-library-clippy",
+          "--defer=60",
+          "--",
+          "cargo",
+          "clippy",
+          "--offline",
+          "--locked",
+          "--all-targets",
+          "--manifest-path",
+          "ta_codegen/output/rust/Cargo.toml",
+          "--",
+          "-D",
+          "warnings"
+        ],
+        "returncode": 0,
+        "cwd": "/tmp/polars-recovery/upstream-wma-signed-cast",
+        "environment": {
+          "CARGO_HOME": "/tmp/polars-recovery/engulf-evidence/cargo-home",
+          "CARGO_TARGET_DIR": "/tmp/polars-recovery/wma-signed-cast-evidence/target",
+          "CARGO_BUILD_BUILD_DIR": "/tmp/polars-recovery/wma-signed-cast-evidence/build",
+          "CARGO_BUILD_JOBS": "2",
+          "RUSTUP_TOOLCHAIN": "1.97.0",
+          "RUSTC": "/Users/ec666/.rustup/toolchains/1.97.0-aarch64-apple-darwin/bin/rustc"
+        },
+        "fresh_process_check": "no active compiler/build/regtest process",
+        "performance": "No timing claim; incidental regtest timing columns not used"
+      },
+      {
+        "label": "servers",
+        "command": [
+          "python3",
+          "/tmp/polars-recovery/upstream-wma-signed-cast/scripts/quiet.py",
+          "noisy",
+          "codex-wma-signed-servers",
+          "--defer=60",
+          "--",
+          "python3",
+          "scripts/build.py",
+          "servers",
+          "--language=c,rust"
+        ],
+        "returncode": 1,
+        "cwd": "/tmp/polars-recovery/upstream-wma-signed-cast",
+        "environment": {
+          "CARGO_HOME": "/tmp/polars-recovery/engulf-evidence/cargo-home",
+          "CARGO_TARGET_DIR": "/tmp/polars-recovery/wma-signed-cast-evidence/target",
+          "CARGO_BUILD_BUILD_DIR": "/tmp/polars-recovery/wma-signed-cast-evidence/build",
+          "CARGO_BUILD_JOBS": "2",
+          "RUSTUP_TOOLCHAIN": "1.97.0",
+          "RUSTC": "/Users/ec666/.rustup/toolchains/1.97.0-aarch64-apple-darwin/bin/rustc"
+        },
+        "fresh_process_check": "no active compiler/build/regtest process",
+        "performance": "No timing claim; incidental regtest timing columns not used"
+      },
+      {
+        "label": "servers",
+        "command": [
+          "python3",
+          "/tmp/polars-recovery/upstream-wma-signed-cast/scripts/quiet.py",
+          "noisy",
+          "codex-wma-signed-servers",
+          "--defer=60",
+          "--",
+          "python3",
+          "scripts/build.py",
+          "servers",
+          "--language=c,rust"
+        ],
+        "returncode": 0,
+        "cwd": "/tmp/polars-recovery/upstream-wma-signed-cast",
+        "environment": {
+          "CARGO_HOME": "/tmp/polars-recovery/engulf-evidence/cargo-home",
+          "CARGO_TARGET_DIR": "/tmp/polars-recovery/upstream-wma-signed-cast/ta_codegen/output/rust/target",
+          "CARGO_BUILD_BUILD_DIR": "/tmp/polars-recovery/wma-signed-cast-evidence/server-build",
+          "CARGO_BUILD_JOBS": "2",
+          "RUSTUP_TOOLCHAIN": "1.97.0",
+          "RUSTC": "/Users/ec666/.rustup/toolchains/1.97.0-aarch64-apple-darwin/bin/rustc"
+        },
+        "fresh_process_check": "no active compiler/build/regtest process",
+        "performance": "No timing claim; incidental regtest timing columns not used"
+      },
+      {
+        "label": "all237-C-Rust-codegen",
+        "command": [
+          "python3",
+          "/tmp/polars-recovery/upstream-wma-signed-cast/scripts/quiet.py",
+          "noisy",
+          "codex-wma-signed-all237-C-Rust-codegen",
+          "--defer=60",
+          "--",
+          "./ta_regtest",
+          "--codegen",
+          "--language=c,rust"
+        ],
+        "returncode": 0,
+        "cwd": "/tmp/polars-recovery/upstream-wma-signed-cast/bin",
+        "environment": {
+          "CARGO_HOME": "/tmp/polars-recovery/engulf-evidence/cargo-home",
+          "CARGO_TARGET_DIR": "/tmp/polars-recovery/upstream-wma-signed-cast/ta_codegen/output/rust/target",
+          "CARGO_BUILD_BUILD_DIR": "/tmp/polars-recovery/wma-signed-cast-evidence/server-build",
+          "CARGO_BUILD_JOBS": "2",
+          "RUSTUP_TOOLCHAIN": "1.97.0",
+          "RUSTC": "/Users/ec666/.rustup/toolchains/1.97.0-aarch64-apple-darwin/bin/rustc"
+        },
+        "fresh_process_check": "no active compiler/build/regtest process",
+        "performance": "No timing claim; incidental regtest timing columns not used"
+      }
+    ],
+    "phase3-commands.json": [
+      {
+        "label": "build-native",
+        "command": [
+          "python3",
+          "/tmp/polars-recovery/upstream-wma-signed-cast/scripts/quiet.py",
+          "noisy",
+          "codex-wma-signed-build-native",
+          "--defer=60",
+          "--",
+          "cargo",
+          "build",
+          "--offline",
+          "--release",
+          "--locked",
+          "-p",
+          "ta-lib",
+          "--manifest-path",
+          "ta_codegen/output/rust/Cargo.toml"
+        ],
+        "returncode": 0,
+        "fresh_process_check": "clear",
+        "target_execution": "correctness contracts only; no timing mode"
+      },
+      {
+        "label": "compile-native",
+        "command": [
+          "python3",
+          "/tmp/polars-recovery/upstream-wma-signed-cast/scripts/quiet.py",
+          "noisy",
+          "codex-wma-signed-compile-native",
+          "--defer=60",
+          "--",
+          "/Users/ec666/.rustup/toolchains/1.97.0-aarch64-apple-darwin/bin/rustc",
+          "--edition=2021",
+          "-O",
+          "-Clto=thin",
+          "-Ccodegen-units=1",
+          "-Dwarnings",
+          "--check-cfg=cfg(c_reference,test)",
+          "/tmp/polars-recovery/wma-signed-cast-evidence/contract.rs",
+          "-Ldependency=/tmp/polars-recovery/wma-signed-cast-evidence/target/release/deps",
+          "-Ldependency=/tmp/polars-recovery/wma-signed-cast-evidence/build/release/deps",
+          "--extern",
+          "ta_lib=/tmp/polars-recovery/wma-signed-cast-evidence/target/release/libta_lib.rlib",
+          "-o",
+          "/tmp/polars-recovery/wma-signed-cast-evidence/contract-native"
+        ],
+        "returncode": 0,
+        "fresh_process_check": "clear",
+        "target_execution": "correctness contracts only; no timing mode"
+      },
+      {
+        "label": "compile-C",
+        "command": [
+          "python3",
+          "/tmp/polars-recovery/upstream-wma-signed-cast/scripts/quiet.py",
+          "noisy",
+          "codex-wma-signed-compile-C",
+          "--defer=60",
+          "--",
+          "/Users/ec666/.rustup/toolchains/1.97.0-aarch64-apple-darwin/bin/rustc",
+          "--edition=2021",
+          "-O",
+          "-Clto=thin",
+          "-Ccodegen-units=1",
+          "-Dwarnings",
+          "--check-cfg=cfg(c_reference,test)",
+          "/tmp/polars-recovery/wma-signed-cast-evidence/contract.rs",
+          "--cfg",
+          "c_reference",
+          "-Lnative=/tmp/polars-recovery/upstream-wma-signed-cast/cmake-build",
+          "-lstatic=ta-lib",
+          "-lm",
+          "-lframework=Accelerate",
+          "-o",
+          "/tmp/polars-recovery/wma-signed-cast-evidence/contract-C"
+        ],
+        "returncode": 0,
+        "fresh_process_check": "clear",
+        "target_execution": "correctness contracts only; no timing mode"
+      },
+      {
+        "label": "capture-native",
+        "command": [
+          "python3",
+          "/tmp/polars-recovery/upstream-wma-signed-cast/scripts/quiet.py",
+          "noisy",
+          "codex-wma-signed-capture-native",
+          "--defer=60",
+          "--",
+          "/tmp/polars-recovery/wma-signed-cast-evidence/contract-native",
+          "--contract",
+          "/tmp/polars-recovery/upstream-mavp-profile/fixtures",
+          "/tmp/polars-recovery/wma-signed-cast-evidence/capture-native"
+        ],
+        "returncode": 0,
+        "fresh_process_check": "clear",
+        "target_execution": "correctness contracts only; no timing mode"
+      },
+      {
+        "label": "capture-C",
+        "command": [
+          "python3",
+          "/tmp/polars-recovery/upstream-wma-signed-cast/scripts/quiet.py",
+          "noisy",
+          "codex-wma-signed-capture-C",
+          "--defer=60",
+          "--",
+          "/tmp/polars-recovery/wma-signed-cast-evidence/contract-C",
+          "--contract",
+          "/tmp/polars-recovery/upstream-mavp-profile/fixtures",
+          "/tmp/polars-recovery/wma-signed-cast-evidence/capture-C"
+        ],
+        "returncode": 0,
+        "fresh_process_check": "clear",
+        "target_execution": "correctness contracts only; no timing mode"
+      }
+    ],
+    "exact-compare-command.json": {
+      "command": [
+        "python3",
+        "/tmp/polars-recovery/upstream-wma-signed-cast/scripts/quiet.py",
+        "noisy",
+        "codex-wma-signed-exact-compare",
+        "--defer=60",
+        "--",
+        "python3",
+        "/tmp/polars-recovery/wma-signed-cast-evidence/compare_contracts.py"
+      ],
+      "returncode": 0,
+      "fresh_process_check": "clear"
+    },
+    "static-commands.json": [
+      {
+        "version": "1.90.0",
+        "command": [
+          "python3",
+          "/tmp/polars-recovery/upstream-wma-signed-cast/scripts/quiet.py",
+          "noisy",
+          "codex-wma-signed-static-1.90.0-0",
+          "--defer=60",
+          "--",
+          "cargo",
+          "build",
+          "--offline",
+          "--release",
+          "--locked",
+          "-p",
+          "ta-lib",
+          "--target",
+          "x86_64-unknown-linux-gnu",
+          "--manifest-path",
+          "/tmp/polars-recovery/upstream-wma-signed-cast/ta_codegen/output/rust/Cargo.toml"
+        ],
+        "returncode": 0,
+        "environment": {
+          "CARGO_BUILD_BUILD_DIR": "/tmp/polars-recovery/wma-signed-cast-evidence/static-1.90.0/build",
+          "RUSTC": "/Users/ec666/.rustup/toolchains/1.90.0-aarch64-apple-darwin/bin/rustc",
+          "RUSTUP_TOOLCHAIN": "1.90.0",
+          "CARGO_HOME": "/tmp/polars-recovery/engulf-evidence/cargo-home",
+          "CARGO_TARGET_DIR": "/tmp/polars-recovery/wma-signed-cast-evidence/static-1.90.0/target",
+          "CARGO_BUILD_JOBS": "2",
+          "CARGO_PROFILE_RELEASE_CODEGEN_UNITS": "16",
+          "CARGO_PROFILE_RELEASE_LTO": "false",
+          "CARGO_PROFILE_RELEASE_DEBUG": "false",
+          "CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUSTFLAGS": "--sysroot /tmp/polars-recovery/engulf-consumer-evidence/tools/sysroot"
+        },
+        "probe_sha256": "3aa54f4c5e6799765a8dc1010271a676bc489ae56ef6f716adaefe7194df9621",
+        "fresh_process_check": "clear",
+        "target_execution": false,
+        "timing": false
+      },
+      {
+        "version": "1.90.0",
+        "command": [
+          "python3",
+          "/tmp/polars-recovery/upstream-wma-signed-cast/scripts/quiet.py",
+          "noisy",
+          "codex-wma-signed-static-1.90.0-1",
+          "--defer=60",
+          "--",
+          "/Users/ec666/.rustup/toolchains/1.90.0-aarch64-apple-darwin/bin/rustc",
+          "--edition=2021",
+          "--sysroot",
+          "/tmp/polars-recovery/engulf-consumer-evidence/tools/sysroot",
+          "--target",
+          "x86_64-unknown-linux-gnu",
+          "-O",
+          "-Ccodegen-units=16",
+          "--emit=link",
+          "/tmp/polars-recovery/wma-signed-cast-evidence/static-probe.rs",
+          "-Ldependency=/tmp/polars-recovery/wma-signed-cast-evidence/static-1.90.0/target/x86_64-unknown-linux-gnu/release/deps",
+          "-Ldependency=/tmp/polars-recovery/wma-signed-cast-evidence/static-1.90.0/build/x86_64-unknown-linux-gnu/release/deps",
+          "-Ldependency=/tmp/polars-recovery/wma-signed-cast-evidence/static-1.90.0/target/release/deps",
+          "-Ldependency=/tmp/polars-recovery/wma-signed-cast-evidence/static-1.90.0/build/release/deps",
+          "--extern",
+          "ta_lib=/tmp/polars-recovery/wma-signed-cast-evidence/static-1.90.0/target/x86_64-unknown-linux-gnu/release/libta_lib.rlib",
+          "-o",
+          "/tmp/polars-recovery/wma-signed-cast-evidence/static-1.90.0/static-probe",
+          "-Csave-temps",
+          "-Clinker=/usr/bin/true"
+        ],
+        "returncode": 0,
+        "environment": {
+          "CARGO_BUILD_BUILD_DIR": "/tmp/polars-recovery/wma-signed-cast-evidence/static-1.90.0/build",
+          "RUSTC": "/Users/ec666/.rustup/toolchains/1.90.0-aarch64-apple-darwin/bin/rustc",
+          "RUSTUP_TOOLCHAIN": "1.90.0",
+          "CARGO_HOME": "/tmp/polars-recovery/engulf-evidence/cargo-home",
+          "CARGO_TARGET_DIR": "/tmp/polars-recovery/wma-signed-cast-evidence/static-1.90.0/target",
+          "CARGO_BUILD_JOBS": "2",
+          "CARGO_PROFILE_RELEASE_CODEGEN_UNITS": "16",
+          "CARGO_PROFILE_RELEASE_LTO": "false",
+          "CARGO_PROFILE_RELEASE_DEBUG": "false",
+          "CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUSTFLAGS": "--sysroot /tmp/polars-recovery/engulf-consumer-evidence/tools/sysroot"
+        },
+        "probe_sha256": "3aa54f4c5e6799765a8dc1010271a676bc489ae56ef6f716adaefe7194df9621",
+        "fresh_process_check": "clear",
+        "target_execution": false,
+        "timing": false
+      },
+      {
+        "version": "1.97.0",
+        "command": [
+          "python3",
+          "/tmp/polars-recovery/upstream-wma-signed-cast/scripts/quiet.py",
+          "noisy",
+          "codex-wma-signed-static-1.97.0-0",
+          "--defer=60",
+          "--",
+          "cargo",
+          "build",
+          "--offline",
+          "--release",
+          "--locked",
+          "-p",
+          "ta-lib",
+          "--target",
+          "x86_64-unknown-linux-gnu",
+          "--manifest-path",
+          "/tmp/polars-recovery/upstream-wma-signed-cast/ta_codegen/output/rust/Cargo.toml"
+        ],
+        "returncode": 0,
+        "environment": {
+          "CARGO_BUILD_BUILD_DIR": "/tmp/polars-recovery/wma-signed-cast-evidence/static-1.97.0/build",
+          "RUSTC": "/Users/ec666/.rustup/toolchains/1.97.0-aarch64-apple-darwin/bin/rustc",
+          "RUSTUP_TOOLCHAIN": "1.97.0",
+          "CARGO_HOME": "/tmp/polars-recovery/engulf-evidence/cargo-home",
+          "CARGO_TARGET_DIR": "/tmp/polars-recovery/wma-signed-cast-evidence/static-1.97.0/target",
+          "CARGO_BUILD_JOBS": "2",
+          "CARGO_PROFILE_RELEASE_CODEGEN_UNITS": "1",
+          "CARGO_PROFILE_RELEASE_LTO": "thin",
+          "CARGO_PROFILE_RELEASE_DEBUG": "false",
+          "CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUSTFLAGS": "--sysroot /tmp/polars-recovery/engulf-evidence/profile-sysroot"
+        },
+        "probe_sha256": "3aa54f4c5e6799765a8dc1010271a676bc489ae56ef6f716adaefe7194df9621",
+        "fresh_process_check": "clear",
+        "target_execution": false,
+        "timing": false
+      },
+      {
+        "version": "1.97.0",
+        "command": [
+          "python3",
+          "/tmp/polars-recovery/upstream-wma-signed-cast/scripts/quiet.py",
+          "noisy",
+          "codex-wma-signed-static-1.97.0-1",
+          "--defer=60",
+          "--",
+          "/Users/ec666/.rustup/toolchains/1.97.0-aarch64-apple-darwin/bin/rustc",
+          "--edition=2021",
+          "--sysroot",
+          "/tmp/polars-recovery/engulf-evidence/profile-sysroot",
+          "--target",
+          "x86_64-unknown-linux-gnu",
+          "-O",
+          "-Ccodegen-units=1",
+          "-Clto=thin",
+          "--emit=link",
+          "/tmp/polars-recovery/wma-signed-cast-evidence/static-probe.rs",
+          "-Ldependency=/tmp/polars-recovery/wma-signed-cast-evidence/static-1.97.0/target/x86_64-unknown-linux-gnu/release/deps",
+          "-Ldependency=/tmp/polars-recovery/wma-signed-cast-evidence/static-1.97.0/build/x86_64-unknown-linux-gnu/release/deps",
+          "-Ldependency=/tmp/polars-recovery/wma-signed-cast-evidence/static-1.97.0/target/release/deps",
+          "-Ldependency=/tmp/polars-recovery/wma-signed-cast-evidence/static-1.97.0/build/release/deps",
+          "--extern",
+          "ta_lib=/tmp/polars-recovery/wma-signed-cast-evidence/static-1.97.0/target/x86_64-unknown-linux-gnu/release/libta_lib.rlib",
+          "-o",
+          "/tmp/polars-recovery/wma-signed-cast-evidence/static-1.97.0/static-probe",
+          "-Csave-temps",
+          "-Clinker=/usr/bin/true"
+        ],
+        "returncode": 0,
+        "environment": {
+          "CARGO_BUILD_BUILD_DIR": "/tmp/polars-recovery/wma-signed-cast-evidence/static-1.97.0/build",
+          "RUSTC": "/Users/ec666/.rustup/toolchains/1.97.0-aarch64-apple-darwin/bin/rustc",
+          "RUSTUP_TOOLCHAIN": "1.97.0",
+          "CARGO_HOME": "/tmp/polars-recovery/engulf-evidence/cargo-home",
+          "CARGO_TARGET_DIR": "/tmp/polars-recovery/wma-signed-cast-evidence/static-1.97.0/target",
+          "CARGO_BUILD_JOBS": "2",
+          "CARGO_PROFILE_RELEASE_CODEGEN_UNITS": "1",
+          "CARGO_PROFILE_RELEASE_LTO": "thin",
+          "CARGO_PROFILE_RELEASE_DEBUG": "false",
+          "CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUSTFLAGS": "--sysroot /tmp/polars-recovery/engulf-evidence/profile-sysroot"
+        },
+        "probe_sha256": "3aa54f4c5e6799765a8dc1010271a676bc489ae56ef6f716adaefe7194df9621",
+        "fresh_process_check": "clear",
+        "target_execution": false,
+        "timing": false
+      }
+    ]
   },
-  {
-    "label": "generator-clippy",
-    "returncode": 0,
-    "command": [
-      "cargo",
-      "clippy",
-      "--offline",
-      "--all-targets",
-      "--manifest-path",
-      "ta_codegen/generator/Cargo.toml",
-      "--",
-      "-D",
-      "warnings"
-    ],
-    "environment": {
-      "CARGO_HOME": "/tmp/polars-recovery/engulf-evidence/cargo-home",
-      "CARGO_TARGET_DIR": "/tmp/polars-recovery/upstream-mavp-profile/source/ta_codegen/output/rust/target",
-      "CARGO_BUILD_BUILD_DIR": "/tmp/polars-recovery/upstream-mavp-profile/gate-build",
-      "CARGO_BUILD_JOBS": "2",
-      "RUSTUP_TOOLCHAIN": "1.97.0",
-      "RUSTC": "/Users/ec666/.rustup/toolchains/1.97.0-aarch64-apple-darwin/bin/rustc"
-    }
-  },
-  {
-    "label": "library-tests",
-    "returncode": 0,
-    "command": [
-      "cargo",
-      "test",
-      "--offline",
-      "--release",
-      "--locked",
-      "--manifest-path",
-      "ta_codegen/output/rust/Cargo.toml",
-      "-p",
-      "ta-lib"
-    ],
-    "environment": {
-      "CARGO_HOME": "/tmp/polars-recovery/engulf-evidence/cargo-home",
-      "CARGO_TARGET_DIR": "/tmp/polars-recovery/upstream-mavp-profile/source/ta_codegen/output/rust/target",
-      "CARGO_BUILD_BUILD_DIR": "/tmp/polars-recovery/upstream-mavp-profile/gate-build",
-      "CARGO_BUILD_JOBS": "2",
-      "RUSTUP_TOOLCHAIN": "1.97.0",
-      "RUSTC": "/Users/ec666/.rustup/toolchains/1.97.0-aarch64-apple-darwin/bin/rustc"
-    }
-  },
-  {
-    "label": "library-doc",
-    "returncode": 0,
-    "command": [
-      "cargo",
-      "doc",
-      "--offline",
-      "--no-deps",
-      "--manifest-path",
-      "ta_codegen/output/rust/Cargo.toml",
-      "-p",
-      "ta-lib"
-    ],
-    "environment": {
-      "CARGO_HOME": "/tmp/polars-recovery/engulf-evidence/cargo-home",
-      "CARGO_TARGET_DIR": "/tmp/polars-recovery/upstream-mavp-profile/source/ta_codegen/output/rust/target",
-      "CARGO_BUILD_BUILD_DIR": "/tmp/polars-recovery/upstream-mavp-profile/gate-build",
-      "CARGO_BUILD_JOBS": "2",
-      "RUSTUP_TOOLCHAIN": "1.97.0",
-      "RUSTC": "/Users/ec666/.rustup/toolchains/1.97.0-aarch64-apple-darwin/bin/rustc"
-    }
-  },
-  {
-    "label": "library-clippy",
-    "returncode": 0,
-    "command": [
-      "cargo",
-      "clippy",
-      "--offline",
-      "--all-targets",
-      "--manifest-path",
-      "ta_codegen/output/rust/Cargo.toml",
-      "--",
-      "-D",
-      "warnings"
-    ],
-    "environment": {
-      "CARGO_HOME": "/tmp/polars-recovery/engulf-evidence/cargo-home",
-      "CARGO_TARGET_DIR": "/tmp/polars-recovery/upstream-mavp-profile/source/ta_codegen/output/rust/target",
-      "CARGO_BUILD_BUILD_DIR": "/tmp/polars-recovery/upstream-mavp-profile/gate-build",
-      "CARGO_BUILD_JOBS": "2",
-      "RUSTUP_TOOLCHAIN": "1.97.0",
-      "RUSTC": "/Users/ec666/.rustup/toolchains/1.97.0-aarch64-apple-darwin/bin/rustc"
-    }
-  },
-  {
-    "label": "servers",
-    "returncode": 1,
-    "command": [
-      "python3",
-      "scripts/build.py",
-      "servers",
-      "--language=c,rust"
-    ],
-    "environment": {
-      "CARGO_HOME": "/tmp/polars-recovery/engulf-evidence/cargo-home",
-      "CARGO_TARGET_DIR": "/tmp/polars-recovery/upstream-mavp-profile/source/ta_codegen/output/rust/target",
-      "CARGO_BUILD_BUILD_DIR": "/tmp/polars-recovery/upstream-mavp-profile/gate-build",
-      "CARGO_BUILD_JOBS": "2",
-      "RUSTUP_TOOLCHAIN": "1.97.0",
-      "RUSTC": "/Users/ec666/.rustup/toolchains/1.97.0-aarch64-apple-darwin/bin/rustc"
-    }
-  },
-  {
-    "label": "servers",
-    "returncode": 0,
-    "command": [
-      "python3",
-      "scripts/build.py",
-      "servers",
-      "--language=c,rust"
-    ],
-    "environment": {
-      "CARGO_HOME": "/tmp/polars-recovery/engulf-evidence/cargo-home",
-      "CARGO_TARGET_DIR": "/tmp/polars-recovery/upstream-mavp-profile/source/ta_codegen/output/rust/target",
-      "CARGO_BUILD_BUILD_DIR": "/tmp/polars-recovery/upstream-mavp-profile/gate-build",
-      "CARGO_BUILD_JOBS": "2",
-      "RUSTUP_TOOLCHAIN": "1.97.0",
-      "RUSTC": "/Users/ec666/.rustup/toolchains/1.97.0-aarch64-apple-darwin/bin/rustc"
-    }
-  },
-  {
-    "label": "cross-codegen",
-    "returncode": 1,
-    "command": [
-      "bin/ta_regtest",
-      "--codegen",
-      "--language=c,rust"
-    ],
-    "environment": {
-      "CARGO_HOME": "/tmp/polars-recovery/engulf-evidence/cargo-home",
-      "CARGO_TARGET_DIR": "/tmp/polars-recovery/upstream-mavp-profile/source/ta_codegen/output/rust/target",
-      "CARGO_BUILD_BUILD_DIR": "/tmp/polars-recovery/upstream-mavp-profile/gate-build",
-      "CARGO_BUILD_JOBS": "2",
-      "RUSTUP_TOOLCHAIN": "1.97.0",
-      "RUSTC": "/Users/ec666/.rustup/toolchains/1.97.0-aarch64-apple-darwin/bin/rustc"
-    }
-  },
-  {
-    "label": "cross-codegen",
-    "returncode": 0,
-    "command": [
-      "./ta_regtest",
-      "--codegen",
-      "--language=c,rust"
-    ],
-    "environment": {
-      "CARGO_HOME": "/tmp/polars-recovery/engulf-evidence/cargo-home",
-      "CARGO_TARGET_DIR": "/tmp/polars-recovery/upstream-mavp-profile/source/ta_codegen/output/rust/target",
-      "CARGO_BUILD_BUILD_DIR": "/tmp/polars-recovery/upstream-mavp-profile/gate-build",
-      "CARGO_BUILD_JOBS": "2",
-      "RUSTUP_TOOLCHAIN": "1.97.0",
-      "RUSTC": "/Users/ec666/.rustup/toolchains/1.97.0-aarch64-apple-darwin/bin/rustc"
-    }
-  }
-]
+  "performance": "UNVERIFIED; no local timings or activated CI"
+}

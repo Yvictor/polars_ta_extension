@@ -1,40 +1,34 @@
 {
-  "PASS": true,
+  "cases": 928,
+  "words": 3899188,
+  "NaN_representation_deltas": 0,
   "version": "0.8.1 (Oct 30 2026 02:16:29)",
-  "calls": 928,
-  "elements_including_canaries": 3899188,
-  "NaN_representation_different_cases": [],
+  "wrapper_sha256": "ff49d29177ce405eb6eca9ebbdd6b251af5a0bb57961b30b9bf89ab8e8ba9908",
   "large_periods": [
     {
-      "case": "c01850",
+      "id": "c01850",
       "period": 46340,
       "n": 417063,
       "beg": 46339,
       "count": 370724,
-      "exact_finite_signed_zero_inf_and_nan_positions_C083_CCD_candidate": true,
-      "raw_sha256": "9d6bb6a534a757b97bba8b941411fe7e76a18160c0eda27a0ae3d1d080fb7737"
+      "sha256": "9d6bb6a534a757b97bba8b941411fe7e76a18160c0eda27a0ae3d1d080fb7737"
     },
     {
-      "case": "c01852",
+      "id": "c01852",
       "period": 46341,
       "n": 417072,
       "beg": 46340,
       "count": 370732,
-      "exact_finite_signed_zero_inf_and_nan_positions_C083_CCD_candidate": true,
-      "raw_sha256": "4faea54ba7156677c57635a32e8aaddf0a44446d5465e6c1fd7894923a55a626"
+      "sha256": "4faea54ba7156677c57635a32e8aaddf0a44446d5465e6c1fd7894923a55a626"
     },
     {
-      "case": "c01854",
+      "id": "c01854",
       "period": 100000,
       "n": 900003,
       "beg": 99999,
       "count": 800004,
-      "exact_finite_signed_zero_inf_and_nan_positions_C083_CCD_candidate": true,
-      "raw_sha256": "ce9705ae18046544d84f996455178e7c93c53cc7c2bd9075335c031f8201c13d"
+      "sha256": "ce9705ae18046544d84f996455178e7c93c53cc7c2bd9075335c031f8201c13d"
     }
   ],
-  "divider_policy": "C081/C083/CCD/candidate all widen period to f64 before product; weights-only edit leaves divider expression unchanged",
-  "finite_tolerance": 0.0,
-  "signed_zero_exact": true,
-  "reference_wrapper_sha256": "ff49d29177ce405eb6eca9ebbdd6b251af5a0bb57961b30b9bf89ab8e8ba9908"
+  "scope": "fresh direct WMA only; newer public stream API not exposed by this wrapper; exact finite/zero/Inf and NaNpositions/tails"
 }

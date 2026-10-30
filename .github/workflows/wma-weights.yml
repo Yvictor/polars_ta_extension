@@ -1,7 +1,7 @@
-name: Selected upstream WMA exact-weight evidence
+name: Selected upstream WMA signed-cast evidence
 on:
   push:
-    branches: [codex/wma-weights-ci]
+    branches: [codex/wma-signed-cast-ci]
   workflow_dispatch:
 permissions:
   contents: read
@@ -9,7 +9,7 @@ concurrency:
   group: wma-weights-${{ github.ref }}
   cancel-in-progress: false
 env:
-  CANDIDATE_COMMIT: 220eb7bafcc5f409799f7902809200c0479a12bb
+  CANDIDATE_COMMIT: 6208b650ccd2b980e38269d4df19f0b4b1f6d028
   BASELINE_COMMIT: ccd3172940ed1d9daa4e7197f2265810852e8910
   ORIGINAL_COMMIT: 62021c1d14ef5499505af5547384cab509adf3fc
   CARGO_BUILD_JOBS: '4'

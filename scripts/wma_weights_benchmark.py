@@ -16,7 +16,7 @@ import time
 import re
 
 BASELINE = 'ccd3172940ed1d9daa4e7197f2265810852e8910'
-CANDIDATE = '220eb7bafcc5f409799f7902809200c0479a12bb'
+CANDIDATE = '6208b650ccd2b980e38269d4df19f0b4b1f6d028'
 ORIGINAL = '62021c1d14ef5499505af5547384cab509adf3fc'
 PRIMARY = ('original', 'baseline', 'candidate')
 C_PAIR = ('baseline-c', 'candidate-c')

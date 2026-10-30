@@ -149,7 +149,7 @@ class Protocol(unittest.TestCase):
 
     def test_reviewed_freeze(self):
         f=json.loads((m.PROOF/'source-freeze.json').read_text())
-        self.assertEqual(f['commit'],m.CANDIDATE);self.assertEqual(f['base'],m.BASELINE);self.assertEqual(len(f['files']),12)
+        self.assertEqual(f['commit'],m.CANDIDATE);self.assertEqual(f['base'],m.BASELINE);self.assertEqual(len(f['files']),14)
         self.assertNotEqual(m.CANDIDATE,m.BASELINE);self.assertNotEqual(m.CANDIDATE,m.ORIGINAL)
         for name,h in f['proofs'].items():self.assertEqual(m.sha(m.PROOF/name),h)
 

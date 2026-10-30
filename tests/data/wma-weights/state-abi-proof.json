@@ -1,32 +1,48 @@
 {
-  "ABI.manifest": {
-    "unchanged": true,
-    "before_sha256": "9281baaeeb48bb656623e12c3c222343df22b8aecfddccb45958923fe403e447",
-    "after_sha256": "9281baaeeb48bb656623e12c3c222343df22b8aecfddccb45958923fe403e447",
-    "scope": "entire file"
+  "base": "ccd3172940ed1d9daa4e7197f2265810852e8910",
+  "generated_files": {
+    "src/ta_func/ta_WMA.c": {
+      "baseline_sha256": "2e8dd35cf119dff7e0711d499b5d8f77fbb39f303ddf2e03e5806e83e02b6d3c",
+      "candidate_sha256": "5db901343feee501e64f732456e5bbde455706dfb8c22ee766d8d1c80070241f",
+      "only_weight_casts_changed": true,
+      "seed_sites": 3,
+      "reseed_sites": 7
+    },
+    "ta_codegen/output/csharp/library/src/Core_WMA.cs": {
+      "baseline_sha256": "4bd130484a7b33ed3c492b1f3e8102d0531540be1a306dfa43a4988795714050",
+      "candidate_sha256": "8ce6f71cda5dbfc5ca97133fb8f6bfd4a841a31a74874cae317df654a6e4afef",
+      "only_weight_casts_changed": true,
+      "seed_sites": 3,
+      "reseed_sites": 7
+    },
+    "ta_codegen/output/java/fragments/Core_WMA.java": {
+      "baseline_sha256": "8af4ed27889c4cd8641baa76142b137057360b3ca5400bf3f4af77cec9b28011",
+      "candidate_sha256": "fd1f19c730fb8249e29169d221221e466d1bde489c0d43e888a9fba72ad9cd86",
+      "only_weight_casts_changed": true,
+      "seed_sites": 3,
+      "reseed_sites": 7
+    },
+    "ta_codegen/output/java/library/src/main/java/io/github/talib/Core.java": {
+      "baseline_sha256": "fb091f4872546511c16ed4633d5e50183b0caa95445c0f5cb4baa8adbcde3e03",
+      "candidate_sha256": "b9cfb941def0f24dfa88949a720639e1de78777e61d939c87db6b1d32cdd2a9f",
+      "only_weight_casts_changed": true,
+      "seed_sites": 3,
+      "reseed_sites": 7
+    },
+    "ta_codegen/output/rust/library/src/ta_func/wma.rs": {
+      "baseline_sha256": "ef624c1f427d29f4934019a3b57907b322ba9cc52d054570345686b002c4967f",
+      "candidate_sha256": "e5c3a44b58a6abf079f7af506e321e2872706409f67e1126c9a678c5e472dbdf",
+      "only_weight_casts_changed": true,
+      "seed_sites": 2,
+      "reseed_sites": 6
+    }
   },
-  "ABI.released": {
-    "unchanged": true,
-    "before_sha256": "7e5b30d4d96428e58ea111f60c0858eb1c206210c57dba338fbf86b4f9c5f130",
-    "after_sha256": "7e5b30d4d96428e58ea111f60c0858eb1c206210c57dba338fbf86b4f9c5f130",
-    "scope": "entire file"
+  "ABI_files_unchanged": {
+    "ABI.manifest": "9281baaeeb48bb656623e12c3c222343df22b8aecfddccb45958923fe403e447",
+    "ABI.released": "7e5b30d4d96428e58ea111f60c0858eb1c206210c57dba338fbf86b4f9c5f130",
+    "include/ta_func.h": "ddfc317be9691b80fe4b86d6ec91387a5b30e52c092d003063e4bb3479cd0474",
+    "src/ta_func/ta_func_stream_private.h": "80724dab2dfb0d411de1cd976064f5d2a49a3c73bba1cf06731e0ba7227035ec"
   },
-  "include/ta_func.h": {
-    "unchanged": true,
-    "before_sha256": "ddfc317be9691b80fe4b86d6ec91387a5b30e52c092d003063e4bb3479cd0474",
-    "after_sha256": "ddfc317be9691b80fe4b86d6ec91387a5b30e52c092d003063e4bb3479cd0474",
-    "scope": "entire file"
-  },
-  "src/ta_func/ta_func_stream_private.h": {
-    "unchanged": true,
-    "before_sha256": "80724dab2dfb0d411de1cd976064f5d2a49a3c73bba1cf06731e0ba7227035ec",
-    "after_sha256": "80724dab2dfb0d411de1cd976064f5d2a49a3c73bba1cf06731e0ba7227035ec",
-    "scope": "entire file"
-  },
-  "ta_codegen/output/rust/library/src/ta_func/wma.rs": {
-    "unchanged": true,
-    "before_sha256": "1a52306d5849f52378b09f446c31170e6c0152f778ab999746bb5f5e44bba149",
-    "after_sha256": "1a52306d5849f52378b09f446c31170e6c0152f778ab999746bb5f5e44bba149",
-    "scope": "WmaStreamState declaration only"
-  }
+  "canonical_counters": "unchanged int; generatedRustusize; explicitweights1..100000 narrowtoi32exactly",
+  "performance": "UNVERIFIED; no local timings"
 }
